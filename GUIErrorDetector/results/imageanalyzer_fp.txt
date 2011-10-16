@@ -1,0 +1,41 @@
+--- found anomaly call chain ----, num: 0
+### the call graph seems to be wrong
+Node: < Application, Lorg/eclipse/swt/examples/imageanalyzer/ImageAnalyzer, main([Ljava/lang/String;)V > Context: Everywhere
+ -> Node: < Application, Lorg/eclipse/swt/widgets/Display, readAndDispatch()Z > Context: Everywhere
+ -> Node: < Application, Lorg/eclipse/swt/widgets/Display, runDeferredEvents()Z > Context: Everywhere
+ -> Node: < Application, Lorg/eclipse/swt/widgets/Widget, sendEvent(Lorg/eclipse/swt/widgets/Event;)V > Context: Everywhere
+ -> Node: < Application, Lorg/eclipse/swt/widgets/EventTable, sendEvent(Lorg/eclipse/swt/widgets/Event;)V > Context: Everywhere
+ -> Node: < Application, Lorg/eclipse/swt/widgets/TypedListener, handleEvent(Lorg/eclipse/swt/widgets/Event;)V > Context: Everywhere
+ -> Node: < Application, Lorg/eclipse/swt/examples/imageanalyzer/ImageAnalyzer$15, widgetSelected(Lorg/eclipse/swt/events/SelectionEvent;)V > Context: Everywhere
+ -> Node: < Application, Lorg/eclipse/swt/examples/imageanalyzer/ImageAnalyzer, animate()V > Context: Everywhere
+ -> Node: synthetic < Primordial, Ljava/lang/Thread, start()V > Context: Everywhere
+ -> Node: synthetic < Primordial, Ljava/lang/Thread, start()V > Context: Everywhere
+ -> Node: < Application, Lorg/eclipse/swt/examples/imageanalyzer/ImageAnalyzer$39, run()V > Context: Everywhere
+ -> Node: < Application, Lorg/eclipse/swt/graphics/Resource, dispose()V > Context: Everywhere
+ -> Node: < Application, Lorg/eclipse/swt/graphics/GC, destroy()V > Context: Everywhere
+ -> Node: < Application, Lorg/eclipse/swt/widgets/Control, internal_dispose_GC(JLorg/eclipse/swt/graphics/GCData;)V > Context: Everywhere
+ -> Node: < Application, Lorg/eclipse/swt/widgets/Widget, checkWidget()V > Context: Everywhere
+
+
+
+--- found anomaly call chain ----, num: 1
+Node: < Application, Lorg/eclipse/swt/examples/imageanalyzer/ImageAnalyzer, main([Ljava/lang/String;)V > Context: Everywhere
+ -> Node: < Application, Lorg/eclipse/swt/widgets/Display, readAndDispatch()Z > Context: Everywhere
+ -> Node: < Application, Lorg/eclipse/swt/widgets/Display, runDeferredEvents()Z > Context: Everywhere
+ -> Node: < Application, Lorg/eclipse/swt/widgets/Widget, sendEvent(Lorg/eclipse/swt/widgets/Event;)V > Context: Everywhere
+ -> Node: < Application, Lorg/eclipse/swt/widgets/EventTable, sendEvent(Lorg/eclipse/swt/widgets/Event;)V > Context: Everywhere
+ -> Node: < Application, Lorg/eclipse/swt/widgets/TypedListener, handleEvent(Lorg/eclipse/swt/widgets/Event;)V > Context: Everywhere
+ -> Node: < Application, Lorg/eclipse/swt/examples/imageanalyzer/ImageAnalyzer$15, widgetSelected(Lorg/eclipse/swt/events/SelectionEvent;)V > Context: Everywhere
+ -> Node: < Application, Lorg/eclipse/swt/examples/imageanalyzer/ImageAnalyzer, animate()V > Context: Everywhere
+ -> Node: synthetic < Primordial, Ljava/lang/Thread, start()V > Context: Everywhere
+ -> Node: synthetic < Primordial, Ljava/lang/Thread, start()V > Context: Everywhere
+ -> Node: < Application, Lorg/eclipse/swt/examples/imageanalyzer/ImageAnalyzer$40, run()V > Context: Everywhere
+ -> Node: < Application, Lorg/eclipse/swt/examples/imageanalyzer/ImageAnalyzer, animateLoop()V > Context: Everywhere
+ -> Node: < Application, Lorg/eclipse/swt/graphics/Image, <init>(Lorg/eclipse/swt/graphics/Device;II)V > Context: Everywhere
+ -> Node: < Application, Lorg/eclipse/swt/graphics/Image, init(II)V > Context: Everywhere
+ #### it calls internal_new_GC (null), so skip the checking
+ -> Node: < Application, Lorg/eclipse/swt/widgets/Display, internal_new_GC(Lorg/eclipse/swt/graphics/GCData;)J > Context: Everywhere
+ -> Node: < Application, Lorg/eclipse/swt/widgets/Display, getSystemFont()Lorg/eclipse/swt/graphics/Font; > Context: Everywhere
+ -> Node: < Application, Lorg/eclipse/swt/widgets/Display, checkDevice()V > Context: Everywhere
+
+Total: 2
