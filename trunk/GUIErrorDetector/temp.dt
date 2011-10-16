@@ -1,0 +1,36 @@
+digraph "DirectedGraph" {
+graph [concentrate = true];center=true;fontsize=6;node [ color=blue,shape="box"fontsize=6,fontcolor=black,fontname=Arial];edge [ color=black,fontsize=6,fontcolor=black,fontname=Arial]; 
+   "Node: synthetic < Primordial, Lcom/ibm/wala/FakeRootClass, fakeRootMethod()V > Context: Everywhere" [ ]
+   "Node: synthetic < Primordial, Lcom/ibm/wala/FakeRootClass, fakeWorldClinit()V > Context: Everywhere" [ ]
+   "Node: < Application, Ltest/HelloWorld, main([Ljava/lang/String;)V > Context: Everywhere" [ ]
+   "Node: < Application, Ltest/HelloWorld, sayHello1()V > Context: Everywhere" [ ]
+   "Node: < Application, Ltest/HelloWorld, callThread()V > Context: Everywhere" [ ]
+   "Node: < Application, Ltest/HelloWorld$1, <init>()V > Context: Everywhere" [ ]
+   "Node: < Application, Ltest/HelloWorld$2, <init>()V > Context: Everywhere" [ ]
+   "Node: < Application, Ltest/HelloWorld, execute(Ljava/lang/Runnable;)V > Context: Everywhere" [ ]
+   "Node: synthetic < Primordial, Ljava/lang/Thread, start()V > Context: Everywhere" [ ]
+   "Node: < Application, Ltest/HelloWorld$1, run()V > Context: Everywhere" [ ]
+   "Node: < Application, Ltest/HelloWorld$2, run()V > Context: Everywhere" [ ]
+   "Node: < Primordial, Ljava/lang/Thread, run()V > Context: Everywhere" [ ]
+   "Node: < Application, Ltest/HelloWorld, sayHello2()V > Context: Everywhere" [ ]
+   "Node: < Primordial, Ljava/lang/ref/Reference, <clinit>()V > Context: Everywhere" [ ]
+ "Node: synthetic < Primordial, Lcom/ibm/wala/FakeRootClass, fakeRootMethod()V > Context: Everywhere" -> "Node: synthetic < Primordial, Lcom/ibm/wala/FakeRootClass, fakeWorldClinit()V > Context: Everywhere" 
+ "Node: synthetic < Primordial, Lcom/ibm/wala/FakeRootClass, fakeRootMethod()V > Context: Everywhere" -> "Node: < Application, Ltest/HelloWorld, main([Ljava/lang/String;)V > Context: Everywhere" 
+ "Node: synthetic < Primordial, Lcom/ibm/wala/FakeRootClass, fakeWorldClinit()V > Context: Everywhere" -> "Node: < Primordial, Ljava/lang/ref/Reference, <clinit>()V > Context: Everywhere" 
+ "Node: < Application, Ltest/HelloWorld, main([Ljava/lang/String;)V > Context: Everywhere" -> "Node: < Application, Ltest/HelloWorld, sayHello1()V > Context: Everywhere" 
+ "Node: < Application, Ltest/HelloWorld, main([Ljava/lang/String;)V > Context: Everywhere" -> "Node: < Application, Ltest/HelloWorld, callThread()V > Context: Everywhere" 
+ "Node: < Application, Ltest/HelloWorld, callThread()V > Context: Everywhere" -> "Node: < Application, Ltest/HelloWorld$1, <init>()V > Context: Everywhere" 
+ "Node: < Application, Ltest/HelloWorld, callThread()V > Context: Everywhere" -> "Node: < Application, Ltest/HelloWorld$2, <init>()V > Context: Everywhere" 
+ "Node: < Application, Ltest/HelloWorld, callThread()V > Context: Everywhere" -> "Node: < Application, Ltest/HelloWorld, execute(Ljava/lang/Runnable;)V > Context: Everywhere" 
+ "Node: < Application, Ltest/HelloWorld, execute(Ljava/lang/Runnable;)V > Context: Everywhere" -> "Node: synthetic < Primordial, Ljava/lang/Thread, start()V > Context: Everywhere" 
+ "Node: synthetic < Primordial, Ljava/lang/Thread, start()V > Context: Everywhere" -> "Node: < Application, Ltest/HelloWorld$1, run()V > Context: Everywhere" 
+ "Node: synthetic < Primordial, Ljava/lang/Thread, start()V > Context: Everywhere" -> "Node: < Application, Ltest/HelloWorld$2, run()V > Context: Everywhere" 
+ "Node: synthetic < Primordial, Ljava/lang/Thread, start()V > Context: Everywhere" -> "Node: < Primordial, Ljava/lang/Thread, run()V > Context: Everywhere" 
+ "Node: < Application, Ltest/HelloWorld$1, run()V > Context: Everywhere" -> "Node: < Application, Ltest/HelloWorld, sayHello1()V > Context: Everywhere" 
+ "Node: < Application, Ltest/HelloWorld$2, run()V > Context: Everywhere" -> "Node: < Application, Ltest/HelloWorld, sayHello2()V > Context: Everywhere" 
+ "Node: < Primordial, Ljava/lang/Thread, run()V > Context: Everywhere" -> "Node: < Application, Ltest/HelloWorld$1, run()V > Context: Everywhere" 
+ "Node: < Primordial, Ljava/lang/Thread, run()V > Context: Everywhere" -> "Node: < Application, Ltest/HelloWorld$2, run()V > Context: Everywhere" 
+ "Node: < Primordial, Ljava/lang/Thread, run()V > Context: Everywhere" -> "Node: < Primordial, Ljava/lang/Thread, run()V > Context: Everywhere" 
+ "Node: < Primordial, Ljava/lang/ref/Reference, <clinit>()V > Context: Everywhere" -> "Node: synthetic < Primordial, Ljava/lang/Thread, start()V > Context: Everywhere" 
+
+}

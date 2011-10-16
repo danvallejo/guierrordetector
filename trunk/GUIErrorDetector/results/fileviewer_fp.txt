@@ -1,0 +1,45 @@
+--- found anomaly call chain ----, num: 0
+Node: < Application, Lorg/eclipse/swt/examples/fileviewer/FileViewer, main([Ljava/lang/String;)V > Context: Everywhere
+ -> Node: < Application, Lorg/eclipse/swt/examples/fileviewer/FileViewer, open(Lorg/eclipse/swt/widgets/Display;)Lorg/eclipse/swt/widgets/Shell; > Context: Everywhere
+ -> Node: < Application, Lorg/eclipse/swt/examples/fileviewer/FileViewer, notifyRefreshFiles([Ljava/io/File;)V > Context: Everywhere
+ -> Node: < Application, Lorg/eclipse/swt/examples/fileviewer/FileViewer, handleDeferredRefresh()V > Context: Everywhere
+ -> Node: < Application, Lorg/eclipse/swt/examples/fileviewer/FileViewer, workerUpdate(Ljava/io/File;Z)V > Context: Everywhere
+ -> Node: synthetic < Primordial, Ljava/lang/Thread, start()V > Context: Everywhere
+ -> Node: synthetic < Primordial, Ljava/lang/Thread, start()V > Context: Everywhere
+ -> Node: < Application, Lorg/eclipse/swt/examples/fileviewer/FileViewer$1, run()V > Context: Everywhere
+ -> Node: < Application, Lorg/eclipse/swt/examples/fileviewer/FileViewer, access$5(Lorg/eclipse/swt/examples/fileviewer/FileViewer;)V > Context: Everywhere
+ -> Node: < Application, Lorg/eclipse/swt/examples/fileviewer/FileViewer, workerExecute()V > Context: Everywhere
+ -> Node: < Application, Lorg/eclipse/swt/examples/fileviewer/FileViewer, workerAddFileDetails(Ljava/io/File;)V > Context: Everywhere
+ -> Node: < Application, Lorg/eclipse/swt/examples/fileviewer/IconCache, getIconFromProgram(Lorg/eclipse/swt/program/Program;)Lorg/eclipse/swt/graphics/Image; > Context: Everywhere
+ -> Node: < Application, Lorg/eclipse/swt/program/Program, getImageData()Lorg/eclipse/swt/graphics/ImageData; > Context: Everywhere
+ -> Node: < Application, Lorg/eclipse/swt/graphics/Image, getImageData()Lorg/eclipse/swt/graphics/ImageData; > Context: Everywhere
+ ### passes a null value there, the same as imageanalyzer
+ -> Node: < Application, Lorg/eclipse/swt/widgets/Display, internal_new_GC(Lorg/eclipse/swt/graphics/GCData;)J > Context: Everywhere
+ -> Node: < Application, Lorg/eclipse/swt/widgets/Display, getSystemFont()Lorg/eclipse/swt/graphics/Font; > Context: Everywhere
+ -> Node: < Application, Lorg/eclipse/swt/widgets/Display, checkDevice()V > Context: Everywhere
+
+      Node: < Application, Lorg/eclipse/swt/widgets/Widget, checkWidget()V > Context: Everywhere
+
+      
+      --- found anomaly call chain ----, num: 1
+Node: < Application, Lorg/eclipse/swt/examples/fileviewer/FileViewer, main([Ljava/lang/String;)V > Context: Everywhere
+ -> Node: < Application, Lorg/eclipse/swt/examples/fileviewer/FileViewer, open(Lorg/eclipse/swt/widgets/Display;)Lorg/eclipse/swt/widgets/Shell; > Context: Everywhere
+ -> Node: < Application, Lorg/eclipse/swt/examples/fileviewer/FileViewer, notifyRefreshFiles([Ljava/io/File;)V > Context: Everywhere
+ -> Node: < Application, Lorg/eclipse/swt/examples/fileviewer/FileViewer, handleDeferredRefresh()V > Context: Everywhere
+ -> Node: < Application, Lorg/eclipse/swt/examples/fileviewer/FileViewer, workerUpdate(Ljava/io/File;Z)V > Context: Everywhere
+ -> Node: synthetic < Primordial, Ljava/lang/Thread, start()V > Context: Everywhere
+ -> Node: synthetic < Primordial, Ljava/lang/Thread, start()V > Context: Everywhere
+ -> Node: < Application, Lorg/eclipse/swt/examples/fileviewer/FileViewer$1, run()V > Context: Everywhere
+ -> Node: < Application, Lorg/eclipse/swt/examples/fileviewer/FileViewer, access$5(Lorg/eclipse/swt/examples/fileviewer/FileViewer;)V > Context: Everywhere
+ -> Node: < Application, Lorg/eclipse/swt/examples/fileviewer/FileViewer, workerExecute()V > Context: Everywhere
+ -> Node: < Application, Lorg/eclipse/swt/examples/fileviewer/FileViewer, workerAddFileDetails(Ljava/io/File;)V > Context: Everywhere
+ -> Node: < Application, Lorg/eclipse/swt/program/Program, findProgram(Ljava/lang/String;)Lorg/eclipse/swt/program/Program; > Context: Everywhere
+ -> Node: < Application, Lorg/eclipse/swt/program/Program, getProgram(Ljava/lang/String;Ljava/lang/String;)Lorg/eclipse/swt/program/Program; > Context: Everywhere
+ ### this is wrong! why there is an edge here
+ -> Node: < Primordial, Ljava/lang/String, valueOf(Ljava/lang/Object;)Ljava/lang/String; > Context: Everywhere
+ -> Node: < Application, Lorg/eclipse/swt/widgets/Widget, toString()Ljava/lang/String; > Context: Everywhere
+ -> Node: < Application, Lorg/eclipse/swt/widgets/Menu, getNameText()Ljava/lang/String; > Context: Everywhere
+ -> Node: < Application, Lorg/eclipse/swt/widgets/Menu, getItems()[Lorg/eclipse/swt/widgets/MenuItem; > Context: Everywhere
+ -> Node: < Application, Lorg/eclipse/swt/widgets/Widget, checkWidget()V > Context: Everywhere
+
+Total: 2
