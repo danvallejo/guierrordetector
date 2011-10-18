@@ -3,7 +3,7 @@ package edu.washington.cs.detector;
 import edu.washington.cs.detector.util.Log;
 
 //TODO: context sensitivity, and a heuristic to fitler redundancy
-public class UIErrorMain {
+public class SWTAppUIErrorMain {
 	
 	public static final String swtJar = "D:\\research\\guierror\\wala\\tmp\\org.eclipse.swt.win32.win32.x86_64_3.6.2.v3659c.jar";
 	
@@ -16,7 +16,7 @@ public class UIErrorMain {
 		//XXX a few false positives, wrapping inside a try-catch block?
 		//static analysis precision
 		//for fileviewer subject
-	    Log.logConfig(UIErrorMain.default_log);
+	    Log.logConfig(SWTAppUIErrorMain.default_log);
 	    
 		String appPath = fileviewer + ";" + swtJar;
 		UIAnomalyDetector detector = new UIAnomalyDetector(appPath);
