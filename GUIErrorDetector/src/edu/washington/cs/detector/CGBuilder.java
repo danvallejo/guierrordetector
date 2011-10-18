@@ -19,8 +19,10 @@ import com.ibm.wala.ipa.callgraph.Entrypoint;
 import com.ibm.wala.ipa.callgraph.impl.DefaultEntrypoint;
 import com.ibm.wala.ipa.callgraph.impl.Util;
 import com.ibm.wala.ipa.cha.ClassHierarchy;
+import com.ibm.wala.ipa.cha.ClassHierarchyException;
 import com.ibm.wala.types.ClassLoaderReference;
 import com.ibm.wala.types.MethodReference;
+import com.ibm.wala.types.TypeName;
 import com.ibm.wala.util.collections.HashSetFactory;
 import com.ibm.wala.util.config.AnalysisScopeReader;
 import com.ibm.wala.util.graph.Graph;
@@ -48,14 +50,11 @@ public class CGBuilder {
 	private Graph<CGNode> appCallGraph = null;
 	private AnalysisScope scope = null;
 	
+	//by default it uses all main methods are starting points
 	public void buildCG() {
 		try {
 			// get all files for analysis
-			this.scope = AnalysisScopeReader
-					.makeJavaBinaryAnalysisScope(appPath, exclusionFile);
-			this.cha = ClassHierarchy.make(scope);
-			// treat all main methods as entry points for call graph
-			// XXX need to weak
+			this.makeScopeAndClassHierarchy();
 			Iterable<Entrypoint> entrypoints = com.ibm.wala.ipa.callgraph.impl.Util
 					.makeMainEntrypoints(scope, cha);
 			AnalysisOptions options = new AnalysisOptions(scope, entrypoints);
@@ -70,6 +69,33 @@ public class CGBuilder {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+	}
+	
+	public void buildCG(Iterable<Entrypoint> entrypoints) {
+		try {
+			// get all files for analysis
+			//must call makeScopeAndClassHierarchy before calling this
+			if(this.scope == null || this.cha == null) {
+				throw new RuntimeException("Please call makeScopeAndClassHierarchy() before calling this.");
+			}
+			
+			AnalysisOptions options = new AnalysisOptions(scope, entrypoints);
+			// use 0-cfa as default
+			CallGraphBuilder builder = Util.makeZeroCFABuilder(options,
+					new AnalysisCache(), cha, scope);
+			this.callgraph = builder.makeCallGraph(options, null);
+
+			System.err.println(CallGraphStats.getStats(this.callgraph));
+			// only remain the classes loaded by app
+			this.appCallGraph = WALAUtils.pruneForAppLoader(this.callgraph);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	public void makeScopeAndClassHierarchy() throws IOException, ClassHierarchyException {
+		this.scope = AnalysisScopeReader.makeJavaBinaryAnalysisScope(appPath, exclusionFile);
+        this.cha = ClassHierarchy.make(scope);
 	}
 	
 	public CallGraph getCallGraph() {
@@ -105,9 +131,20 @@ public class CGBuilder {
 				}
 			}
 		}
+		
+		//XXX I suspect there is a bug in WALA, the {@link methodClass} argument does not take effect
+		final HashSet<Entrypoint> prunedResult = HashSetFactory.make();
+		for(Entrypoint p : result) {
+			TypeName tn = p.getMethod().getDeclaringClass().getName();
+			String fullClassName = (tn.getPackage() != null ? tn.getPackage().toString() + "." : "") + tn.getClassName().toString();
+			if(fullClassName.equals(methodClass)) {
+			  prunedResult.add(p);
+			}
+		}
+		
 		return new Iterable<Entrypoint>() {
 			public Iterator<Entrypoint> iterator() {
-				return result.iterator();
+				return prunedResult.iterator();
 			}
 		};
 	}
