@@ -7,11 +7,9 @@ import com.ibm.wala.ipa.callgraph.CGNode;
 import com.ibm.wala.ipa.callgraph.Entrypoint;
 import com.ibm.wala.ipa.cha.ClassHierarchy;
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
-import com.ibm.wala.types.TypeName;
 import com.ibm.wala.util.graph.Graph;
 
 import edu.washington.cs.detector.util.EclipsePluginCommons;
-import edu.washington.cs.detector.util.Log;
 
 import junit.framework.TestCase;
 
@@ -21,7 +19,7 @@ public class TestUseCustomizedEntries extends TestCase {
 		String appPath = TestCommons.testfolder + "helloworld";// + ";" +  UIErrorMain.swtJar;
 		CGBuilder builder = new CGBuilder(appPath);
 		builder.buildCG();
-		Iterable<Entrypoint> entries = builder.getCustomizedEntryPointsInApp(builder.getAnalysisScope(),
+		Iterable<Entrypoint> entries = CGEntryManager.getCustomizedEntryPointsInApp(builder.getAnalysisScope(),
 				builder.getClassHierarchy(), "test.helloworld", "sayHello2", "()V");
 		
 		int size = 0;
@@ -46,7 +44,7 @@ public class TestUseCustomizedEntries extends TestCase {
 		}
 		
 		String methodClass = "plugintest.views.SampleView";
-		Iterable<Entrypoint> entries = builder.getPublicMethodAsEntryPointsInApp(builder.getAnalysisScope(), cha, methodClass);
+		Iterable<Entrypoint> entries = CGEntryManager.getPublicMethodAsEntryPointsInApp(builder.getAnalysisScope(), cha, methodClass);
 		
 		int size = 0;
 		for(Entrypoint entry : entries) {
@@ -88,7 +86,7 @@ public class TestUseCustomizedEntries extends TestCase {
 		}
 		
 		String methodClass = "plugintest.Activator";
-		Iterable<Entrypoint> entries = builder.getCustomizedEntryPointsInApp(builder.getAnalysisScope(),
+		Iterable<Entrypoint> entries = CGEntryManager.getCustomizedEntryPointsInApp(builder.getAnalysisScope(),
 				//XXX a bug in wala, the class name does not take effects
 				builder.getClassHierarchy(), methodClass, "start", "(Lorg/osgi/framework/BundleContext;)V");
 		
