@@ -3,11 +3,15 @@ package edu.washington.cs.detector;
 import java.io.IOException;
 
 import com.ibm.wala.classLoader.IClass;
+import com.ibm.wala.ipa.callgraph.CGNode;
 import com.ibm.wala.ipa.callgraph.Entrypoint;
 import com.ibm.wala.ipa.cha.ClassHierarchy;
+import com.ibm.wala.ipa.cha.ClassHierarchyException;
 import com.ibm.wala.types.TypeName;
+import com.ibm.wala.util.graph.Graph;
 
 import edu.washington.cs.detector.util.EclipsePluginCommons;
+import edu.washington.cs.detector.util.PDFViewer;
 
 import junit.framework.TestCase;
 
@@ -29,10 +33,10 @@ public class TestFindCustomizedEntries extends TestCase {
 		assertEquals("Number of entries.", 1, size);
 	}
 	
-	public void testFindCustomizedEntriesForPlugin() throws IOException {
-		String appPath = "D:\\research\\guierror\\eclipsews\\plugintest\\bin" + ";" +  EclipsePluginCommons.DEPENDENT_UI_JARS;
+	public void testFindCustomizedEntriesForPlugin() throws IOException, ClassHierarchyException {
+		String appPath = "D:\\research\\guierror\\eclipsews\\plugintest\\bin" + ";" +  EclipsePluginCommons.DEPENDENT_JARS;
 		CGBuilder builder = new CGBuilder(appPath);
-		builder.buildCG();
+		builder.makeScopeAndClassHierarchy();
 		ClassHierarchy cha = builder.getClassHierarchy();
 		
 		for(IClass kclass : cha) {
@@ -49,15 +53,23 @@ public class TestFindCustomizedEntries extends TestCase {
 		int size = 0;
 		for(Entrypoint entry : entries) {
 			assertTrue(entry != null);
-			TypeName tn = entry.getMethod().getDeclaringClass().getName();
-			String fullClassName = (tn.getPackage() != null ? tn.getPackage().toString() + "." : "") + tn.getClassName().toString();
-			if(fullClassName.equals(methodClass)) {
-			  System.out.println("entry: " + entry );
-			  size++;
-			}
+			System.out.println("entry: " + entry);
+			size++;
 		}
 		
 		assertEquals("Number of entries.", 1, size);
+		
+		builder.buildCG(entries);
+		
+		PDFViewer.viewCG("plugincg.pdf", builder.getAppCallGraph());
+		Graph<CGNode> appCG = builder.getAppCallGraph();
+		int count = 0;
+		for(CGNode node : appCG) {
+			count++;
+			if(node.toString().indexOf("plugintest") != -1)
+			    System.out.println("App cg node: " + node);
+		}
+		System.out.println("count: " + count);
 	}
 	
 }
