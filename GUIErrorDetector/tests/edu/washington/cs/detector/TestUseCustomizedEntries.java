@@ -19,7 +19,7 @@ public class TestUseCustomizedEntries extends TestCase {
 		String appPath = TestCommons.testfolder + "helloworld";// + ";" +  UIErrorMain.swtJar;
 		CGBuilder builder = new CGBuilder(appPath);
 		builder.buildCG();
-		Iterable<Entrypoint> entries = CGEntryManager.getCustomizedEntryPointsInApp(builder.getAnalysisScope(),
+		Iterable<Entrypoint> entries = CGEntryManager.getAppMethodsBySiganture(builder.getAnalysisScope(),
 				builder.getClassHierarchy(), "test.helloworld", "sayHello2", "()V");
 		
 		int size = 0;
@@ -44,7 +44,7 @@ public class TestUseCustomizedEntries extends TestCase {
 		}
 		
 		String methodClass = "plugintest.views.SampleView";
-		Iterable<Entrypoint> entries = CGEntryManager.getPublicMethodAsEntryPointsInApp(builder.getAnalysisScope(), cha, methodClass);
+		Iterable<Entrypoint> entries = CGEntryManager.getAppPublicMethodsByClass(builder.getAnalysisScope(), cha, methodClass);
 		
 		int size = 0;
 		for(Entrypoint entry : entries) {
@@ -86,7 +86,7 @@ public class TestUseCustomizedEntries extends TestCase {
 		}
 		
 		String methodClass = "plugintest.Activator";
-		Iterable<Entrypoint> entries = CGEntryManager.getCustomizedEntryPointsInApp(builder.getAnalysisScope(),
+		Iterable<Entrypoint> entries = CGEntryManager.getAppMethodsBySiganture(builder.getAnalysisScope(),
 				//XXX a bug in wala, the class name does not take effects
 				builder.getClassHierarchy(), methodClass, "start", "(Lorg/osgi/framework/BundleContext;)V");
 		
@@ -110,6 +110,25 @@ public class TestUseCustomizedEntries extends TestCase {
 			    System.out.println("App cg node: " + node);
 		}
 		System.out.println("count: " + count);
+	}
+	
+	public void testGetPublicMethodsFromAllSubclasses() throws IOException, ClassHierarchyException {
+		String appPath = "D:\\research\\guierror\\eclipsews\\plugintest\\bin" + ";" +  EclipsePluginCommons.DEPENDENT_JARS;
+		CGBuilder builder = new CGBuilder(appPath);
+		builder.makeScopeAndClassHierarchy();
+		
+		Iterable<Entrypoint> entries = CGEntryManager.getAppPublicMethodsInSubclasses(builder.getAnalysisScope(),
+				builder.getClassHierarchy(), "org.eclipse.ui.part.WorkbenchPart", "plugintest");
+		
+		int count = 0;
+		for(Entrypoint ep : entries) {
+			System.out.println("entry: " + ep);
+			count++;
+		}
+		
+		System.out.println("count = : " + count);
+		
+		assertEquals(3, count);
 	}
 	
 }

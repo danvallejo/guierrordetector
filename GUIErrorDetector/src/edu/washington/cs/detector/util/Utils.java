@@ -7,4 +7,8 @@ public class Utils {
 		return str.replace('/', '.');
 	}
 	
+	public static String translateDotToSlash(String str) {
+		assert str != null;
+		return str.replace('.', '/');
+	}
 }
