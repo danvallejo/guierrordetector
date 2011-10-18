@@ -33,6 +33,43 @@ public class TestFindCustomizedEntries extends TestCase {
 		assertEquals("Number of entries.", 1, size);
 	}
 	
+	public void testFindAllPublicMethodsForPlugin() throws ClassHierarchyException, IOException {
+		String appPath = "D:\\research\\guierror\\eclipsews\\plugintest\\bin" + ";" +  EclipsePluginCommons.DEPENDENT_JARS;
+		CGBuilder builder = new CGBuilder(appPath);
+		builder.makeScopeAndClassHierarchy();
+		ClassHierarchy cha = builder.getClassHierarchy();
+		
+		for(IClass kclass : cha) {
+			if(kclass.toString().indexOf("plugintest") != -1) {
+			    System.out.println("class: " + kclass);
+			}
+		}
+		
+		String methodClass = "plugintest.views.SampleView";
+		Iterable<Entrypoint> entries = builder.getPublicMethodAsEntryPointsInApp(builder.getAnalysisScope(), cha, methodClass);
+		
+		int size = 0;
+		for(Entrypoint entry : entries) {
+			assertTrue(entry != null);
+			System.out.println("entry: " + entry);
+			size++;
+		}
+		
+		System.out.println("size is: " + size);
+		
+        builder.buildCG(entries);
+		
+		//PDFViewer.viewCG("plugincg.pdf", builder.getAppCallGraph());
+		Graph<CGNode> appCG = builder.getAppCallGraph();
+		int count = 0;
+		for(CGNode node : appCG) {
+			count++;
+			if(node.toString().indexOf("plugintest") != -1)
+			    System.out.println("App cg node: " + node);
+		}
+		System.out.println("count: " + count);
+	}
+	
 	public void testFindCustomizedEntriesForPlugin() throws IOException, ClassHierarchyException {
 		String appPath = "D:\\research\\guierror\\eclipsews\\plugintest\\bin" + ";" +  EclipsePluginCommons.DEPENDENT_JARS;
 		CGBuilder builder = new CGBuilder(appPath);
@@ -61,7 +98,7 @@ public class TestFindCustomizedEntries extends TestCase {
 		
 		builder.buildCG(entries);
 		
-		PDFViewer.viewCG("plugincg.pdf", builder.getAppCallGraph());
+		//PDFViewer.viewCG("plugincg.pdf", builder.getAppCallGraph());
 		Graph<CGNode> appCG = builder.getAppCallGraph();
 		int count = 0;
 		for(CGNode node : appCG) {

@@ -2,6 +2,7 @@ package edu.washington.cs.detector;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 
@@ -28,6 +29,7 @@ import com.ibm.wala.util.config.AnalysisScopeReader;
 import com.ibm.wala.util.graph.Graph;
 import com.ibm.wala.util.io.FileProvider;
 
+import edu.washington.cs.detector.util.Utils;
 import edu.washington.cs.detector.util.WALAUtils;
 
 public class CGBuilder {
@@ -114,6 +116,39 @@ public class CGBuilder {
 		return scope;
 	}
 	
+	public static Iterable<Entrypoint> getPublicMethodAsEntryPointsInApp(AnalysisScope scope, ClassHierarchy cha, String methodClass) {
+		if (cha == null) {
+			throw new IllegalArgumentException("cha is null");
+		}
+		ClassLoaderReference clr = scope.getApplicationLoader();
+		final HashSet<Entrypoint> result = HashSetFactory.make();
+		for (IClass klass : cha) {
+			if (klass.getClassLoader().getReference().equals(clr)) {
+				Collection<IMethod> allMethods = klass.getAllMethods();
+				for(IMethod m : allMethods) {
+					if(!m.isPublic()) {
+						continue;
+					}
+					//XXX a bug in wala
+					TypeName tn = m.getDeclaringClass().getName();
+					String fullClassName = (tn.getPackage() != null ? Utils.translateSlashToDot(tn.getPackage().toString()) + "." : "")
+					    + tn.getClassName().toString();
+					//System.out.println("fullClassName: " + fullClassName + ", methodClass: " + methodClass);
+					if(!fullClassName.equals(methodClass)) {
+						continue;
+					}
+					result.add(new DefaultEntrypoint(m, cha));
+				}
+			}
+		}
+		
+		return new Iterable<Entrypoint>() {
+			public Iterator<Entrypoint> iterator() {
+				return result.iterator();
+			}
+		}; 
+	}
+	
 	public static Iterable<Entrypoint> getCustomizedEntryPointsInApp(
 			AnalysisScope scope, ClassHierarchy cha, String methodClass, String methodName, String methodSignature) {
 		if (cha == null) {
@@ -136,7 +171,7 @@ public class CGBuilder {
 		final HashSet<Entrypoint> prunedResult = HashSetFactory.make();
 		for(Entrypoint p : result) {
 			TypeName tn = p.getMethod().getDeclaringClass().getName();
-			String fullClassName = (tn.getPackage() != null ? tn.getPackage().toString() + "." : "") + tn.getClassName().toString();
+			String fullClassName = (tn.getPackage() != null ? Utils.translateSlashToDot(tn.getPackage().toString()) + "." : "") + tn.getClassName().toString();
 			if(fullClassName.equals(methodClass)) {
 			  prunedResult.add(p);
 			}
