@@ -11,11 +11,10 @@ import com.ibm.wala.types.TypeName;
 import com.ibm.wala.util.graph.Graph;
 
 import edu.washington.cs.detector.util.EclipsePluginCommons;
-import edu.washington.cs.detector.util.PDFViewer;
 
 import junit.framework.TestCase;
 
-public class TestFindCustomizedEntries extends TestCase {
+public class TestUseCustomizedEntries extends TestCase {
 	
 	public void testFindCustomizedEntries() throws IOException {
 		String appPath = TestCommons.testfolder + "helloworld";// + ";" +  UIErrorMain.swtJar;
@@ -68,6 +67,9 @@ public class TestFindCustomizedEntries extends TestCase {
 			    System.out.println("App cg node: " + node);
 		}
 		System.out.println("count: " + count);
+		
+		//try to detect errors from all public methods
+		
 	}
 	
 	public void testFindCustomizedEntriesForPlugin() throws IOException, ClassHierarchyException {
