@@ -63,6 +63,10 @@ public class UIAnomalyDetector {
 		ClassHierarchy cha = builder.getClassHierarchy();
 		CallGraph cg = builder.getCallGraph();
 		Graph<CGNode> g = builder.getAppCallGraph();
+		
+		if(cg == null || g == null) {
+			throw new RuntimeException("please call buildCG first to construct the call graphs.");
+		}
 	    
 	    //find all methods that may touch UI elements
 	    UIMethodSummarizer uisummarizer = new UIMethodSummarizer(g, cha);
