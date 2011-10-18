@@ -3,6 +3,8 @@ package edu.washington.cs.detector;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 import com.ibm.wala.classLoader.IClass;
 import com.ibm.wala.classLoader.IMethod;
@@ -13,14 +15,60 @@ import com.ibm.wala.ipa.cha.ClassHierarchy;
 import com.ibm.wala.types.ClassLoaderReference;
 import com.ibm.wala.types.MethodReference;
 import com.ibm.wala.types.TypeName;
+import com.ibm.wala.types.TypeReference;
 import com.ibm.wala.util.collections.HashSetFactory;
 
 import edu.washington.cs.detector.util.Utils;
 
 public class CGEntryManager {
-
 	
-	public static Iterable<Entrypoint> getPublicMethodAsEntryPointsInApp(AnalysisScope scope, ClassHierarchy cha, String methodClass) {
+	//superClassFullName: a.b.c.ClassName; appClassPackage: a.b.c
+	public static Iterable<Entrypoint> getAppPublicMethodsInSubclasses(AnalysisScope scope, ClassHierarchy cha, String superClassFullName,
+			String appClassPackage) {
+		if (cha == null) {
+			throw new IllegalArgumentException("cha is null");
+		}
+		//get the superclass
+		String claszzSignature = "L" + Utils.translateDotToSlash(superClassFullName);
+		IClass superClazz = cha.lookupClass(TypeReference.findOrCreate(ClassLoaderReference.Application, claszzSignature));
+		if(superClazz == null) {
+			throw new IllegalArgumentException("Class: " + superClassFullName + " can not be found in app loader.");
+		}
+		
+		//get all classes extending the superClass
+		List<IClass> subclasses = new LinkedList<IClass>();
+		for(IClass clz : cha) {
+			if(cha.isAssignableFrom(superClazz, clz)) {
+				if(appClassPackage != null ) {
+				    //only added if clz is inside the appClassPackage
+					TypeName tn = clz.getName();
+					if(Utils.translateSlashToDot(tn.getPackage().toString()).startsWith(appClassPackage)) {
+						subclasses.add(clz);
+					}
+				} else {
+					subclasses.add(clz);
+				}
+			}
+		}
+		
+		final HashSet<Entrypoint> result = HashSetFactory.make();
+		//get all public methods
+		for(IClass clz : subclasses) {
+			for(IMethod m : clz.getDeclaredMethods()) {
+				if(m.isPublic()) {
+					result.add(new DefaultEntrypoint(m, cha));
+				}
+			}
+		}
+		
+		return new Iterable<Entrypoint>() {
+			public Iterator<Entrypoint> iterator() {
+				return result.iterator();
+			}
+		};
+	}
+	
+	public static Iterable<Entrypoint> getAppPublicMethodsByClass(AnalysisScope scope, ClassHierarchy cha, String methodClass) {
 		if (cha == null) {
 			throw new IllegalArgumentException("cha is null");
 		}
@@ -53,7 +101,7 @@ public class CGEntryManager {
 		}; 
 	}
 	
-	public static Iterable<Entrypoint> getCustomizedEntryPointsInApp(
+	public static Iterable<Entrypoint> getAppMethodsBySiganture(
 			AnalysisScope scope, ClassHierarchy cha, String methodClass, String methodName, String methodSignature) {
 		if (cha == null) {
 			throw new IllegalArgumentException("cha is null");
