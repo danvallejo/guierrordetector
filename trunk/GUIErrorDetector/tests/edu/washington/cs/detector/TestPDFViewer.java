@@ -20,4 +20,13 @@ public class TestPDFViewer extends TestCase {
 		
 	}
 	
+	public void testDisplayPASensitivity() throws IOException {
+		String appPath =  TestCommons.testfolder + "paflowsensitive";
+		CGBuilder builder = new CGBuilder(appPath, FileProvider.getFile(CallGraphTestUtil.REGRESSION_EXCLUSIONS));
+		builder.buildCG();
+		
+		PDFViewer.viewCG("smallpa.pdf", builder.getAppCallGraph());
+		
+	}
+	
 }
