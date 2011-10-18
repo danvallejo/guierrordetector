@@ -28,7 +28,7 @@ public class EclipsePluginUIErrorMain {
 		main.reportUIErrors();
 	}
 	
-	public void reportUIErrors() throws IOException, ClassHierarchyException {
+	public List<AnomalyCallChain> reportUIErrors() throws IOException, ClassHierarchyException {
 		List<String> uiClasses = this.getAllUIClasses();
 		if(uiClasses.isEmpty()) {
 			System.err.println("There is no UI class in the given plugin.");
@@ -63,6 +63,7 @@ public class EclipsePluginUIErrorMain {
 		}
 		
 		System.out.println(sb.toString());
+		return anomalyCallChains;
 	}
 	
 	public List<String> getAllUIClasses() {
