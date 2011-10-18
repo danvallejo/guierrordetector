@@ -35,29 +35,31 @@ public class UIAnomalyDetector {
 	public List<AnomalyCallChain> detectUIAnomaly() {
 		try {
 			//get the exclusion file
-			File exclusionFile = FileProvider.getFile(exclusion_file);
+			CGBuilder defaultBuilder = this.getDefaultCGBuilder();
 			//start to detect anomaly
-			return this.detectUIAnomaly(this.appPath, exclusionFile);
+			return this.detectUIAnomaly(defaultBuilder);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		} catch (IllegalArgumentException e) {
 			throw new RuntimeException(e);
-		} catch (CallGraphBuilderCancelException e) {
-			throw new RuntimeException(e);
-		} catch (WalaException e) {
-			throw new RuntimeException(e);
 		}
 	}
 	
-	private List<AnomalyCallChain> detectUIAnomaly(String appPath, File exclusionFile) throws IOException,
-	    IllegalArgumentException, CallGraphBuilderCancelException, WalaException {
-		
+	//use all main as entries
+	private CGBuilder getDefaultCGBuilder() throws IOException {
+		CGBuilder builder = new CGBuilder(this.appPath, FileProvider.getFile(exclusion_file));
+		builder.buildCG();
+		return builder;
+	}
+	
+	public List<AnomalyCallChain> detectUIAnomaly(CGBuilder builder) throws IOException { 
+		return detectUIAnomaly(FileProvider.getFile(exclusion_file), builder);
+	}
+	
+	private List<AnomalyCallChain> detectUIAnomaly(File eclusionFile, CGBuilder builder) {
 		//All anomaly call chain
 		List<AnomalyCallChain> anomalyCallChains = new LinkedList<AnomalyCallChain>();
 		
-		//build call graph
-		CGBuilder builder = new CGBuilder(appPath, exclusionFile);
-		builder.buildCG();
 		ClassHierarchy cha = builder.getClassHierarchy();
 		CallGraph cg = builder.getCallGraph();
 		Graph<CGNode> g = builder.getAppCallGraph();
@@ -72,6 +74,7 @@ public class UIAnomalyDetector {
 	    
 	    StringBuilder sb = new StringBuilder();
 	    Collection<CGNode> entries = cg.getEntrypointNodes();
+	    
 	    int count = 0;
 	    //see all the reachable thread start method
 	    for(CGNode entry : entries) {

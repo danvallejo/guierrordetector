@@ -11,6 +11,7 @@ import com.ibm.wala.types.TypeName;
 import com.ibm.wala.util.graph.Graph;
 
 import edu.washington.cs.detector.util.EclipsePluginCommons;
+import edu.washington.cs.detector.util.Log;
 
 import junit.framework.TestCase;
 
@@ -69,7 +70,9 @@ public class TestUseCustomizedEntries extends TestCase {
 		System.out.println("count: " + count);
 		
 		//try to detect errors from all public methods
-		
+		UIAnomalyDetector detector = new UIAnomalyDetector(appPath);
+//		Log.logConfig(UIErrorMain.default_log);
+		assertEquals(detector.detectUIAnomaly(builder).size(), 4);
 	}
 	
 	public void testFindCustomizedEntriesForPlugin() throws IOException, ClassHierarchyException {

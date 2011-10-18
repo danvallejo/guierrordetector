@@ -51,13 +51,14 @@ public class CGBuilder {
 	private ClassHierarchy cha = null;
 	private Graph<CGNode> appCallGraph = null;
 	private AnalysisScope scope = null;
+	private Iterable<Entrypoint> entrypoints = null;
 	
 	//by default it uses all main methods are starting points
 	public void buildCG() {
 		try {
 			// get all files for analysis
 			this.makeScopeAndClassHierarchy();
-			Iterable<Entrypoint> entrypoints = com.ibm.wala.ipa.callgraph.impl.Util
+			this.entrypoints = com.ibm.wala.ipa.callgraph.impl.Util
 					.makeMainEntrypoints(scope, cha);
 			AnalysisOptions options = new AnalysisOptions(scope, entrypoints);
 			// use 0-cfa as default
@@ -73,13 +74,14 @@ public class CGBuilder {
 		}
 	}
 	
-	public void buildCG(Iterable<Entrypoint> entrypoints) {
+	public void buildCG(Iterable<Entrypoint> eps) {
 		try {
 			// get all files for analysis
 			//must call makeScopeAndClassHierarchy before calling this
 			if(this.scope == null || this.cha == null) {
 				throw new RuntimeException("Please call makeScopeAndClassHierarchy() before calling this.");
 			}
+			this.entrypoints = eps;
 			
 			AnalysisOptions options = new AnalysisOptions(scope, entrypoints);
 			// use 0-cfa as default
@@ -114,6 +116,10 @@ public class CGBuilder {
 	
 	public AnalysisScope getAnalysisScope() {
 		return scope;
+	}
+	
+	public Iterable<Entrypoint> getEntrypoints() {
+		return this.entrypoints;
 	}
 	
 	public static Iterable<Entrypoint> getPublicMethodAsEntryPointsInApp(AnalysisScope scope, ClassHierarchy cha, String methodClass) {
