@@ -9,17 +9,17 @@ import junit.framework.TestCase;
 public class TestSimpleExamples extends TestCase {
 	
 	public void testThreadError() {
-		String appPath = TestCommons.testfolder + "threaderror" + ";" +  UIErrorMain.swtJar;
+		String appPath = TestCommons.testfolder + "threaderror" + ";" +  SWTAppUIErrorMain.swtJar;
 		this.checkCallChainNumber(1, appPath);
 	}
 	
 	public void testSyncNoError() {
-		String appPath = TestCommons.testfolder + "syncnoerror" + ";" +  UIErrorMain.swtJar;
+		String appPath = TestCommons.testfolder + "syncnoerror" + ";" +  SWTAppUIErrorMain.swtJar;
 		this.checkCallChainNumber(0, appPath);
 	}
 	
 	public void testTimerError() {
-		String appPath = TestCommons.testfolder + "timererror" + ";" +  UIErrorMain.swtJar;
+		String appPath = TestCommons.testfolder + "timererror" + ";" +  SWTAppUIErrorMain.swtJar;
 		this.checkCallChainNumber(1, appPath);
 	}
 	
@@ -27,7 +27,7 @@ public class TestSimpleExamples extends TestCase {
 	//should figure out how to remove redundant!
 	public void testThreadInsideAsync() {
 		Log.logConfig("./sampleprogram/test/threadinasync/report.txt");
-		String appPath = TestCommons.testfolder + "threadinasync" + ";" +  UIErrorMain.swtJar;
+		String appPath = TestCommons.testfolder + "threadinasync" + ";" +  SWTAppUIErrorMain.swtJar;
 		this.checkCallChainNumber(2, appPath);
 	}
 

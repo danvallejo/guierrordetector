@@ -6,7 +6,7 @@ import junit.framework.TestCase;
 
 public class TestSWTExamples extends TestCase {
 	
-    public static final String swtJar = UIErrorMain.swtJar;
+    public static final String swtJar = SWTAppUIErrorMain.swtJar;
     
     public static final String swtEx = TestCommons.swtEx;
     
