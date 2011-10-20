@@ -1,12 +1,15 @@
 package edu.washington.cs.detector.util;
 
+import java.io.PrintStream;
 import java.util.Collection;
 import java.util.Iterator;
 
+import com.ibm.wala.classLoader.IClass;
 import com.ibm.wala.ipa.callgraph.CGNode;
 import com.ibm.wala.ipa.callgraph.CallGraph;
 import com.ibm.wala.ipa.callgraph.propagation.LocalPointerKey;
 import com.ibm.wala.types.ClassLoaderReference;
+import com.ibm.wala.types.TypeName;
 import com.ibm.wala.util.WalaException;
 import com.ibm.wala.util.collections.CollectionFilter;
 import com.ibm.wala.util.collections.Filter;
@@ -15,6 +18,10 @@ import com.ibm.wala.util.graph.GraphSlicer;
 
 public class WALAUtils {
 
+	public static void viewCallGraphFromNode(Graph<CGNode> g, CGNode node, PrintStream out) {
+//		System.ou
+	}
+	
 	public static void viewCallGraph(Graph<CGNode> g) {
 		 StringBuilder sb = new StringBuilder();
 		    for(CGNode node : g) {
@@ -56,4 +63,12 @@ public class WALAUtils {
 	      }
 	    }
 	  }
+		
+		//return like a.b.c.d
+		public static String getJavaFullClassName(IClass clazz) {
+			TypeName tn = clazz.getName();
+			String packageName = (tn.getPackage() == null ? "" : tn.getPackage().toString() + ".");
+			String clazzName = tn.getClassName().toString();
+			return Utils.translateSlashToDot(packageName) + clazzName;
+		}
 }
