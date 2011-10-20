@@ -2,6 +2,9 @@ package edu.washington.cs.detector;
 
 import java.util.List;
 
+import edu.washington.cs.detector.util.Globals;
+import edu.washington.cs.detector.util.Log;
+
 import junit.framework.TestCase;
 
 public class TestSWTExamples extends TestCase {
@@ -11,23 +14,23 @@ public class TestSWTExamples extends TestCase {
     public static final String swtEx = TestCommons.swtEx;
     
     //verified no errors
-	private String addressbook = swtEx + "addressbook" + ";" + swtJar;
-	private String accessability = swtEx + "accessibility" + ";" + swtJar;
-	private String browser = swtEx + "browserexample" + ";" + swtJar;
-	private String clipboard = swtEx + "clipboard" + ";" + swtJar;
-	private String controlexample = swtEx + "controlexample" + ";" + swtJar;
-	private String dnd = swtEx + "dnd" + ";" + swtJar;
-	private String graphics = swtEx + "graphics" + ";" + swtJar;
-	private String helloworldex = swtEx + "helloworld" + ";" + swtJar;
-	private String hoverhelp = swtEx + "hoverhelp" + ";" + swtJar;
-	private String javaviewer = swtEx + "javaviewer" + ";" + swtJar;
-	private String layoutexample = swtEx + "layoutexample" + ";" + swtJar;
-	private String paint = swtEx + "paint" + ";" + swtJar;
-	private String texteditor = swtEx + "texteditor" + ";" + swtJar;
+	private String addressbook = swtEx + "addressbook" + Globals.pathSep + swtJar;
+	private String accessability = swtEx + "accessibility" + Globals.pathSep + swtJar;
+	private String browser = swtEx + "browserexample" + Globals.pathSep + swtJar;
+	private String clipboard = swtEx + "clipboard" + Globals.pathSep + swtJar;
+	private String controlexample = swtEx + "controlexample" +Globals.pathSep + swtJar;
+	private String dnd = swtEx + "dnd" + Globals.pathSep + swtJar;
+	private String graphics = swtEx + "graphics" + Globals.pathSep + swtJar;
+	private String helloworldex = swtEx + "helloworld" + Globals.pathSep + swtJar;
+	private String hoverhelp = swtEx + "hoverhelp" + Globals.pathSep + swtJar;
+	private String javaviewer = swtEx + "javaviewer" + Globals.pathSep + swtJar;
+	private String layoutexample = swtEx + "layoutexample" + Globals.pathSep + swtJar;
+	private String paint = swtEx + "paint" + Globals.pathSep + swtJar;
+	private String texteditor = swtEx + "texteditor" + Globals.pathSep + swtJar;
 	
 	//have no errors, but issues positivies
-	String imageanalyzer = swtEx + "imageanalyzer" + ";" + swtJar;
-	String fileviewer = swtEx + "fileviewer" + ";" + swtJar;
+	String imageanalyzer = swtEx + "imageanalyzer" + Globals.pathSep + swtJar;
+	String fileviewer = swtEx + "fileviewer" + Globals.pathSep + swtJar;
 	
 	public void testAddressBook() {
 		this.checkCallChainNumber(0, addressbook);
