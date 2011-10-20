@@ -11,9 +11,7 @@ import java.util.Set;
 import com.ibm.wala.core.tests.callGraph.CallGraphTestUtil;
 import com.ibm.wala.ipa.callgraph.CGNode;
 import com.ibm.wala.ipa.callgraph.CallGraph;
-import com.ibm.wala.ipa.callgraph.CallGraphBuilderCancelException;
 import com.ibm.wala.ipa.cha.ClassHierarchy;
-import com.ibm.wala.util.WalaException;
 import com.ibm.wala.util.graph.Graph;
 import com.ibm.wala.util.io.FileProvider;
 
@@ -53,16 +51,21 @@ public class UIAnomalyDetector {
 	}
 	
 	public List<AnomalyCallChain> detectUIAnomaly(CGBuilder builder) throws IOException { 
-		return detectUIAnomaly(FileProvider.getFile(exclusion_file), builder);
+		return detectUIAnomaly(FileProvider.getFile(exclusion_file), builder, builder.getCallGraph().getEntrypointNodes());
 	}
 	
-	private List<AnomalyCallChain> detectUIAnomaly(File eclusionFile, CGBuilder builder) {
+	public List<AnomalyCallChain> detectUIAnomaly(CGBuilder builder, Collection<CGNode> entries) throws IOException { 
+		return detectUIAnomaly(FileProvider.getFile(exclusion_file), builder, entries);
+	}
+	
+	private List<AnomalyCallChain> detectUIAnomaly(File eclusionFile, CGBuilder builder, Collection<CGNode> entries) {
 		//All anomaly call chain
 		List<AnomalyCallChain> anomalyCallChains = new LinkedList<AnomalyCallChain>();
 		
 		ClassHierarchy cha = builder.getClassHierarchy();
 		CallGraph cg = builder.getCallGraph();
 		Graph<CGNode> g = builder.getAppCallGraph();
+		//Collection<CGNode> entries = cg.getEntrypointNodes();
 		
 		if(cg == null || g == null) {
 			throw new RuntimeException("please call buildCG first to construct the call graphs.");
@@ -77,7 +80,8 @@ public class UIAnomalyDetector {
 	    System.out.println("  node touches UI: " + nodes.size());
 	    
 	    StringBuilder sb = new StringBuilder();
-	    Collection<CGNode> entries = cg.getEntrypointNodes();
+	    
+	    System.out.println("Entries used in UIAnomalyDetector: " + entries.size());
 	    
 	    int count = 0;
 	    //see all the reachable thread start method
