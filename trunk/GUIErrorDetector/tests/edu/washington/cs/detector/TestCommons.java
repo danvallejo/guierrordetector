@@ -7,4 +7,5 @@ public class TestCommons {
 	
 	public final static String testfolder = "D:\\research\\guierror\\eclipsews\\GUIErrorDetector\\bin\\test\\";
 	
+	public static String cdt_60_dir = "D:\\research\\guierror\\subjects\\cdt-master-6.0.0";
 }
