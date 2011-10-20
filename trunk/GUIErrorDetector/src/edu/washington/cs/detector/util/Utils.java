@@ -1,6 +1,7 @@
 package edu.washington.cs.detector.util;
 
-import java.util.List;
+import java.util.Collection;
+import java.util.LinkedList;
 
 public class Utils {
 	
@@ -22,5 +23,13 @@ public class Utils {
 			}
 		}
 		return false;
+ 	}
+	
+	public static <T> Collection<T> iterableToCollection(Iterable<T> ts) {
+		Collection<T> collection = new LinkedList<T>();
+		for(T t : ts) {
+			collection.add(t);
+		}
+		return collection;
  	}
 }

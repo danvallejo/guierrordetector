@@ -64,12 +64,17 @@ public final class Files {
     return dir.delete();
   }
 
+  public static List<String> findFilesInDir(String dirPath, String startsWith, String endsWith) {
+	  return findFilesInDir(new File(dirPath), startsWith, endsWith);
+  }
+  
   public static List<String> findFilesInDir(File dir, String startsWith, String endsWith) {
     if (!dir.isDirectory()) throw new IllegalArgumentException("not a directory: " + dir.getAbsolutePath());
     File currentDir = dir;
     List<String> retval = new ArrayList<String>();
     for (String fileName : currentDir.list()) {
-      if (fileName.startsWith(startsWith) && fileName.endsWith(endsWith))
+      if ((startsWith == null || fileName.startsWith(startsWith))
+    		  && (endsWith == null || fileName.endsWith(endsWith)))
         retval.add(fileName);
     }
     return retval;
