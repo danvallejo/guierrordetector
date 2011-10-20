@@ -68,6 +68,26 @@ public class CGEntryManager {
 		};
 	}
 	
+	public static Iterable<Entrypoint> getAllPublicMethods(CGBuilder builder, List<String> uiClasses) {
+		AnalysisScope scope = builder.getAnalysisScope();
+		ClassHierarchy cha = builder.getClassHierarchy();
+		
+		final HashSet<Entrypoint> result = HashSetFactory.make();
+		for(String methodClass : uiClasses) {
+		    Iterable<Entrypoint> entries = CGEntryManager.getAppPublicMethodsByClass(scope, cha, methodClass);
+		    for(Entrypoint ep : entries) {
+		    	result.add(ep);
+		    }
+		}
+		
+		return new Iterable<Entrypoint>() {
+			public Iterator<Entrypoint> iterator() {
+				return result.iterator();
+			}
+		}; 
+	}
+	
+	//methodClass: a.b.c.d
 	public static Iterable<Entrypoint> getAppPublicMethodsByClass(AnalysisScope scope, ClassHierarchy cha, String methodClass) {
 		if (cha == null) {
 			throw new IllegalArgumentException("cha is null");
