@@ -3,27 +3,42 @@ package edu.washington.cs.detector;
 import java.util.LinkedList;
 import java.util.List;
 
-import edu.washington.cs.detector.util.EclipsePluginCommons;
+import com.ibm.wala.classLoader.IClass;
+
 import edu.washington.cs.detector.util.Files;
 import edu.washington.cs.detector.util.Globals;
-
+import edu.washington.cs.detector.util.PropertyReader;
 
 public class TestCommons {
 	
-	public final static String swtEx = "D:\\research\\guierror\\eclipsews\\SWTExamples\\bin\\org\\eclipse\\swt\\examples\\";
+	public final static PropertyReader reader = PropertyReader.createInstance("./tests/tests.properties"); 
 	
-	public final static String testfolder = "D:\\research\\guierror\\eclipsews\\GUIErrorDetector\\bin\\test\\";
+	public final static String swtEx = reader.getProperty("swt.example.folder");
+		//"D:\\research\\guierror\\eclipsews\\SWTExamples\\bin\\org\\eclipse\\swt\\examples\\";
 	
-	public static String cdt_60_dir = "D:\\research\\guierror\\subjects\\cdt-master-6.0.0";
+	public final static String testfolder = reader.getProperty("project.test.folder");
+		//"D:\\research\\guierror\\eclipsews\\GUIErrorDetector\\bin\\test\\";
 	
-	public static String mylyn_362_dir = "D:\\research\\guierror\\subjects\\mylyn-3.6.2.v20110908-0706";
+	public static String cdt_60_dir = reader.getProperty("cdt.60.dir");
+		//"D:\\research\\guierror\\subjects\\cdt-master-6.0.0";
 	
-	public static String rse_303_dir = "D:\\research\\guierror\\subjects\\RSE-SDK-3.0.3\\eclipse";
+	public static String mylyn_362_dir = reader.getProperty("mylyn.362.dir");
+		//"D:\\research\\guierror\\subjects\\mylyn-3.6.2.v20110908-0706";
+	
+	public static String rse_303_dir = reader.getProperty("rse.303.dir");
+		//"D:\\research\\guierror\\subjects\\RSE-SDK-3.0.3\\eclipse";
+	
+	public static String pde_eclipseplugin_dir = reader.getProperty("pde.eclipseplugin.dir");
+		//"D:\\develop-tools\\eclipse\\eclipse\\plugins";
+	
+	public static boolean isConcreteAccessibleClass(IClass kclass) {
+		return !kclass.isAbstract() && !kclass.isInterface() && !kclass.isPublic();
+	}
 	
 	public static List<String> getNonSourceNonTestsJars(String dir) {
 		List<String> files = Files.findFilesInDir(dir, null, ".jar");
 		List<String> nonSrcNonTestFiles = new LinkedList<String>();
-		System.out.println("---- jars ------");
+		System.out.println("Loaded app jars: ");
 		for(String f : files) {
 			if(f.indexOf("source") == -1 && f.indexOf("tests") == -1) {
 				String jarPath = dir + Globals.fileSep + f;
@@ -31,7 +46,7 @@ public class TestCommons {
 				nonSrcNonTestFiles.add(jarPath);
 			}
 		}
-		System.out.println("Number of jars: " + nonSrcNonTestFiles.size());
+		System.out.println("Number of loaded app jars: " + nonSrcNonTestFiles.size());
 		return nonSrcNonTestFiles;
 	}
 	
@@ -45,8 +60,10 @@ public class TestCommons {
 			}
 			sb.append(appJars.get(i));
 		}
-		sb.append(Globals.pathSep);
-		sb.append(uiJars);
+		if(uiJars != null) {
+		    sb.append(Globals.pathSep);
+		    sb.append(uiJars);
+		}
 		System.out.println("All assembled jar path: " + sb.toString());
 		return sb.toString();
 	}
