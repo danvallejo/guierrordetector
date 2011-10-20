@@ -1,27 +1,28 @@
 package edu.washington.cs.detector;
 
+import edu.washington.cs.detector.util.Globals;
 import edu.washington.cs.detector.util.Log;
+import edu.washington.cs.detector.util.PropertyReader;
 
 //TODO: context sensitivity, and a heuristic to fitler redundancy
 public class SWTAppUIErrorMain {
 	
-	public static final String swtJar = "D:\\research\\guierror\\wala\\tmp\\org.eclipse.swt.win32.win32.x86_64_3.6.2.v3659c.jar";
+	public static final PropertyReader reader = PropertyReader.createInstance("./src/detector.properties");
 	
-	public static String default_log = "./log.txt";
+	public static final String swtJar = reader.getProperty("swt.jar.location");
+	
+	public static String default_log = reader.getProperty("default.log.file");
 	
 	public static void main(String[] args) {
-		
-		String fileviewer = "D:\\research\\guierror\\eclipsews\\SWTExamples\\bin\\org\\eclipse\\swt\\examples\\fileviewer";
-		
-		//XXX a few false positives, wrapping inside a try-catch block?
-		//static analysis precision
-		//for fileviewer subject
+		String appPath = getAppPath(args);
 	    Log.logConfig(SWTAppUIErrorMain.default_log);
-	    
-		String appPath = fileviewer + ";" + swtJar;
+		appPath = appPath + Globals.pathSep + swtJar;
 		UIAnomalyDetector detector = new UIAnomalyDetector(appPath);
 		detector.detectUIAnomaly();
 	    
 	}
 
-}
+	private static String getAppPath(String[] args) {
+		throw new RuntimeException("not implemented.");
+	}
+} 
