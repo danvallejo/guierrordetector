@@ -2,7 +2,8 @@ package edu.washington.cs.detector.util;
 
 public class EclipsePluginCommons {
 	
-	public static String PLUGIN_DIR = "D:\\develop-tools\\eclipse\\eclipse\\plugins\\";
+	public static String PLUGIN_DIR = PropertyReader.createInstance("./src/detector.properties").getProperty("eclipse.plugin.dir"); 
+		//"D:\\develop-tools\\eclipse\\eclipse\\plugins\\";
 
 	public static String DEPENDENT_JARS =
 		PLUGIN_DIR + "org.eclipse.ui_3.6.2.M20110203-1100.jar" + Globals.pathSep +
