@@ -15,6 +15,7 @@ import com.ibm.wala.ipa.callgraph.Entrypoint;
 import com.ibm.wala.ipa.callgraph.impl.Util;
 import com.ibm.wala.ipa.cha.ClassHierarchy;
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
+import com.ibm.wala.ipa.cha.IClassHierarchy;
 import com.ibm.wala.util.config.AnalysisScopeReader;
 import com.ibm.wala.util.graph.Graph;
 import com.ibm.wala.util.io.FileProvider;
@@ -23,8 +24,12 @@ import edu.washington.cs.detector.util.WALAUtils;
 
 public class CGBuilder {
 	
+	public enum CG {RTA, ZeroCFA, ZeroContainerCFA, ZeroOneCFA, ZeroOneContainerCFA}
+	
 	public final String appPath;
 	public final File exclusionFile;
+	
+	private CG type = CG.ZeroCFA;
 	
 	public CGBuilder(String appPath) throws IOException {
 		this.appPath = appPath;
@@ -42,6 +47,15 @@ public class CGBuilder {
 	private AnalysisScope scope = null;
 	private Iterable<Entrypoint> entrypoints = null;
 	
+	public CG getCGType() {
+		return type;
+	}
+	
+	public void setCGType(CG type) {
+		assert type != null;
+		this.type = type;
+	}
+	
 	//by default it uses all main methods are starting points
 	public void buildCG() {
 		try {
@@ -51,8 +65,9 @@ public class CGBuilder {
 					.makeMainEntrypoints(scope, cha);
 			AnalysisOptions options = new AnalysisOptions(scope, entrypoints);
 			// use 0-cfa as default
-			CallGraphBuilder builder = Util.makeZeroCFABuilder(options,
-					new AnalysisCache(), cha, scope);
+			
+			CallGraphBuilder builder = this.chooseCallGraphBuilder(options, new AnalysisCache(), cha, scope);
+			
 			this.callgraph = builder.makeCallGraph(options, null);
 
 			System.err.println(CallGraphStats.getStats(this.callgraph));
@@ -74,8 +89,8 @@ public class CGBuilder {
 			
 			AnalysisOptions options = new AnalysisOptions(scope, entrypoints);
 			// use 0-cfa as default
-			CallGraphBuilder builder = Util.makeZeroCFABuilder(options,
-					new AnalysisCache(), cha, scope);
+			CallGraphBuilder builder = this.chooseCallGraphBuilder(options, new AnalysisCache(), cha, scope);
+			
 			this.callgraph = builder.makeCallGraph(options, null);
 
 			System.err.println(CallGraphStats.getStats(this.callgraph));
@@ -89,6 +104,31 @@ public class CGBuilder {
 	public void makeScopeAndClassHierarchy() throws IOException, ClassHierarchyException {
 		this.scope = AnalysisScopeReader.makeJavaBinaryAnalysisScope(appPath, exclusionFile);
         this.cha = ClassHierarchy.make(scope);
+	}
+	
+	private CallGraphBuilder chooseCallGraphBuilder(AnalysisOptions options, AnalysisCache cache,
+        IClassHierarchy cha, AnalysisScope scope) {
+		CallGraphBuilder builder = null;
+		if(this.type == CG.ZeroCFA) {
+			System.out.println("Using 0-CFA call graph");
+			builder = Util.makeZeroCFABuilder(options, new AnalysisCache(), cha, scope);
+		} else if (this.type == CG.ZeroOneCFA) {
+			System.out.println("Using 0-1-CFA call graph");
+			builder = Util.makeVanillaZeroOneCFABuilder(options, new AnalysisCache(), cha, scope);
+		} else if (this.type == CG.ZeroContainerCFA) {
+			System.out.println("Using 0-container-CFA call graph");
+			builder = Util.makeVanillaZeroOneContainerCFABuilder(options, new AnalysisCache(), cha, scope);
+		} else if (this.type == CG.RTA) {
+			System.out.println("Using RTA call graph");
+			builder = Util.makeRTABuilder(options, new AnalysisCache(), cha, scope);
+		} else if (this.type == CG.ZeroOneContainerCFA) {
+			System.out.println("Using 0-1-container-CFA call graph");
+			builder = Util.makeZeroOneContainerCFABuilder(options, new AnalysisCache(), cha, scope);
+		} else {
+			throw new RuntimeException("The CG type: " + type + " is unknonw");
+		}
+		assert builder != null;
+		return builder;
 	}
 	
 	public CallGraph getCallGraph() {
