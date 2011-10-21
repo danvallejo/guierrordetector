@@ -18,6 +18,8 @@ import junit.framework.TestCase;
 
 public abstract class AbstractUITest extends TestCase {
 	
+	public static boolean DEBUG = false;
+	
 	protected abstract boolean isUIClass(IClass kclass);
 	
 	protected abstract String getAppPath();
@@ -28,7 +30,7 @@ public abstract class AbstractUITest extends TestCase {
 		TestCommons.getNonSourceNonTestsJars(getAppPath());
 	}
 	
-	public void reportUIErrors(String outputFilePath) throws IOException, ClassHierarchyException {
+	public void reportUIErrors(String outputFilePath, CGBuilder.CG opt) throws IOException, ClassHierarchyException {
 		String appPath =  TestCommons.assemblyAppPath(getAppPath(), getDependentJars());
 	    CGBuilder builder = new CGBuilder(appPath);
 	    builder.makeScopeAndClassHierarchy();
@@ -51,6 +53,11 @@ public abstract class AbstractUITest extends TestCase {
 			size++;
 		}
 		System.out.println("entry size is: " + size);
+		
+		if(opt != null) {
+			builder.setCGType(opt);
+		}
+		
 		builder.buildCG(entries);
 		
         Log.logConfig(outputFilePath);
@@ -58,9 +65,17 @@ public abstract class AbstractUITest extends TestCase {
 		Graph<CGNode> appCG = builder.getAppCallGraph();
 		System.out.println("App CG node num: " + appCG.getNumberOfNodes());
 		
+		if(DEBUG) {
+		    WALAUtils.viewCallGraph(appCG);
+		}
+		
 		//try to detect errors from all public methods
 		UIAnomalyDetector detector = new UIAnomalyDetector(appPath);
 		List<AnomalyCallChain> chains = detector.detectUIAnomaly(builder);
 		System.out.println("Number of anomaly call chains: " + chains.size());
+	}
+	
+	public void reportUIErrors(String outputFilePath) throws IOException, ClassHierarchyException {
+		reportUIErrors(outputFilePath, null);
 	}
 }
