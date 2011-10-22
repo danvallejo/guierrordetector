@@ -10,6 +10,7 @@ import com.ibm.wala.ipa.cha.ClassHierarchyException;
 import com.ibm.wala.util.graph.Graph;
 
 import edu.washington.cs.detector.util.EclipsePluginCommons;
+import edu.washington.cs.detector.util.Globals;
 
 import junit.framework.TestCase;
 
@@ -20,7 +21,7 @@ public class TestUseCustomizedEntries extends TestCase {
 		CGBuilder builder = new CGBuilder(appPath);
 		builder.buildCG();
 		Iterable<Entrypoint> entries = CGEntryManager.getAppMethodsBySiganture(builder.getAnalysisScope(),
-				builder.getClassHierarchy(), "test.helloworld", "sayHello2", "()V");
+				builder.getClassHierarchy(), "test.helloworld.HelloWorld", "sayHello2", "()V");
 		
 		int size = 0;
 		for(Entrypoint entry : entries) {
@@ -32,7 +33,7 @@ public class TestUseCustomizedEntries extends TestCase {
 	}
 	
 	public void testFindAllPublicMethodsForPlugin() throws ClassHierarchyException, IOException {
-		String appPath = "D:\\research\\guierror\\eclipsews\\plugintest\\bin" + ";" +  EclipsePluginCommons.DEPENDENT_JARS;
+		String appPath = TestCommons.plugintest_bin_dir + Globals.pathSep  +  EclipsePluginCommons.DEPENDENT_JARS;
 		CGBuilder builder = new CGBuilder(appPath);
 		builder.makeScopeAndClassHierarchy();
 		ClassHierarchy cha = builder.getClassHierarchy();
@@ -52,7 +53,6 @@ public class TestUseCustomizedEntries extends TestCase {
 			System.out.println("entry: " + entry);
 			size++;
 		}
-		
 		System.out.println("size is: " + size);
 		
         builder.buildCG(entries);
@@ -69,12 +69,11 @@ public class TestUseCustomizedEntries extends TestCase {
 		
 		//try to detect errors from all public methods
 		UIAnomalyDetector detector = new UIAnomalyDetector(appPath);
-//		Log.logConfig(UIErrorMain.default_log);
 		assertEquals(detector.detectUIAnomaly(builder).size(), 4);
 	}
 	
 	public void testFindCustomizedEntriesForPlugin() throws IOException, ClassHierarchyException {
-		String appPath = "D:\\research\\guierror\\eclipsews\\plugintest\\bin" + ";" +  EclipsePluginCommons.DEPENDENT_JARS;
+		String appPath = TestCommons.plugintest_bin_dir + Globals.pathSep +  EclipsePluginCommons.DEPENDENT_JARS;
 		CGBuilder builder = new CGBuilder(appPath);
 		builder.makeScopeAndClassHierarchy();
 		ClassHierarchy cha = builder.getClassHierarchy();
@@ -96,12 +95,9 @@ public class TestUseCustomizedEntries extends TestCase {
 			System.out.println("entry: " + entry);
 			size++;
 		}
-		
 		assertEquals("Number of entries.", 1, size);
 		
 		builder.buildCG(entries);
-		
-		//PDFViewer.viewCG("plugincg.pdf", builder.getAppCallGraph());
 		Graph<CGNode> appCG = builder.getAppCallGraph();
 		int count = 0;
 		for(CGNode node : appCG) {
@@ -113,7 +109,7 @@ public class TestUseCustomizedEntries extends TestCase {
 	}
 	
 	public void testGetPublicMethodsFromAllSubclasses() throws IOException, ClassHierarchyException {
-		String appPath = "D:\\research\\guierror\\eclipsews\\plugintest\\bin" + ";" +  EclipsePluginCommons.DEPENDENT_JARS;
+		String appPath = TestCommons.plugintest_bin_dir + Globals.pathSep +  EclipsePluginCommons.DEPENDENT_JARS;
 		CGBuilder builder = new CGBuilder(appPath);
 		builder.makeScopeAndClassHierarchy();
 		
@@ -125,9 +121,7 @@ public class TestUseCustomizedEntries extends TestCase {
 			System.out.println("entry: " + ep);
 			count++;
 		}
-		
 		System.out.println("count = : " + count);
-		
 		assertEquals(3, count);
 	}
 	
