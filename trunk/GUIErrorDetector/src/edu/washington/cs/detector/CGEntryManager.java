@@ -68,6 +68,7 @@ public class CGEntryManager {
 		};
 	}
 	
+	//class name: a.b.c.d.Class
 	public static Iterable<Entrypoint> getAllPublicMethods(CGBuilder builder, List<String> uiClasses) {
 		AnalysisScope scope = builder.getAnalysisScope();
 		ClassHierarchy cha = builder.getClassHierarchy();
@@ -155,5 +156,4 @@ public class CGEntryManager {
 			}
 		};
 	}
-	
 }
