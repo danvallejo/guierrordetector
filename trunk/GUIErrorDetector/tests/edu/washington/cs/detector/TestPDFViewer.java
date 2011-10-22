@@ -16,6 +16,7 @@ public class TestPDFViewer extends TestCase {
 		CGBuilder builder = new CGBuilder(appPath, FileProvider.getFile(CallGraphTestUtil.REGRESSION_EXCLUSIONS));
 		builder.buildCG();
 		
+		assertEquals(14, builder.getAppCallGraph().getNumberOfNodes());
 		PDFViewer.viewCG("smallcg.pdf", builder.getAppCallGraph());
 		
 	}
@@ -25,6 +26,7 @@ public class TestPDFViewer extends TestCase {
 		CGBuilder builder = new CGBuilder(appPath, FileProvider.getFile(CallGraphTestUtil.REGRESSION_EXCLUSIONS));
 		builder.buildCG();
 		
+		assertEquals(8, builder.getAppCallGraph().getNumberOfNodes());
 		PDFViewer.viewCG("smallpa.pdf", builder.getAppCallGraph());
 		
 	}
