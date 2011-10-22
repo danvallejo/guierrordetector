@@ -65,7 +65,6 @@ public class UIAnomalyDetector {
 		ClassHierarchy cha = builder.getClassHierarchy();
 		CallGraph cg = builder.getCallGraph();
 		Graph<CGNode> g = builder.getAppCallGraph();
-		//Collection<CGNode> entries = cg.getEntrypointNodes();
 		
 		if(cg == null || g == null) {
 			throw new RuntimeException("please call buildCG first to construct the call graphs.");
