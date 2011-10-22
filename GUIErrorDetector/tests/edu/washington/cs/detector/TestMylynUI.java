@@ -1,6 +1,7 @@
 package edu.washington.cs.detector;
 
 import java.io.IOException;
+import java.util.List;
 
 import com.ibm.wala.classLoader.IClass;
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
@@ -29,11 +30,12 @@ public class TestMylynUI extends AbstractUITest {
 	}
 	
 	public void testGetAppJars() {
-		super.reportAppJars();
+		super.checkAppJarNumber(82);
 	}
 	
 	public void testDetectUIErrors() throws IOException, ClassHierarchyException {
-		super.reportUIErrors(SWTAppUIErrorMain.default_log);
+		List<AnomalyCallChain> chains = super.reportUIErrors(SWTAppUIErrorMain.default_log);
+		//assertEquals(100, chains.size());
 	}
 
 }
