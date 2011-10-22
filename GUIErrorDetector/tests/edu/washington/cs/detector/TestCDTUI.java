@@ -3,6 +3,8 @@ package edu.washington.cs.detector;
 import java.io.File;
 import java.io.IOException;
 import java.util.Enumeration;
+import java.util.List;
+import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
@@ -35,15 +37,16 @@ public class TestCDTUI extends AbstractUITest {
 	
 
 	public void testGetAppJars() {
-		super.reportAppJars();
+		super.checkAppJarNumber(57);
 	}
 	
 	public void testDetectUIErrors() throws IOException, ClassHierarchyException {
-		super.reportUIErrors(SWTAppUIErrorMain.default_log);
+		List<AnomalyCallChain> chains = super.reportUIErrors(SWTAppUIErrorMain.default_log);
+		assertEquals(198, chains.size());
 	}
 	
 	public void testFindClassInJar() throws IOException, ClassHierarchyException {
-		String appPath =  "D:\\research\\guierror\\subjects\\cdt-master-6.0.0\\plugins\\org.eclipse.cdt.dsf.gdb_2.0.0.200906161748.jar";
+		String appPath =  PLUGIN_DIR + Globals.fileSep + "org.eclipse.cdt.dsf.gdb_2.0.0.200906161748.jar";
 	    CGBuilder builder = new CGBuilder(appPath);
 	    builder.makeScopeAndClassHierarchy();
 	    
@@ -55,11 +58,15 @@ public class TestCDTUI extends AbstractUITest {
 	    
 	    File f = new File(appPath);
 	    JarFile file = new JarFile(f);
-	    for (Enumeration e = file.entries(); e.hasMoreElements();) {
+	    int count = 0;
+	    for (Enumeration<JarEntry> e = file.entries(); e.hasMoreElements();) {
 	        ZipEntry Z = (ZipEntry) e.nextElement();
-	        if(Z.toString().indexOf("launching") != -1)
+	        if(Z.toString().indexOf("launching") != -1) {
 	            System.out.println("zip entry: " + Z);
+	        }
+	        count++;
 	    }
+	    assertEquals(669, count);
 	}
 	
 }
