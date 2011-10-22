@@ -14,22 +14,12 @@ public class TestCommons {
 	public final static PropertyReader reader = PropertyReader.createInstance("./tests/tests.properties"); 
 	
 	public final static String swtEx = reader.getProperty("swt.example.folder");
-		//"D:\\research\\guierror\\eclipsews\\SWTExamples\\bin\\org\\eclipse\\swt\\examples\\";
-	
 	public final static String testfolder = reader.getProperty("project.test.folder");
-		//"D:\\research\\guierror\\eclipsews\\GUIErrorDetector\\bin\\test\\";
-	
 	public static String cdt_60_dir = reader.getProperty("cdt.60.dir");
-		//"D:\\research\\guierror\\subjects\\cdt-master-6.0.0";
-	
 	public static String mylyn_362_dir = reader.getProperty("mylyn.362.dir");
-		//"D:\\research\\guierror\\subjects\\mylyn-3.6.2.v20110908-0706";
-	
 	public static String rse_303_dir = reader.getProperty("rse.303.dir");
-		//"D:\\research\\guierror\\subjects\\RSE-SDK-3.0.3\\eclipse";
-	
 	public static String pde_eclipseplugin_dir = reader.getProperty("pde.eclipseplugin.dir");
-		//"D:\\develop-tools\\eclipse\\eclipse\\plugins";
+	public static String plugintest_bin_dir = reader.getProperty("plugin.test.bin.dir");
 	
 	public static boolean isConcreteAccessibleClass(IClass kclass) {
 		return !kclass.isAbstract() && !kclass.isInterface() && !kclass.isPublic();
@@ -52,7 +42,7 @@ public class TestCommons {
 	
 	public static String assemblyAppPath(String dir, String additionalJars) {
 		List<String> appJars = TestCommons.getNonSourceNonTestsJars(dir);
-		String uiJars = additionalJars;//EclipsePluginCommons.DEPENDENT_JARS;
+		String uiJars = additionalJars;
 		StringBuilder sb = new StringBuilder();
 		for(int i = 0; i < appJars.size(); i++) {
 			if(i != 0) {
