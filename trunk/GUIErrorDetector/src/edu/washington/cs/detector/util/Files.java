@@ -121,6 +121,17 @@ public final class Files {
   public static List<String> readWhole(String fileName) throws IOException {
     return readWhole(new File(fileName));
   }
+  
+  /**
+   * Reads the whole file. Returns the list of lines.  
+   */
+  public static List<String> readWholeNoExp(String fileName) {
+	  try {
+         return readWhole(new File(fileName));
+	  }  catch (IOException e) {
+		  throw new RuntimeException(e);
+	  }
+  }
 
   /**
    * Reads the whole file. Returns the list of lines.  
