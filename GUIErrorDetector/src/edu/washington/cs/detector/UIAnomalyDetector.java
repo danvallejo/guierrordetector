@@ -83,10 +83,12 @@ public class UIAnomalyDetector {
 	    System.out.println("Entries used in UIAnomalyDetector: " + entries.size());
 	    
 	    int count = 0;
+	    
 	    //see all the reachable thread start method
 	    for(CGNode entry : entries) {
 	        ThreadStartFinder finder = new ThreadStartFinder(cg, entry);
 	        Set<CallChainNode> reachableStarts = finder.getReachableThreadStarts();
+	        System.out.println("Number of starts: " + reachableStarts.size() + ", for entry.");
 	        sb.append("----reach nodes for entry point -----");
 	        sb.append(Globals.lineSep);
 	        sb.append(entry);
@@ -116,6 +118,8 @@ public class UIAnomalyDetector {
 	        	}
 	        }
 	    }
+	    
+	    //print out the summarization
 	    sb.append("Total: " + count);
 	    sb.append(Globals.lineSep);
 	    System.out.println("total: " + count);
