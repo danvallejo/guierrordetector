@@ -5,9 +5,15 @@ import java.util.List;
 
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
 
+import junit.framework.Test;
 import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 public class TestSimpleEclipsePlugins extends TestCase {
+	
+	public static Test suite() {
+		return new TestSuite(TestSimpleEclipsePlugins.class);
+	}
 	
 	public void testSimplePlugin() throws ClassHierarchyException, IOException {
 		EclipsePluginUIErrorMain.APP_PATH = TestCommons.plugintest_bin_dir;

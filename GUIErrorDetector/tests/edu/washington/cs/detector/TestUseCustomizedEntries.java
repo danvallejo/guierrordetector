@@ -12,9 +12,15 @@ import com.ibm.wala.util.graph.Graph;
 import edu.washington.cs.detector.util.EclipsePluginCommons;
 import edu.washington.cs.detector.util.Globals;
 
+import junit.framework.Test;
 import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 public class TestUseCustomizedEntries extends TestCase {
+	
+	public static Test suite() {
+		return new TestSuite(TestUseCustomizedEntries.class);
+	}
 	
 	public void testFindCustomizedEntries() throws IOException {
 		String appPath = TestCommons.testfolder + "helloworld";// + ";" +  UIErrorMain.swtJar;
