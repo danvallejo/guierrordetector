@@ -9,6 +9,7 @@ import junit.framework.TestSuite;
 import com.ibm.wala.core.tests.callGraph.CallGraphTestUtil;
 import com.ibm.wala.util.io.FileProvider;
 
+import edu.washington.cs.detector.CGBuilder.CG;
 import edu.washington.cs.detector.util.PDFViewer;
 
 public class TestPDFViewer extends TestCase {
@@ -35,6 +36,17 @@ public class TestPDFViewer extends TestCase {
 		assertEquals(8, builder.getAppCallGraph().getNumberOfNodes());
 		PDFViewer.viewCG("smallpa.pdf", builder.getAppCallGraph());
 		
+	}
+	
+	public void testImpreciseCG() throws IOException {
+		String appPath =  TestCommons.testfolder + "imprecisecg";
+		CGBuilder builder = new CGBuilder(appPath, FileProvider.getFile(CallGraphTestUtil.REGRESSION_EXCLUSIONS));
+		builder.setCGType(CG.ZeroOneContainerCFA);
+		builder.buildCG();
+		
+		
+		assertEquals(12, builder.getAppCallGraph().getNumberOfNodes());
+		PDFViewer.viewCG("imprecisecg.pdf", builder.getAppCallGraph());
 	}
 	
 }
