@@ -60,4 +60,15 @@ public class TestPDFViewer extends TestCase {
 		PDFViewer.viewCG("controlflow.pdf", builder.getAppCallGraph());
 	}
 	
+	public void testExceptionhandling() throws IOException {
+		String appPath =  TestCommons.testfolder + "exceptionhandling";
+		CGBuilder builder = new CGBuilder(appPath, FileProvider.getFile(CallGraphTestUtil.REGRESSION_EXCLUSIONS));
+		builder.setCGType(CG.ZeroOneContainerCFA);
+		builder.buildCG();
+		
+		
+		assertEquals(5, builder.getAppCallGraph().getNumberOfNodes());
+		PDFViewer.viewCG("exceptioncg.pdf", builder.getAppCallGraph());
+	}
+	
 }
