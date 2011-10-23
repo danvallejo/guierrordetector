@@ -4,9 +4,15 @@ import java.util.List;
 
 import edu.washington.cs.detector.util.Log;
 
+import junit.framework.Test;
 import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 public class TestSimpleExamples extends TestCase {
+	
+	public static Test suite() {
+		return new TestSuite(TestSimpleExamples.class);
+	}
 	
 	public void testThreadError() {
 		String appPath = TestCommons.testfolder + "threaderror" + ";" +  SWTAppUIErrorMain.swtJar;

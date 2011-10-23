@@ -2,9 +2,15 @@ package edu.washington.cs.detector;
 
 import edu.washington.cs.detector.util.EclipsePluginCommons;
 import edu.washington.cs.detector.util.Utils;
+import junit.framework.Test;
 import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 public class TestFileExistence extends TestCase {
+	
+	public static Test suite() {
+		return new TestSuite(TestFileExistence.class);
+	}
 
 	public void testDirExistence() {
 		Utils.checkDirExistence(TestCommons.swtEx);
