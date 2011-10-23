@@ -81,7 +81,7 @@ public class TestRSESDKUI extends AbstractUITest {
 		
 	}
 	
-	class FilterFPForRSE extends FilterStrategy {
+	static class FilterFPForRSE extends FilterStrategy {
 		@Override
 		public List<AnomalyCallChain> filter(List<AnomalyCallChain> chains) {
 			List<AnomalyCallChain> result = new LinkedList<AnomalyCallChain>();
@@ -105,7 +105,7 @@ public class TestRSESDKUI extends AbstractUITest {
 		
 	}
 	
-	class FilterExceptionCapturedMethod extends FilterFPForRSE {
+	static class FilterExceptionCapturedMethod extends FilterFPForRSE {
 		@Override
 		protected boolean remove(AnomalyCallChain c) {
 			for(CGNode node : c.nodes) {

@@ -15,8 +15,10 @@ import com.ibm.wala.ipa.cha.ClassHierarchyException;
 import edu.washington.cs.detector.AbstractUITest;
 import edu.washington.cs.detector.AnomalyCallChain;
 import edu.washington.cs.detector.CGBuilder;
+import edu.washington.cs.detector.CallChainFilter;
 import edu.washington.cs.detector.SWTAppUIErrorMain;
 import edu.washington.cs.detector.TestCommons;
+import edu.washington.cs.detector.experiments.TestRSESDKUI.FilterExceptionCapturedMethod;
 import edu.washington.cs.detector.util.EclipsePluginCommons;
 import edu.washington.cs.detector.util.Globals;
 
@@ -45,9 +47,13 @@ public class TestCDTUI extends AbstractUITest {
 		super.checkAppJarNumber(57);
 	}
 	
-	public void testDetectUIErrors() throws IOException, ClassHierarchyException {
+	public void testDetectAndFilterUIErrors() throws IOException, ClassHierarchyException {
 		List<AnomalyCallChain> chains = super.reportUIErrors(SWTAppUIErrorMain.default_log);
 		assertEquals(198, chains.size());
+		
+		CallChainFilter filter = new CallChainFilter(chains);
+		chains = filter.apply(new FilterExceptionCapturedMethod());
+		System.out.println("No of chains after filtering exception-capture FP: " + chains.size());
 	}
 	
 	public void testFindClassInJar() throws IOException, ClassHierarchyException {
