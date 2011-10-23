@@ -3,13 +3,15 @@ package edu.washington.cs.detector;
 import java.util.LinkedList;
 import java.util.List;
 
+import junit.framework.TestCase;
+
 import com.ibm.wala.classLoader.IClass;
 
 import edu.washington.cs.detector.util.Files;
 import edu.washington.cs.detector.util.Globals;
 import edu.washington.cs.detector.util.PropertyReader;
 
-public class TestCommons {
+public class TestCommons extends TestCase {
 	
 	public final static PropertyReader reader = PropertyReader.createInstance("./tests/tests.properties"); 
 	
