@@ -49,4 +49,15 @@ public class TestPDFViewer extends TestCase {
 		PDFViewer.viewCG("imprecisecg.pdf", builder.getAppCallGraph());
 	}
 	
+	public void testImpactOfControlFlow() throws IOException {
+		String appPath =  TestCommons.testfolder + "controlflow";
+		CGBuilder builder = new CGBuilder(appPath, FileProvider.getFile(CallGraphTestUtil.REGRESSION_EXCLUSIONS));
+		builder.setCGType(CG.ZeroOneContainerCFA);
+		builder.buildCG();
+		
+		
+		assertEquals(6, builder.getAppCallGraph().getNumberOfNodes());
+		PDFViewer.viewCG("controlflow.pdf", builder.getAppCallGraph());
+	}
+	
 }
