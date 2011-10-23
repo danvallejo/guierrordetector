@@ -35,6 +35,8 @@ public class AnomalyCallChain {
 			}
             count++;
 			sb.append(node);
+			sb.append(", line: ");
+			sb.append(node.getMethod().getLineNumber(0));
 			sb.append(Globals.lineSep);
 		}
 		return sb.toString();
