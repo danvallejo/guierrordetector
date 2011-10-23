@@ -13,14 +13,14 @@ public class CallChainNode {
 	
 	private CallChainNode parent = null;
 	
-//	private int lineNum = -1;
-	
 	public CallChainNode(CGNode node) {
+		//this(node, (CGNode)null);
 		assert node != null;
 		this.node = node;
 	}
 	
 	public CallChainNode(CGNode node, CGNode parent) {
+		//this(node, new CallChainNode(parent));
 		assert node != null;
 		this.node = node;
 		this.parent = new CallChainNode(parent);
@@ -31,6 +31,8 @@ public class CallChainNode {
 		assert parent != null;
 		this.node = node;
 		this.parent = parent;
+		//compute line number
+		//this.lineNum = this.node.getMethod().getLineNumber(0);
 	}
 	
 	public CallChainNode getParent() {
