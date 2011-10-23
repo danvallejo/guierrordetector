@@ -1,10 +1,15 @@
-package edu.washington.cs.detector;
+package edu.washington.cs.detector.experiments;
 
 import java.io.IOException;
 import java.util.List;
 
 import com.ibm.wala.classLoader.IClass;
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
+
+import edu.washington.cs.detector.AbstractUITest;
+import edu.washington.cs.detector.AnomalyCallChain;
+import edu.washington.cs.detector.SWTAppUIErrorMain;
+import edu.washington.cs.detector.TestCommons;
 
 public class TestPDEUI extends AbstractUITest {
 
