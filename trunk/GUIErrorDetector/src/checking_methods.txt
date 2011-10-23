@@ -1,0 +1,2 @@
+org.eclipse.swt.widgets.Widget.checkWidget()V
+org.eclipse.swt.widgets.Display.checkDevice()V
