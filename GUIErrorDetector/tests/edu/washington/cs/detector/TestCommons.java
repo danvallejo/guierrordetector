@@ -22,6 +22,7 @@ public class TestCommons extends TestCase {
 	public static String rse_303_dir = reader.getProperty("rse.303.dir");
 	public static String pde_eclipseplugin_dir = reader.getProperty("pde.eclipseplugin.dir");
 	public static String plugintest_bin_dir = reader.getProperty("plugin.test.bin.dir");
+	public static String subeclipse_1_6 = reader.getProperty("subeclipse.1.6.dir");
 	
 	public static boolean isConcreteAccessibleClass(IClass kclass) {
 		return !kclass.isAbstract() && !kclass.isInterface() && !kclass.isPublic();
