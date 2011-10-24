@@ -17,7 +17,7 @@ public class TestPropertyReader extends TestCase {
 	
 	public void testTestProperty() {
 		PropertyReader reader = PropertyReader.createInstance("./tests/tests.properties");
-		this.checkAndShowEntryNumber(7, reader);
+		this.checkAndShowEntryNumber(8, reader);
 	}
 	
 	private void checkAndShowEntryNumber(int expectedNum, PropertyReader reader) {
