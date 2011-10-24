@@ -1,11 +1,15 @@
 package edu.washington.cs.detector.util;
 
+import java.util.List;
+
 public class EclipsePluginCommons {
 	
 	public static String PLUGIN_DIR = PropertyReader.createInstance("./src/detector.properties").getProperty("eclipse.plugin.dir"); 
 		//"D:\\develop-tools\\eclipse\\eclipse\\plugins\\";
 
-	public static String DEPENDENT_JARS =
+	public static String DEPENDENT_JARS = getAllDependentJars();
+	
+	private static String OLD_DEPENDENT_JARS =
 		PLUGIN_DIR + "org.eclipse.ui_3.6.2.M20110203-1100.jar" + Globals.pathSep +
 		PLUGIN_DIR + "org.eclipse.swt_3.6.2.v3659c.jar" + Globals.pathSep +
 		PLUGIN_DIR + "org.eclipse.swt.win32.win32.x86_64_3.6.2.v3659c.jar" + Globals.pathSep +
@@ -23,5 +27,26 @@ public class EclipsePluginCommons {
 		PLUGIN_DIR + "org.eclipse.equinox.app_1.3.1.R36x_v20100803.jar" + Globals.pathSep +
 		PLUGIN_DIR + "org.eclipse.equinox.common_3.6.0.v20100503.jar";
 
+	public static String getAllDependentJars() {
+		List<String> jarNames = Files.readWholeNoExp("./src/eclipse_jars.txt");
+		StringBuilder sb = new StringBuilder();
+		int count = 0;
+		for(String jarName : jarNames) {
+			if(count != 0) {
+				sb.append(Globals.pathSep);
+			}
+			count++;
+			sb.append(PLUGIN_DIR);
+			sb.append(jarName);
+		}
+		return sb.toString();
+	}
+	
+	public static void main(String[] args) {
+		String path = getAllDependentJars();
+		if(!path.equals(OLD_DEPENDENT_JARS)) {
+			throw new RuntimeException();
+		}
+	}
 	
 }
