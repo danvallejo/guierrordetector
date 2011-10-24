@@ -18,7 +18,6 @@ import edu.washington.cs.detector.TestCommons;
 import edu.washington.cs.detector.CGBuilder.CG;
 import edu.washington.cs.detector.util.EclipsePluginCommons;
 import edu.washington.cs.detector.util.Globals;
-import edu.washington.cs.detector.util.Utils;
 
 public class TestRSESDKUI extends AbstractUITest {
 	public static String PLUGIN_DIR = TestCommons.rse_303_dir + Globals.fileSep
