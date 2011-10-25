@@ -44,41 +44,16 @@ public class TestWalaCGContextSensitivity extends TestCase {
 	public static Test suite() {
 		return new TestSuite(TestWalaCGContextSensitivity.class);
 	}
-
-	public void testContextSensitiveCG() throws IOException, IllegalArgumentException, WalaException, CancelException {
-		String appPath =  TestCommons.testfolder + "sensitivecg";
-		
-		AnalysisScope scope = AnalysisScopeReader.makeJavaBinaryAnalysisScope(appPath, FileProvider.getFile(CallGraphTestUtil.REGRESSION_EXCLUSIONS));
-		IClassHierarchy cha = ClassHierarchy.make(scope);
-		
-		Iterable<Entrypoint> entrypoints = com.ibm.wala.ipa.callgraph.impl.Util.makeMainEntrypoints(scope, cha);
-		AnalysisOptions options = new AnalysisOptions(scope, entrypoints);
-		
-		CallGraphBuilder builder = Util.makeZeroOneContainerCFABuilder(options, new AnalysisCache(), cha, scope);
-	    CallGraph cg = builder.makeCallGraph(options, null);
-	    
-	    PointerAnalysis pa = builder.getPointerAnalysis();
-	    System.out.println("---- pointer key ----");
-	    for(PointerKey key : pa.getPointerKeys()) {
-	    	System.out.println(" " + key);
-	    }
-	    System.out.println("---- insance key ----");
-	    for(InstanceKey key : pa.getInstanceKeys()) {
-	    	System.out.println(" " + key);
-	    }
-	    
-	    //no context info
-	    Iterator<CGNode> it = cg.iterator();
-	    while(it.hasNext()) {
-	    	System.out.println(it.next().getContext());
-	    }
-	    
-	    Graph<CGNode> appGraph = WALAUtils.pruneForAppLoader(cg);
-	    //System.out.println(pa.getInstanceKeys());
-	    PDFViewer.viewCG("cscg.pdf", appGraph);
+	
+	public void testContextSensitiveCG1() throws IllegalArgumentException, IOException, CancelException, WalaException {
+		this.buildContextSensitiveCG(1);
+	}
+	
+	public void testContextSensitiveCG2() throws IllegalArgumentException, IOException, CancelException, WalaException {
+		this.buildContextSensitiveCG(2);
 	}
 
-	public void testContextSensitiveCG2() throws IOException,
+	public void buildContextSensitiveCG(int level) throws IOException,
 			IllegalArgumentException, CancelException, WalaException {
 		//all configurations
 		String appPath = TestCommons.testfolder + "sensitivecg";
@@ -90,9 +65,16 @@ public class TestWalaCGContextSensitivity extends TestCase {
 		AnalysisOptions options = CallGraphTestUtil.makeAnalysisOptions(scope,
 				entrypoints);
 		//set up the call graph builder
-		CallGraphBuilder builder = WALAUtils.makeOneCFABuilder(options, new AnalysisCache(), cha, scope);
+		CallGraphBuilder builder = WALAUtils.makeCFABuilder(level, options, new AnalysisCache(), cha, scope);
 		CallGraph cg = builder.makeCallGraph(options, null);
 		Graph<CGNode> appGraph = WALAUtils.pruneForAppLoader(cg);
-		PDFViewer.viewCG("1-cfa", appGraph);
+		PDFViewer.viewCG(level + "-cfa", appGraph);
+		
+		//i want to see the context
+		for(CGNode node : appGraph) {
+			System.out.println(node);
+//			System.out.println("   node number: ");
+			System.out.println("   its context: " + node.getContext());
+		}
 	}
 }

@@ -34,5 +34,8 @@ public class ContextSensitiveCG {
     	ContextSensitiveCG icg = new ContextSensitiveCG();
     	icg.dispatchViaB();
     	icg.dispatchViaC();
+//    	ContextSensitiveCG icg2 = new ContextSensitiveCG();
+//    	icg2.dispatchViaB();
+//    	icg2.dispatchViaC();
     }
 }
