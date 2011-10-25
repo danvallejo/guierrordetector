@@ -1,5 +1,6 @@
 package edu.washington.cs.detector.util;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -13,6 +14,7 @@ import com.ibm.wala.ipa.callgraph.impl.Util;
 import com.ibm.wala.ipa.callgraph.propagation.LocalPointerKey;
 import com.ibm.wala.ipa.callgraph.propagation.SSAPropagationCallGraphBuilder;
 import com.ibm.wala.ipa.callgraph.propagation.cfa.nCFABuilder;
+import com.ibm.wala.ipa.cha.ClassHierarchy;
 import com.ibm.wala.ipa.cha.IClassHierarchy;
 import com.ibm.wala.types.ClassLoaderReference;
 import com.ibm.wala.types.TypeName;
@@ -91,5 +93,22 @@ public class WALAUtils {
 			String packageName = (tn.getPackage() == null ? "" : tn.getPackage().toString() + ".");
 			String clazzName = tn.getClassName().toString();
 			return Utils.translateSlashToDot(packageName) + clazzName;
+		}
+		
+		//dump all classes
+		public static void dumpClasses(ClassHierarchy cha, String fileName) {
+			StringBuilder sb = new StringBuilder();
+			int count = 0;
+			for(IClass c : cha) {
+				sb.append(c);
+				sb.append(Globals.lineSep);
+				count++;
+			}
+			sb.append("Number in total: " + count);
+			try {
+				Files.writeToFile(sb.toString(), fileName);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
 		}
 }

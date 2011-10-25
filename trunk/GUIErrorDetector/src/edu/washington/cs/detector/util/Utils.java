@@ -69,6 +69,22 @@ public class Utils {
  	}
 	
 	/** This project-specific methods */
+	public static <T> void dumpList(Collection<T> c, String fileName) {
+		StringBuilder sb = new StringBuilder();
+		int num = 0;
+		for(T t : c) {
+			sb.append(t);
+			sb.append(Globals.lineSep);
+			num ++;
+		}
+		sb.append("Num in total: " + num);
+		try {
+			Files.writeToFile(sb.toString(), fileName);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
 	public static void dumpAnomalyCallChains(List<AnomalyCallChain> chains, String fileName) {
 		dumpAnomalyCallChains(chains, new File(fileName));
 	}
