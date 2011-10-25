@@ -24,7 +24,7 @@ import edu.washington.cs.detector.util.WALAUtils;
 
 public class CGBuilder {
 	
-	public enum CG {RTA, ZeroCFA, ZeroContainerCFA, ZeroOneCFA, ZeroOneContainerCFA}
+	public enum CG {RTA, ZeroCFA, ZeroContainerCFA, ZeroOneCFA, ZeroOneContainerCFA, OneCFA, TwoCFA}
 	
 	public final String appPath;
 	public final File exclusionFile;
@@ -111,19 +111,25 @@ public class CGBuilder {
 		CallGraphBuilder builder = null;
 		if(this.type == CG.ZeroCFA) {
 			System.out.println("Using 0-CFA call graph");
-			builder = Util.makeZeroCFABuilder(options, new AnalysisCache(), cha, scope);
+			builder = Util.makeZeroCFABuilder(options, cache, cha, scope);
 		} else if (this.type == CG.ZeroOneCFA) {
 			System.out.println("Using 0-1-CFA call graph");
-			builder = Util.makeVanillaZeroOneCFABuilder(options, new AnalysisCache(), cha, scope);
+			builder = Util.makeVanillaZeroOneCFABuilder(options, cache, cha, scope);
 		} else if (this.type == CG.ZeroContainerCFA) {
 			System.out.println("Using 0-container-CFA call graph");
-			builder = Util.makeVanillaZeroOneContainerCFABuilder(options, new AnalysisCache(), cha, scope);
+			builder = Util.makeVanillaZeroOneContainerCFABuilder(options, cache, cha, scope);
 		} else if (this.type == CG.RTA) {
 			System.out.println("Using RTA call graph");
-			builder = Util.makeRTABuilder(options, new AnalysisCache(), cha, scope);
+			builder = Util.makeRTABuilder(options, cache, cha, scope);
 		} else if (this.type == CG.ZeroOneContainerCFA) {
 			System.out.println("Using 0-1-container-CFA call graph");
-			builder = Util.makeZeroOneContainerCFABuilder(options, new AnalysisCache(), cha, scope);
+			builder = Util.makeZeroOneContainerCFABuilder(options, cache, cha, scope);
+		} else if (this.type == CG.OneCFA) {
+			System.out.println("Using 1-CFA call graph");
+			builder = WALAUtils.makeOneCFABuilder(options,  cache, cha, scope);
+		} else if (this.type == CG.TwoCFA) {
+			System.out.println("Using 2-CFA call graph");
+			builder = WALAUtils.makeCFABuilder(2, options,  cache, cha, scope);
 		} else {
 			throw new RuntimeException("The CG type: " + type + " is unknonw");
 		}

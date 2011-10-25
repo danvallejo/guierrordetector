@@ -50,6 +50,13 @@ public class TestRSESDKUI extends AbstractUITest {
 		assertEquals(308, chains.size());
 	}
 	
+	//a ridiculous number
+	public void testDetectUIErrorsByOneCFA() throws IOException,
+			ClassHierarchyException {
+		List<AnomalyCallChain> chains = super.reportUIErrors(null, CG.OneCFA);
+		assertEquals(95645, chains.size());
+	}
+	
 	public void testDetectUIErrorsAndFilter() throws IOException,
 	    ClassHierarchyException {
 		List<AnomalyCallChain> chains = super.reportUIErrors(SWTAppUIErrorMain.default_log, CG.ZeroOneContainerCFA);
