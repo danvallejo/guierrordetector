@@ -24,7 +24,7 @@ public class RemoveSystemCallStrategy extends FilterStrategy {
 	}
 	
 	protected boolean containSystemCall(AnomalyCallChain chain) {
-		for(CGNode node : chain.nodes) {
+		for(CGNode node : chain.getFullCallChain()) {
 			IClass klass = node.getMethod().getDeclaringClass();
 			
 			String className = klass.getName().toString();

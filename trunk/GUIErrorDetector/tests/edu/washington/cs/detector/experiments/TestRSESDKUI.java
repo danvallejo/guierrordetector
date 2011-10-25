@@ -94,7 +94,7 @@ public class TestRSESDKUI extends AbstractUITest {
 			return result;
 		}
 		protected boolean remove(AnomalyCallChain c) {
-			for(CGNode node : c.nodes) {
+			for(CGNode node : c.getFullCallChain()) {
 				if(node.toString().indexOf("run(Lorg/eclipse/jface/operation/IRunnableWithProgress;ZLorg/eclipse/core/runtime/IProgressMonitor;Lorg/eclipse/swt/widgets/Display;)V") != -1) {
 					return true;
 				}
@@ -107,7 +107,7 @@ public class TestRSESDKUI extends AbstractUITest {
 	static class FilterExceptionCapturedMethod extends FilterFPForRSE {
 		@Override
 		protected boolean remove(AnomalyCallChain c) {
-			for(CGNode node : c.nodes) {
+			for(CGNode node : c.getFullCallChain()) {
 				if(node.toString().indexOf("Lorg/eclipse/jface/operation/ModalContext$ModalContextThread, run()V") != -1) {
 					return true;
 				}
