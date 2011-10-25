@@ -18,7 +18,7 @@ import edu.washington.cs.detector.CGBuilder;
 import edu.washington.cs.detector.CallChainFilter;
 import edu.washington.cs.detector.SWTAppUIErrorMain;
 import edu.washington.cs.detector.TestCommons;
-import edu.washington.cs.detector.experiments.TestRSESDKUI.FilterExceptionCapturedMethod;
+import edu.washington.cs.detector.experiments.filters.RemoveContainingNodeStrategy;
 import edu.washington.cs.detector.util.EclipsePluginCommons;
 import edu.washington.cs.detector.util.Globals;
 
@@ -52,7 +52,7 @@ public class TestCDTUI extends AbstractUITest {
 		assertEquals(198, chains.size());
 		
 		CallChainFilter filter = new CallChainFilter(chains);
-		chains = filter.apply(new FilterExceptionCapturedMethod());
+		chains = filter.apply(new RemoveContainingNodeStrategy("Lorg/eclipse/jface/operation/ModalContext$ModalContextThread, run()V"));
 		System.out.println("No of chains after filtering exception-capture FP: " + chains.size());
 	}
 	
