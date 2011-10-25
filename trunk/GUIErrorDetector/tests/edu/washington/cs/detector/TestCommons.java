@@ -25,7 +25,8 @@ public class TestCommons extends TestCase {
 	public static String subeclipse_1_6 = reader.getProperty("subeclipse.1.6.dir");
 	
 	public static boolean isConcreteAccessibleClass(IClass kclass) {
-		return !kclass.isAbstract() && !kclass.isInterface() && !kclass.isPublic();
+		return !kclass.isAbstract() && !kclass.isInterface() && !kclass.isPublic()
+		    && kclass.getName().getClassName().toString().indexOf("$") == -1;
 	}
 	
 	public static List<String> getNonSourceNonTestsJars(String dir) {
