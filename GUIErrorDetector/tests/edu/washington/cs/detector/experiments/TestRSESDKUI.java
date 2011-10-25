@@ -16,8 +16,12 @@ import edu.washington.cs.detector.RemoveSystemCallStrategy;
 import edu.washington.cs.detector.SWTAppUIErrorMain;
 import edu.washington.cs.detector.TestCommons;
 import edu.washington.cs.detector.CGBuilder.CG;
+import edu.washington.cs.detector.experiments.filters.MergeSameTailStrategy;
+import edu.washington.cs.detector.experiments.filters.RemoveContainingNodeStrategy;
+import edu.washington.cs.detector.experiments.filters.RemoveSameEntryStrategy;
 import edu.washington.cs.detector.util.EclipsePluginCommons;
 import edu.washington.cs.detector.util.Globals;
+import edu.washington.cs.detector.util.Utils;
 
 public class TestRSESDKUI extends AbstractUITest {
 	public static String PLUGIN_DIR = TestCommons.rse_303_dir + Globals.fileSep
@@ -55,6 +59,15 @@ public class TestRSESDKUI extends AbstractUITest {
 			ClassHierarchyException {
 		List<AnomalyCallChain> chains = super.reportUIErrors(null, CG.OneCFA);
 		assertEquals(95645, chains.size());
+		CallChainFilter filter = new CallChainFilter(chains);
+		chains = filter.apply(new MergeSameTailStrategy());
+		System.out.println("No of chains after removing common tails: " + chains.size());
+		//Utils.dumpAnomalyCallChains(chains, SWTAppUIErrorMain.default_log);
+		
+		filter = new CallChainFilter(chains);
+		chains = filter.apply(new RemoveSameEntryStrategy());
+		System.out.println("No of chains after removing same starting node: " + chains.size());
+		Utils.dumpAnomalyCallChains(chains, SWTAppUIErrorMain.default_log);
 	}
 	
 	public void testDetectUIErrorsAndFilter() throws IOException,
@@ -68,11 +81,12 @@ public class TestRSESDKUI extends AbstractUITest {
 		System.out.println("No of chains after filtering system classes: " + chains.size());
 		
 		filter = new CallChainFilter(chains);
-		chains = filter.apply(new FilterFPForRSE());
+		chains = filter.apply(new RemoveContainingNodeStrategy("run(Lorg/eclipse/jface/operation/IRunnableWithProgress;ZLorg/eclipse/core/runtime/IProgressMonitor;Lorg/eclipse/swt/widgets/Display;)V"));
 		System.out.println("No of chains after filtering RSE-specific FP: " + chains.size());
 		
 		filter = new CallChainFilter(chains);
-		chains = filter.apply(new FilterExceptionCapturedMethod());
+		//exception capturing methods
+		chains = filter.apply(new RemoveContainingNodeStrategy("Lorg/eclipse/jface/operation/ModalContext$ModalContextThread, run()V"));
 		System.out.println("No of chains after filtering exception-capture FP: " + chains.size());
 		
 		int count = 0;
@@ -86,43 +100,6 @@ public class TestRSESDKUI extends AbstractUITest {
 		}
 		
 	}
-	
-	static class FilterFPForRSE extends FilterStrategy {
-		@Override
-		public List<AnomalyCallChain> filter(List<AnomalyCallChain> chains) {
-			List<AnomalyCallChain> result = new LinkedList<AnomalyCallChain>();
-			
-			for(AnomalyCallChain c : chains) {
-				if(!remove(c)) {
-				    result.add(c);
-				}
-			}
-			
-			return result;
-		}
-		protected boolean remove(AnomalyCallChain c) {
-			for(CGNode node : c.getFullCallChain()) {
-				if(node.toString().indexOf("run(Lorg/eclipse/jface/operation/IRunnableWithProgress;ZLorg/eclipse/core/runtime/IProgressMonitor;Lorg/eclipse/swt/widgets/Display;)V") != -1) {
-					return true;
-				}
-			}
-			return false;
-		}
-		
-	}
-	
-	static class FilterExceptionCapturedMethod extends FilterFPForRSE {
-		@Override
-		protected boolean remove(AnomalyCallChain c) {
-			for(CGNode node : c.getFullCallChain()) {
-				if(node.toString().indexOf("Lorg/eclipse/jface/operation/ModalContext$ModalContextThread, run()V") != -1) {
-					return true;
-				}
-			}
-			return false;
-		}
-	}
-	
 	
 	//I can not reproduce this!
 	public void testKnownBug267478() throws ClassHierarchyException, IOException {
