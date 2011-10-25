@@ -25,6 +25,14 @@ public class AnomalyCallChain {
 		this.start2check.addAll(start2Check);
 	}
 	
+	public List<CGNode> getUI2Start() {
+		return this.ui2start;
+	}
+	
+	public List<CGNode> getStart2Check() {
+		return this.start2check;
+	}
+	
 	public List<CGNode> getFullCallChain() {
 		final List<CGNode> nodes = new LinkedList<CGNode>();
 		nodes.addAll(ui2start);
@@ -41,7 +49,7 @@ public class AnomalyCallChain {
 			   sb.append(" -> ");	
 			}
             count++;
-			sb.append(node);
+			sb.append(node); //print method?, not the node; avoiding context info
 			sb.append(", line: ");
 			sb.append(node.getMethod().getLineNumber(0));
 			sb.append(Globals.lineSep);
