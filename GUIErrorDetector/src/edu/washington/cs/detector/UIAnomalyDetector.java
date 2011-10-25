@@ -77,11 +77,9 @@ public class UIAnomalyDetector {
 	    System.out.println("After pruning all non-app classes: ");
 	    System.out.println("  node num: " + g.getNumberOfNodes());
 	    System.out.println("  node touches UI: " + nodes.size());
-	    
-	    StringBuilder sb = new StringBuilder();
-	    
 	    System.out.println("Entries used in UIAnomalyDetector: " + entries.size());
 	    
+	    StringBuilder sb = new StringBuilder();
 	    int count = 0;
 	    
 	    //see all the reachable thread start method
@@ -89,13 +87,17 @@ public class UIAnomalyDetector {
 	        ThreadStartFinder finder = new ThreadStartFinder(cg, entry);
 	        Set<CallChainNode> reachableStarts = finder.getReachableThreadStarts();
 	        System.out.println("Number of starts: " + reachableStarts.size() + ", for entry.");
-	        sb.append("----reach nodes for entry point -----");
-	        sb.append(Globals.lineSep);
-	        sb.append(entry);
-	        sb.append(Globals.lineSep);
+	        if(Log.isLoggingOn()) { //check Log is turned on in order to avoid overflow
+	            sb.append("----reach nodes for entry point -----");
+	            sb.append(Globals.lineSep);
+	            sb.append(entry);
+	            sb.append(Globals.lineSep);
+	        }
 	        for(CallChainNode chainNode : reachableStarts) {
-	        	sb.append("   start: " + chainNode.node);
-	        	sb.append(Globals.lineSep);
+	        	if(Log.isLoggingOn()) {
+	        	    sb.append("   start: " + chainNode.node);
+	        	    sb.append(Globals.lineSep);
+	        	}
 	        	//see its reachable UI method
 	        	UIAnomalyMethodFinder detector = new UIAnomalyMethodFinder(g, nodes, chainNode.node);
 	        	List<CallChainNode> resultNodes = detector.findUINodes();
@@ -103,17 +105,17 @@ public class UIAnomalyDetector {
 	        	resultNodes = this.removeRepetition(resultNodes);
 	        	for(CallChainNode resultNode : resultNodes) {
 	        		AnomalyCallChain chain = new AnomalyCallChain();
-//	        		chain.addCGNodes(chainNode.getChainToRoot());
-//	        		chain.addCGNodes(resultNode.getChainToRoot());
 	        		chain.addNodes(chainNode.getChainToRoot(), chainNode.node, resultNode.getChainToRoot());
-	        		sb.append("      " + resultNode.node);
-	        		sb.append(Globals.lineSep);
-	        		sb.append("");
-	        		sb.append(Globals.lineSep);
-	        		sb.append("--- found anomaly call chain ----, num: " + (count++));
-	        		sb.append(Globals.lineSep);
-	        		sb.append(chain.getFullCallChainAsString());
-	        		sb.append(Globals.lineSep);
+	        		if(Log.isLoggingOn()) {
+	        		    sb.append("      " + resultNode.node);
+	        		    sb.append(Globals.lineSep);
+	        		    sb.append("");
+	        		    sb.append(Globals.lineSep);
+	        		    sb.append("--- found anomaly call chain ----, num: " + (count++));
+	        		    sb.append(Globals.lineSep);
+	        		    sb.append(chain.getFullCallChainAsString());
+	        		    sb.append(Globals.lineSep);
+	        		}
 	        		//add to the return result
 	        		anomalyCallChains.add(chain);
 	        	}
