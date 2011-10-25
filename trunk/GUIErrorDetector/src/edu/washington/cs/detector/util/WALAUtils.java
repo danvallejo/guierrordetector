@@ -1,13 +1,19 @@
 package edu.washington.cs.detector.util;
 
-import java.io.PrintStream;
 import java.util.Collection;
 import java.util.Iterator;
 
 import com.ibm.wala.classLoader.IClass;
+import com.ibm.wala.ipa.callgraph.AnalysisCache;
+import com.ibm.wala.ipa.callgraph.AnalysisOptions;
+import com.ibm.wala.ipa.callgraph.AnalysisScope;
 import com.ibm.wala.ipa.callgraph.CGNode;
 import com.ibm.wala.ipa.callgraph.CallGraph;
+import com.ibm.wala.ipa.callgraph.impl.Util;
 import com.ibm.wala.ipa.callgraph.propagation.LocalPointerKey;
+import com.ibm.wala.ipa.callgraph.propagation.SSAPropagationCallGraphBuilder;
+import com.ibm.wala.ipa.callgraph.propagation.cfa.nCFABuilder;
+import com.ibm.wala.ipa.cha.IClassHierarchy;
 import com.ibm.wala.types.ClassLoaderReference;
 import com.ibm.wala.types.TypeName;
 import com.ibm.wala.util.WalaException;
@@ -18,8 +24,17 @@ import com.ibm.wala.util.graph.GraphSlicer;
 
 public class WALAUtils {
 
-	public static void viewCallGraphFromNode(Graph<CGNode> g, CGNode node, PrintStream out) {
-//		System.ou
+	public static SSAPropagationCallGraphBuilder makeOneCFABuilder(
+			AnalysisOptions options, AnalysisCache cache, IClassHierarchy cha,
+			AnalysisScope scope) {
+
+		if (options == null) {
+			throw new IllegalArgumentException("options is null");
+		}
+		Util.addDefaultSelectors(options, cha);
+		Util.addDefaultBypassLogic(options, scope, Util.class.getClassLoader(), cha);
+
+		return new nCFABuilder(1, cha, options, cache, null, null);
 	}
 	
 	public static void viewCallGraph(Graph<CGNode> g) {
