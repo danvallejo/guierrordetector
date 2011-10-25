@@ -1,17 +1,14 @@
 package edu.washington.cs.detector.experiments;
 
 import java.io.IOException;
-import java.util.LinkedList;
 import java.util.List;
 
 import com.ibm.wala.classLoader.IClass;
-import com.ibm.wala.ipa.callgraph.CGNode;
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
 
 import edu.washington.cs.detector.AbstractUITest;
 import edu.washington.cs.detector.AnomalyCallChain;
 import edu.washington.cs.detector.CallChainFilter;
-import edu.washington.cs.detector.FilterStrategy;
 import edu.washington.cs.detector.RemoveSystemCallStrategy;
 import edu.washington.cs.detector.SWTAppUIErrorMain;
 import edu.washington.cs.detector.TestCommons;
@@ -62,12 +59,13 @@ public class TestRSESDKUI extends AbstractUITest {
 		CallChainFilter filter = new CallChainFilter(chains);
 		chains = filter.apply(new MergeSameTailStrategy());
 		System.out.println("No of chains after removing common tails: " + chains.size());
-		//Utils.dumpAnomalyCallChains(chains, SWTAppUIErrorMain.default_log);
+		
+		Utils.dumpAnomalyCallChains(chains, "./logs/rse_merge_tail.txt");
 		
 		filter = new CallChainFilter(chains);
 		chains = filter.apply(new RemoveSameEntryStrategy());
 		System.out.println("No of chains after removing same starting node: " + chains.size());
-		Utils.dumpAnomalyCallChains(chains, SWTAppUIErrorMain.default_log);
+		Utils.dumpAnomalyCallChains(chains, "./logs/rse_remove_entry.txt");
 	}
 	
 	public void testDetectUIErrorsAndFilter() throws IOException,

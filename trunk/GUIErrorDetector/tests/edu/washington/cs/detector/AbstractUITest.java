@@ -56,7 +56,7 @@ public abstract class AbstractUITest extends TestCase {
 		}
 	    System.out.println("UI classes: " + uiClasses);
 	    WALAUtils.dumpClasses(cha, "./logs/loaded_classes.txt");
-	    Utils.dumpList(uiClasses, "./logs/ui_classes.txt");
+	    Utils.dumpCollection(uiClasses, "./logs/ui_classes.txt");
 	    
 	    //report UI errors
 	    return reportUIErrors(outputFilePath, appPath, uiClasses, builder, opt);
@@ -101,6 +101,8 @@ public abstract class AbstractUITest extends TestCase {
 		System.out.println("number of entry node in the built CG: " + builder.getCallGraph().getEntrypointNodes().size());
 		System.out.println("CG node num: " + builder.getCallGraph().getNumberOfNodes());
 		System.out.println("App CG node num: " + builder.getAppCallGraph().getNumberOfNodes());
+		
+		Utils.dumpCollection(builder.getCallGraph().getEntrypointNodes(), "./logs/entries.txt");
 		
 		if(DEBUG) {
 		    WALAUtils.viewCallGraph(builder.getAppCallGraph());
