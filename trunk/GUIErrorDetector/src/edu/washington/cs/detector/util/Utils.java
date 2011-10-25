@@ -1,8 +1,12 @@
 package edu.washington.cs.detector.util;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
+
+import edu.washington.cs.detector.AnomalyCallChain;
 
 public class Utils {
 	
@@ -63,4 +67,28 @@ public class Utils {
 		}
 		return collection;
  	}
+	
+	/** This project-specific methods */
+	public static void dumpAnomalyCallChains(List<AnomalyCallChain> chains, String fileName) {
+		dumpAnomalyCallChains(chains, new File(fileName));
+	}
+	
+    public static void dumpAnomalyCallChains(List<AnomalyCallChain> chains, File file) {
+		StringBuilder sb = new StringBuilder();
+		
+		int count = 0;
+		for(AnomalyCallChain c : chains) {
+			sb.append(count++ + "-th anomaly call chain");
+			sb.append(Globals.lineSep);
+			sb.append(c.getFullCallChainAsString());
+			sb.append(Globals.lineSep);
+			sb.append(Globals.lineSep);
+		}
+		
+		try {
+			Files.writeToFile(sb.toString(), file);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 }
