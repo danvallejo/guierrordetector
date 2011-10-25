@@ -101,8 +101,9 @@ public abstract class AbstractUITest extends TestCase {
 		if(DEBUG) {
 		    WALAUtils.viewCallGraph(builder.getAppCallGraph());
 		}
-		
-		Log.logConfig(outputFilePath);
+		if(outputFilePath != null) {
+		    Log.logConfig(outputFilePath);
+		}
 		//try to detect errors from all public methods
 		UIAnomalyDetector detector = new UIAnomalyDetector(appPath);
 		List<AnomalyCallChain> chains = detector.detectUIAnomaly(builder);
