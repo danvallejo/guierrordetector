@@ -103,8 +103,9 @@ public class UIAnomalyDetector {
 	        	resultNodes = this.removeRepetition(resultNodes);
 	        	for(CallChainNode resultNode : resultNodes) {
 	        		AnomalyCallChain chain = new AnomalyCallChain();
-	        		chain.addCGNodes(chainNode.getChainToRoot());
-	        		chain.addCGNodes(resultNode.getChainToRoot());
+//	        		chain.addCGNodes(chainNode.getChainToRoot());
+//	        		chain.addCGNodes(resultNode.getChainToRoot());
+	        		chain.addNodes(chainNode.getChainToRoot(), chainNode.node, resultNode.getChainToRoot());
 	        		sb.append("      " + resultNode.node);
 	        		sb.append(Globals.lineSep);
 	        		sb.append("");
