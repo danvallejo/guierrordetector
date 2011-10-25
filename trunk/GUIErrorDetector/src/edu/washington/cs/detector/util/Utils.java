@@ -69,7 +69,7 @@ public class Utils {
  	}
 	
 	/** This project-specific methods */
-	public static <T> void dumpList(Collection<T> c, String fileName) {
+	public static <T> void dumpCollection(Collection<T> c, String fileName) {
 		StringBuilder sb = new StringBuilder();
 		int num = 0;
 		for(T t : c) {
