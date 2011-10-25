@@ -10,6 +10,7 @@ import com.ibm.wala.ipa.cha.ClassHierarchy;
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
 
 import edu.washington.cs.detector.util.Log;
+import edu.washington.cs.detector.util.Utils;
 import edu.washington.cs.detector.util.WALAUtils;
 
 import junit.framework.TestCase;
@@ -53,6 +54,9 @@ public abstract class AbstractUITest extends TestCase {
 	    		 uiClasses.add(WALAUtils.getJavaFullClassName(kclass));
 	    	}
 		}
+	    System.out.println("UI classes: " + uiClasses);
+	    WALAUtils.dumpClasses(cha, "./logs/loaded_classes.txt");
+	    Utils.dumpList(uiClasses, "./logs/ui_classes.txt");
 	    
 	    //report UI errors
 	    return reportUIErrors(outputFilePath, appPath, uiClasses, builder, opt);
