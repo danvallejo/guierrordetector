@@ -10,9 +10,9 @@ import edu.washington.cs.detector.util.Globals;
 
 public class AnomalyCallChain {
 	
-	public final List<CGNode> ui2start = new LinkedList<CGNode>();
+	private List<CGNode> ui2start = new LinkedList<CGNode>();
 	private CGNode threadStart = null;
-	public final List<CGNode> start2check = new LinkedList<CGNode>();
+	private List<CGNode> start2check = new LinkedList<CGNode>();
 	
 	public CGNode getThreadStartNode() {
 		return this.threadStart;
@@ -28,6 +28,7 @@ public class AnomalyCallChain {
 	public List<CGNode> getFullCallChain() {
 		final List<CGNode> nodes = new LinkedList<CGNode>();
 		nodes.addAll(ui2start);
+		nodes.remove(threadStart); //remove double count of thread start
 		nodes.addAll(start2check);
 		return nodes;
 	}
