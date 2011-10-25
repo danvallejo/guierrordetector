@@ -27,6 +27,12 @@ public class WALAUtils {
 	public static SSAPropagationCallGraphBuilder makeOneCFABuilder(
 			AnalysisOptions options, AnalysisCache cache, IClassHierarchy cha,
 			AnalysisScope scope) {
+		return makeCFABuilder(1, options, cache, cha, scope);
+	}
+	
+	public static SSAPropagationCallGraphBuilder makeCFABuilder(int n,
+			AnalysisOptions options, AnalysisCache cache, IClassHierarchy cha,
+			AnalysisScope scope) {
 
 		if (options == null) {
 			throw new IllegalArgumentException("options is null");
@@ -34,7 +40,7 @@ public class WALAUtils {
 		Util.addDefaultSelectors(options, cha);
 		Util.addDefaultBypassLogic(options, scope, Util.class.getClassLoader(), cha);
 
-		return new nCFABuilder(1, cha, options, cache, null, null);
+		return new nCFABuilder(n, cha, options, cache, null, null);
 	}
 	
 	public static void viewCallGraph(Graph<CGNode> g) {
