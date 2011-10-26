@@ -34,11 +34,11 @@ public class TestCommons extends TestCase {
 		List<String> nonSrcNonTestFiles = new LinkedList<String>();
 		System.out.println("Loaded app jars: ");
 		for(String f : files) {
-			if(f.indexOf("source") == -1 && f.indexOf("tests") == -1) {
+			//if(f.indexOf("source") == -1 && f.indexOf("tests") == -1) {
 				String jarPath = dir + Globals.fileSep + f;
 				System.out.println(jarPath);
 				nonSrcNonTestFiles.add(jarPath);
-			}
+			//}
 		}
 		System.out.println("Number of loaded app jars: " + nonSrcNonTestFiles.size());
 		return nonSrcNonTestFiles;

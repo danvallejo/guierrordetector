@@ -2,9 +2,12 @@ package edu.washington.cs.detector.experiments;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 
 import com.ibm.wala.classLoader.IClass;
+import com.ibm.wala.classLoader.IMethod;
 import com.ibm.wala.core.tests.callGraph.CallGraphTestUtil;
 import com.ibm.wala.ipa.callgraph.AnalysisCache;
 import com.ibm.wala.ipa.callgraph.AnalysisOptions;
@@ -14,9 +17,14 @@ import com.ibm.wala.ipa.callgraph.CallGraph;
 import com.ibm.wala.ipa.callgraph.CallGraphBuilder;
 import com.ibm.wala.ipa.callgraph.CallGraphBuilderCancelException;
 import com.ibm.wala.ipa.callgraph.Entrypoint;
+import com.ibm.wala.ipa.callgraph.impl.DefaultEntrypoint;
 import com.ibm.wala.ipa.callgraph.impl.Util;
+import com.ibm.wala.ipa.callgraph.propagation.PropagationCallGraphBuilder;
 import com.ibm.wala.ipa.cha.ClassHierarchy;
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
+import com.ibm.wala.types.ClassLoaderReference;
+import com.ibm.wala.types.TypeName;
+import com.ibm.wala.util.collections.HashSetFactory;
 import com.ibm.wala.util.config.AnalysisScopeReader;
 import com.ibm.wala.util.io.FileProvider;
 
@@ -138,24 +146,58 @@ public class TestRSESDKUI extends AbstractUITest {
 	}
 	
 	public void testEntryPointInCallGraph() throws IOException, ClassHierarchyException, IllegalArgumentException, CallGraphBuilderCancelException {
+		String myClass = "org.eclipse.dstore.internal.core.client.ClientUpdateHandler";
+
+		//PropagationCallGraphBuilder.DEBUG_ENTRYPOINTS = true;
+		
 		String appPath =  TestCommons.assemblyAppPath(getAppPath(), getDependentJars());
 		AnalysisScope scope = AnalysisScopeReader.makeJavaBinaryAnalysisScope(appPath,
 				FileProvider.getFile(CallGraphTestUtil.REGRESSION_EXCLUSIONS));
 		ClassHierarchy cha = ClassHierarchy.make(scope);
-		Iterable<Entrypoint> entrypoints =  CGEntryManager.getAllPublicMethods(scope, cha,  "org.eclipse.dstore.core.model.UpdateHandler");
+
+		ClassLoaderReference clr = scope.getApplicationLoader();
+		final HashSet<Entrypoint> result = HashSetFactory.make();
+		for (IClass klass : cha) {
+			if (klass.getClassLoader().getReference().equals(clr)) {
+				Collection<IMethod> allMethods = klass.getDeclaredMethods();
+				for(IMethod m : allMethods) {
+					if(!m.isPublic() || m.isAbstract()) {
+						continue;
+					}
+					TypeName tn = m.getDeclaringClass().getName();
+					String fullClassName = (tn.getPackage() != null ? Utils.translateSlashToDot(tn.getPackage().toString()) + "." : "")
+					    + tn.getClassName().toString();
+					if(!fullClassName.equals(myClass)) {
+						continue;
+					}
+					result.add(new DefaultEntrypoint(m, cha));
+				}
+			}
+		}
+
+		Iterable<Entrypoint> entrypoints = new Iterable<Entrypoint>() {
+			public Iterator<Entrypoint> iterator() {
+				return result.iterator();
+			}
+		}; 
 
 		System.out.println("Number of entry points: " + Utils.countIterable(entrypoints));
 		Utils.dumpCollection(entrypoints, System.out);
 		
-		/* Explicitly setentrypoints in the AnalysisOptions */
+		/* Explicitly set entrypoints in the AnalysisOptions */
 		AnalysisOptions options = new AnalysisOptions(scope, entrypoints);
 		CallGraphBuilder builder = Util.makeZeroCFABuilder(options, new AnalysisCache(), cha, scope);
 
+		System.out.println("Type of the call graph builder: " + builder.getClass());
+		System.out.println("Before making call graph, the number of entry points: "
+				+ Utils.countIterable(options.getEntrypoints()));
 		CallGraph callgraph = builder.makeCallGraph(options, null);
 
 		/*the size of entryNodes is DIFFERENT than the size of entrypoints*/
 		Collection<CGNode> entryNodes = callgraph.getEntrypointNodes();
 		System.out.println("Number of entry nodes: " + entryNodes.size());
 		System.out.println(entryNodes);
+		
+		assertEquals("The entry size is not equal.", entryNodes.size(), Utils.countIterable(entrypoints));
 	}
 }
