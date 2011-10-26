@@ -24,14 +24,29 @@ public class TestUseCustomizedEntries extends TestCase {
 		return new TestSuite(TestUseCustomizedEntries.class);
 	}
 	
-	public void testCallGraphEntries() throws IOException, ClassHierarchyException {
+	//"test.callgraphentries.NoAbstract"
+	public void testNoAbstractCallGraphEntries() throws ClassHierarchyException, IOException {
+		this.checkCallGraphEntries("test.callgraphentries.NoAbstract");
+	}
+	
+	//"test.callgraphentries.NoAbstract"
+	public void testAbstractCallGraphEntries() throws ClassHierarchyException, IOException {
+		try {
+		   this.checkCallGraphEntries("test.callgraphentries.CGEntries");
+		   assertTrue("Should not reach here.", false);
+		} catch (AssertionError error) {
+			//pass
+		}
+	}
+	
+	public void checkCallGraphEntries(String className) throws IOException, ClassHierarchyException {
 		String appPath = TestCommons.testfolder + "callgraphentries";
 		CGBuilder builder = new CGBuilder(appPath);
 		builder.makeScopeAndClassHierarchy();
 		Iterable<Entrypoint> entries = CGEntryManager.getAppPublicMethodsByClass(builder.getAnalysisScope(),
-				builder.getClassHierarchy(), "test.callgraphentries.CGEntries");
+				builder.getClassHierarchy(), className);
 		builder.buildCG(entries);
-		PDFViewer.viewCG("cgentries.pdf", builder.getAppCallGraph());
+		PDFViewer.viewCG("cgentries_" + className + ".pdf", builder.getAppCallGraph());
 		System.out.println("entries num: " + Utils.countIterable(entries));
 		System.out.println("entries: " + Utils.dumpCollection(entries));
 		//let's see the entries
