@@ -46,7 +46,6 @@ public class TestCommons extends TestCase {
 	
 	public static String assemblyAppPath(String dir, String additionalJars) {
 		List<String> appJars = TestCommons.getNonSourceNonTestsJars(dir);
-		String uiJars = additionalJars;
 		StringBuilder sb = new StringBuilder();
 		for(int i = 0; i < appJars.size(); i++) {
 			if(i != 0) {
@@ -54,9 +53,9 @@ public class TestCommons extends TestCase {
 			}
 			sb.append(appJars.get(i));
 		}
-		if(uiJars != null) {
+		if(additionalJars != null) {
 		    sb.append(Globals.pathSep);
-		    sb.append(uiJars);
+		    sb.append(additionalJars);
 		}
 		System.out.println("All assembled jar path: " + sb.toString());
 		return sb.toString();
