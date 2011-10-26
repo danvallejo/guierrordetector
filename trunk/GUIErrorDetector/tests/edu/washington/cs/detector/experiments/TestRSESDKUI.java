@@ -1,13 +1,28 @@
 package edu.washington.cs.detector.experiments;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 import com.ibm.wala.classLoader.IClass;
+import com.ibm.wala.core.tests.callGraph.CallGraphTestUtil;
+import com.ibm.wala.ipa.callgraph.AnalysisCache;
+import com.ibm.wala.ipa.callgraph.AnalysisOptions;
+import com.ibm.wala.ipa.callgraph.AnalysisScope;
+import com.ibm.wala.ipa.callgraph.CGNode;
+import com.ibm.wala.ipa.callgraph.CallGraph;
+import com.ibm.wala.ipa.callgraph.CallGraphBuilder;
+import com.ibm.wala.ipa.callgraph.CallGraphBuilderCancelException;
+import com.ibm.wala.ipa.callgraph.Entrypoint;
+import com.ibm.wala.ipa.callgraph.impl.Util;
+import com.ibm.wala.ipa.cha.ClassHierarchy;
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
+import com.ibm.wala.util.config.AnalysisScopeReader;
+import com.ibm.wala.util.io.FileProvider;
 
 import edu.washington.cs.detector.AbstractUITest;
 import edu.washington.cs.detector.AnomalyCallChain;
+import edu.washington.cs.detector.CGEntryManager;
 import edu.washington.cs.detector.CallChainFilter;
 import edu.washington.cs.detector.RemoveSystemCallStrategy;
 import edu.washington.cs.detector.SWTAppUIErrorMain;
@@ -120,5 +135,27 @@ public class TestRSESDKUI extends AbstractUITest {
 		AbstractUITest.DEBUG = true;
 		List<AnomalyCallChain> chains  = test.reportUIErrors(SWTAppUIErrorMain.default_log, CG.ZeroOneCFA);
 		assertEquals(0, chains.size());
+	}
+	
+	public void testEntryPointInCallGraph() throws IOException, ClassHierarchyException, IllegalArgumentException, CallGraphBuilderCancelException {
+		String appPath =  TestCommons.assemblyAppPath(getAppPath(), getDependentJars());
+		AnalysisScope scope = AnalysisScopeReader.makeJavaBinaryAnalysisScope(appPath,
+				FileProvider.getFile(CallGraphTestUtil.REGRESSION_EXCLUSIONS));
+		ClassHierarchy cha = ClassHierarchy.make(scope);
+		Iterable<Entrypoint> entrypoints =  CGEntryManager.getAllPublicMethods(scope, cha,  "org.eclipse.dstore.core.model.UpdateHandler");
+
+		System.out.println("Number of entry points: " + Utils.countIterable(entrypoints));
+		Utils.dumpCollection(entrypoints, System.out);
+		
+		/* Explicitly setentrypoints in the AnalysisOptions */
+		AnalysisOptions options = new AnalysisOptions(scope, entrypoints);
+		CallGraphBuilder builder = Util.makeZeroCFABuilder(options, new AnalysisCache(), cha, scope);
+
+		CallGraph callgraph = builder.makeCallGraph(options, null);
+
+		/*the size of entryNodes is DIFFERENT than the size of entrypoints*/
+		Collection<CGNode> entryNodes = callgraph.getEntrypointNodes();
+		System.out.println("Number of entry nodes: " + entryNodes.size());
+		System.out.println(entryNodes);
 	}
 }

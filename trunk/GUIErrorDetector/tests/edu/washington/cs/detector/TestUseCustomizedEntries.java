@@ -11,6 +11,8 @@ import com.ibm.wala.util.graph.Graph;
 
 import edu.washington.cs.detector.util.EclipsePluginCommons;
 import edu.washington.cs.detector.util.Globals;
+import edu.washington.cs.detector.util.PDFViewer;
+import edu.washington.cs.detector.util.Utils;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -20,6 +22,22 @@ public class TestUseCustomizedEntries extends TestCase {
 	
 	public static Test suite() {
 		return new TestSuite(TestUseCustomizedEntries.class);
+	}
+	
+	public void testCallGraphEntries() throws IOException, ClassHierarchyException {
+		String appPath = TestCommons.testfolder + "callgraphentries";
+		CGBuilder builder = new CGBuilder(appPath);
+		builder.makeScopeAndClassHierarchy();
+		Iterable<Entrypoint> entries = CGEntryManager.getAppPublicMethodsByClass(builder.getAnalysisScope(),
+				builder.getClassHierarchy(), "test.callgraphentries.CGEntries");
+		builder.buildCG(entries);
+		PDFViewer.viewCG("cgentries.pdf", builder.getAppCallGraph());
+		System.out.println("entries num: " + Utils.countIterable(entries));
+		System.out.println("entries: " + Utils.dumpCollection(entries));
+		//let's see the entries
+		System.out.println("Number of entries in the built CG: " + builder.getCallGraph().getEntrypointNodes().size());
+		assertEquals("The no of entries not equal, in built CG and the given entries.",
+				Utils.countIterable(entries), builder.getCallGraph().getEntrypointNodes().size());
 	}
 	
 	public void testFindCustomizedEntries() throws IOException {
