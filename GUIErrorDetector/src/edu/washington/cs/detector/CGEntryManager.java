@@ -73,8 +73,21 @@ public class CGEntryManager {
 		AnalysisScope scope = builder.getAnalysisScope();
 		ClassHierarchy cha = builder.getClassHierarchy();
 		
+		return getAllPublicMethods(scope, cha, uiClasses);
+	}
+	
+	public static Iterable<Entrypoint> getAllPublicMethods(AnalysisScope scope, ClassHierarchy cha, String... uiClasses) {
+		List<String> clazzList = new LinkedList<String>();
+		for(String uiClass : uiClasses) {
+			clazzList.add(uiClass);
+		}
+		return getAllPublicMethods(scope, cha, clazzList);
+	}
+	
+	public static Iterable<Entrypoint> getAllPublicMethods(AnalysisScope scope, ClassHierarchy cha, List<String> uiClasses) {
 		final HashSet<Entrypoint> result = HashSetFactory.make();
 		for(String methodClass : uiClasses) {
+			//System.out.println("method class: " + methodClass);
 		    Iterable<Entrypoint> entries = CGEntryManager.getAppPublicMethodsByClass(scope, cha, methodClass);
 		    for(Entrypoint ep : entries) {
 		    	result.add(ep);
@@ -97,7 +110,7 @@ public class CGEntryManager {
 		final HashSet<Entrypoint> result = HashSetFactory.make();
 		for (IClass klass : cha) {
 			if (klass.getClassLoader().getReference().equals(clr)) {
-				Collection<IMethod> allMethods = klass.getAllMethods();
+				Collection<IMethod> allMethods = klass.getDeclaredMethods();
 				for(IMethod m : allMethods) {
 					if(!m.isPublic()) {
 						continue;
@@ -106,7 +119,7 @@ public class CGEntryManager {
 					TypeName tn = m.getDeclaringClass().getName();
 					String fullClassName = (tn.getPackage() != null ? Utils.translateSlashToDot(tn.getPackage().toString()) + "." : "")
 					    + tn.getClassName().toString();
-					//System.out.println("fullClassName: " + fullClassName + ", methodClass: " + methodClass);
+					//System.out.println("For methods: " + m + "; fullClassName: " + fullClassName + ", methodClass: " + methodClass);
 					if(!fullClassName.equals(methodClass)) {
 						continue;
 					}
