@@ -1,16 +1,13 @@
 package test.callgraphentries;
 
-public class CGEntries {
-	
+public abstract class CGEntries {
 	public void foo() {}
-	
 	public void bar() { foo(); }
-	
-	public void moo() {}
-	
-	public static void main(String[] args) {
-		CGEntries entries = new CGEntries();
-		entries.bar();
-	}
-	
+	public abstract void moo();
+}
+
+class NoAbstract {
+	public void foo1() {}
+	public void foo2() {foo1();}
+	public void foo3() {foo2();}
 }
