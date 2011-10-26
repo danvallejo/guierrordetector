@@ -3,11 +3,14 @@ package edu.washington.cs.detector;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import com.ibm.wala.classLoader.IClass;
+import com.ibm.wala.ipa.callgraph.CGNode;
 import com.ibm.wala.ipa.callgraph.Entrypoint;
 import com.ibm.wala.ipa.cha.ClassHierarchy;
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
+import com.ibm.wala.types.MethodReference;
 
 import edu.washington.cs.detector.util.Log;
 import edu.washington.cs.detector.util.Utils;
@@ -54,9 +57,8 @@ public abstract class AbstractUITest extends TestCase {
 	    		 uiClasses.add(WALAUtils.getJavaFullClassName(kclass));
 	    	}
 		}
-	    System.out.println("UI classes: " + uiClasses);
+	    
 	    WALAUtils.dumpClasses(cha, "./logs/loaded_classes.txt");
-	    Utils.dumpCollection(uiClasses, "./logs/ui_classes.txt");
 	    
 	    //report UI errors
 	    return reportUIErrors(outputFilePath, appPath, uiClasses, builder, opt);
@@ -84,12 +86,12 @@ public abstract class AbstractUITest extends TestCase {
 		//dump info
 		System.out.println("Total class num: " + builder.getClassHierarchy().getNumberOfClasses());
 	    System.out.println("Number of UI classes: " + uiClasses.size());
+	    Utils.dumpCollection(uiClasses, "./logs/ui_classes.txt");
 	    
 	    Iterable<Entrypoint> entries = CGEntryManager.getAllPublicMethods(builder, uiClasses);
 		int size = 0;
 		for(Entrypoint entry : entries) {
 			assertTrue(entry != null);
-			//System.out.println("entry: " + entry);
 			size++;
 		}
 		System.out.println("Number of entries for building CG: " + size);
@@ -102,7 +104,15 @@ public abstract class AbstractUITest extends TestCase {
 		System.out.println("CG node num: " + builder.getCallGraph().getNumberOfNodes());
 		System.out.println("App CG node num: " + builder.getAppCallGraph().getNumberOfNodes());
 		
-		Utils.dumpCollection(builder.getCallGraph().getEntrypointNodes(), "./logs/entries.txt");
+//		Utils.dumpCollection(builder.getCallGraph().getEntrypointNodes(), "./logs/entries.txt");
+		Utils.dumpCollection(entries, "./logs/entries.txt");
+		
+//		for(Entrypoint ep : entries) {
+//			MethodReference im = ep.getMethod().getReference();
+//		    Set<CGNode> allNodes = builder.getCallGraph().getNodes(im);
+//		    System.out.println(" entry point: " + ep + ",  has number of cg node: " + allNodes.size());
+//		}
+		
 		
 		if(DEBUG) {
 		    WALAUtils.viewCallGraph(builder.getAppCallGraph());
