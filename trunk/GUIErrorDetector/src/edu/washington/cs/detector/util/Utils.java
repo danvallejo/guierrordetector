@@ -2,6 +2,7 @@ package edu.washington.cs.detector.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -69,7 +70,24 @@ public class Utils {
  	}
 	
 	/** This project-specific methods */
-	public static <T> void dumpCollection(Collection<T> c, String fileName) {
+	public static <T> int countIterable(Iterable<T> c) {
+		int count = 0;
+		for(T t: c) {
+			count++;
+		}
+		return count;
+	}
+	public static <T> void dumpCollection(Iterable<T> c, PrintStream out) {
+		out.println(dumpCollection(c));
+	}
+	public static <T> void dumpCollection(Iterable<T> c, String fileName) {
+		try {
+			Files.writeToFile(dumpCollection(c), fileName);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	public static <T> String dumpCollection(Iterable<T> c) {
 		StringBuilder sb = new StringBuilder();
 		int num = 0;
 		for(T t : c) {
@@ -78,11 +96,7 @@ public class Utils {
 			num ++;
 		}
 		sb.append("Num in total: " + num);
-		try {
-			Files.writeToFile(sb.toString(), fileName);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		return sb.toString();
 	}
 	
 	public static void dumpAnomalyCallChains(List<AnomalyCallChain> chains, String fileName) {
