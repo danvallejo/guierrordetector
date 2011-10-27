@@ -51,7 +51,16 @@ public class TestUseCustomizedEntries extends TestCase {
 	}
 	
 	public void checkCallGraphEntries(String appPath, String className) throws IOException, ClassHierarchyException {
-		checkCallGraphEntries(appPath, className, false);
+		this.checkCallGraphEntries(appPath, className, false);
+	}
+	
+	public void testComplexInteraction() throws ClassHierarchyException, IOException {
+		this.checkCallGraphEntries(TestCommons.testfolder + "useinterface",
+				//"test.useinterface.Main", false);
+				//"test.useinterface.Foo", false);
+		        //"test.useinterface.Main2", false);
+				"test.useinterface.MainClass", false);
+		        //"test.useinterface.Handler", false);
 	}
 	
 	public void checkCallGraphEntries(String appPath, String className, boolean useSubType) throws IOException, ClassHierarchyException {
