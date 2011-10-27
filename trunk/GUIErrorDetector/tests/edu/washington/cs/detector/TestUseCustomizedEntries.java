@@ -9,6 +9,7 @@ import com.ibm.wala.ipa.cha.ClassHierarchy;
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
 import com.ibm.wala.util.graph.Graph;
 
+import edu.washington.cs.detector.CGBuilder.CG;
 import edu.washington.cs.detector.util.EclipsePluginCommons;
 import edu.washington.cs.detector.util.Globals;
 import edu.washington.cs.detector.util.PDFViewer;
@@ -26,25 +27,30 @@ public class TestUseCustomizedEntries extends TestCase {
 	
 	//"test.callgraphentries.NoAbstract"
 	public void testNoAbstractCallGraphEntries() throws ClassHierarchyException, IOException {
-		this.checkCallGraphEntries("test.callgraphentries.NoAbstract");
+		this.checkCallGraphEntries(TestCommons.testfolder + "callgraphentries", "test.callgraphentries.NoAbstract");
 	}
 	
 	//"test.callgraphentries.NoAbstract"
 	public void testAbstractCallGraphEntries() throws ClassHierarchyException, IOException {
 		try {
-		   this.checkCallGraphEntries("test.callgraphentries.CGEntries");
+		   this.checkCallGraphEntries(TestCommons.testfolder + "callgraphentries", "test.callgraphentries.CGEntries");
 		   assertTrue("Should not reach here.", false);
 		} catch (AssertionError error) {
 			//pass
 		}
 	}
 	
-	public void checkCallGraphEntries(String className) throws IOException, ClassHierarchyException {
-		String appPath = TestCommons.testfolder + "callgraphentries";
+	public void testInterfaceClass() throws ClassHierarchyException, IOException {
+		this.checkCallGraphEntries(TestCommons.testfolder + "useinterface",
+				"test.useinterface.InterfaceClass");
+	}
+	
+	public void checkCallGraphEntries(String appPath, String className) throws IOException, ClassHierarchyException {
 		CGBuilder builder = new CGBuilder(appPath);
 		builder.makeScopeAndClassHierarchy();
 		Iterable<Entrypoint> entries = CGEntryManager.getAppPublicMethodsByClass(builder.getAnalysisScope(),
 				builder.getClassHierarchy(), className);
+		builder.setCGType(CG.RTA);
 		builder.buildCG(entries);
 		PDFViewer.viewCG("cgentries_" + className + ".pdf", builder.getAppCallGraph());
 		System.out.println("entries num: " + Utils.countIterable(entries));

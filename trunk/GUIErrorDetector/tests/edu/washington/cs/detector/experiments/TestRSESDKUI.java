@@ -128,7 +128,8 @@ public class TestRSESDKUI extends AbstractUITest {
 		AbstractUITest test = new AbstractUITest(){
 			@Override
 			protected boolean isUIClass(IClass kclass) {
-				return kclass.toString().indexOf("org/eclipse/dstore/core/model/UpdateHandler") != -1;
+				return kclass.toString().indexOf("org/eclipse/dstore/internal/core/client/ClientUpdateHandler") != -1;
+				//return kclass.toString().indexOf("org/eclipse/dstore/internal/extra/DomainNotifier") != -1;
 			}
 			@Override
 			protected String getAppPath() {
@@ -141,7 +142,7 @@ public class TestRSESDKUI extends AbstractUITest {
 			
 		};
 		AbstractUITest.DEBUG = true;
-		List<AnomalyCallChain> chains  = test.reportUIErrors(SWTAppUIErrorMain.default_log, CG.ZeroOneCFA);
+		List<AnomalyCallChain> chains  = test.reportUIErrors(SWTAppUIErrorMain.default_log, CG.ZeroCFA);
 		assertEquals(0, chains.size());
 	}
 	

@@ -3,15 +3,13 @@ package edu.washington.cs.detector;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import com.ibm.wala.classLoader.IClass;
-import com.ibm.wala.ipa.callgraph.CGNode;
 import com.ibm.wala.ipa.callgraph.Entrypoint;
 import com.ibm.wala.ipa.cha.ClassHierarchy;
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
-import com.ibm.wala.types.MethodReference;
 
+import edu.washington.cs.detector.util.Files;
 import edu.washington.cs.detector.util.Log;
 import edu.washington.cs.detector.util.Utils;
 import edu.washington.cs.detector.util.WALAUtils;
@@ -107,15 +105,9 @@ public abstract class AbstractUITest extends TestCase {
 //		Utils.dumpCollection(builder.getCallGraph().getEntrypointNodes(), "./logs/entries.txt");
 		Utils.dumpCollection(entries, "./logs/entries.txt");
 		
-//		for(Entrypoint ep : entries) {
-//			MethodReference im = ep.getMethod().getReference();
-//		    Set<CGNode> allNodes = builder.getCallGraph().getNodes(im);
-//		    System.out.println(" entry point: " + ep + ",  has number of cg node: " + allNodes.size());
-//		}
-		
-		
 		if(DEBUG) {
 		    WALAUtils.viewCallGraph(builder.getAppCallGraph());
+		    Files.writeToFile(builder.getAppCallGraph().toString(), "./logs/callgraph.txt");
 		}
 		if(outputFilePath != null) {
 		    Log.logConfig(outputFilePath);
