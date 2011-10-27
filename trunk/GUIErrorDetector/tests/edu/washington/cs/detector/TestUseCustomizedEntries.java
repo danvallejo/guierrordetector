@@ -33,11 +33,16 @@ public class TestUseCustomizedEntries extends TestCase {
 	//"test.callgraphentries.NoAbstract"
 	public void testAbstractCallGraphEntries() throws ClassHierarchyException, IOException {
 		try {
-		   this.checkCallGraphEntries(TestCommons.testfolder + "callgraphentries", "test.callgraphentries.CGEntries");
-		   assertTrue("Should not reach here.", false);
+		   this.checkCallGraphEntries(TestCommons.testfolder + "callgraphentries", "test.callgraphentries.CGEntries", true);
 		} catch (AssertionError error) {
-			//pass
+			return;
 		}
+		assertTrue("Should not reach here.", false);
+	}
+	
+	public void testSubClass() throws ClassHierarchyException, IOException {
+		this.checkCallGraphEntries(TestCommons.testfolder + "callgraphentries",
+				"test.callgraphentries.SubEntries");
 	}
 	
 	public void testInterfaceClass() throws ClassHierarchyException, IOException {
@@ -46,17 +51,23 @@ public class TestUseCustomizedEntries extends TestCase {
 	}
 	
 	public void checkCallGraphEntries(String appPath, String className) throws IOException, ClassHierarchyException {
+		checkCallGraphEntries(appPath, className, false);
+	}
+	
+	public void checkCallGraphEntries(String appPath, String className, boolean useSubType) throws IOException, ClassHierarchyException {
 		CGBuilder builder = new CGBuilder(appPath);
 		builder.makeScopeAndClassHierarchy();
 		Iterable<Entrypoint> entries = CGEntryManager.getAppPublicMethodsByClass(builder.getAnalysisScope(),
-				builder.getClassHierarchy(), className);
+				builder.getClassHierarchy(), className, useSubType);
 		builder.setCGType(CG.RTA);
 		builder.buildCG(entries);
 		PDFViewer.viewCG("cgentries_" + className + ".pdf", builder.getAppCallGraph());
 		System.out.println("entries num: " + Utils.countIterable(entries));
 		System.out.println("entries: " + Utils.dumpCollection(entries));
 		//let's see the entries
-		System.out.println("Number of entries in the built CG: " + builder.getCallGraph().getEntrypointNodes().size());
+		System.out.println("Number of entries in the built CG: "
+				+ builder.getCallGraph().getEntrypointNodes().size() + ", v.s. number of entries: "
+				+ Utils.countIterable(entries));
 		assertEquals("The no of entries not equal, in built CG and the given entries.",
 				Utils.countIterable(entries), builder.getCallGraph().getEntrypointNodes().size());
 	}
