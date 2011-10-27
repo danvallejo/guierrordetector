@@ -16,7 +16,7 @@ public class SmallSmokeTest extends TestCase {
 		
 		suite.addTest(TestFileExistence.suite());
 		suite.addTest(TestPropertyReader.suite());
-		suite.addTest(TestPDFViewer.suite());
+		suite.addTest(TestCGWithPDFViewer.suite());
 		
 		suite.addTest(TestUseCustomizedEntries.suite());
 		suite.addTest(TestSWTExamples.suite());
