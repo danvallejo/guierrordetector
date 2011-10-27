@@ -11,6 +11,7 @@ import com.ibm.wala.classLoader.IMethod;
 import com.ibm.wala.ipa.callgraph.AnalysisScope;
 import com.ibm.wala.ipa.callgraph.Entrypoint;
 import com.ibm.wala.ipa.callgraph.impl.DefaultEntrypoint;
+import com.ibm.wala.ipa.callgraph.impl.SubtypesEntrypoint;
 import com.ibm.wala.ipa.cha.ClassHierarchy;
 import com.ibm.wala.types.ClassLoaderReference;
 import com.ibm.wala.types.MethodReference;
@@ -103,6 +104,11 @@ public class CGEntryManager {
 	
 	//methodClass: a.b.c.d
 	public static Iterable<Entrypoint> getAppPublicMethodsByClass(AnalysisScope scope, ClassHierarchy cha, String methodClass) {
+		return getAppPublicMethodsByClass(scope, cha, methodClass, false);
+	}
+	
+	//methodClass: a.b.c.d
+	public static Iterable<Entrypoint> getAppPublicMethodsByClass(AnalysisScope scope, ClassHierarchy cha, String methodClass, boolean useSubClass) {
 		if (cha == null) {
 			throw new IllegalArgumentException("cha is null");
 		}
@@ -123,7 +129,11 @@ public class CGEntryManager {
 					if(!fullClassName.equals(methodClass)) {
 						continue;
 					}
-					result.add(new DefaultEntrypoint(m, cha));
+					if(useSubClass) {
+						result.add(new SubtypesEntrypoint(m, cha));
+					} else {
+					    result.add(new DefaultEntrypoint(m, cha));
+					}
 				}
 			}
 		}
