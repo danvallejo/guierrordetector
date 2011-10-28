@@ -85,6 +85,18 @@ class Bar extends AbBar {
 		IFoo foo = this.bridge.getFoo();
 		foo.foo();
 	}
+//	public static void main(String[] args) {
+//	    //create a Foo object
+//	    IFoo foo = new Foo();
+//	    //create a bridge and set its foo field
+//	    Bridge b = new Bridge();
+//	    b.setFoo(foo);
+//	    //create a bar, and set bridge
+//	    AbBar bar = new Bar();
+//	    bar.setBridge(b);
+//	    //call bar()
+//	    bar.bar();
+//	}
 }
 //a bridge class, like a Foo wrapper
 class Bridge {
