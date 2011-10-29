@@ -1,10 +1,18 @@
 package edu.washington.cs.detector.util;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
+import java.util.zip.ZipEntry;
 
 import com.ibm.wala.classLoader.IClass;
+import com.ibm.wala.core.tests.callGraph.CallGraphTestUtil;
 import com.ibm.wala.ipa.callgraph.AnalysisCache;
 import com.ibm.wala.ipa.callgraph.AnalysisOptions;
 import com.ibm.wala.ipa.callgraph.AnalysisScope;
@@ -15,14 +23,19 @@ import com.ibm.wala.ipa.callgraph.propagation.LocalPointerKey;
 import com.ibm.wala.ipa.callgraph.propagation.SSAPropagationCallGraphBuilder;
 import com.ibm.wala.ipa.callgraph.propagation.cfa.nCFABuilder;
 import com.ibm.wala.ipa.cha.ClassHierarchy;
+import com.ibm.wala.ipa.cha.ClassHierarchyException;
 import com.ibm.wala.ipa.cha.IClassHierarchy;
 import com.ibm.wala.types.ClassLoaderReference;
 import com.ibm.wala.types.TypeName;
 import com.ibm.wala.util.WalaException;
 import com.ibm.wala.util.collections.CollectionFilter;
 import com.ibm.wala.util.collections.Filter;
+import com.ibm.wala.util.config.AnalysisScopeReader;
 import com.ibm.wala.util.graph.Graph;
 import com.ibm.wala.util.graph.GraphSlicer;
+import com.ibm.wala.util.io.FileProvider;
+
+import edu.washington.cs.detector.SWTAppUIErrorMain;
 
 public class WALAUtils {
 
@@ -111,4 +124,47 @@ public class WALAUtils {
 				throw new RuntimeException(e);
 			}
 		}
+		
+
+	    //check all class in a given jar are all loaded by Wala
+	    public static int getUnloadedClassNum(ClassHierarchy cha, String jarFile) throws IOException {
+	    	assert (jarFile != null && jarFile.endsWith(".jar"));
+	    	//assert cha != null;
+	    	
+	    	Set<String> classInJar = new HashSet<String>();
+		    JarFile file = new JarFile(new File(jarFile));
+		    for (Enumeration<JarEntry> e = file.entries(); e.hasMoreElements();) {
+		        ZipEntry Z = (ZipEntry) e.nextElement();
+		        String entryName = Z.toString();
+		        if(entryName.endsWith(".class")) {
+		            String classFileName = Utils.translateSlashToDot(entryName);
+		            String className = classFileName.substring(0, classFileName.length() - ".class".length());
+		            classInJar.add(className);
+		        }
+		    }
+		    
+		    //all loaded class
+		    Set<String> loadedClasses = new HashSet<String>();
+		    for(IClass c : cha) {
+		    	loadedClasses.add(iclassToClassName(c));
+		    }
+		    
+//		    System.out.println("no in jar: " + classInJar.size());
+//		    System.out.println("no of class loaded: " + loadedClasses.size());
+		    int notloaded = 0;
+		    for(String cj : classInJar) {
+		    	if(!loadedClasses.contains(cj)) {
+		    		System.out.println("not include: " + cj);
+		    		notloaded ++;
+		    	}
+		    }
+	        return notloaded;
+	    }
+	    
+	    public static String iclassToClassName(IClass c) {
+	    	TypeName tn = c.getName();
+	    	String packageName = Utils.translateSlashToDot(tn.getPackage() == null ? "" : tn.getPackage().toString() + ".");
+	    	String className = tn.getClassName().toString();
+	    	return packageName + className;
+	    }
 }

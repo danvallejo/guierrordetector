@@ -1,5 +1,15 @@
 package edu.washington.cs.detector.util;
 
+import java.io.IOException;
+
+import com.ibm.wala.core.tests.callGraph.CallGraphTestUtil;
+import com.ibm.wala.ipa.callgraph.AnalysisScope;
+import com.ibm.wala.ipa.cha.ClassHierarchy;
+import com.ibm.wala.ipa.cha.ClassHierarchyException;
+import com.ibm.wala.util.config.AnalysisScopeReader;
+import com.ibm.wala.util.io.FileProvider;
+
+import edu.washington.cs.detector.SWTAppUIErrorMain;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -26,4 +36,13 @@ public class TestPropertyReader extends TestCase {
 			System.out.println("key: " + key + "; value: " + reader.getProperty((String)key));
 		}
 	}
+	
+    
+    public void testLoadedJar() throws IOException, ClassHierarchyException {
+    	AnalysisScope scope = AnalysisScopeReader.makeJavaBinaryAnalysisScope(SWTAppUIErrorMain.swtJar,
+				FileProvider.getFile(CallGraphTestUtil.REGRESSION_EXCLUSIONS));
+		ClassHierarchy cha = ClassHierarchy.make(scope);
+		
+    	assertEquals(1, WALAUtils.getUnloadedClassNum(cha, SWTAppUIErrorMain.swtJar));
+    }
 }
