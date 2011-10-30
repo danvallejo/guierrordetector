@@ -6,6 +6,8 @@ import java.util.List;
 
 import com.ibm.wala.ipa.callgraph.CGNode;
 
+import edu.washington.cs.detector.util.Globals;
+
 //keep track the whole call chain
 public class CallChainNode {
 	
@@ -58,5 +60,21 @@ public class CallChainNode {
 		Collections.reverse(list);
 		
 		return list;
+	}
+	
+	public String getChainToRootAsStr() {
+		StringBuilder sb = new StringBuilder();
+		int count = 0;
+		for(CGNode node : getChainToRoot()) {
+            if(count != 0) {
+			   sb.append(" -> ");	
+			}
+            count++;
+			sb.append(node); //print method?, not the node; avoiding context info
+			sb.append(", line: ");
+			sb.append(node.getMethod().getLineNumber(0));
+			sb.append(Globals.lineSep);
+		}
+		return sb.toString();
 	}
 }
