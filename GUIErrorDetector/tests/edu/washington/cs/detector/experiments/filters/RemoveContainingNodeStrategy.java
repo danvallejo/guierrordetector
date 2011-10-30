@@ -13,18 +13,18 @@ public class RemoveContainingNodeStrategy extends FilterStrategy {
 	public RemoveContainingNodeStrategy(String sig) {
 		this.sig = sig;
 	}
+	
 	@Override
 	public List<AnomalyCallChain> filter(List<AnomalyCallChain> chains) {
 		List<AnomalyCallChain> result = new LinkedList<AnomalyCallChain>();
-		
 		for(AnomalyCallChain c : chains) {
 			if(!remove(c)) {
 			    result.add(c);
 			}
 		}
-		
 		return result;
 	}
+	
 	protected boolean remove(AnomalyCallChain c) {
 		for(CGNode node : c.getFullCallChain()) {
 			if(node.toString().indexOf(this.sig) != -1) {
