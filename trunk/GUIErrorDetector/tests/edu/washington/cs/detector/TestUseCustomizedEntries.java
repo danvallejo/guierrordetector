@@ -59,7 +59,8 @@ public class TestUseCustomizedEntries extends TestCase {
 				//"test.useinterface.Main", false);
 				//"test.useinterface.Foo", false);
 		        //"test.useinterface.Main2", false);
-				"test.useinterface.MainClass", false);
+				"test.useinterface.Bar", false);
+				//"test.useinterface.MainClass", false);
 		        //"test.useinterface.Handler", false);
 	}
 	
