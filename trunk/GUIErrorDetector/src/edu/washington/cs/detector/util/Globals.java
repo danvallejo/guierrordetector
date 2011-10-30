@@ -7,11 +7,11 @@ import java.io.PrintStream;
 
 public class Globals {
 
-  public static final String lineSep = System.getProperty("line.separator");
+  public static final String lineSep = System.getProperty("line.separator"); //\n or \n\r
 
-  public static final String pathSep = System.getProperty("path.separator");
+  public static final String pathSep = System.getProperty("path.separator"); //; or :
   
-  public static final String fileSep = System.getProperty("file.separator");
+  public static final String fileSep = System.getProperty("file.separator"); // / or \
 
   public static PrintStream blackHole;
 
