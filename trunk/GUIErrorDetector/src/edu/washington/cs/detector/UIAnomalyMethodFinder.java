@@ -22,14 +22,14 @@ public class UIAnomalyMethodFinder {
 	
 	//some methods like Display#getBounds won't touch a UI element, but call checkDevice
 	//need to see the IR for more details
-	public static final String[] checking_methods = Files.readWholeNoExp("./src/checking_methods.txt").toArray(new String[0]);
+	public static String[] checking_methods = Files.readWholeNoExp("./src/checking_methods.txt").toArray(new String[0]);
 	
 //	        {"org.eclipse.swt.widgets.Widget.checkWidget()V"
 //			,"org.eclipse.swt.widgets.Display.checkDevice()V"
 //			};
 	
 	//note, asyncExec just call runnable.run directly
-	public static final String[] safe_methods = {"org.eclipse.swt.widgets.Display.asyncExec(Ljava/lang/Runnable;)V",
+	public static String[] safe_methods = {"org.eclipse.swt.widgets.Display.asyncExec(Ljava/lang/Runnable;)V",
 			"org.eclipse.swt.widgets.Display.syncExec(Ljava/lang/Runnable;)V"};
 	
 	public final CGNode startNode;
@@ -39,6 +39,16 @@ public class UIAnomalyMethodFinder {
 		this.cg = cg;
 		this.uiNodes = uiNodes;
 		this.startNode = startNode;
+	}
+	
+	/** reload all checking method for customization */
+	public static void reloadCheckingMethods(String fileName) {
+		assert fileName != null;
+		checking_methods = Files.readWholeNoExp(fileName).toArray(new String[0]);
+	}
+	public static void reloadSafeMethods(String fileName) {
+		assert fileName != null;
+		safe_methods = Files.readWholeNoExp(fileName).toArray(new String[0]);
 	}
 	
 	/** Use BFS to find all UI nodes that are reachable from {@link startNode}}
