@@ -26,6 +26,7 @@ import com.ibm.wala.ipa.callgraph.propagation.cfa.nCFABuilder;
 import com.ibm.wala.ipa.cha.ClassHierarchy;
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
 import com.ibm.wala.ipa.cha.IClassHierarchy;
+import com.ibm.wala.ssa.SSAInstruction;
 import com.ibm.wala.types.ClassLoaderReference;
 import com.ibm.wala.types.TypeName;
 import com.ibm.wala.util.WalaException;
@@ -172,5 +173,17 @@ public class WALAUtils {
 	    	String packageName = Utils.translateSlashToDot(tn.getPackage() == null ? "" : tn.getPackage().toString() + ".");
 	    	String className = tn.getClassName().toString();
 	    	return packageName + className;
+	    }
+	    
+	    //utilities for ir
+	    public static String getAllIRAsString(CGNode node) {
+	    	StringBuilder sb = new StringBuilder();
+	    	Iterator<SSAInstruction> it = node.getIR().iterateAllInstructions();
+	    	while(it.hasNext()) {
+	    		SSAInstruction ssa = it.next();
+	    		sb.append(ssa);
+	    		sb.append(Globals.lineSep);
+	    	}
+	    	return sb.toString();
 	    }
 }
