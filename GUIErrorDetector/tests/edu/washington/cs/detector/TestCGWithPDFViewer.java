@@ -11,6 +11,7 @@ import com.ibm.wala.util.io.FileProvider;
 
 import edu.washington.cs.detector.CGBuilder.CG;
 import edu.washington.cs.detector.util.PDFViewer;
+import edu.washington.cs.detector.util.WALAUtils;
 
 public class TestCGWithPDFViewer extends TestCase {
 	
@@ -27,6 +28,9 @@ public class TestCGWithPDFViewer extends TestCase {
 //		builder.setCGType(CG.CFA);
 //		builder.setCFAPrecision(4);
 		builder.buildCG();
+		
+		String irstr = WALAUtils.getAllIRAsString(builder.getCallGraph().getFakeRootNode());
+		System.out.println(irstr);
 		
 		assertEquals(23, builder.getAppCallGraph().getNumberOfNodes());
 		PDFViewer.viewCG("multithread.pdf", builder.getAppCallGraph());
@@ -67,7 +71,6 @@ public class TestCGWithPDFViewer extends TestCase {
 		CGBuilder builder = new CGBuilder(appPath, FileProvider.getFile(CallGraphTestUtil.REGRESSION_EXCLUSIONS));
 		builder.setCGType(CG.ZeroOneContainerCFA);
 		builder.buildCG();
-		
 		
 		assertEquals(6, builder.getAppCallGraph().getNumberOfNodes());
 		PDFViewer.viewCG("controlflow.pdf", builder.getAppCallGraph());
