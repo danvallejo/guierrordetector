@@ -57,6 +57,8 @@ public abstract class AbstractUITest extends TestCase {
 		}
 	    
 	    WALAUtils.dumpClasses(cha, "./logs/loaded_classes.txt");
+	    Utils.dumpCollection(WALAUtils.getUnloadedClasses(cha, TestCommons.getNonSourceNonTestsJars(getAppPath())),
+	    		"./logs/unloaded_classes.txt");
 	    
 	    //report UI errors
 	    return reportUIErrors(outputFilePath, appPath, uiClasses, builder, opt);

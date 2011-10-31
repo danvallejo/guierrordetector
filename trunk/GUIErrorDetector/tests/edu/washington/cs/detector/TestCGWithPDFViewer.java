@@ -18,6 +18,20 @@ public class TestCGWithPDFViewer extends TestCase {
 		return new TestSuite(TestCGWithPDFViewer.class);
 	}
 	
+	public void testMultiThread() throws IOException {
+		String appPath =  TestCommons.testfolder + "multithreads";
+		CGBuilder builder = new CGBuilder(appPath, FileProvider.getFile(CallGraphTestUtil.REGRESSION_EXCLUSIONS));
+		
+		builder.setCGType(CG.OneCFA);
+		
+//		builder.setCGType(CG.CFA);
+//		builder.setCFAPrecision(4);
+		builder.buildCG();
+		
+		assertEquals(23, builder.getAppCallGraph().getNumberOfNodes());
+		PDFViewer.viewCG("multithread.pdf", builder.getAppCallGraph());
+	}
+	
 	public void testDisplaySmallCG() throws IOException {
 		String appPath =  TestCommons.testfolder + "helloworld";
 		CGBuilder builder = new CGBuilder(appPath, FileProvider.getFile(CallGraphTestUtil.REGRESSION_EXCLUSIONS));
@@ -43,7 +57,6 @@ public class TestCGWithPDFViewer extends TestCase {
 		CGBuilder builder = new CGBuilder(appPath, FileProvider.getFile(CallGraphTestUtil.REGRESSION_EXCLUSIONS));
 		builder.setCGType(CG.ZeroOneContainerCFA);
 		builder.buildCG();
-		
 		
 		assertEquals(12, builder.getAppCallGraph().getNumberOfNodes());
 		PDFViewer.viewCG("imprecisecg.pdf", builder.getAppCallGraph());
