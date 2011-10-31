@@ -14,6 +14,7 @@ import edu.washington.cs.detector.util.EclipsePluginCommons;
 import edu.washington.cs.detector.util.Globals;
 import edu.washington.cs.detector.util.PDFViewer;
 import edu.washington.cs.detector.util.Utils;
+import edu.washington.cs.detector.util.WALAUtils;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -78,6 +79,10 @@ public class TestUseCustomizedEntries extends TestCase {
 		System.out.println("Number of entries in the built CG: "
 				+ builder.getCallGraph().getEntrypointNodes().size() + ", v.s. number of entries: "
 				+ Utils.countIterable(entries));
+		//see the IR in the root node
+		String irstr = WALAUtils.getAllIRAsString(builder.getCallGraph().getFakeRootNode());
+		System.out.println(irstr);
+		
 		assertEquals("The no of entries not equal, in built CG and the given entries.",
 				Utils.countIterable(entries), builder.getCallGraph().getEntrypointNodes().size());
 	}
