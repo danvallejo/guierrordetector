@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -125,11 +126,16 @@ public class WALAUtils {
 			}
 		}
 		
-
-	    //check all class in a given jar are all loaded by Wala
-	    public static int getUnloadedClassNum(ClassHierarchy cha, String jarFile) throws IOException {
-	    	assert (jarFile != null && jarFile.endsWith(".jar"));
-	    	//assert cha != null;
+		public static Set<String> getUnloadedClasses(ClassHierarchy cha, Collection<String> jars) throws IOException {
+			Set<String> unloadedClasses = new LinkedHashSet<String>();
+			for(String jarFile : jars) {
+				unloadedClasses.addAll(getUnloadedClasses(cha, jarFile));
+			}
+			return unloadedClasses;
+		}
+		
+		public static Set<String> getUnloadedClasses(ClassHierarchy cha, String jarFile) throws IOException {
+			assert (jarFile != null && jarFile.endsWith(".jar"));
 	    	
 	    	Set<String> classInJar = new HashSet<String>();
 		    JarFile file = new JarFile(new File(jarFile));
@@ -142,23 +148,23 @@ public class WALAUtils {
 		            classInJar.add(className);
 		        }
 		    }
-		    
 		    //all loaded class
 		    Set<String> loadedClasses = new HashSet<String>();
 		    for(IClass c : cha) {
 		    	loadedClasses.add(iclassToClassName(c));
 		    }
-		    
-//		    System.out.println("no in jar: " + classInJar.size());
-//		    System.out.println("no of class loaded: " + loadedClasses.size());
-		    int notloaded = 0;
+		    Set<String> unloadedClasses = new HashSet<String>();
 		    for(String cj : classInJar) {
 		    	if(!loadedClasses.contains(cj)) {
-		    		System.out.println("not include: " + cj);
-		    		notloaded ++;
+		    		unloadedClasses.add(cj);
 		    	}
 		    }
-	        return notloaded;
+	        return unloadedClasses;
+		}
+
+	    //check all class in a given jar are all loaded by Wala
+	    public static int getUnloadedClassNum(ClassHierarchy cha, String jarFile) throws IOException {
+	    	return getUnloadedClasses(cha, jarFile).size();
 	    }
 	    
 	    public static String iclassToClassName(IClass c) {

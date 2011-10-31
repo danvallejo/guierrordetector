@@ -24,12 +24,13 @@ import edu.washington.cs.detector.util.WALAUtils;
 
 public class CGBuilder {
 	
-	public enum CG {RTA, ZeroCFA, ZeroContainerCFA, ZeroOneCFA, ZeroOneContainerCFA, OneCFA, TwoCFA}
+	public enum CG {RTA, ZeroCFA, ZeroContainerCFA, ZeroOneCFA, ZeroOneContainerCFA, OneCFA, TwoCFA, CFA}
 	
 	public final String appPath;
 	public final File exclusionFile;
 	
 	private CG type = CG.ZeroCFA;
+	private int cfaprecision = -1;
 	
 	public CGBuilder(String appPath) throws IOException {
 		this.appPath = appPath;
@@ -54,6 +55,12 @@ public class CGBuilder {
 	public void setCGType(CG type) {
 		assert type != null;
 		this.type = type;
+	}
+	
+	public void setCFAPrecision(int i) {
+		if(i < 2) {throw new RuntimeException("Please use setCGType instead.");}
+		if(type != CG.CFA) {throw new RuntimeException("Please set CG type as CFA first.");}
+		this.cfaprecision = i;
 	}
 	
 	//by default it uses all main methods are starting points
@@ -130,6 +137,12 @@ public class CGBuilder {
 		} else if (this.type == CG.TwoCFA) {
 			System.out.println("Using 2-CFA call graph");
 			builder = WALAUtils.makeCFABuilder(2, options,  cache, cha, scope);
+		} else if (this.type == CG.CFA) { 
+			if(this.cfaprecision < 2) {
+				throw new RuntimeException("Please set cfa precision first.");
+			}
+			System.out.println("Use CFA with precision: " + this.cfaprecision);
+			builder = WALAUtils.makeCFABuilder(this.cfaprecision, options,  cache, cha, scope);
 		} else {
 			throw new RuntimeException("The CG type: " + type + " is unknonw");
 		}
