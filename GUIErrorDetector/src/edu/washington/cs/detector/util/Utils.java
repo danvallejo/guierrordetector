@@ -51,12 +51,12 @@ public class Utils {
 		}
 	}
 	//find all jar files
-	public static List<String> getNonSourceNonTestsJars(String dir) {
+	public static List<String> getJars(String dir) {
 		List<String> files = Files.findFilesInDir(dir, null, ".jar");
 		return files;
 	}
 	
-	public static String concatenateToPath(List<String> strs) {
+	public static String conToPath(List<String> strs) {
 		StringBuilder sb = new StringBuilder();
 		int count = 0;
 		for(String str : strs) {
