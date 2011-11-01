@@ -24,11 +24,11 @@ public class TestSoLVE extends TestCase {
 	    Globals.pathSep + "D:\\research\\guierror\\eclipsews\\SoLVE\\jface.jar" +
 	    Globals.pathSep + "D:\\research\\guierror\\eclipsews\\SoLVE\\win\\swt.jar";
 	
-	public void testRunningJavaNativeCompiler() throws IOException {
+	public void testRunningSoLVE() throws IOException {
 		String path = appPath + Globals.pathSep + libJar;
         UIAnomalyDetector detector = new UIAnomalyDetector(path);
 		
-		CGBuilder builder = new CGBuilder(appPath);
+		CGBuilder builder = new CGBuilder(path);
 		builder.setCGType(CG.OneCFA);
 		builder.buildCG();
 		

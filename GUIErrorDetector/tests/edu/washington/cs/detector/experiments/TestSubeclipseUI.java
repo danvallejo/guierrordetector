@@ -8,11 +8,14 @@ import com.ibm.wala.ipa.cha.ClassHierarchyException;
 
 import edu.washington.cs.detector.AbstractUITest;
 import edu.washington.cs.detector.AnomalyCallChain;
+import edu.washington.cs.detector.CallChainFilter;
+import edu.washington.cs.detector.RemoveSystemCallStrategy;
 import edu.washington.cs.detector.SWTAppUIErrorMain;
 import edu.washington.cs.detector.TestCommons;
 import edu.washington.cs.detector.CGBuilder.CG;
 import edu.washington.cs.detector.util.EclipsePluginCommons;
 import edu.washington.cs.detector.util.Globals;
+import edu.washington.cs.detector.util.Utils;
 
 public class TestSubeclipseUI extends AbstractUITest {
 
@@ -20,9 +23,9 @@ public class TestSubeclipseUI extends AbstractUITest {
 	
 	@Override
 	protected boolean isUIClass(IClass kclass) {
-		return TestCommons.isConcreteAccessibleClass(kclass)
-		    && kclass.toString().indexOf("/ui") != -1
-		    && kclass.toString().indexOf("/subclipse/") != -1;
+		return //TestCommons.isConcreteAccessibleClass(kclass) &&
+		    kclass.toString().indexOf("/ui/operations/CheckoutAsProjectOperation") != -1;
+//		    && kclass.toString().indexOf("/subclipse/") != -1;
 	}
 
 	@Override
@@ -42,6 +45,12 @@ public class TestSubeclipseUI extends AbstractUITest {
 	public void testDetectUIErrors() throws IOException,
 	    ClassHierarchyException {
         List<AnomalyCallChain> chains = super.reportUIErrors(SWTAppUIErrorMain.default_log, CG.ZeroOneContainerCFA);
-        assertEquals(524, chains.size());
+        System.out.println("No of chains before filtering system classes: " + chains.size());
+        
+        CallChainFilter filter = new CallChainFilter(chains);
+		chains = filter.apply(new RemoveSystemCallStrategy());
+		System.out.println("No of chains after filtering system classes: " + chains.size());
+		
+		Utils.dumpAnomalyCallChains(chains, "./logs/subclipse-1.6.txt");
     }
 }
