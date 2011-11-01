@@ -32,4 +32,8 @@ public class CallChainFilter {
 		return result;
 	}
 	
+	public static List<AnomalyCallChain> filter(List<AnomalyCallChain> chains, FilterStrategy strategy) {
+		CallChainFilter filter = new CallChainFilter(chains);
+		return filter.apply(strategy);
+	}
 }

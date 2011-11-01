@@ -55,8 +55,9 @@ public class Utils {
 		List<String> files = Files.findFilesInDir(dir, null, ".jar");
 		List<String> fullPaths = new LinkedList<String>();
 		for(String file : files) {
-			fullPaths.add(dir + Globals.pathSep + file);
+			fullPaths.add(dir + Globals.fileSep + file);
 		}
+		//System.out.println(fullPaths);
 		return fullPaths;
 	}
 	
