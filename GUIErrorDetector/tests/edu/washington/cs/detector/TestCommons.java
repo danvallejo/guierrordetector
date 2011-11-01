@@ -44,6 +44,18 @@ public class TestCommons extends TestCase {
 		return nonSrcNonTestFiles;
 	}
 	
+	public static List<String> getJarsFromPath(String path) {
+		String[] jars = path.split(Globals.pathSep);
+		List<String> jarList = new LinkedList<String>();
+		for(String jar : jars) {
+			if(jar.trim().endsWith(".jar")) {
+			    jarList.add(jar);
+			}
+		}
+		return jarList;
+		
+	}
+	
 	public static String assemblyAppPath(String dir, String additionalJars) {
 		List<String> appJars = TestCommons.getNonSourceNonTestsJars(dir);
 		StringBuilder sb = new StringBuilder();
