@@ -10,7 +10,8 @@ import edu.washington.cs.detector.util.Utils;
 
 public class RemoveSystemCallStrategy extends FilterStrategy {
 	
-	public static String[] system_classes = new String[] {"Ljava/lang/String", "Ljava/io/PrintStream"};
+	public static String[] system_classes = new String[] {"Ljava/lang/String",
+		"Ljava/io/PrintStream", "Ljava/lang/System"};
 
 	@Override
 	public List<AnomalyCallChain> filter(List<AnomalyCallChain> chains) {
@@ -23,13 +24,19 @@ public class RemoveSystemCallStrategy extends FilterStrategy {
 		return result;
 	}
 	
+	//a system call occurs before calling thread.start()
 	protected boolean containSystemCall(AnomalyCallChain chain) {
+		boolean seeThreadStart = false;
 		for(CGNode node : chain.getFullCallChain()) {
 			IClass klass = node.getMethod().getDeclaringClass();
 			
+			if(node.getMethod().getSignature().equals("Ljava/lang/Thread, start()V")) {
+				seeThreadStart = true;
+			}
+			
 			String className = klass.getName().toString();
 			//System.err.println(className);
-			if(Utils.<String>includedIn(className, system_classes)) {
+			if(Utils.<String>includedIn(className, system_classes) && !seeThreadStart) {
 				return true;
 			}
 		}
