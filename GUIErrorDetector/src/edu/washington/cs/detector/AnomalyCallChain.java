@@ -56,5 +56,14 @@ public class AnomalyCallChain {
 		}
 		return sb.toString();
 	}
-
+	
+	public static String flatCGNodeList(List<CGNode> nodeList) {
+		assert nodeList != null;
+		StringBuilder sb = new StringBuilder();
+		for(CGNode node : nodeList) {
+			sb.append(node);
+			sb.append(Globals.lineSep);
+		}
+		return sb.toString();
+	}
 }
