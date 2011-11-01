@@ -53,7 +53,11 @@ public class Utils {
 	//find all jar files
 	public static List<String> getJars(String dir) {
 		List<String> files = Files.findFilesInDir(dir, null, ".jar");
-		return files;
+		List<String> fullPaths = new LinkedList<String>();
+		for(String file : files) {
+			fullPaths.add(dir + Globals.pathSep + file);
+		}
+		return fullPaths;
 	}
 	
 	public static String conToPath(List<String> strs) {
