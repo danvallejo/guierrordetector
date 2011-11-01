@@ -50,6 +50,24 @@ public class Utils {
 			}
 		}
 	}
+	//find all jar files
+	public static List<String> getNonSourceNonTestsJars(String dir) {
+		List<String> files = Files.findFilesInDir(dir, null, ".jar");
+		return files;
+	}
+	
+	public static String concatenateToPath(List<String> strs) {
+		StringBuilder sb = new StringBuilder();
+		int count = 0;
+		for(String str : strs) {
+			if(count != 0) {
+				sb.append(Globals.pathSep);
+			}
+			sb.append(str);
+			count++;
+		}
+		return sb.toString();
+	}
 	
 	public static <T> boolean includedIn(T target, T[] array) {
 		assert target != null;
