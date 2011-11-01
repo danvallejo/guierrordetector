@@ -1,0 +1,31 @@
+0-th anomaly call chain
+Node: < Application, Lcom/toubassi/filebunker/ui/FileBunker, main([Ljava/lang/String;)V > Context: CallStringContext: [ fakeRootMethod@95 ], line: 551
+ -> Node: < Application, Lorg/eclipse/jface/window/Window, open()I > Context: CallStringContext: [ main@24 ], line: 635
+ -> Node: < Application, Lorg/eclipse/jface/window/Window, runEventLoop(Lorg/eclipse/swt/widgets/Shell;)V > Context: CallStringContext: [ open@34 ], line: 661
+ -> Node: < Application, Lorg/eclipse/swt/widgets/Display, readAndDispatch()Z > Context: CallStringContext: [ runEventLoop@20 ], line: 2423
+ -> Node: < Application, Lorg/eclipse/swt/widgets/Display, runDeferredEvents()Z > Context: CallStringContext: [ readAndDispatch@55 ], line: 2758
+ -> Node: < Application, Lorg/eclipse/swt/widgets/Widget, sendEvent(Lorg/eclipse/swt/widgets/Event;)V > Context: CallStringContext: [ runDeferredEvents@84 ], line: 794
+ -> Node: < Application, Lorg/eclipse/swt/widgets/EventTable, sendEvent(Lorg/eclipse/swt/widgets/Event;)V > Context: CallStringContext: [ sendEvent@25 ], line: 75
+ -> Node: < Application, Lorg/eclipse/swt/widgets/TypedListener, handleEvent(Lorg/eclipse/swt/widgets/Event;)V > Context: CallStringContext: [ sendEvent@60 ], line: 78
+ -> Node: < Application, Lcom/toubassi/filebunker/ui/backup/BackupController$2, widgetSelected(Lorg/eclipse/swt/events/SelectionEvent;)V > Context: CallStringContext: [ handleEvent@198 ], line: 232
+ -> Node: < Application, Lcom/toubassi/filebunker/ui/backup/BackupController, access$1(Lcom/toubassi/filebunker/ui/backup/BackupController;)V > Context: CallStringContext: [ widgetSelected@4 ], line: 284
+ -> Node: < Application, Lcom/toubassi/filebunker/ui/backup/BackupController, previewClicked()V > Context: CallStringContext: [ access$1@1 ], line: 286
+ -> Node: < Application, Lcom/toubassi/filebunker/ui/backup/BackupController, performPreview()V > Context: CallStringContext: [ previewClicked@1 ], line: 434
+ -> Node: < Application, Lorg/eclipse/jface/dialogs/ProgressMonitorDialog, run(ZZLorg/eclipse/jface/operation/IRunnableWithProgress;)V > Context: CallStringContext: [ performPreview@36 ], line: 392
+ -> Node: < Application, Lorg/eclipse/jface/operation/ModalContext, run(Lorg/eclipse/jface/operation/IRunnableWithProgress;ZLorg/eclipse/core/runtime/IProgressMonitor;Lorg/eclipse/swt/widgets/Display;)V > Context: CallStringContext: [ run@30 ], line: 245
+ -> Node: synthetic < Primordial, Ljava/lang/Thread, start()V > Context: CallStringContext: [ run@99 ], line: -1
+ -> Node: < Application, Lorg/eclipse/jface/operation/ModalContext$ModalContextThread, run()V > Context: CallStringContext: [ start@1 ], line: 100
+ -> Node: < Application, Lcom/toubassi/filebunker/ui/backup/PerformBackup, run(Lorg/eclipse/core/runtime/IProgressMonitor;)V > Context: CallStringContext: [ run@15 ], line: 81
+ -> Node: < Application, Lcom/toubassi/filebunker/vault/Vault, backup(Lcom/toubassi/filebunker/vault/BackupSpecification;Lcom/toubassi/filebunker/vault/FileOperationListener;Lcom/toubassi/filebunker/vault/BackupResult;)V > Context: CallStringContext: [ run@213 ], line: 243
+ -> Node: < Application, Lcom/toubassi/filebunker/vault/CoordinatingFileStore, backupFile(Ljava/io/File;Ljava/lang/String;Lcom/toubassi/filebunker/vault/RevisionIdentifier;Lcom/toubassi/filebunker/vault/FileOperationListener;)V > Context: CallStringContext: [ backup@165 ], line: 257
+ -> Node: < Application, Lcom/toubassi/filebunker/vault/WebMailFileStore, backupFile(Ljava/io/File;Ljava/lang/String;Lcom/toubassi/filebunker/vault/RevisionIdentifier;Lcom/toubassi/filebunker/vault/FileOperationListener;)V > Context: CallStringContext: [ backupFile@19 ], line: 287
+ -> Node: < Application, Lcom/subx/common/NotificationCenter, post(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)V > Context: CallStringContext: [ backupFile@240 ], line: 215
+ -> Node: < Application, Lcom/subx/common/NotificationCenter, postToMap(Ljava/util/Map;Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)V > Context: CallStringContext: [ post@16 ], line: 232
+ -> Node: < Application, Lcom/subx/common/NotificationCenter, postToInfo(Lcom/subx/common/ListenerInfo;Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)V > Context: CallStringContext: [ postToMap@34 ], line: 253
+ -> Node: < Application, Lcom/toubassi/filebunker/ui/backup/BackupController, handleNotification(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)V > Context: CallStringContext: [ postToInfo@34 ], line: 535
+ -> Node: < Application, Lcom/toubassi/filebunker/ui/backup/BackupController, updateButtons()V > Context: CallStringContext: [ handleNotification@19 ], line: 271
+ -> Node: < Application, Lorg/eclipse/swt/widgets/Control, setEnabled(Z)V > Context: CallStringContext: [ updateButtons@21 ], line: 2019
+ -> Node: < Application, Lorg/eclipse/swt/widgets/Display, getFocusControl()Lorg/eclipse/swt/widgets/Control; > Context: CallStringContext: [ setEnabled@16 ], line: 1120
+ -> Node: < Application, Lorg/eclipse/swt/widgets/Display, checkDevice()V > Context: CallStringContext: [ getFocusControl@1 ], line: 560
+
+
