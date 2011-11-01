@@ -1,0 +1,58 @@
+0-th anomaly call chain
+Node: < Application, Ledu/sysu/virgoftp/gui/widgets/dialogs/PromptDialog, main([Ljava/lang/String;)V > Context: CallStringContext: [ fakeRootMethod@10 ], line: 84
+ -> Node: < Application, Lorg/eclipse/swt/widgets/Display, readAndDispatch()Z > Context: CallStringContext: [ main@69 ], line: 2829
+ -> Node: < Application, Lorg/eclipse/swt/widgets/Display, runAsyncMessages(Z)Z > Context: CallStringContext: [ readAndDispatch@41 ], line: 3132
+ -> Node: < Application, Lorg/eclipse/swt/widgets/Synchronizer, runAsyncMessages(Z)Z > Context: CallStringContext: [ runAsyncMessages@5 ], line: 115
+ -> Node: < Application, Lorg/eclipse/swt/widgets/RunnableLock, run()V > Context: CallStringContext: [ runAsyncMessages@29 ], line: 35
+ -> Node: < Application, Ledu/sysu/virgoftp/gui/JobTableManager$3, run()V > Context: CallStringContext: [ run@11 ], line: 470
+ -> Node: < Application, Ledu/sysu/virgoftp/gui/transfer/TransferTask, start(Ljava/util/List;ZZZ)V > Context: CallStringContext: [ run@546 ], line: 255
+ -> Node: < Application, Ledu/sysu/virgoftp/gui/threads/ThreadPool$TaskThread, start()V > Context: CallStringContext: [ start@104 ], line: 170
+ -> Node: synthetic < Primordial, Ljava/lang/Thread, start()V > Context: CallStringContext: [ start@8 ], line: -1
+ -> Node: < Application, Ledu/sysu/virgoftp/gui/threads/ThreadPool$TaskThread, run()V > Context: CallStringContext: [ start@1 ], line: 72
+ -> Node: < Application, Ledu/sysu/virgoftp/gui/transfer/AbstractFileTransferThread, run()V > Context: CallStringContext: [ run@149 ], line: 196
+ -> Node: < Application, Ledu/sysu/virgoftp/gui/transfer/AbstractFileTransferThread, prepareForTransfer()Z > Context: CallStringContext: [ run@1 ], line: 107
+ -> Node: < Application, Ledu/sysu/virgoftp/gui/LoggerHandle, <init>(Lorg/eclipse/swt/custom/StyledText;Ledu/sysu/virgoftp/gui/threads/TaskLog;)V > Context: CallStringContext: [ prepareForTransfer@29 ], line: 78
+ -> Node: < Application, Ledu/sysu/virgoftp/gui/preferences/ColorPreference, getLog_command()Lorg/eclipse/swt/graphics/Color; > Context: CallStringContext: [ <init>@10 ], line: 65
+ -> Node: < Application, Lorg/eclipse/swt/widgets/Display, getSystemColor(I)Lorg/eclipse/swt/graphics/Color; > Context: CallStringContext: [ getLog_command@58 ], line: 1861
+ -> Node: < Application, Lorg/eclipse/swt/widgets/Display, checkDevice()V > Context: CallStringContext: [ getSystemColor@1 ], line: 654
+
+
+1-th anomaly call chain
+Node: < Application, Ledu/sysu/virgoftp/gui/widgets/dialogs/PromptDialog, main([Ljava/lang/String;)V > Context: CallStringContext: [ fakeRootMethod@10 ], line: 84
+ -> Node: < Application, Lorg/eclipse/swt/widgets/Display, readAndDispatch()Z > Context: CallStringContext: [ main@69 ], line: 2829
+ -> Node: < Application, Lorg/eclipse/swt/widgets/Display, runAsyncMessages(Z)Z > Context: CallStringContext: [ readAndDispatch@41 ], line: 3132
+ -> Node: < Application, Lorg/eclipse/swt/widgets/Synchronizer, runAsyncMessages(Z)Z > Context: CallStringContext: [ runAsyncMessages@5 ], line: 115
+ -> Node: < Application, Lorg/eclipse/swt/widgets/RunnableLock, run()V > Context: CallStringContext: [ runAsyncMessages@29 ], line: 35
+ -> Node: < Application, Ledu/sysu/virgoftp/gui/JobTableManager$3, run()V > Context: CallStringContext: [ run@11 ], line: 470
+ -> Node: < Application, Ledu/sysu/virgoftp/gui/transfer/TransferTask, start(Ljava/util/List;ZZZ)V > Context: CallStringContext: [ run@546 ], line: 255
+ -> Node: < Application, Ledu/sysu/virgoftp/gui/threads/ThreadPool$TaskThread, start()V > Context: CallStringContext: [ start@104 ], line: 170
+ -> Node: synthetic < Primordial, Ljava/lang/Thread, start()V > Context: CallStringContext: [ start@8 ], line: -1
+ -> Node: < Application, Ledu/sysu/virgoftp/gui/threads/ThreadPool$TaskThread, run()V > Context: CallStringContext: [ start@1 ], line: 72
+ -> Node: < Application, Ledu/sysu/virgoftp/gui/transfer/AbstractFileTransferThread, run()V > Context: CallStringContext: [ run@149 ], line: 196
+ -> Node: < Application, Ledu/sysu/virgoftp/gui/transfer/AbstractFileTransferThread, prepareForTransfer()Z > Context: CallStringContext: [ run@1 ], line: 107
+ -> Node: < Application, Ledu/sysu/virgoftp/gui/LoggerHandle, <init>(Lorg/eclipse/swt/custom/StyledText;Ledu/sysu/virgoftp/gui/threads/TaskLog;)V > Context: CallStringContext: [ prepareForTransfer@29 ], line: 78
+ -> Node: < Application, Ledu/sysu/virgoftp/gui/preferences/FontPreference, getLog_font()Lorg/eclipse/swt/graphics/FontData; > Context: CallStringContext: [ <init>@48 ], line: 68
+ -> Node: < Application, Lorg/eclipse/swt/widgets/Display, getSystemFont()Lorg/eclipse/swt/graphics/Font; > Context: CallStringContext: [ getLog_font@48 ], line: 2093
+ -> Node: < Application, Lorg/eclipse/swt/widgets/Display, checkDevice()V > Context: CallStringContext: [ getSystemFont@1 ], line: 654
+
+
+2-th anomaly call chain
+Node: < Application, Ledu/sysu/virgoftp/gui/widgets/dialogs/PromptDialog, main([Ljava/lang/String;)V > Context: CallStringContext: [ fakeRootMethod@10 ], line: 84
+ -> Node: < Application, Lorg/eclipse/swt/widgets/Display, readAndDispatch()Z > Context: CallStringContext: [ main@69 ], line: 2829
+ -> Node: < Application, Lorg/eclipse/swt/widgets/Display, runAsyncMessages(Z)Z > Context: CallStringContext: [ readAndDispatch@41 ], line: 3132
+ -> Node: < Application, Lorg/eclipse/swt/widgets/Synchronizer, runAsyncMessages(Z)Z > Context: CallStringContext: [ runAsyncMessages@5 ], line: 115
+ -> Node: < Application, Lorg/eclipse/swt/widgets/RunnableLock, run()V > Context: CallStringContext: [ runAsyncMessages@29 ], line: 35
+ -> Node: < Application, Ledu/sysu/virgoftp/gui/JobTableManager$3, run()V > Context: CallStringContext: [ run@11 ], line: 470
+ -> Node: < Application, Ledu/sysu/virgoftp/gui/transfer/TransferTask, start(Ljava/util/List;ZZZ)V > Context: CallStringContext: [ run@546 ], line: 255
+ -> Node: < Application, Ledu/sysu/virgoftp/gui/threads/ThreadPool$TaskThread, start()V > Context: CallStringContext: [ start@104 ], line: 170
+ -> Node: synthetic < Primordial, Ljava/lang/Thread, start()V > Context: CallStringContext: [ start@8 ], line: -1
+ -> Node: < Application, Ledu/sysu/virgoftp/gui/threads/ThreadPool$TaskThread, run()V > Context: CallStringContext: [ start@1 ], line: 72
+ -> Node: < Application, Ledu/sysu/virgoftp/gui/transfer/AbstractFileTransferThread, run()V > Context: CallStringContext: [ run@149 ], line: 196
+ -> Node: < Application, Ledu/sysu/virgoftp/gui/transfer/AbstractFileTransferThread, prepareForTransfer()Z > Context: CallStringContext: [ run@1 ], line: 107
+ -> Node: < Application, Ledu/sysu/virgoftp/gui/LoggerHandle, <init>(Lorg/eclipse/swt/custom/StyledText;Ledu/sysu/virgoftp/gui/threads/TaskLog;)V > Context: CallStringContext: [ prepareForTransfer@29 ], line: 78
+ -> Node: < Application, Ledu/sysu/virgoftp/gui/preferences/ColorPreference, getLog_command()Lorg/eclipse/swt/graphics/Color; > Context: CallStringContext: [ <init>@10 ], line: 65
+ -> Node: < Application, Lorg/eclipse/swt/widgets/Display, getSystemColor(I)Lorg/eclipse/swt/graphics/Color; > Context: CallStringContext: [ getLog_command@58 ], line: 1861
+ -> Node: < Application, Lorg/eclipse/swt/graphics/Device, getSystemColor(I)Lorg/eclipse/swt/graphics/Color; > Context: CallStringContext: [ getSystemColor@250 ], line: 467
+ -> Node: < Application, Lorg/eclipse/swt/widgets/Display, checkDevice()V > Context: CallStringContext: [ getSystemColor@1 ], line: 654
+
+
