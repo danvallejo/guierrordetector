@@ -12,8 +12,13 @@ import edu.washington.cs.detector.util.Utils;
 
 public class RemoveSystemCallStrategy extends FilterStrategy {
 	
-	public static String[] system_classes = new String[] {"Ljava/lang/String",
+	private static String[] system_classes = new String[] {"Ljava/lang/String",
 		"Ljava/io/PrintStream", "Ljava/lang/System"};
+	
+	public static void setSystemClasses(String[] classes) {
+		assert classes != null;
+		system_classes = classes;
+	}
 
 	@Override
 	public List<AnomalyCallChain> filter(List<AnomalyCallChain> chains) {
@@ -32,7 +37,7 @@ public class RemoveSystemCallStrategy extends FilterStrategy {
 		for(CGNode node : chain.getFullCallChain()) {
 			IClass klass = node.getMethod().getDeclaringClass();
 			
-			if(node.getMethod().getSignature().equals("Ljava/lang/Thread, start()V")) {
+			if(node.getMethod().getSignature().equals(thread_start_method)) {
 				seeThreadStart = true;
 			}
 			
