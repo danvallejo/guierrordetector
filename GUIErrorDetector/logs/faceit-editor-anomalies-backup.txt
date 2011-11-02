@@ -1,0 +1,37 @@
+0-th anomaly call chain
+Node: < Application, Lcom/scicom/faceit/RichClientWindow, main([Ljava/lang/String;)V > Context: CallStringContext: [ fakeRootMethod@5 ], line: 75
+ -> Node: < Application, Lorg/eclipse/jface/window/Window, open()I > Context: CallStringContext: [ main@14 ], line: 635
+ -> Node: < Application, Lorg/eclipse/jface/window/Window, runEventLoop(Lorg/eclipse/swt/widgets/Shell;)V > Context: CallStringContext: [ open@34 ], line: 661
+ -> Node: < Application, Lorg/eclipse/swt/widgets/Display, readAndDispatch()Z > Context: CallStringContext: [ runEventLoop@20 ], line: 2374
+ -> Node: < Application, Lorg/eclipse/swt/widgets/Display, runDeferredEvents()Z > Context: CallStringContext: [ readAndDispatch@55 ], line: 2702
+ -> Node: < Application, Lorg/eclipse/swt/widgets/Widget, sendEvent(Lorg/eclipse/swt/widgets/Event;)V > Context: CallStringContext: [ runDeferredEvents@84 ], line: 794
+ -> Node: < Application, Lorg/eclipse/swt/widgets/EventTable, sendEvent(Lorg/eclipse/swt/widgets/Event;)V > Context: CallStringContext: [ sendEvent@25 ], line: 75
+ -> Node: < Application, Lorg/eclipse/jface/action/ActionContributionItem$7, handleEvent(Lorg/eclipse/swt/widgets/Event;)V > Context: CallStringContext: [ sendEvent@60 ], line: 762
+ -> Node: < Application, Lorg/eclipse/jface/action/ActionContributionItem, access$2(Lorg/eclipse/jface/action/ActionContributionItem;Lorg/eclipse/swt/widgets/Event;Z)V > Context: CallStringContext: [ handleEvent@60 ], line: 850
+ -> Node: < Application, Lorg/eclipse/jface/action/ActionContributionItem, handleWidgetSelection(Lorg/eclipse/swt/widgets/Event;Z)V > Context: CallStringContext: [ access$2@3 ], line: 852
+ -> Node: < Application, Lorg/eclipse/jface/action/Action, runWithEvent(Lorg/eclipse/swt/widgets/Event;)V > Context: CallStringContext: [ handleWidgetSelection@278 ], line: 881
+ -> Node: < Application, Lcom/scicom/faceit/MainWindow$EditClearAllAction, run()V > Context: CallStringContext: [ runWithEvent@1 ], line: 2368
+ -> Node: < Application, Lorg/eclipse/jface/text/source/SourceViewer, doOperation(I)V > Context: CallStringContext: [ run@62 ], line: 678
+ -> Node: < Application, Lorg/eclipse/jface/text/TextViewer, doOperation(I)V > Context: CallStringContext: [ doOperation@312 ], line: 3348
+ -> Node: < Application, Lorg/eclipse/jface/text/TextViewer, print()V > Context: CallStringContext: [ doOperation@336 ], line: 3822
+ -> Node: synthetic < Primordial, Ljava/lang/Thread, start()V > Context: CallStringContext: [ print@64 ], line: -1
+ -> Node: < Application, Lorg/eclipse/jface/text/TextViewer$5, run()V > Context: CallStringContext: [ start@1 ], line: 3832
+ -> Node: < Application, Lorg/eclipse/swt/custom/StyledText$Printing, run()V > Context: CallStringContext: [ run@4 ], line: 597
+ -> Node: < Application, Lorg/eclipse/swt/custom/StyledText$Printing, print()V > Context: CallStringContext: [ run@36 ], line: 481
+ -> Node: < Application, Lorg/eclipse/swt/custom/StyledTextRenderer, drawLine(Ljava/lang/String;IILorg/eclipse/swt/graphics/GC;Lorg/eclipse/swt/graphics/Color;Lorg/eclipse/swt/graphics/Color;Z)V > Context: CallStringContext: [ print@102 ], line: 107
+ -> Node: < Application, Lorg/eclipse/swt/custom/StyledTextRenderer, getTextLayout(Ljava/lang/String;I)Lorg/eclipse/swt/graphics/TextLayout; > Context: CallStringContext: [ drawLine@51 ], line: 409
+ -> Node: < Application, Lorg/eclipse/swt/custom/DisplayRenderer, getBidiSegments(ILjava/lang/String;)[I > Context: CallStringContext: [ getTextLayout@47 ], line: 127
+ -> Node: < Application, Lorg/eclipse/swt/custom/StyledText, getBidiSegments(ILjava/lang/String;)[I > Context: CallStringContext: [ getBidiSegments@18 ], line: 4118
+ -> Node: < Application, Lorg/eclipse/swt/custom/StyledText, sendLineEvent(IILjava/lang/String;)Lorg/eclipse/swt/custom/StyledTextEvent; > Context: CallStringContext: [ getBidiSegments@23 ], line: 3722
+ -> Node: < Application, Lorg/eclipse/swt/widgets/Widget, notifyListeners(ILorg/eclipse/swt/widgets/Event;)V > Context: CallStringContext: [ sendLineEvent@94 ], line: 611
+ -> Node: < Application, Lorg/eclipse/swt/widgets/Widget, sendEvent(ILorg/eclipse/swt/widgets/Event;)V > Context: CallStringContext: [ notifyListeners@19 ], line: 805
+ -> Node: < Application, Lorg/eclipse/swt/widgets/Widget, sendEvent(ILorg/eclipse/swt/widgets/Event;Z)V > Context: CallStringContext: [ sendEvent@4 ], line: 809
+ -> Node: < Application, Lorg/eclipse/swt/widgets/Widget, sendEvent(Lorg/eclipse/swt/widgets/Event;)V > Context: CallStringContext: [ sendEvent@73 ], line: 794
+ -> Node: < Application, Lorg/eclipse/swt/widgets/EventTable, sendEvent(Lorg/eclipse/swt/widgets/Event;)V > Context: CallStringContext: [ sendEvent@25 ], line: 75
+ -> Node: < Application, Lorg/eclipse/swt/widgets/TypedListener, handleEvent(Lorg/eclipse/swt/widgets/Event;)V > Context: CallStringContext: [ sendEvent@60 ], line: 78
+ -> Node: < Application, Lorg/eclipse/jface/text/TextViewer$CursorListener, mouseUp(Lorg/eclipse/swt/events/MouseEvent;)V > Context: CallStringContext: [ handleEvent@472 ], line: 1113
+ -> Node: < Application, Lorg/eclipse/swt/custom/StyledText, getSelectionCount()I > Context: CallStringContext: [ mouseUp@7 ], line: 4052
+ -> Node: < Application, Lorg/eclipse/swt/custom/StyledText, getSelectionRange()Lorg/eclipse/swt/graphics/Point; > Context: CallStringContext: [ getSelectionCount@5 ], line: 4020
+ -> Node: < Application, Lorg/eclipse/swt/widgets/Widget, checkWidget()V > Context: CallStringContext: [ getSelectionRange@1 ], line: 282
+
+
