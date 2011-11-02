@@ -14,6 +14,7 @@ import edu.washington.cs.detector.CGBuilder.CG;
 import edu.washington.cs.detector.SWTAppUIErrorMain;
 import edu.washington.cs.detector.UIAnomalyDetector;
 import edu.washington.cs.detector.experiments.filters.MergeSameTailStrategy;
+import edu.washington.cs.detector.experiments.filters.RemoveContainingNodeBeforeStartStrategy;
 import edu.washington.cs.detector.experiments.filters.RemoveContainingNodeStrategy;
 import edu.washington.cs.detector.experiments.filters.RemoveSystemCallStrategy;
 import edu.washington.cs.detector.util.Utils;
@@ -42,30 +43,30 @@ public class TestTuxGuitar extends TestCase {
 		chains = filter.apply(new RemoveSystemCallStrategy());
 		System.out.println("No of chains after filtering system classes: " + chains.size());
 		
-//		filter = new CallChainFilter(chains);
-//		chains = filter.apply(new RemoveContainingNodeStrategy("Lorg/eclipse/swt/graphics/Device, dispose()V"));
-//		System.out.println("No of chains after filtering dispose(): " + chains.size());
+		filter = new CallChainFilter(chains);
+		chains = filter.apply(new RemoveContainingNodeBeforeStartStrategy("Lorg/eclipse/swt/graphics/Device, dispose()V"));
+		System.out.println("No of chains after filtering dispose(): " + chains.size());
 //		
 //		//not safe
 //		filter = new CallChainFilter(chains);
 //		chains = filter.apply(new RemoveContainingNodeStrategy("Lorg/herac/tuxguitar/gui/helper/SyncThread$1, run()V"));
 //		System.out.println("No of chains after removing sync thread: " + chains.size());
 //		
-//		filter = new CallChainFilter(chains);
-//		chains = filter.apply(new RemoveContainingNodeStrategy("Lorg/herac/tuxguitar/gui/util/MessageDialog, errorMessage(Lorg/eclipse/swt/widgets/Shell;Ljava/lang/Throwable;)V"));
-//		System.out.println("No of chains after removing message dialog thread: " + chains.size());
+		filter = new CallChainFilter(chains);
+		chains = filter.apply(new RemoveContainingNodeStrategy("Lorg/herac/tuxguitar/gui/util/MessageDialog, errorMessage(Lorg/eclipse/swt/widgets/Shell;Ljava/lang/Throwable;)V"));
+		System.out.println("No of chains after removing message dialog thread: " + chains.size());
 		
-//		filter = new CallChainFilter(chains);
-//		chains = filter.apply(new RemoveSynchronizeTask("Lorg/herac/tuxguitar/util/TGSynchronizer$TGSynchronizerTask, run()V"));
-//		System.out.println("No of chains after removing sync task dialog thread: " + chains.size());
+		filter = new CallChainFilter(chains);
+		chains = filter.apply(new RemoveSynchronizeTask("Lorg/herac/tuxguitar/util/TGSynchronizer$TGSynchronizerTask, run()V"));
+		System.out.println("No of chains after removing sync task dialog thread: " + chains.size());
 		
 		filter = new CallChainFilter(chains);
 		chains = filter.apply(new MergeSameTailStrategy());
-		System.out.println("No of chains after removing common tails: " + chains.size());
-		
+		System.out.println("No of chains after merging same tails: " + chains.size());
 		
 		Utils.dumpAnomalyCallChains(chains, "./logs/tuxguitar-1.2-anomalies.txt");
 		
+		assertTrue(chains.size() == 0);
 	}
 	
 	class RemoveSynchronizeTask extends RemoveContainingNodeStrategy {
@@ -77,7 +78,11 @@ public class TestTuxGuitar extends TestCase {
 		@Override
 		protected boolean remove(AnomalyCallChain c) {
 			boolean hasSyncTask = false;
+			boolean hasSeeStart = false;
 			for(CGNode node : c.getFullCallChain()) {
+				if(node.toString().indexOf(super.thread_start_method) != -1) {
+					hasSeeStart = true;
+				}
 				if(node.toString().indexOf(this.sig) != -1) {
 					hasSyncTask = true;
 					break;
@@ -86,12 +91,12 @@ public class TestTuxGuitar extends TestCase {
 			//count how many thread start it has
 			int threadstartcount = 0;
 			for(CGNode node : c.getFullCallChain()) {
-				if(node.toString().indexOf("Ljava/lang/Thread, start()V") != -1) {
+				if(node.toString().indexOf(super.thread_start_method) != -1) {
 					threadstartcount ++;
 				}
 			}
 			
-			return hasSyncTask && (threadstartcount < 2);
+			return hasSyncTask && (threadstartcount < 2) && !hasSeeStart;
 		}
 		
 	}
