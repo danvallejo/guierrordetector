@@ -24,7 +24,7 @@ import edu.washington.cs.detector.util.Utils;
  * */
 public class TestTuxGuitar extends TestCase {
 	
-	public void testRunng() throws IOException {
+	public void testTuxGuitar() throws IOException {
 		String appPath = "D:\\research\\guierror\\subjects\\tuxguitar-1.2.jar" + ";" +  SWTAppUIErrorMain.swtJar;
 		UIAnomalyDetector detector = new UIAnomalyDetector(appPath);
 		
@@ -42,18 +42,18 @@ public class TestTuxGuitar extends TestCase {
 		chains = filter.apply(new RemoveSystemCallStrategy());
 		System.out.println("No of chains after filtering system classes: " + chains.size());
 		
-		filter = new CallChainFilter(chains);
-		chains = filter.apply(new RemoveContainingNodeStrategy("Lorg/eclipse/swt/graphics/Device, dispose()V"));
-		System.out.println("No of chains after filtering dispose(): " + chains.size());
-		
-		//not safe
-		filter = new CallChainFilter(chains);
-		chains = filter.apply(new RemoveContainingNodeStrategy("Lorg/herac/tuxguitar/gui/helper/SyncThread$1, run()V"));
-		System.out.println("No of chains after removing sync thread: " + chains.size());
-		
-		filter = new CallChainFilter(chains);
-		chains = filter.apply(new RemoveContainingNodeStrategy("Lorg/herac/tuxguitar/gui/util/MessageDialog, errorMessage(Lorg/eclipse/swt/widgets/Shell;Ljava/lang/Throwable;)V"));
-		System.out.println("No of chains after removing message dialog thread: " + chains.size());
+//		filter = new CallChainFilter(chains);
+//		chains = filter.apply(new RemoveContainingNodeStrategy("Lorg/eclipse/swt/graphics/Device, dispose()V"));
+//		System.out.println("No of chains after filtering dispose(): " + chains.size());
+//		
+//		//not safe
+//		filter = new CallChainFilter(chains);
+//		chains = filter.apply(new RemoveContainingNodeStrategy("Lorg/herac/tuxguitar/gui/helper/SyncThread$1, run()V"));
+//		System.out.println("No of chains after removing sync thread: " + chains.size());
+//		
+//		filter = new CallChainFilter(chains);
+//		chains = filter.apply(new RemoveContainingNodeStrategy("Lorg/herac/tuxguitar/gui/util/MessageDialog, errorMessage(Lorg/eclipse/swt/widgets/Shell;Ljava/lang/Throwable;)V"));
+//		System.out.println("No of chains after removing message dialog thread: " + chains.size());
 		
 //		filter = new CallChainFilter(chains);
 //		chains = filter.apply(new RemoveSynchronizeTask("Lorg/herac/tuxguitar/util/TGSynchronizer$TGSynchronizerTask, run()V"));
