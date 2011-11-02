@@ -19,7 +19,7 @@ public class TestSonar extends TestCase {
 	/**
 	 * No bugs found
 	 * */
-	public void testRunningSonar() throws IOException {
+	public void testSonar() throws IOException {
 		String appPath = "D:\\research\\guierror\\subjects\\sonar.jar"
 			+ Globals.pathSep +  SWTAppUIErrorMain.swtJar
 			+ Globals.pathSep + "D:\\research\\guierror\\eclipsews\\Sonar\\mail.jar"
