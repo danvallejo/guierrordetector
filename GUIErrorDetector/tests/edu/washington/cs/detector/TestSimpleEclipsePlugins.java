@@ -5,6 +5,8 @@ import java.util.List;
 
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
 
+import edu.washington.cs.detector.experiments.filters.RemoveSystemCallStrategy;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;

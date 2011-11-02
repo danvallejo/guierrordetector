@@ -10,12 +10,12 @@ import junit.framework.TestCase;
 import edu.washington.cs.detector.AnomalyCallChain;
 import edu.washington.cs.detector.CGBuilder;
 import edu.washington.cs.detector.CallChainFilter;
-import edu.washington.cs.detector.RemoveSystemCallStrategy;
 import edu.washington.cs.detector.CGBuilder.CG;
 import edu.washington.cs.detector.SWTAppUIErrorMain;
 import edu.washington.cs.detector.UIAnomalyDetector;
 import edu.washington.cs.detector.experiments.filters.MergeSameTailStrategy;
 import edu.washington.cs.detector.experiments.filters.RemoveContainingNodeStrategy;
+import edu.washington.cs.detector.experiments.filters.RemoveSystemCallStrategy;
 import edu.washington.cs.detector.util.Utils;
 
 /**
