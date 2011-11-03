@@ -22,15 +22,37 @@ import edu.washington.cs.detector.util.Log;
 //implements the algorithm
 public class UIAnomalyDetector {
 	
-	public static String exclusion_file = CallGraphTestUtil.REGRESSION_EXCLUSIONS;
-	
-	public final String appPath;
+	private final String appPath;
+	private String exclusion_file = CallGraphTestUtil.REGRESSION_EXCLUSIONS;
 	
 	public UIAnomalyDetector(String appPath) {
 		assert appPath != null;
 		this.appPath = appPath;
 	}
 	
+	public String getAppPath() {
+		return this.appPath;
+	}
+	public String getExclusionFile() {
+		return exclusion_file;
+	}
+	public void setExclusionFile(String exclusionFile) {
+		assert exclusionFile != null;
+		exclusion_file = exclusionFile;
+	}
+	
+	//configure the UI anomaly detector for different purpose
+	//You can configure this detector for different UI models, e.g., swing
+	public void configureCheckingMethods(String configFilePath) {
+		UIAnomalyMethodFinder.setCheckingMethods(configFilePath);
+	}
+	public void configureSafeMethods(String configFilePath) {
+		UIAnomalyMethodFinder.setSafeMethods(configFilePath);
+	}
+	
+	/**
+	 * Methods for detecting anomaly UI call chains
+	 * */
 	public List<AnomalyCallChain> detectUIAnomaly() {
 		try {
 			//get the exclusion file
