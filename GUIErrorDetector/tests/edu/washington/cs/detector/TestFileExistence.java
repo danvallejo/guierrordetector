@@ -41,8 +41,8 @@ public class TestFileExistence extends TestCase {
 		Utils.checkFileExistence(fPath);
 		List<String> list = Files.readWhole(fPath);
 		System.out.println(list);
-		assertEquals(list.size(), UIAnomalyMethodFinder.checking_methods.length);
-		for(String str : UIAnomalyMethodFinder.checking_methods) {
+		assertEquals(list.size(), UIAnomalyMethodFinder.getCheckingMethods().length);
+		for(String str : UIAnomalyMethodFinder.getCheckingMethods()) {
 			assertTrue("str: " + str + " not in: " + fPath, list.contains(str));
 		}
 	}
