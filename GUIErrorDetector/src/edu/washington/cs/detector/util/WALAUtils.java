@@ -76,10 +76,20 @@ public class WALAUtils {
 		    Log.log(sb.toString());
 	}
 	
-
-	  public static Graph<CGNode> pruneForAppLoader(CallGraph g) throws WalaException {
-	    return pruneGraph(g, new ApplicationLoaderFilter());
+	  //FIXME buyer aware
+	  public static Graph<CGNode> copy(Graph<CGNode> g) throws WalaException {
+		  return pruneGraph(g, new AcceptAllFilter());
 	  }
+	  private static class AcceptAllFilter implements Filter<CGNode> {
+			public boolean accepts(CGNode o) {
+				return true;
+			}
+		}
+
+	public static Graph<CGNode> pruneForAppLoader(CallGraph g)
+			throws WalaException {
+		return pruneGraph(g, new ApplicationLoaderFilter());
+	}
 	  
 	  public static <T> Graph<T> pruneGraph(Graph<T> g, Filter<T> f) throws WalaException {
 		    Collection<T> slice = GraphSlicer.slice(g, f);

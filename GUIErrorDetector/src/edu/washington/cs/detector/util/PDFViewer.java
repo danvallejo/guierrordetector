@@ -15,7 +15,12 @@ import com.ibm.wala.viz.PDFViewUtil;
 
 public class PDFViewer {
 	
+	public static boolean DISABLE_VIEW_CG = false;
+	
 	public static void viewCG(String pdfFileName, Graph<CGNode> g) {
+		if(DISABLE_VIEW_CG) {
+			return;
+		}
 		try {
 			viewCGAsPDF(pdfFileName, g);
 		} catch (WalaException e) {

@@ -2,7 +2,10 @@ package edu.washington.cs.detector;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.LinkedList;
 
+import com.ibm.wala.classLoader.IMethod;
 import com.ibm.wala.core.tests.callGraph.CallGraphTestUtil;
 import com.ibm.wala.ipa.callgraph.AnalysisCache;
 import com.ibm.wala.ipa.callgraph.AnalysisOptions;
@@ -20,6 +23,7 @@ import com.ibm.wala.util.config.AnalysisScopeReader;
 import com.ibm.wala.util.graph.Graph;
 import com.ibm.wala.util.io.FileProvider;
 
+import edu.washington.cs.detector.util.Utils;
 import edu.washington.cs.detector.util.WALAUtils;
 
 public class CGBuilder {
@@ -152,6 +156,38 @@ public class CGBuilder {
 	
 	public CallGraph getCallGraph() {
 		return callgraph;
+	}
+	
+	public Collection<CGNode> getCallGraphEntryNodes() {
+		if(callgraph == null) {
+			throw new RuntimeException("You must build call graph first.");
+		}
+		return callgraph.getEntrypointNodes();
+	}
+	
+	//give a number of entrypoint, get the corresponding entry point nodes
+	public Collection<CGNode> getCallGraphEntryNodes(Iterable<Entrypoint> entries) {
+		if(this.entrypoints == null) {
+			throw new RuntimeException("You must build call graph first.");
+		}
+		//assert the entrypoint must be included in the CG entry points
+		if(!Utils.includedIn(entries, this.entrypoints)) {
+			throw new RuntimeException("The given entry point set is not included in this.entrypoints.");
+		}
+		//then match the CG Node based on the IMethod
+		Collection<CGNode> allEntryCGNodes = this.getCallGraphEntryNodes();
+		Collection<CGNode> matchedCGNodes = new LinkedList<CGNode>();
+		for(Entrypoint entry : entries) {
+			IMethod method = entry.getMethod();
+			//try to find
+			for(CGNode entryCGNode : allEntryCGNodes) {
+				if(entryCGNode.getMethod().equals(method)) {
+					matchedCGNodes.add(entryCGNode);
+					break;
+				}
+			}
+		}
+		return matchedCGNodes;
 	}
 	
 	public ClassHierarchy getClassHierarchy() {
