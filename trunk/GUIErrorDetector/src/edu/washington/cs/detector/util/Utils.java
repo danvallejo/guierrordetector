@@ -92,6 +92,13 @@ public class Utils {
 		return collection;
  	}
 	
+	//check if every element of its is included in all
+	public static <T> boolean includedIn(Iterable<T> its, Iterable<T> all) {
+		Collection<T> collection_its = iterableToCollection(its);
+		Collection<T> collection_all = iterableToCollection(its);
+		return collection_all.containsAll(collection_its);
+	}
+	
 	/** This project-specific methods */
 	public static <T> int countIterable(Iterable<T> c) {
 		int count = 0;

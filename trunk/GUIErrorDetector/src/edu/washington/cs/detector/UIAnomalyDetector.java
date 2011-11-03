@@ -51,7 +51,8 @@ public class UIAnomalyDetector {
 	}
 	
 	/**
-	 * Methods for detecting anomaly UI call chains
+	 * Methods for detecting anomaly UI call chains. It treats every main
+	 * methods as entries
 	 * */
 	public List<AnomalyCallChain> detectUIAnomaly() {
 		try {
@@ -74,9 +75,11 @@ public class UIAnomalyDetector {
 	}
 	
 	public List<AnomalyCallChain> detectUIAnomaly(CGBuilder builder) throws IOException { 
-		return detectUIAnomaly(FileProvider.getFile(exclusion_file), builder, builder.getCallGraph().getEntrypointNodes());
+		return detectUIAnomaly(FileProvider.getFile(exclusion_file), builder, builder.getCallGraphEntryNodes());
+		// builder.getCallGraph().getEntrypointNodes());
 	}
 	
+	//users can designate specific entries nodes for detecting UI anomaly
 	public List<AnomalyCallChain> detectUIAnomaly(CGBuilder builder, Collection<CGNode> entries) throws IOException { 
 		return detectUIAnomaly(FileProvider.getFile(exclusion_file), builder, entries);
 	}
