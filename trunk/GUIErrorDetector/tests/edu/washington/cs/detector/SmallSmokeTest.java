@@ -21,6 +21,7 @@ public class SmallSmokeTest extends TestCase {
 		suite.addTest(TestPropertyReader.suite());
 		suite.addTest(TestCGWithPDFViewer.suite());
 		suite.addTest(TestCGBuilder.suite());
+		suite.addTest(TestUIAnomalyDetector.suite());
 		
 		suite.addTest(TestUseCustomizedEntries.suite());
 		suite.addTest(TestSWTExamples.suite());
