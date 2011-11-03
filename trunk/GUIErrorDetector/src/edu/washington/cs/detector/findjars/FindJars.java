@@ -6,12 +6,26 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 public class FindJars {
+
+	static Pattern ENTRY_LINE_PATTERN = Pattern.compile("^[^ ]*:.*$");
+	static Pattern REQUIRE_BUNDLE_ENTRY_LINE_PATTERN = Pattern.compile("^(?:Require-Bundle|Import-Package|DynamicImport-Package):(.*)$");
+	static Pattern BUNDLE_SYMBOLIC_NAME_LINE_PATTERN = Pattern.compile("^Bundle-SymbolicName: ([^ ;]*)(;.*)?$");
+	static Pattern BUNDLE_VERSION_LINE_PATTERN = Pattern.compile("^Bundle-Version: (.*)$");
+	
+	static Pattern BUNDLE_SPEC_PATTERN = Pattern.compile("^(([^,\"]|\"[^\"]*\")*)(,|$)");
+	static Pattern BUNDLE_SPEC_ENTRY_PATTERN = Pattern.compile("^(([^;\"]|\"[^\"]*\")*)(;|$)");
+	
+	static Pattern BUNDLE_MINMAX_VER_ENTRY_PATTERN = Pattern.compile("^bundle-version=\"(\\[|\\()([0-9.]*),([0-9.]*)(\\]|\\))\"$");
+	static Pattern BUNDLE_MIN_VER_ENTRY_PATTERN = Pattern.compile("^bundle-version=\"([0-9.]*)\"$");
+	static Pattern BUNDLE_OPTIONAL_ENTRY_PATTERN = Pattern.compile("^resolution:=optional$");
+	static Pattern BUNDLE_REEXPORT_ENTRY_PATTERN = Pattern.compile("^visibility:=reexport$");
 
 	/**
 	 * @param args
@@ -24,6 +38,7 @@ public class FindJars {
 							new String[] {
 									"/Users/hlv/tmp/plugins/plugintest_1.0.0.201111021521.jar",
 									"/Users/hlv/bin/eclipse/plugins/org.eclipse.jdt.core_3.7.1.v_B76_R37x.jar" },
+									
 							new String[] {
 									"/Users/hlv/bin/eclipse/plugins/org.eclipse.debug.ui_3.7.101.v20110817_r371.jar",
 									"/Users/hlv/bin/eclipse/plugins/org.eclipse.swt.cocoa.macosx.x86_64_3.7.1.v3738a.jar",
@@ -47,119 +62,137 @@ public class FindJars {
 		}
 	}
 	
-	static Pattern REQUIRE_BUNDLE_ENTRY_LINE_PATTERN = Pattern.compile("^Require-Bundle:(.*)$");
-	static Pattern ENTRY_LINE_PATTERN = Pattern.compile("^[^ ]*:.*$");
-	
-	static Pattern BUNDLE_SPEC_PATTERN = Pattern.compile("^(([^,\"]|\"[^\"]*\")*)(,|$)");
-	static Pattern BUNDLE_SPEC_ENTRY_PATTERN = Pattern.compile("^(([^;\"]|\"[^\"]*\")*)(;|$)");
-	
-	static Pattern BUNDLE_MINMAX_VER_ENTRY_PATTERN = Pattern.compile("^bundle-version=\"(\\[|\\()([0-9.]*),([0-9.]*)(\\]|\\))\"$");
-	static Pattern BUNDLE_MIN_VER_ENTRY_PATTERN = Pattern.compile("^bundle-version=\"([0-9.]*)\"$");
-	static Pattern BUNDLE_OPTIONAL_ENTRY_PATTERN = Pattern.compile("^resolution:=optional$");
-	static Pattern BUNDLE_REEXPORT_ENTRY_PATTERN = Pattern.compile("^visibility:=reexport$");
-
 	String[] findDependentJars(String[] jas, String[] jbs) throws IOException {
 		
-		boolean[] flags = new boolean[jbs.length];
+		ArrayList<String> result = new ArrayList<String>();
+		
+		BundleInfo[] bas = new BundleInfo[jas.length];
+		BundleInfo[] bbs = new BundleInfo[jbs.length];
+		
+		for (int i = 0; i < jas.length; ++i) {
+			bas[i] = getBundleInfo(jas[i]);
+		}
+		
+		for (int i = 0; i < jbs.length; ++i) {
+			bbs[i] = getBundleInfo(jbs[i]);
+		}
+		
+		boolean[] flags = new boolean[bbs.length];
 		Arrays.fill(flags, false);
 		
-		for (String filename : jas) {
-			ZipFile jarFile = new ZipFile(filename);
-			ZipEntry entry = jarFile.getEntry("META-INF/MANIFEST.MF");
-			if (entry == null || entry.isDirectory()) {
-				System.out.println("IS NULL");
+		LinkedList<BundleInfo> jcs = new LinkedList<BundleInfo>(Arrays.asList(bas));
+		
+		while (!jcs.isEmpty()) {
+			BundleInfo bundleInfo = jcs.remove();
+
+			if (bundleInfo.requiredBundles == null) {
 				continue;
 			}
 			
-			BufferedReader in = new BufferedReader(new InputStreamReader(jarFile.getInputStream(entry)));
+			for (RequiredBundleInfo info : bundleInfo.requiredBundles) {
+				
+				if (info.symbolicName != null) {
+					for (int i = 0; i < bbs.length; ++i) {
+						if (flags[i]) {
+							continue;
+						}
+						
+						if (bbs[i].symbolicName.equals(info.symbolicName)) {
+							
+							// TODO check version
+							
+							flags[i] = true;
+							
+							jcs.add(bbs[i]);
+							result.add(jbs[i]);
+							
+							break;
+						}
+					}
+				}
+			}
+		}
+
+		return result.toArray(new String[]{});
+	}
+	
+	public BundleInfo getBundleInfo(String path) {
+		try {
+			ZipFile jarFile = new ZipFile(path);
+		
+			ZipEntry entry = jarFile.getEntry("META-INF/MANIFEST.MF");
+			if (entry == null || entry.isDirectory()) {
+				System.err.println("MANIFEST.MF not found!");
+				return null;
+			}
+		
+			BundleInfo bundleInfo = new BundleInfo();
+
+			BufferedReader in = new BufferedReader(
+					new InputStreamReader(jarFile.getInputStream(entry)));
+			
 			String line = null;
+			String nextLine = in.readLine();
 			
-			StringBuffer buffer = new StringBuffer();
+			ArrayList<RequiredBundleInfo> infos = new ArrayList<RequiredBundleInfo>();
 			
-			boolean flag = false;
-			
-			while (!flag) {
-				line = in.readLine();
+			while (true) {
+				
+				line = nextLine;
+				nextLine = in.readLine();
+				
 				if (line == null) {
 					break;
 				}
 				
 				Matcher m = REQUIRE_BUNDLE_ENTRY_LINE_PATTERN.matcher(line);
 				if (m.find()) {
-					flag = true;
-					
+					StringBuffer buffer = new StringBuffer();
 					buffer.append(m.group(1).trim());
-					break;
+					
+					while (nextLine != null) {
+						m = ENTRY_LINE_PATTERN.matcher(nextLine);
+						if (m.find()) {
+							break;
+						}
+						
+						line = nextLine;
+						nextLine = in.readLine();
+						buffer.append(line.trim());
+					}
+					
+					infos.addAll(parseBundles(buffer.toString()));
+					
+					continue;
 				}
-			}
-			
-			if (flag) {
-				while (true) {
-					line = in.readLine();
-					if (line == null) {
-						break;
-					}
-					
-					Matcher m = ENTRY_LINE_PATTERN.matcher(line);
-					if (m.find()) {
-						break;
-					}
-					
-					buffer.append(line.trim());
+				
+				m = BUNDLE_SYMBOLIC_NAME_LINE_PATTERN.matcher(line);
+				if (m.find()) {
+					bundleInfo.symbolicName = m.group(1);
+					continue;
+				}
+				
+				m = BUNDLE_VERSION_LINE_PATTERN.matcher(line);
+				if (m.find()) {
+					bundleInfo.version = m.group(1);
+					continue;
 				}
 			}
 			
 			in.close();
-
-			ArrayList<RequiredBundleInfo> infos = parseBundles(buffer.toString());
-
-//			for (RequiredBundleInfo info : infos) {
-//				System.out.println(info.bundleName);
-//
-//				if (info.minVersion != null && info.maxVersion == null) {
-//					System.out.println(String.format("minVersion : %s", info.minVersion));
-//				} else if (info.maxVersion != null) {
-//					System.out.println(String.format("minVersion (%s): %s", info.minVersionInclusive ? "inclusive" : "exclusive", info.minVersion));
-//					System.out.println(String.format("maxVersion (%s): %s", info.maxVersionInclusive ? "inclusive" : "exclusive", info.maxVersion));
-//				}
-//				
-//				if (info.optional) {
-//					System.out.println("Optional");
-//				}
-//				
-//				if (info.reexport) {
-//					System.out.println("Reexport");
-//				}
-//				
-//				System.out.println();
-//			}
 			
-			for (RequiredBundleInfo info : infos) {
-				if (info.bundleName != null) {
-					for (int i = 0; i < flags.length; ++i) {
-						File f = new File(jbs[i]);
-						if (f.isDirectory()) {
-							continue;
-						}
-						
-						if (f.getName().startsWith(info.bundleName + "_")) {
-							flags[i] = true;
-						}
-					}
-				}
-			}
+			bundleInfo.requiredBundles = infos.toArray(new RequiredBundleInfo[]{});
 			
+//			System.out.println(path + " : " + bundleInfo.symbolicName);
+//			System.out.println(Arrays.toString(bundleInfo.requiredBundles));
+			
+			return bundleInfo;
+	
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-		
-		ArrayList<String> result = new ArrayList<String>();
-		
-		for (int i = 0; i <flags.length; ++i) {
-			if (flags[i]) {
-				result.add(jbs[i]);
-			}
-		}
-		
-		return result.toArray(new String[]{});
+
+		return null;
 	}
 	
 	public ArrayList<RequiredBundleInfo> parseBundles(String bundleSpecs) {
@@ -184,8 +217,8 @@ public class FindJars {
 		while (bundleSpec.length() > 0) {
 			Matcher m = BUNDLE_SPEC_ENTRY_PATTERN.matcher(bundleSpec);
 			if (m.find()) {
-				if (info.bundleName == null) {
-					info.bundleName = m.group(1);
+				if (info.symbolicName == null) {
+					info.symbolicName = m.group(1);
 				} else {
 					parseEntry(info, m.group(1));
 				}
@@ -231,8 +264,15 @@ public class FindJars {
 	}
 }
 
+class BundleInfo {
+	public String symbolicName;
+	public String version;
+	
+	public RequiredBundleInfo[] requiredBundles;
+}
+
 class RequiredBundleInfo {
-	public String bundleName;
+	public String symbolicName;
 	
 	public String minVersion;
 	public boolean minVersionInclusive;
@@ -244,5 +284,29 @@ class RequiredBundleInfo {
 	public boolean reexport;
 	
 	public RequiredBundleInfo() {
+	}
+	
+	@Override
+	public String toString() {
+		StringBuffer buffer = new StringBuffer();
+		
+		buffer.append(symbolicName);
+
+		if (minVersion != null && maxVersion == null) {
+			buffer.append(String.format(";minVersion : %s", minVersion));
+		} else if (maxVersion != null) {
+			buffer.append(String.format(";minVersion (%s): %s", minVersionInclusive ? "inclusive" : "exclusive", minVersion));
+			buffer.append(String.format(";maxVersion (%s): %s", maxVersionInclusive ? "inclusive" : "exclusive", maxVersion));
+		}
+		
+		if (optional) {
+			buffer.append(";optional");
+		}
+		
+		if (reexport) {
+			buffer.append(";reexport");
+		}
+		
+		return buffer.toString();
 	}
 }
