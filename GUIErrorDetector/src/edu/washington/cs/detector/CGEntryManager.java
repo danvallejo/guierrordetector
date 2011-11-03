@@ -77,17 +77,17 @@ public class CGEntryManager {
 		return getAllPublicMethods(scope, cha, uiClasses);
 	}
 	
-	public static Iterable<Entrypoint> getAllPublicMethods(AnalysisScope scope, ClassHierarchy cha, String... uiClasses) {
+	public static Iterable<Entrypoint> getAllPublicMethods(AnalysisScope scope, ClassHierarchy cha, String... methodClasses) {
 		List<String> clazzList = new LinkedList<String>();
-		for(String uiClass : uiClasses) {
+		for(String uiClass : methodClasses) {
 			clazzList.add(uiClass);
 		}
 		return getAllPublicMethods(scope, cha, clazzList);
 	}
 	
-	public static Iterable<Entrypoint> getAllPublicMethods(AnalysisScope scope, ClassHierarchy cha, List<String> uiClasses) {
+	public static Iterable<Entrypoint> getAllPublicMethods(AnalysisScope scope, ClassHierarchy cha, List<String> methodClasses) {
 		final HashSet<Entrypoint> result = HashSetFactory.make();
-		for(String methodClass : uiClasses) {
+		for(String methodClass : methodClasses) {
 			//System.out.println("method class: " + methodClass);
 		    Iterable<Entrypoint> entries = CGEntryManager.getAppPublicMethodsByClass(scope, cha, methodClass);
 		    for(Entrypoint ep : entries) {

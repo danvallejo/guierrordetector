@@ -65,6 +65,34 @@ public class TestUseCustomizedEntries extends TestCase {
 		        //"test.useinterface.Handler", false);
 	}
 	
+	public void testComplexInteractionAllPublicMethodsAsEntries() throws ClassHierarchyException, IOException {
+		this.checkCallGraphEntries(TestCommons.testfolder + "useinterface",
+				false, "test.useinterface.Bar",  "test.useinterface.AbBar" , "test.useinterface.Bridge", "test.useinterface.Foo");
+	}
+	
+	//FIXME the followiing two methods are identical except for the code of obtaining entries
+	public void checkCallGraphEntries(String appPath, boolean useSubType, String...classNames) throws IOException, ClassHierarchyException {
+		CGBuilder builder = new CGBuilder(appPath);
+		builder.makeScopeAndClassHierarchy();
+		Iterable<Entrypoint> entries = CGEntryManager.getAllPublicMethods(builder.getAnalysisScope(),
+				builder.getClassHierarchy(), classNames);
+		builder.setCGType(CG.RTA);
+		builder.buildCG(entries);
+		PDFViewer.viewCG("cgentries_" + classNames.length + ".pdf", builder.getAppCallGraph());
+		System.out.println("entries num: " + Utils.countIterable(entries));
+		System.out.println("entries: " + Utils.dumpCollection(entries));
+		//let's see the entries
+		System.out.println("Number of entries in the built CG: "
+				+ builder.getCallGraph().getEntrypointNodes().size() + ", v.s. number of entries: "
+				+ Utils.countIterable(entries));
+		//see the IR in the root node
+		String irstr = WALAUtils.getAllIRAsString(builder.getCallGraph().getFakeRootNode());
+		System.out.println(irstr);
+		
+		assertEquals("The no of entries not equal, in built CG and the given entries.",
+				Utils.countIterable(entries), builder.getCallGraph().getEntrypointNodes().size());
+	}
+	
 	public void checkCallGraphEntries(String appPath, String className, boolean useSubType) throws IOException, ClassHierarchyException {
 		CGBuilder builder = new CGBuilder(appPath);
 		builder.makeScopeAndClassHierarchy();
