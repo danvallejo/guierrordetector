@@ -1,10 +1,12 @@
 package edu.washington.cs.detector;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
 import com.ibm.wala.classLoader.IClass;
+import com.ibm.wala.ipa.callgraph.CGNode;
 import com.ibm.wala.ipa.callgraph.Entrypoint;
 import com.ibm.wala.ipa.cha.ClassHierarchy;
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
@@ -21,6 +23,8 @@ public abstract class AbstractUITest extends TestCase {
 	public static boolean DEBUG = false;
 	
 	protected abstract boolean isUIClass(IClass kclass);
+	
+	protected boolean isEntryClass(IClass kclass) {return isUIClass(kclass); }
 	
 	protected abstract String getAppPath();
 	
@@ -117,6 +121,77 @@ public abstract class AbstractUITest extends TestCase {
 		//try to detect errors from all public methods
 		UIAnomalyDetector detector = new UIAnomalyDetector(appPath);
 		List<AnomalyCallChain> chains = detector.detectUIAnomaly(builder);
+		System.out.println("Number of anomaly call chains: " + chains.size());
+		
+		return chains;
+	}
+	
+	/** Treat every public method in the uiClass list as call graph entry, permit user
+	 *  to set call graph precision
+	 *  All public methods in the entry classes are used as entry nodes, but when detecting errors, only
+	 *  public methods in uiClasses are used as the starting points.
+	 */
+	public List<AnomalyCallChain> reportUIErrorsWithEntries(String outputFilePath, CGBuilder.CG opt)
+	    throws IOException, ClassHierarchyException {
+		String appPath = TestCommons.assemblyAppPath(getAppPath(), getDependentJars());
+		CGBuilder builder = new CGBuilder(appPath);
+	    builder.makeScopeAndClassHierarchy();
+	    
+		if(builder.getClassHierarchy() == null || builder.getAnalysisScope() == null) {
+			throw new RuntimeException("Please call builder.makeScopeAndClassHierarchy first.");
+		}
+		
+		//find all entry classes
+	    ClassHierarchy cha = builder.getClassHierarchy();
+	    List<String> uiClasses = new LinkedList<String>();
+	    for(IClass kclass : cha) {
+	    	if(this.isUIClass(kclass)) {
+	    		 uiClasses.add(WALAUtils.getJavaFullClassName(kclass));
+	    	}
+		}
+	    
+	    List<String> entryClasses = new LinkedList<String>();
+	    for(IClass kclass : cha) {
+	    	if(this.isEntryClass(kclass)) {
+	    		entryClasses.add(WALAUtils.getJavaFullClassName(kclass));
+	    	}
+		}
+	    
+		//dump info
+		System.out.println("Total class num: " + builder.getClassHierarchy().getNumberOfClasses());
+		System.out.println("Number of entry classes: " + entryClasses.size());
+	    System.out.println("Number of UI classes: " + uiClasses.size());
+	    Utils.dumpCollection(entryClasses, "./logs/entry_classes.txt");
+	    Utils.dumpCollection(uiClasses, "./logs/ui_classes.txt");
+	    
+	    Iterable<Entrypoint> entries = CGEntryManager.getAllPublicMethods(builder, entryClasses);
+		System.out.println("Number of entries for building CG: " + Utils.countIterable(entries));
+		Utils.dumpCollection(entries, "./logs/entries.txt");
+		
+		if(opt != null) {
+			builder.setCGType(opt);
+		}
+		builder.buildCG(entries);
+		
+		Iterable<Entrypoint> queryUIEntries = CGEntryManager.getAllPublicMethods(builder, uiClasses);
+		System.out.println("Number of query UI entries: " + Utils.countIterable(queryUIEntries));
+		Utils.dumpCollection(queryUIEntries, "./logs/ui_query_entries.txt");
+		
+		System.out.println("number of entry node in the built CG: " + builder.getCallGraph().getEntrypointNodes().size());
+		System.out.println("CG node num: " + builder.getCallGraph().getNumberOfNodes());
+		System.out.println("App CG node num: " + builder.getAppCallGraph().getNumberOfNodes());
+		
+		if(DEBUG) {
+		    WALAUtils.viewCallGraph(builder.getAppCallGraph());
+		    Files.writeToFile(builder.getAppCallGraph().toString(), "./logs/callgraph.txt");
+		}
+		if(outputFilePath != null) {
+		    Log.logConfig(outputFilePath);
+		}
+		//try to detect errors from all public methods
+		UIAnomalyDetector detector = new UIAnomalyDetector(appPath);
+		Collection<CGNode> uiEntryNodes = builder.getCallGraphEntryNodes(queryUIEntries);
+		List<AnomalyCallChain> chains = detector.detectUIAnomaly(builder, uiEntryNodes);
 		System.out.println("Number of anomaly call chains: " + chains.size());
 		
 		return chains;
