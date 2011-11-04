@@ -146,6 +146,38 @@ public class TestRSESDKUI extends AbstractUITest {
 		assertEquals(0, chains.size());
 	}
 	
+	public void testKnownBug267478ByAllEntries() throws ClassHierarchyException, IOException {
+		//org.eclipse.rse.services.dstore.util.DownloadListener
+		AbstractUITest test = new AbstractUITest(){
+			@Override
+			protected boolean isUIClass(IClass kclass) {
+				return kclass.toString().indexOf("org/eclipse/dstore/internal/core/client/ClientUpdateHandler") != -1;
+				//return kclass.toString().indexOf("org/eclipse/dstore/internal/extra/DomainNotifier") != -1;
+			}
+			@Override
+			protected boolean isEntryClass(IClass kclass) {
+				if(isUIClass(kclass)) {
+					return true;
+				}
+				return kclass.toString().indexOf("org/eclipse/dstore/") != -1
+				    || kclass.toString().indexOf("org/eclipse/rse/internal") != -1;
+				//return kclass.toString().indexOf("org/eclipse/dstore/internal/extra/DomainNotifier") != -1;
+			}
+			@Override
+			protected String getAppPath() {
+				return PLUGIN_DIR;
+			}
+			@Override
+			protected String getDependentJars() {
+				return EclipsePluginCommons.DEPENDENT_JARS;
+			}
+			
+		};
+		AbstractUITest.DEBUG = true;
+		List<AnomalyCallChain> chains  = test.reportUIErrorsWithEntries(SWTAppUIErrorMain.default_log, CG.RTA);
+		System.out.println(chains.size());
+	}
+	
 	public void testEntryPointInCallGraph() throws IOException, ClassHierarchyException, IllegalArgumentException, CallGraphBuilderCancelException {
 		String myClass = "org.eclipse.dstore.internal.core.client.ClientUpdateHandler";
 

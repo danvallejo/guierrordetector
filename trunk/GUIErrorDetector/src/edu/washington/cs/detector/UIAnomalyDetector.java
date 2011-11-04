@@ -131,6 +131,10 @@ public class UIAnomalyDetector {
 	        	List<CallChainNode> resultNodes = detector.findUINodes();
 	        	//remove repetition here
 	        	resultNodes = this.removeNodeRepetition(resultNodes);
+	        	if(Log.isLoggingOn()) {
+	        		sb.append("Result nodes: " + resultNodes);
+	        		sb.append(Globals.lineSep);
+	        	}
 	        	for(CallChainNode resultNode : resultNodes) {
 	        		AnomalyCallChain chain = new AnomalyCallChain();
 	        		chain.addNodes(threadStartNode.getChainToRoot(), threadStartNode.node, resultNode.getChainToRoot());
