@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import com.ibm.wala.classLoader.IClass;
@@ -32,6 +33,7 @@ import edu.washington.cs.detector.AbstractUITest;
 import edu.washington.cs.detector.AnomalyCallChain;
 import edu.washington.cs.detector.CGEntryManager;
 import edu.washington.cs.detector.CallChainFilter;
+import edu.washington.cs.detector.FilterStrategy;
 import edu.washington.cs.detector.SWTAppUIErrorMain;
 import edu.washington.cs.detector.TestCommons;
 import edu.washington.cs.detector.CGBuilder.CG;
@@ -42,6 +44,7 @@ import edu.washington.cs.detector.experiments.filters.RemoveSystemCallStrategy;
 import edu.washington.cs.detector.util.EclipsePluginCommons;
 import edu.washington.cs.detector.util.Globals;
 import edu.washington.cs.detector.util.Utils;
+import edu.washington.cs.detector.util.WALAUtils;
 
 public class TestRSESDKUI extends AbstractUITest {
 	public static String PLUGIN_DIR = TestCommons.rse_303_dir + Globals.fileSep
@@ -149,9 +152,11 @@ public class TestRSESDKUI extends AbstractUITest {
 	public void testKnownBug267478ByAllEntries() throws ClassHierarchyException, IOException {
 		//org.eclipse.rse.services.dstore.util.DownloadListener
 		AbstractUITest test = new AbstractUITest(){
+			final Collection<String> exposedClasses = TestCommons.getPluginExposedClasses(getAppPath());
 			@Override
 			protected boolean isUIClass(IClass kclass) {
-				return kclass.toString().indexOf("org/eclipse/dstore/internal/core/client/ClientUpdateHandler") != -1;
+				return kclass.toString().indexOf("org/eclipse/dstore/internal/core/client/ClientUpdateHandler") != -1
+				    || kclass.toString().indexOf("org/eclipse/dstore/core/client/ClientConnection") != -1;
 				//return kclass.toString().indexOf("org/eclipse/dstore/internal/extra/DomainNotifier") != -1;
 			}
 			@Override
@@ -159,9 +164,16 @@ public class TestRSESDKUI extends AbstractUITest {
 				if(isUIClass(kclass)) {
 					return true;
 				}
-				return kclass.toString().indexOf("org/eclipse/dstore/") != -1
-				    || kclass.toString().indexOf("org/eclipse/rse/internal") != -1;
-				//return kclass.toString().indexOf("org/eclipse/dstore/internal/extra/DomainNotifier") != -1;
+				String javaClass = WALAUtils.getJavaFullClassName(kclass);
+				return exposedClasses.contains(javaClass);
+//				return kclass.toString().indexOf("org/eclipse/dstore/") != -1
+//				    || kclass.toString().indexOf("org/eclipse/rse/services/") != -1
+//				    || kclass.toString().indexOf("org/eclipse/rse/internal/") != -1;
+////				    || kclass.toString().indexOf("org/eclipse/dstore/internal/extra") != -1
+////				    || kclass.toString().indexOf("org/eclipse/rse/internal/services/") != -1
+////				    || kclass.toString().indexOf("org/eclipse/dstore/core/model/UpdateHandler") != -1
+////				    || kclass.toString().indexOf("org/eclipse/dstore/core/model/UpdateHandler") != -1;
+//				//return kclass.toString().indexOf("org/eclipse/dstore/internal/extra/DomainNotifier") != -1;
 			}
 			@Override
 			protected String getAppPath() {
@@ -173,8 +185,15 @@ public class TestRSESDKUI extends AbstractUITest {
 			}
 			
 		};
+		
+		List<FilterStrategy> filters = new LinkedList<FilterStrategy>();
+		filters.add(new RemoveSystemCallStrategy());
+		filters.add(new MergeSameTailStrategy());
+		
 		AbstractUITest.DEBUG = true;
-		List<AnomalyCallChain> chains  = test.reportUIErrorsWithEntries(SWTAppUIErrorMain.default_log, CG.RTA);
+		List<AnomalyCallChain> chains 
+		    = test.reportUIErrorsWithEntries(SWTAppUIErrorMain.default_log, CG.OneCFA, filters);
+//		    = test.reportUIErrorsWithEntries(null, CG.OneCFA);
 		System.out.println(chains.size());
 	}
 	

@@ -36,4 +36,9 @@ public class CallChainFilter {
 		CallChainFilter filter = new CallChainFilter(chains);
 		return filter.apply(strategy);
 	}
+	
+	public static List<AnomalyCallChain> filter(List<AnomalyCallChain> chains, List<FilterStrategy> strategies) {
+		CallChainFilter filter = new CallChainFilter(chains);
+		return filter.apply(strategies);
+	}
 }
