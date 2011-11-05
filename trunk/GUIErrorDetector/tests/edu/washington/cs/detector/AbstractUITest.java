@@ -2,6 +2,7 @@ package edu.washington.cs.detector;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -130,8 +131,14 @@ public abstract class AbstractUITest extends TestCase {
 	 *  to set call graph precision
 	 *  All public methods in the entry classes are used as entry nodes, but when detecting errors, only
 	 *  public methods in uiClasses are used as the starting points.
+	 * @throws IOException 
+	 * @throws ClassHierarchyException 
 	 */
 	public List<AnomalyCallChain> reportUIErrorsWithEntries(String outputFilePath, CGBuilder.CG opt)
+	    throws ClassHierarchyException, IOException {
+		return reportUIErrorsWithEntries(outputFilePath, opt, Collections.<FilterStrategy>emptyList());
+	}
+	public List<AnomalyCallChain> reportUIErrorsWithEntries(String outputFilePath, CGBuilder.CG opt, List<FilterStrategy> filters)
 	    throws IOException, ClassHierarchyException {
 		String appPath = TestCommons.assemblyAppPath(getAppPath(), getDependentJars());
 		CGBuilder builder = new CGBuilder(appPath);
@@ -190,6 +197,10 @@ public abstract class AbstractUITest extends TestCase {
 		}
 		//try to detect errors from all public methods
 		UIAnomalyDetector detector = new UIAnomalyDetector(appPath);
+		
+		//add filters
+		detector.addFilterStrategies(filters);
+		
 		Collection<CGNode> uiEntryNodes = builder.getCallGraphEntryNodes(queryUIEntries);
 		List<AnomalyCallChain> chains = detector.detectUIAnomaly(builder, uiEntryNodes);
 		System.out.println("Number of anomaly call chains: " + chains.size());

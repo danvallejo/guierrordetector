@@ -24,6 +24,7 @@ public class UIAnomalyDetector {
 	
 	private final String appPath;
 	private String exclusion_file = CallGraphTestUtil.REGRESSION_EXCLUSIONS;
+	private List<FilterStrategy> filters = new LinkedList<FilterStrategy>();
 	
 	public UIAnomalyDetector(String appPath) {
 		assert appPath != null;
@@ -39,6 +40,16 @@ public class UIAnomalyDetector {
 	public void setExclusionFile(String exclusionFile) {
 		assert exclusionFile != null;
 		exclusion_file = exclusionFile;
+	}
+	
+	public void addFilterStrategy(FilterStrategy strategy) {
+		filters.add(strategy);
+	}
+	public void addFilterStrategies(Collection<FilterStrategy> strategies) {
+		filters.addAll(strategies);
+	}
+	public List<FilterStrategy> getFilters() {
+		return this.filters;
 	}
 	
 	//configure the UI anomaly detector for different purpose
@@ -106,7 +117,7 @@ public class UIAnomalyDetector {
 	    System.out.println("Entries used in UIAnomalyDetector: " + entries.size());
 	    
 	    StringBuilder sb = new StringBuilder();
-	    int count = 0;
+	    
 	    
 	    //see all the reachable thread start method
 	    for(CGNode entry : entries) {
@@ -138,22 +149,30 @@ public class UIAnomalyDetector {
 	        	for(CallChainNode resultNode : resultNodes) {
 	        		AnomalyCallChain chain = new AnomalyCallChain();
 	        		chain.addNodes(threadStartNode.getChainToRoot(), threadStartNode.node, resultNode.getChainToRoot());
-	        		if(Log.isLoggingOn()) {
-	        		    sb.append("      " + resultNode.node);
-	        		    sb.append(Globals.lineSep);
-	        		    sb.append("");
-	        		    sb.append(Globals.lineSep);
-	        		    sb.append("--- found anomaly call chain ----, num: " + (count++));
-	        		    sb.append(Globals.lineSep);
-	        		    sb.append(chain.getFullCallChainAsString());
-	        		    sb.append(Globals.lineSep);
-	        		}
 	        		//add to the return result
 	        		anomalyCallChains.add(chain);
+	        	}
+	        	//do filtering after traversing from each thread start node
+	        	if(!this.filters.isEmpty()) {
+	        		System.out.println("Before applying: " + this.filters.size() + " filtes, the size: " + anomalyCallChains.size());
+	        		anomalyCallChains = CallChainFilter.filter(anomalyCallChains, this.filters);
+	        		System.out.println("After applying: " + this.filters.size() + " filtes, the size: " + anomalyCallChains.size());
 	        	}
 	        }
 	    }
 	    
+	    int count = 0;
+	    for(AnomalyCallChain chain : anomalyCallChains) {
+	        if(Log.isLoggingOn()) {
+		        sb.append(Globals.lineSep);
+		        sb.append("");
+		        sb.append(Globals.lineSep);
+		        sb.append("--- found anomaly call chain ----, num: " + (count++));
+		        sb.append(Globals.lineSep);
+		        sb.append(chain.getFullCallChainAsString());
+		        sb.append(Globals.lineSep);
+		    }
+	    }
 	    //print out the summarization
 	    sb.append("Total: " + count);
 	    sb.append(Globals.lineSep);
