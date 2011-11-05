@@ -1,11 +1,28 @@
 package edu.washington.cs.detector.util;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
+import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 
 import edu.washington.cs.detector.AnomalyCallChain;
 
@@ -59,6 +76,64 @@ public class Utils {
 		}
 		//System.out.println(fullPaths);
 		return fullPaths;
+	}
+	
+	public static Collection<String> extractClassFromPluginXML(String pluginJarFile) throws IOException {
+		if(!pluginJarFile.endsWith(".jar")) {
+			throw new RuntimeException("The input file: " + pluginJarFile + " is not a jar file.");
+		}
+		String content = getPluginXMLContent(pluginJarFile);
+		if(content != null) {
+			return extractClasses(content);
+		} else {
+		    return Collections.<String>emptySet(); 
+		}
+	}
+	
+	//be aware, this can return null
+	public static String getPluginXMLContent(String jarFilePath) throws IOException {
+		ZipFile jarFile = new ZipFile(jarFilePath);
+		ZipEntry entry = jarFile.getEntry("plugin.xml");
+		if(entry == null) {
+			return null;
+		}
+		BufferedReader in = new BufferedReader(
+				new InputStreamReader(jarFile.getInputStream(entry)));
+		StringBuilder sb = new StringBuilder();
+		String line = in.readLine();
+		while(line != null) {
+		    sb.append(line);
+		    sb.append(Globals.lineSep);
+		    line = in.readLine();
+		}
+		return sb.toString();
+	}
+	
+	public static Collection<String> extractClasses(String xmlContent) {
+		final Set<String> classList = new LinkedHashSet<String>();
+		try {
+			SAXParserFactory factory = SAXParserFactory.newInstance();
+			SAXParser saxParser = factory.newSAXParser();
+			DefaultHandler handler = new DefaultHandler() {
+				public void startElement(String uri, String localName,
+						String qName, Attributes attributes) throws SAXException {
+					if(attributes != null) {
+					    for(int i = 0; i < attributes.getLength(); i++) {
+						    if(attributes.getQName(i).equals("class")) {
+							    classList.add(attributes.getValue(i));
+						    }
+					    }
+					}
+				}
+			};
+			byte[] bytes = xmlContent.getBytes("UTF8");
+			InputStream inputStream = new ByteArrayInputStream(bytes);
+			InputSource source = new InputSource(inputStream);
+			saxParser.parse(source, handler);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return classList;
 	}
 	
 	public static String conToPath(List<String> strs) {

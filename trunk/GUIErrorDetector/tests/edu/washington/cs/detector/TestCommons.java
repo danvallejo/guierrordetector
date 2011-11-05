@@ -1,7 +1,11 @@
 package edu.washington.cs.detector;
 
+import java.io.IOException;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import junit.framework.TestCase;
 
@@ -10,6 +14,7 @@ import com.ibm.wala.classLoader.IClass;
 import edu.washington.cs.detector.util.Files;
 import edu.washington.cs.detector.util.Globals;
 import edu.washington.cs.detector.util.PropertyReader;
+import edu.washington.cs.detector.util.Utils;
 
 public class TestCommons extends TestCase {
 	
@@ -27,6 +32,15 @@ public class TestCommons extends TestCase {
 	public static boolean isConcreteAccessibleClass(IClass kclass) {
 		return !kclass.isAbstract() && !kclass.isInterface() && kclass.isPublic()
 		    && kclass.getName().getClassName().toString().indexOf("$") == -1  ;
+	}
+	
+	public static Collection<String> getPluginExposedClasses(String pluginDir) throws IOException {
+        Set<String> allClasses = new LinkedHashSet<String>();
+		List<String> jarFiles = getNonSourceNonTestsJars(pluginDir);
+		for(String jarFile : jarFiles) {
+			allClasses.addAll(Utils.extractClassFromPluginXML(jarFile));
+		}
+		return allClasses;
 	}
 	
 	public static List<String> getNonSourceNonTestsJars(String dir) {

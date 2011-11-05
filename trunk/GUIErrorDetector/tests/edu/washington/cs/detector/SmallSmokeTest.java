@@ -2,6 +2,7 @@ package edu.washington.cs.detector;
 
 import edu.washington.cs.detector.util.PDFViewer;
 import edu.washington.cs.detector.util.TestPropertyReader;
+import edu.washington.cs.detector.util.TestUtils;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -17,8 +18,11 @@ public class SmallSmokeTest extends TestCase {
 		
 		TestSuite suite = new TestSuite();
 		
+		//remove this, since it need environment-specific settings
+		//suite.addTest(TestUtils.suite());
 		suite.addTest(TestFileExistence.suite());
 		suite.addTest(TestPropertyReader.suite());
+		
 		suite.addTest(TestCGWithPDFViewer.suite());
 		suite.addTest(TestCGBuilder.suite());
 		suite.addTest(TestUIAnomalyDetector.suite());
