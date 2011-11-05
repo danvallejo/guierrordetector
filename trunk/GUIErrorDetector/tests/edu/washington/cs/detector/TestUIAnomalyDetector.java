@@ -74,5 +74,23 @@ public class TestUIAnomalyDetector extends TestCase {
 		//PDFViewer.viewCG("undetectable.pdf", builder.getAppCallGraph());
 		assertEquals(2, chains.size());
 	}
+	
+	public void testMessageQueueSample() throws IOException, ClassHierarchyException {
+		String appPath = TestCommons.testfolder + "messagequeue"
+				+ Globals.pathSep + SWTAppUIErrorMain.swtJar;
+		// use main method as
+		CGBuilder builder = new CGBuilder(appPath);
+		builder.makeScopeAndClassHierarchy();
+		builder.buildCG();
+		// try to detect errors from all public methods
+		UIAnomalyDetector detector = new UIAnomalyDetector(appPath);
+		List<AnomalyCallChain> chains = detector.detectUIAnomaly(builder);
+		System.out.println("Number of anomaly call chains: " + chains.size());
+		//PDFViewer.viewCG("messagequeue.pdf", builder.getAppCallGraph());
+		assertEquals(1, chains.size());
+		
+		System.out.println("Here is the anomaly chain: ");
+		System.out.println(chains.get(0).getFullCallChainAsString());
+	}
 
 }
