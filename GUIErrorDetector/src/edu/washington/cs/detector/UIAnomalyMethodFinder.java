@@ -57,6 +57,15 @@ public class UIAnomalyMethodFinder {
 	/** Use BFS to find all UI nodes that are reachable from {@link startNode}}
 	 * NOTE this method does not need to be a recursive one. since the async/syncExec method
 	 * will not fork a new thread, they just call the run method directly.
+	 * 
+	 * FIXME
+	 * Some tweaks are needed to avoid the algorithm to miss a path. Suppose there
+	 * are two paths:
+	 * (1) a() -> b() -> c() -> d()
+	 * (2) e() -> b() -> f()
+	 * 
+	 * If path (1), which may be invalid is visited first, then path (2) will not be
+	 * visited anymore.
 	 * */
 	public List<CallChainNode> findUINodes() {
 		List<CallChainNode> reachableUINodes = new LinkedList<CallChainNode>();
@@ -93,9 +102,9 @@ public class UIAnomalyMethodFinder {
 			}
 			//Skip the asyncExec / syncExec method calls
 			//these two methods will call run directly
-			if(this.isSafeMethod(node)) {
-				continue;
-			}
+			//if(this.isSafeMethod(node)) {
+			//	continue;
+			//}
 			//add the succ nodes to the queue and continue to traverse
 			Iterator<CGNode> succIt = this.cg.getSuccNodes(node);
 			while(succIt.hasNext()) {
