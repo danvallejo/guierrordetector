@@ -91,7 +91,7 @@ public class TestSWTExamples extends TestCase {
 	}
 	
 	public void testImageanalyzer() {
-		this.checkCallChainNumber(2, imageanalyzer);
+		this.checkCallChainNumber(4, imageanalyzer);
 	}
 	
 	public void testFileviewer() {
