@@ -98,7 +98,7 @@ public final class Files {
   }
 
   public static void writeToFile(String s, String fileName, Boolean append) throws IOException {
-    writeToFile(s, new File(fileName));
+    writeToFile(s, new File(fileName), append);
   }
 
   /**
