@@ -42,37 +42,45 @@ public class ThreadStartFinder {
 		cgNodeMap.put(startPoint, new CallChainNode(startPoint));
 		
 		while(!queue.isEmpty()) {
+			//System.out.println("visited node: ");
+			//System.out.println(visited);
 			CGNode node = queue.remove(0);
 			
 			assert cgNodeMap.containsKey(node);
 			CallChainNode chainNode = cgNodeMap.get(node);
+			
+			//if it is a starting node
+			if(isThreadStartNode(node)) {
+				threadStarts.add(chainNode);
+				continue;
+			}
 			
 			if(visited.contains(node)) {
 				continue;
 			} else {
 			    visited.add(node);
 			}
-			//if it is a starting node
-			if(this.isThreadStartNode(node)) {
-				threadStarts.add(chainNode);
-				continue;
-			}
+
 			//do the next level
 			Iterator<CGNode> it = this.cg.getSuccNodes(node);
 			while(it.hasNext()) {
 				CGNode succNode = it.next();
 				queue.add(succNode);
 				//check if it is already added
-				if(!cgNodeMap.containsKey(succNode)) {
+				//It should be removed, other wise it will miss a few paths
+				// (1)  a() ->b() -> start()
+				// (2)  a() ->c() -> start()
+				//the start() method should correspond to two different callchainnode objects
+				//if(!cgNodeMap.containsKey(succNode)) {
 					cgNodeMap.put(succNode, new CallChainNode(succNode, chainNode));
-				}
+				//}
 			}
 		}
 		
 		return threadStarts;
 	}
 	
-	private boolean isThreadStartNode(CGNode node) {
+	public static boolean isThreadStartNode(CGNode node) {
 		IMethod method = node.getMethod();
 		//assume there is no override on the start method
 		if(method.getSignature().trim().equals(THREAD_START_SIG)) {

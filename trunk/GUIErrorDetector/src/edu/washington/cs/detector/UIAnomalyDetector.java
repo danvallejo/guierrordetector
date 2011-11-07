@@ -123,8 +123,8 @@ public class UIAnomalyDetector {
 	    for(CGNode entry : entries) {
 	        ThreadStartFinder finder = new ThreadStartFinder(cg, entry);
 	        Collection<CallChainNode> reachableStarts = finder.getReachableThreadStarts();
-	        System.out.println("removing the repetitive call chains to start.");
-	        System.out.println("Number of starts: " + reachableStarts.size() + ", for entry.");
+	        System.out.println("Number of pahts to thread start: " + reachableStarts.size()
+	        		+ ", for entry: " + entry);
 	        reachableStarts = this.removeChainRepetition(reachableStarts);
 	        if(Log.isLoggingOn()) { //check Log is turned on in order to avoid overflow
 	            sb.append("----reach nodes for entry point -----");
