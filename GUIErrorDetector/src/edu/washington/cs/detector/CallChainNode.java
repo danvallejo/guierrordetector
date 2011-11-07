@@ -1,8 +1,11 @@
 package edu.washington.cs.detector;
 
+import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import com.ibm.wala.ipa.callgraph.CGNode;
 
@@ -76,5 +79,13 @@ public class CallChainNode {
 			sb.append(Globals.lineSep);
 		}
 		return sb.toString();
+	}
+	
+	public static Set<CGNode> getUnderlyingCGNodes(Collection<CallChainNode> nodes) {
+		Set<CGNode> cgNodeSet = new LinkedHashSet<CGNode>();
+		for(CallChainNode node : nodes) {
+			cgNodeSet.add(node.node);
+		}
+		return cgNodeSet;
 	}
 }
