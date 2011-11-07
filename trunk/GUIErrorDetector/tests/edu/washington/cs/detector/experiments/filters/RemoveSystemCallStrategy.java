@@ -12,8 +12,10 @@ import edu.washington.cs.detector.util.Utils;
 
 public class RemoveSystemCallStrategy extends FilterStrategy {
 	
+	//FIXME need to add more
 	private static String[] system_classes = new String[] {"Ljava/lang/String",
-		"Ljava/io/PrintStream", "Ljava/lang/System"};
+		"Ljava/io/PrintStream", "Ljava/lang/System", "Ljava/lang/Class"
+		, "Ljava/lang/StringBuilder"};
 	
 	public static void setSystemClasses(String[] classes) {
 		assert classes != null;
