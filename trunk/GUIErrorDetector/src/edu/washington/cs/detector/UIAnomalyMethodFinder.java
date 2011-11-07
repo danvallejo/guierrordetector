@@ -31,6 +31,13 @@ public class UIAnomalyMethodFinder {
 	
 	public final CGNode startNode;
 	
+	public UIAnomalyMethodFinder(Graph<CGNode> cg, CGNode startNode) {
+		assert cg.containsNode(startNode);
+		this.cg = cg;
+		this.uiNodes = null; //does not used any more
+		this.startNode = startNode;
+	}
+	
 	public UIAnomalyMethodFinder(Graph<CGNode> cg, Set<CGNode> uiNodes, CGNode startNode) {
 		assert cg.containsNode(startNode);
 		this.cg = cg;
