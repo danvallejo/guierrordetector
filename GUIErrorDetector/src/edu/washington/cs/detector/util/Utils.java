@@ -24,6 +24,8 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import com.ibm.wala.ipa.callgraph.CGNode;
+
 import edu.washington.cs.detector.AnomalyCallChain;
 
 public class Utils {
@@ -226,4 +228,13 @@ public class Utils {
 			throw new RuntimeException(e);
 		}
 	}
+    
+    public static void dumpLargeAnomalyCallChains(Collection<AnomalyCallChain> chains, File f) throws IOException {
+		int count = 0;
+		for(AnomalyCallChain chain : chains) {
+			String str = count++ + "-th anomaly call chain" + Globals.lineSep;
+			str = str + chain.getFullCallChainAsString() + Globals.lineSep;
+			Files.writeToFile(str, f, true);
+		}
+    }
 }
