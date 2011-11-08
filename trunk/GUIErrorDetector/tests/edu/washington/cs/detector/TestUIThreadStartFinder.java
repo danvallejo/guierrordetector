@@ -10,7 +10,6 @@ import com.ibm.wala.ipa.callgraph.CallGraph;
 import com.ibm.wala.util.io.FileProvider;
 
 import edu.washington.cs.detector.util.Globals;
-import edu.washington.cs.detector.util.Log;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
