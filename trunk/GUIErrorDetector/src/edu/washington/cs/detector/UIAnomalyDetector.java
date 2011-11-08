@@ -235,36 +235,4 @@ public class UIAnomalyDetector {
 		System.out.println("Num after removing node repetition: " + uniqueNodeList.size());
 		return uniqueNodeList;
 	}
-//
-//    private List<AnomalyCallChain> findAnomalyCallChain(Collection<CGNode> entries) {
-//    	List<AnomalyCallChain> anomalyCallChains = new LinkedList<AnomalyCallChain>();
-//	    //see all the reachable thread start method
-//	    for(CGNode entry : entries) {
-//	        ThreadStartFinder finder = new ThreadStartFinder(cg, entry);
-//	        Collection<CallChainNode> reachableStarts = finder.getReachableThreadStarts();
-//	        System.out.println("Number of pahts to thread start: " + reachableStarts.size()
-//	        		+ ", for entry: " + entry);
-//	        reachableStarts = this.removeChainRepetition(reachableStarts);
-//	        for(CallChainNode threadStartNode : reachableStarts) {
-//	        	//see its reachable UI method
-//	        	UIAnomalyMethodFinder detector = new UIAnomalyMethodFinder(g, nodes, threadStartNode.node);
-//	        	List<CallChainNode> resultNodes = detector.findUINodes();
-//	        	//remove repetition here
-//	        	resultNodes = this.removeNodeRepetition(resultNodes);
-//	        	for(CallChainNode resultNode : resultNodes) {
-//	        		AnomalyCallChain chain = new AnomalyCallChain();
-//	        		chain.addNodes(threadStartNode.getChainToRoot(), threadStartNode.node, resultNode.getChainToRoot());
-//	        		//add to the return result
-//	        		anomalyCallChains.add(chain);
-//	        	}
-//	        	//do filtering after traversing from each thread start node
-//	        	if(!this.filters.isEmpty()) {
-//	        		System.out.println("Before applying: " + this.filters.size() + " filtes, the size: " + anomalyCallChains.size());
-//	        		anomalyCallChains = CallChainFilter.filter(anomalyCallChains, this.filters);
-//	        		System.out.println("After applying: " + this.filters.size() + " filtes, the size: " + anomalyCallChains.size());
-//	        	}
-//	        }
-//	    }
-//	    return anomalyCallChains;
-//    }
 }
