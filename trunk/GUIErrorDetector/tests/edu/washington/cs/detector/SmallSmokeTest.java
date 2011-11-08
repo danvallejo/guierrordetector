@@ -2,7 +2,6 @@ package edu.washington.cs.detector;
 
 import edu.washington.cs.detector.util.PDFViewer;
 import edu.washington.cs.detector.util.TestPropertyReader;
-import edu.washington.cs.detector.util.TestUtils;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
