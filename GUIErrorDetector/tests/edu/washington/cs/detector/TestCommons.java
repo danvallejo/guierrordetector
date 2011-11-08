@@ -35,10 +35,17 @@ public class TestCommons extends TestCase {
 	}
 	
 	public static Collection<String> getPluginExposedClasses(String pluginDir) throws IOException {
+        return getPluginExposedClasses(pluginDir, null);
+	}
+	
+	public static Collection<String> getPluginExposedClasses(String pluginDir, String outputFilePath) throws IOException {
         Set<String> allClasses = new LinkedHashSet<String>();
 		List<String> jarFiles = getNonSourceNonTestsJars(pluginDir);
 		for(String jarFile : jarFiles) {
 			allClasses.addAll(Utils.extractClassFromPluginXML(jarFile));
+		}
+		if(outputFilePath != null) {
+			Utils.dumpCollection(allClasses, outputFilePath);
 		}
 		return allClasses;
 	}
