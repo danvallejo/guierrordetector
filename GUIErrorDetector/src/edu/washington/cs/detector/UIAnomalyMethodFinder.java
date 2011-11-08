@@ -131,10 +131,10 @@ public class UIAnomalyMethodFinder {
 		return isElementInsideArray(methodSig, checking_methods);
 	}
 	
-	private boolean isSafeMethod(CGNode node) {
-		String methodSig = node.getMethod().getSignature();
-		return isElementInsideArray(methodSig, safe_methods);
-	}
+//	private boolean isSafeMethod(CGNode node) {
+//		String methodSig = node.getMethod().getSignature();
+//		return isElementInsideArray(methodSig, safe_methods);
+//	}
 	
 	private boolean isElementInsideArray(String elem, String[] array) {
 		for(String str : array) {
