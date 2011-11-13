@@ -93,22 +93,12 @@ public class UIAnomalyDetector {
 	}
 	
 	private List<AnomalyCallChain> detectUIAnomaly(File eclusionFile, CGBuilder builder, Collection<CGNode> entries) {
-		ClassHierarchy cha = builder.getClassHierarchy();
 		CallGraph cg = builder.getCallGraph();
 		Graph<CGNode> g = builder.getAppCallGraph();
 		
 		if(cg == null || g == null) {
 			throw new RuntimeException("please call buildCG first to construct the call graphs.");
 		}
-	    
-	    //find all methods that may touch UI elements
-	    UIMethodSummarizer uisummarizer = new UIMethodSummarizer(g, cha);
-	    Set<CGNode> nodes = uisummarizer.getUINodes();
-	    
-	    System.out.println("After pruning all non-app classes: ");
-	    System.out.println("  node num: " + g.getNumberOfNodes());
-	    System.out.println("  node touches UI: " + nodes.size());
-	    System.out.println("Entries used in UIAnomalyDetector: " + entries.size());
 	    
 	    StringBuilder sb = new StringBuilder();
 	    
@@ -133,8 +123,8 @@ public class UIAnomalyDetector {
 	        	    sb.append(Globals.lineSep);
 	        	}
 	        	//see its reachable UI method
-	        	UIAnomalyMethodFinder detector = new UIAnomalyMethodFinder(g, nodes, threadStartNode.node);
-	        	List<CallChainNode> resultNodes = detector.findUINodes();
+	        	UIAnomalyMethodFinder detector = new UIAnomalyMethodFinder(g, threadStartNode.node);
+	        	List<CallChainNode> resultNodes = detector.findThreadUnsafeUINodes();
 	        	//remove repetition here
 	        	//resultNodes = removeNodeRepetition(resultNodes);
 	        	for(CallChainNode resultNode : resultNodes) {
