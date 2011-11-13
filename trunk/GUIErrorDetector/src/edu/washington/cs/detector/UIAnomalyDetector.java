@@ -18,6 +18,7 @@ import com.ibm.wala.util.io.FileProvider;
 import edu.washington.cs.detector.util.Files;
 import edu.washington.cs.detector.util.Globals;
 import edu.washington.cs.detector.util.Log;
+import edu.washington.cs.detector.util.Utils;
 
 //implements the algorithm
 public class UIAnomalyDetector {
@@ -84,7 +85,6 @@ public class UIAnomalyDetector {
 	
 	public List<AnomalyCallChain> detectUIAnomaly(CGBuilder builder) throws IOException { 
 		return detectUIAnomaly(FileProvider.getFile(exclusion_file), builder, builder.getCallGraphEntryNodes());
-		// builder.getCallGraph().getEntrypointNodes());
 	}
 	
 	//users can designate specific entries nodes for detecting UI anomaly
@@ -108,9 +108,10 @@ public class UIAnomalyDetector {
 	    for(CGNode entry : entries) {
 	        ThreadStartFinder finder = new ThreadStartFinder(cg, entry);
 	        Collection<CallChainNode> reachableStarts = finder.getReachableThreadStarts();
-	        System.out.println("Number of pahts to thread start: " + reachableStarts.size()
+	        System.out.println("Number of paths to thread start: " + reachableStarts.size()
 	        		+ ", for entry: " + entry);
-	        reachableStarts = this.removeChainRepetition(reachableStarts);
+	        reachableStarts = Utils.removeRedundantCallChains(reachableStarts);
+	        System.out.println("  - after remove redundance, number of paths to thread start: " + reachableStarts.size());
 	        if(Log.isLoggingOn()) { //check Log is turned on in order to avoid overflow
 	            sb.append("----reach nodes for entry point -----");
 	            sb.append(Globals.lineSep);
@@ -127,6 +128,11 @@ public class UIAnomalyDetector {
 	        	List<CallChainNode> resultNodes = anomalyFinder.findThreadUnsafeUINodes();
 	        	//remove repetition here
 	        	//resultNodes = removeNodeRepetition(resultNodes);
+	        	
+	        	System.out.println("Before removing UI anomaly node repetition: " + resultNodes.size());
+	        	resultNodes = Utils.removeNodeRepetition(resultNodes);
+	        	System.out.println("   After removing UI anomaly node reptition: " + resultNodes.size());
+	        	
 	        	for(CallChainNode resultNode : resultNodes) {
 	        		AnomalyCallChain chain = new AnomalyCallChain();
 	        		chain.addNodes(threadStartNode.getChainToRoot(), threadStartNode.node, resultNode.getChainToRoot());
@@ -161,61 +167,5 @@ public class UIAnomalyDetector {
 	    Log.logln(sb.toString());
 	    
 	    return anomalyCallChains;
-	}
-	
-	private List<CallChainNode> removeChainRepetition(Collection<CallChainNode> nodeList) {
-		List<CallChainNode> uniqueNodeList = new LinkedList<CallChainNode>();
-		//keep track of unique list in the string form
-		Set<String> chainStrSet = new HashSet<String>();
-		
-		for(CallChainNode node : nodeList) {
-			String chainStr = node.getChainToRootAsStr();
-			if(chainStrSet.contains(chainStr)) {
-				continue;
-			} else {
-				uniqueNodeList.add(node);
-				chainStrSet.add(chainStr);
-			}
-		}
-		
-		//write the log file
-		int i = 0;
-		StringBuilder sb = new StringBuilder();
-		for(String chainStr : chainStrSet) {
-			sb.append(i++);
-			sb.append("-th chain");
-			sb.append(Globals.lineSep);
-			sb.append(chainStr);
-			sb.append(Globals.lineSep);
-			sb.append(Globals.lineSep);
-		}
-		try {
-			Files.writeToFile(sb.toString(), "./logs/entry_to_start_chain.txt");
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-		
-		System.out.println("Num before removing call chain repetition: " + nodeList.size());
-		System.out.println("Num after removing call chain repetition: " + uniqueNodeList.size());
-		
-		return uniqueNodeList;
-	}
-	
-	private static List<CallChainNode> removeNodeRepetition(Collection<CallChainNode> nodeList) {
-		List<CallChainNode> uniqueNodeList = new LinkedList<CallChainNode>();
-		Set<CGNode> uniqueNodes = new HashSet<CGNode>();
-		for(CallChainNode n : nodeList) {
-			if(uniqueNodes.contains(n.node)) {
-				continue;
-			} else {
-				uniqueNodeList.add(n);
-				uniqueNodes.add(n.node);
-			}
-		}
-		System.out.println(Globals.lineSep);
-		System.out.println("Num before removing node repetition: " + nodeList.size());
-		System.out.println("Num after removing node repetition: " + uniqueNodeList.size());
-		System.out.println(Globals.lineSep);
-		return uniqueNodeList;
 	}
 }

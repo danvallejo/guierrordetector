@@ -10,6 +10,7 @@ import com.ibm.wala.ipa.callgraph.CallGraph;
 import com.ibm.wala.util.io.FileProvider;
 
 import edu.washington.cs.detector.util.Globals;
+import edu.washington.cs.detector.util.PDFViewer;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -75,6 +76,12 @@ public class TestUIThreadStartFinder extends TestCase {
 		UIAnomalyDetector detector = new UIAnomalyDetector(appPath);
 		List<AnomalyCallChain> chains = detector.detectUIAnomaly(builder);
 		System.out.println("Number of anomaly call chains: " + chains.size());
+		
+		for(AnomalyCallChain chain : chains) {
+			System.out.println("Call chain: ");
+			System.out.println(chain.getFullCallChainAsString());
+			System.out.println();
+		}
 		
 		assertEquals(2, chains.size());
 	}
