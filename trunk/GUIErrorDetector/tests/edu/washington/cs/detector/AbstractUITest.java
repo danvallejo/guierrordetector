@@ -3,16 +3,21 @@ package edu.washington.cs.detector;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import com.ibm.wala.classLoader.IClass;
 import com.ibm.wala.ipa.callgraph.CGNode;
+import com.ibm.wala.ipa.callgraph.CallGraph;
 import com.ibm.wala.ipa.callgraph.Entrypoint;
 import com.ibm.wala.ipa.cha.ClassHierarchy;
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
+import com.ibm.wala.util.graph.Graph;
 
 import edu.washington.cs.detector.util.Files;
+import edu.washington.cs.detector.util.Globals;
 import edu.washington.cs.detector.util.Log;
 import edu.washington.cs.detector.util.Utils;
 import edu.washington.cs.detector.util.WALAUtils;
@@ -195,16 +200,145 @@ public abstract class AbstractUITest extends TestCase {
 		if(outputFilePath != null) {
 		    Log.logConfig(outputFilePath);
 		}
+		
 		//try to detect errors from all public methods
 		UIAnomalyDetector detector = new UIAnomalyDetector(appPath);
 		
 		//add filters
 		detector.addFilterStrategies(filters);
-		
 		Collection<CGNode> uiEntryNodes = builder.getCallGraphEntryNodes(queryUIEntries);
+		
+		/** see UI2start reachable, for testing purpose */
+		//this.testFindAnomalyCallChains(builder.getCallGraph(), uiEntryNodes, "ClientConnection, localConnect");
+		
 		List<AnomalyCallChain> chains = detector.detectUIAnomaly(builder, uiEntryNodes);
 		System.out.println("Number of anomaly call chains: " + chains.size());
 		
+		return chains;
+	}
+	
+	/**
+	 * A few repetitions below
+	 * */
+	public List<AnomalyCallChain> checkPathValidity(String outputFilePath,
+			CGBuilder.CG opt, String startNodeSig, String[] pathNodeSigs)
+			throws IOException, ClassHierarchyException {
+		String appPath = TestCommons.assemblyAppPath(getAppPath(), getDependentJars());
+		CGBuilder builder = new CGBuilder(appPath);
+		builder.makeScopeAndClassHierarchy();
+		// find all UI classes
+		ClassHierarchy cha = builder.getClassHierarchy();
+		List<String> uiClasses = new LinkedList<String>();
+		for (IClass kclass : cha) {
+			if (this.isUIClass(kclass)) {
+				uiClasses.add(WALAUtils.getJavaFullClassName(kclass));
+			}
+		}
+		// find all entry classes
+		List<String> entryClasses = new LinkedList<String>();
+		for (IClass kclass : cha) {
+			if (this.isEntryClass(kclass)) {
+				entryClasses.add(WALAUtils.getJavaFullClassName(kclass));
+			}
+		}
+		//get all entry points
+		Iterable<Entrypoint> entries = CGEntryManager.getAllPublicMethods(
+				builder, entryClasses);
+		//set cg type
+		if (opt != null) {
+			builder.setCGType(opt);
+		}
+		builder.buildCG(entries);
+
+		Iterable<Entrypoint> queryUIEntries = CGEntryManager
+				.getAllPublicMethods(builder, uiClasses);
+		Collection<CGNode> uiEntryNodes = builder
+				.getCallGraphEntryNodes(queryUIEntries);
+		
+		//get the matched ui nodes
+		List<CGNode> matchedUINodes = new LinkedList<CGNode>();
+		for(CGNode uiEntryNode : uiEntryNodes) {
+			if(uiEntryNode.toString().indexOf(startNodeSig) != -1) {
+				matchedUINodes.add(uiEntryNode);
+			}
+		}
+		
+		if(matchedUINodes.isEmpty()) {
+			throw new RuntimeException("NO nodes matched for: " + startNodeSig);
+		}
+		
+		//get entry nodes
+		List<AnomalyCallChain> chains = new LinkedList<AnomalyCallChain>();
+		for(CGNode startNode : matchedUINodes) {
+		     AnomalyCallChain chain = AnomalyCallChain.extractCallChainNodeByNode(builder.getAppCallGraph(), startNode, pathNodeSigs);
+		     if(chain != null) {
+		    	 chains.add(chain);
+		     }
+		}
+		
+
+		return chains;
+	}
+	
+	private void testFindAnomalyCallChains(CallGraph cg, Collection<CGNode> entries, String filterSig) throws IOException {
+		
+		Collection<CGNode> filteredEntries = new LinkedList<CGNode>();
+		for(CGNode entry : entries) {
+			if(entry.toString().indexOf(filterSig) != -1) {
+				filteredEntries.add(entry);
+			}
+		}
+		
+		Set<CGNode> uniqueStarts = new LinkedHashSet<CGNode>();
+		
+		StringBuilder sb = new StringBuilder();
+		sb.append(filteredEntries.size() + " entries in total.");
+		sb.append(Globals.lineSep);
+		int count = 0;
+		for(CGNode entry : filteredEntries) {
+		    ThreadStartFinder finder = new ThreadStartFinder(cg, entry);
+            Collection<CallChainNode> reachableStarts = finder.getReachableThreadStarts();
+            
+            uniqueStarts.addAll(CallChainNode.getUnderlyingCGNodes(reachableStarts));
+            
+            sb.append(count++ + "-th entry: " + entry);
+			sb.append(Globals.lineSep);
+			sb.append("   has " + reachableStarts.size() + " reachable starts.");
+			sb.append(Globals.lineSep);
+			
+			int startNum = 0;
+			for(CallChainNode start : reachableStarts) {
+				sb.append("  num: " + startNum++ + " Thread.start()");
+				sb.append(Globals.lineSep);
+				sb.append(start.getChainToRootAsStr());
+				sb.append(Globals.lineSep);
+				
+				if(start.getChainToRootAsStr().indexOf("Class, getClassLoader()") != -1) {
+					sb.append("   --- ignored...");
+					sb.append(Globals.lineSep);
+					continue;
+				}
+				
+				List<CallChainNode> start2checks = this.getStart2CheckNode(cg, start.node);
+				sb.append(" ====== the number of call chains: " + start2checks.size() + ", for start with id: " + System.identityHashCode(start.node));
+				sb.append(Globals.lineSep);
+				int num = 0;
+				for(CallChainNode node : start2checks) {
+					sb.append("== Num: " + num++ + "-th node");
+					sb.append(Globals.lineSep);
+					sb.append(node.getChainToRootAsStr());
+					sb.append(Globals.lineSep);
+				}
+			}
+		}
+		Files.writeToFile(sb.toString(), "./logs/reachable_starts.txt");
+		System.out.println("Num of unique starts: " + uniqueStarts.size());
+		Utils.dumpCollection(uniqueStarts, "./logs/unique_thread_starts.txt");
+	}
+	
+	private List<CallChainNode> getStart2CheckNode(Graph<CGNode> cg, CGNode startNode) {
+		UIAnomalyMethodFinder anomalyMethodFinder = new UIAnomalyMethodFinder(cg, startNode);
+		List<CallChainNode> chains = anomalyMethodFinder.findThreadUnsafeUINodes();
 		return chains;
 	}
 }
