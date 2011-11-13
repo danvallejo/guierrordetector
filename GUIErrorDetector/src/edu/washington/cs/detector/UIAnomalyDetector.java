@@ -57,9 +57,6 @@ public class UIAnomalyDetector {
 	public void configureCheckingMethods(String configFilePath) {
 		UIAnomalyMethodFinder.setCheckingMethods(configFilePath);
 	}
-	public void configureSafeMethods(String configFilePath) {
-		UIAnomalyMethodFinder.setSafeMethods(configFilePath);
-	}
 	
 	/**
 	 * Methods for detecting anomaly UI call chains. It treats every main
@@ -96,8 +93,6 @@ public class UIAnomalyDetector {
 	}
 	
 	private List<AnomalyCallChain> detectUIAnomaly(File eclusionFile, CGBuilder builder, Collection<CGNode> entries) {
-		
-		
 		ClassHierarchy cha = builder.getClassHierarchy();
 		CallGraph cg = builder.getCallGraph();
 		Graph<CGNode> g = builder.getAppCallGraph();
@@ -141,11 +136,7 @@ public class UIAnomalyDetector {
 	        	UIAnomalyMethodFinder detector = new UIAnomalyMethodFinder(g, nodes, threadStartNode.node);
 	        	List<CallChainNode> resultNodes = detector.findUINodes();
 	        	//remove repetition here
-	        	resultNodes = removeNodeRepetition(resultNodes);
-	        	if(Log.isLoggingOn()) {
-	        		sb.append("Result nodes: " + resultNodes);
-	        		sb.append(Globals.lineSep);
-	        	}
+	        	//resultNodes = removeNodeRepetition(resultNodes);
 	        	for(CallChainNode resultNode : resultNodes) {
 	        		AnomalyCallChain chain = new AnomalyCallChain();
 	        		chain.addNodes(threadStartNode.getChainToRoot(), threadStartNode.node, resultNode.getChainToRoot());
@@ -220,7 +211,7 @@ public class UIAnomalyDetector {
 		return uniqueNodeList;
 	}
 	
-	public static List<CallChainNode> removeNodeRepetition(Collection<CallChainNode> nodeList) {
+	private static List<CallChainNode> removeNodeRepetition(Collection<CallChainNode> nodeList) {
 		List<CallChainNode> uniqueNodeList = new LinkedList<CallChainNode>();
 		Set<CGNode> uniqueNodes = new HashSet<CGNode>();
 		for(CallChainNode n : nodeList) {
@@ -231,8 +222,10 @@ public class UIAnomalyDetector {
 				uniqueNodes.add(n.node);
 			}
 		}
+		System.out.println(Globals.lineSep);
 		System.out.println("Num before removing node repetition: " + nodeList.size());
 		System.out.println("Num after removing node repetition: " + uniqueNodeList.size());
+		System.out.println(Globals.lineSep);
 		return uniqueNodeList;
 	}
 }

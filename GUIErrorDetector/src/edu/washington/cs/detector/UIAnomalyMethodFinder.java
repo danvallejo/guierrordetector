@@ -17,31 +17,26 @@ public class UIAnomalyMethodFinder {
 	
 	public final Graph<CGNode> cg;
 	
-	//the nodes that touch UI elements
-	public final Set<CGNode> uiNodes;
-	
 	//some methods like Display#getBounds won't touch a UI element, but call checkDevice
 	//need to see the IR for more details
 	private static String[] checking_methods
 	    = Files.readWholeNoExp("./src/checking_methods.txt").toArray(new String[0]);
 	
-	//note, asyncExec just call runnable.run directly
-	private static String[] safe_methods = {"org.eclipse.swt.widgets.Display.asyncExec(Ljava/lang/Runnable;)V",
-			"org.eclipse.swt.widgets.Display.syncExec(Ljava/lang/Runnable;)V"};
+	//note, asyncExec just call runnable.run directly, no need to keep them
+	//private static String[] safe_methods = {"org.eclipse.swt.widgets.Display.asyncExec(Ljava/lang/Runnable;)V",
+	//		"org.eclipse.swt.widgets.Display.syncExec(Ljava/lang/Runnable;)V"};
 	
 	public final CGNode startNode;
 	
 	public UIAnomalyMethodFinder(Graph<CGNode> cg, CGNode startNode) {
 		assert cg.containsNode(startNode);
 		this.cg = cg;
-		this.uiNodes = null; //does not used any more
 		this.startNode = startNode;
 	}
 	
 	public UIAnomalyMethodFinder(Graph<CGNode> cg, Set<CGNode> uiNodes, CGNode startNode) {
 		assert cg.containsNode(startNode);
 		this.cg = cg;
-		this.uiNodes = uiNodes;
 		this.startNode = startNode;
 	}
 	
@@ -52,13 +47,6 @@ public class UIAnomalyMethodFinder {
 	public static void setCheckingMethods(String fileName) {
 		assert fileName != null;
 		checking_methods = Files.readWholeNoExp(fileName).toArray(new String[0]);
-	}
-	public static String[] getSafeMethods() {
-		return safe_methods;
-	}
-	public static void setSafeMethods(String fileName) {
-		assert fileName != null;
-		safe_methods = Files.readWholeNoExp(fileName).toArray(new String[0]);
 	}
 	
 	/** Use BFS to find all UI nodes that are reachable from {@link startNode}}
@@ -107,11 +95,7 @@ public class UIAnomalyMethodFinder {
 			} else {
 			    visitedNodes.add(node);
 			}
-			//Skip the asyncExec / syncExec method calls
-			//these two methods will call run directly
-			//if(this.isSafeMethod(node)) {
-			//	continue;
-			//}
+			
 			//add the succ nodes to the queue and continue to traverse
 			Iterator<CGNode> succIt = this.cg.getSuccNodes(node);
 			while(succIt.hasNext()) {
@@ -130,11 +114,6 @@ public class UIAnomalyMethodFinder {
 		String methodSig = node.getMethod().getSignature();
 		return isElementInsideArray(methodSig, checking_methods);
 	}
-	
-//	private boolean isSafeMethod(CGNode node) {
-//		String methodSig = node.getMethod().getSignature();
-//		return isElementInsideArray(methodSig, safe_methods);
-//	}
 	
 	private boolean isElementInsideArray(String elem, String[] array) {
 		for(String str : array) {
