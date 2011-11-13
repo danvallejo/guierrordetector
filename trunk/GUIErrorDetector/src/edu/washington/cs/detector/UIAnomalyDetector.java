@@ -123,8 +123,8 @@ public class UIAnomalyDetector {
 	        	    sb.append(Globals.lineSep);
 	        	}
 	        	//see its reachable UI method
-	        	UIAnomalyMethodFinder detector = new UIAnomalyMethodFinder(g, threadStartNode.node);
-	        	List<CallChainNode> resultNodes = detector.findThreadUnsafeUINodes();
+	        	AnomalyFinder anomalyFinder = new UIAnomalyMethodFinder(g, threadStartNode.node);
+	        	List<CallChainNode> resultNodes = anomalyFinder.findThreadUnsafeUINodes();
 	        	//remove repetition here
 	        	//resultNodes = removeNodeRepetition(resultNodes);
 	        	for(CallChainNode resultNode : resultNodes) {
