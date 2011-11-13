@@ -14,7 +14,7 @@ import edu.washington.cs.detector.util.Globals;
 //keep track the whole call chain
 public class CallChainNode {
 	
-	public final CGNode node;
+	private final CGNode node;
 	
 	private CallChainNode parent = null;
 	
@@ -38,6 +38,10 @@ public class CallChainNode {
 		this.parent = parent;
 		//compute line number
 		//this.lineNum = this.node.getMethod().getLineNumber(0);
+	}
+	
+	public CGNode getNode() {
+		return this.node;
 	}
 	
 	public CallChainNode getParent() {

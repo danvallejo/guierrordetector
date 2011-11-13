@@ -319,8 +319,8 @@ public abstract class AbstractUITest extends TestCase {
 					continue;
 				}
 				
-				List<CallChainNode> start2checks = this.getStart2CheckNode(cg, start.node);
-				sb.append(" ====== the number of call chains: " + start2checks.size() + ", for start with id: " + System.identityHashCode(start.node));
+				List<CallChainNode> start2checks = this.getStart2CheckNode(cg, start.getNode());
+				sb.append(" ====== the number of call chains: " + start2checks.size() + ", for start with id: " + System.identityHashCode(start.getNode()));
 				sb.append(Globals.lineSep);
 				int num = 0;
 				for(CallChainNode node : start2checks) {

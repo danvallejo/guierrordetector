@@ -274,11 +274,11 @@ public class Utils {
 		List<CallChainNode> uniqueNodeList = new LinkedList<CallChainNode>();
 		Set<CGNode> uniqueNodes = new HashSet<CGNode>();
 		for(CallChainNode n : nodes) {
-			if(uniqueNodes.contains(n.node)) {
+			if(uniqueNodes.contains(n.getNode())) {
 				continue;
 			} else {
 				uniqueNodeList.add(n);
-				uniqueNodes.add(n.node);
+				uniqueNodes.add(n.getNode());
 			}
 		}
 		return uniqueNodeList;

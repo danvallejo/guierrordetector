@@ -62,6 +62,9 @@ public final class Log {
 	    }
   }
 
+  public static void logSeparator() {
+	  logln("----------------------");
+  }
 
   public static boolean isLoggingOn() {
     return log != null;
