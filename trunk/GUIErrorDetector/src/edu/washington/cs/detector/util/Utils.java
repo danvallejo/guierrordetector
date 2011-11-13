@@ -24,8 +24,6 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import com.ibm.wala.ipa.callgraph.CGNode;
-
 import edu.washington.cs.detector.AnomalyCallChain;
 
 public class Utils {
@@ -152,7 +150,9 @@ public class Utils {
 	}
 	
 	public static <T> boolean includedIn(T target, T[] array) {
-		assert target != null;
+		if(target == null) {
+			throw new RuntimeException("target can not be null.");
+		}
 		for(T elem : array) {
 			if(elem != null && elem.equals(target)) {
 				return true;

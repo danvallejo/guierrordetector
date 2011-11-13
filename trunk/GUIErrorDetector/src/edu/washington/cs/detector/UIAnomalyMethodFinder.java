@@ -12,32 +12,18 @@ import com.ibm.wala.ipa.callgraph.CGNode;
 import com.ibm.wala.util.graph.Graph;
 
 import edu.washington.cs.detector.util.Files;
+import edu.washington.cs.detector.util.Utils;
 
-public class UIAnomalyMethodFinder {
-	
-	public final Graph<CGNode> cg;
+public class UIAnomalyMethodFinder extends AbstractMethodFinder {
 	
 	//some methods like Display#getBounds won't touch a UI element, but call checkDevice
-	//need to see the IR for more details
+	//need to see the IR for more details. so we check if a thread.start method can
+	//reach a few thread safety checking methods
 	private static String[] checking_methods
 	    = Files.readWholeNoExp("./src/checking_methods.txt").toArray(new String[0]);
-	
-	//note, asyncExec just call runnable.run directly, no need to keep them
-	//private static String[] safe_methods = {"org.eclipse.swt.widgets.Display.asyncExec(Ljava/lang/Runnable;)V",
-	//		"org.eclipse.swt.widgets.Display.syncExec(Ljava/lang/Runnable;)V"};
-	
-	public final CGNode startNode;
-	
+
 	public UIAnomalyMethodFinder(Graph<CGNode> cg, CGNode startNode) {
-		assert cg.containsNode(startNode);
-		this.cg = cg;
-		this.startNode = startNode;
-	}
-	
-	public UIAnomalyMethodFinder(Graph<CGNode> cg, Set<CGNode> uiNodes, CGNode startNode) {
-		assert cg.containsNode(startNode);
-		this.cg = cg;
-		this.startNode = startNode;
+		super(cg, startNode);
 	}
 	
 	/** reload all checking method for customization */
@@ -62,7 +48,7 @@ public class UIAnomalyMethodFinder {
 	 * If path (1), which may be invalid is visited first, then path (2) will not be
 	 * visited anymore.
 	 * */
-	public List<CallChainNode> findUINodes() {
+	public List<CallChainNode> findThreadUnsafeUINodes() {
 		List<CallChainNode> reachableUINodes = new LinkedList<CallChainNode>();
 		
 		//a map keep track of CGNode and is wrapped CallChainNode
@@ -112,15 +98,6 @@ public class UIAnomalyMethodFinder {
 	
 	private boolean isCheckingMethod(CGNode node) {
 		String methodSig = node.getMethod().getSignature();
-		return isElementInsideArray(methodSig, checking_methods);
-	}
-	
-	private boolean isElementInsideArray(String elem, String[] array) {
-		for(String str : array) {
-			if(str.equals(elem)) {
-				return true;
-			}
-		}
-		return false;
+		return Utils.<String>includedIn(methodSig, checking_methods);
 	}
 }
