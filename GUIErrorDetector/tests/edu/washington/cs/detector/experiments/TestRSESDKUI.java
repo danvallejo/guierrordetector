@@ -20,7 +20,6 @@ import com.ibm.wala.ipa.callgraph.CallGraphBuilderCancelException;
 import com.ibm.wala.ipa.callgraph.Entrypoint;
 import com.ibm.wala.ipa.callgraph.impl.DefaultEntrypoint;
 import com.ibm.wala.ipa.callgraph.impl.Util;
-import com.ibm.wala.ipa.callgraph.propagation.PropagationCallGraphBuilder;
 import com.ibm.wala.ipa.cha.ClassHierarchy;
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
 import com.ibm.wala.types.ClassLoaderReference;
@@ -42,6 +41,7 @@ import edu.washington.cs.detector.experiments.filters.RemoveContainingNodeStrate
 import edu.washington.cs.detector.experiments.filters.RemoveSameEntryStrategy;
 import edu.washington.cs.detector.experiments.filters.RemoveSystemCallStrategy;
 import edu.washington.cs.detector.util.EclipsePluginCommons;
+import edu.washington.cs.detector.util.Files;
 import edu.washington.cs.detector.util.Globals;
 import edu.washington.cs.detector.util.Utils;
 import edu.washington.cs.detector.util.WALAUtils;
@@ -77,62 +77,14 @@ public class TestRSESDKUI extends AbstractUITest {
 		assertEquals(308, chains.size());
 	}
 	
-	//a ridiculous number
-	public void testDetectUIErrorsByOneCFA() throws IOException,
-			ClassHierarchyException {
-		List<AnomalyCallChain> chains = super.reportUIErrors(null, CG.OneCFA);
-		assertEquals(95645, chains.size());
-		CallChainFilter filter = new CallChainFilter(chains);
-		chains = filter.apply(new MergeSameTailStrategy());
-		System.out.println("No of chains after removing common tails: " + chains.size());
-		
-		Utils.dumpAnomalyCallChains(chains, "./logs/rse_merge_tail.txt");
-		
-		filter = new CallChainFilter(chains);
-		chains = filter.apply(new RemoveSameEntryStrategy());
-		System.out.println("No of chains after removing same starting node: " + chains.size());
-		Utils.dumpAnomalyCallChains(chains, "./logs/rse_remove_entry.txt");
-	}
-	
-	public void testDetectUIErrorsAndFilter() throws IOException,
-	    ClassHierarchyException {
-		List<AnomalyCallChain> chains = super.reportUIErrors(SWTAppUIErrorMain.default_log, CG.ZeroOneContainerCFA);
-		
-		System.out.println("No of chains before filtering: " + chains.size());
-		
-		CallChainFilter filter = new CallChainFilter(chains);
-		chains = filter.apply(new RemoveSystemCallStrategy());
-		System.out.println("No of chains after filtering system classes: " + chains.size());
-		
-		filter = new CallChainFilter(chains);
-		chains = filter.apply(new RemoveContainingNodeStrategy("run(Lorg/eclipse/jface/operation/IRunnableWithProgress;ZLorg/eclipse/core/runtime/IProgressMonitor;Lorg/eclipse/swt/widgets/Display;)V"));
-		System.out.println("No of chains after filtering RSE-specific FP: " + chains.size());
-		
-		filter = new CallChainFilter(chains);
-		//exception capturing methods
-		chains = filter.apply(new RemoveContainingNodeStrategy("Lorg/eclipse/jface/operation/ModalContext$ModalContextThread, run()V"));
-		System.out.println("No of chains after filtering exception-capture FP: " + chains.size());
-		
-		int count = 0;
-		for(AnomalyCallChain chain : chains) {
-			System.out.println(++count + "-th chain.");
-			System.out.println("--------------------");
-			System.out.println(Globals.lineSep);
-			System.out.println(chain.getFullCallChainAsString());
-			System.out.println(Globals.lineSep);
-			System.out.println(Globals.lineSep);
-		}
-		
-	}
-	
-	//I can not reproduce this!
+	/**
+	 * No errors can be found, since the entry methods must be correctly specified.
+	 * */
 	public void testKnownBug267478() throws ClassHierarchyException, IOException {
-		//org.eclipse.rse.services.dstore.util.DownloadListener
 		AbstractUITest test = new AbstractUITest(){
 			@Override
 			protected boolean isUIClass(IClass kclass) {
 				return kclass.toString().indexOf("org/eclipse/dstore/internal/core/client/ClientUpdateHandler") != -1;
-				//return kclass.toString().indexOf("org/eclipse/dstore/internal/extra/DomainNotifier") != -1;
 			}
 			@Override
 			protected String getAppPath() {
@@ -142,7 +94,6 @@ public class TestRSESDKUI extends AbstractUITest {
 			protected String getDependentJars() {
 				return EclipsePluginCommons.DEPENDENT_JARS;
 			}
-			
 		};
 		AbstractUITest.DEBUG = true;
 		List<AnomalyCallChain> chains  = test.reportUIErrors(SWTAppUIErrorMain.default_log, CG.ZeroCFA);
@@ -152,28 +103,22 @@ public class TestRSESDKUI extends AbstractUITest {
 	public void testKnownBug267478ByAllEntries() throws ClassHierarchyException, IOException {
 		//org.eclipse.rse.services.dstore.util.DownloadListener
 		AbstractUITest test = new AbstractUITest(){
-			final Collection<String> exposedClasses = TestCommons.getPluginExposedClasses(getAppPath());
+			final Collection<String> exposedClasses = TestCommons.getPluginExposedClasses(getAppPath(), "./logs/plugin_xml_classes.txt");
 			@Override
 			protected boolean isUIClass(IClass kclass) {
 				return kclass.toString().indexOf("org/eclipse/dstore/internal/core/client/ClientUpdateHandler") != -1
 				    || kclass.toString().indexOf("org/eclipse/dstore/core/client/ClientConnection") != -1;
-				//return kclass.toString().indexOf("org/eclipse/dstore/internal/extra/DomainNotifier") != -1;
 			}
 			@Override
 			protected boolean isEntryClass(IClass kclass) {
 				if(isUIClass(kclass)) {
 					return true;
 				}
+				if(kclass.toString().indexOf("DStoreFileService") != -1) {
+					return true;
+				}
 				String javaClass = WALAUtils.getJavaFullClassName(kclass);
 				return exposedClasses.contains(javaClass);
-//				return kclass.toString().indexOf("org/eclipse/dstore/") != -1
-//				    || kclass.toString().indexOf("org/eclipse/rse/services/") != -1
-//				    || kclass.toString().indexOf("org/eclipse/rse/internal/") != -1;
-////				    || kclass.toString().indexOf("org/eclipse/dstore/internal/extra") != -1
-////				    || kclass.toString().indexOf("org/eclipse/rse/internal/services/") != -1
-////				    || kclass.toString().indexOf("org/eclipse/dstore/core/model/UpdateHandler") != -1
-////				    || kclass.toString().indexOf("org/eclipse/dstore/core/model/UpdateHandler") != -1;
-//				//return kclass.toString().indexOf("org/eclipse/dstore/internal/extra/DomainNotifier") != -1;
 			}
 			@Override
 			protected String getAppPath() {
@@ -183,24 +128,75 @@ public class TestRSESDKUI extends AbstractUITest {
 			protected String getDependentJars() {
 				return EclipsePluginCommons.DEPENDENT_JARS;
 			}
-			
 		};
 		
 		List<FilterStrategy> filters = new LinkedList<FilterStrategy>();
 		filters.add(new RemoveSystemCallStrategy());
-		filters.add(new MergeSameTailStrategy());
+		//filters.add(new MergeSameTailStrategy());
 		
 		AbstractUITest.DEBUG = true;
 		List<AnomalyCallChain> chains 
-		    = test.reportUIErrorsWithEntries(SWTAppUIErrorMain.default_log, CG.OneCFA, filters);
-//		    = test.reportUIErrorsWithEntries(null, CG.OneCFA);
+		    = test.reportUIErrorsWithEntries(SWTAppUIErrorMain.default_log, CG.RTA, filters); //can change the CG type here
+		
 		System.out.println(chains.size());
+	}
+	
+	public void testCheckKnownBug26747() throws IOException, ClassHierarchyException {
+		AbstractUITest test = new AbstractUITest(){
+			final Collection<String> exposedClasses = TestCommons.getPluginExposedClasses(getAppPath(), "./logs/plugin_xml_classes.txt");
+			@Override
+			protected boolean isUIClass(IClass kclass) {
+				return kclass.toString().indexOf("org/eclipse/dstore/internal/core/client/ClientUpdateHandler") != -1
+				    || kclass.toString().indexOf("org/eclipse/dstore/core/client/ClientConnection") != -1;
+			}
+			@Override
+			protected boolean isEntryClass(IClass kclass) {
+				if(isUIClass(kclass)) {
+					return true;
+				}
+				String javaClass = WALAUtils.getJavaFullClassName(kclass);
+				return exposedClasses.contains(javaClass);
+			}
+			@Override
+			protected String getAppPath() {
+				return PLUGIN_DIR;
+			}
+			@Override
+			protected String getDependentJars() {
+				return EclipsePluginCommons.DEPENDENT_JARS;
+			}
+		};
+		String startSig = "Lorg/eclipse/dstore/core/client/ClientConnection, localConnect()";
+		
+		String[] pathNodesSigs = new String[] {
+				"Ljava/lang/Thread, start()V",
+				"Lorg/eclipse/dstore/core/model/Handler, run()V >",
+				"Lorg/eclipse/dstore/core/model/UpdateHandler, handle()V >",
+				"Lorg/eclipse/dstore/internal/core/client/ClientUpdateHandler, sendUpdates()V",
+				"Lorg/eclipse/dstore/internal/core/client/ClientUpdateHandler, notify",
+				"Lorg/eclipse/dstore/internal/extra/DomainNotifier, fireDomainChanged(Lorg/eclipse/dstore/extra/DomainEvent;)V >",
+				"Lorg/eclipse/rse/services/dstore/util/DownloadListener, domainChanged(Lorg/eclipse/dstore/extra/DomainEvent;)V >",
+				"Lorg/eclipse/rse/services/dstore/util/DownloadListener, setDone(Z)V",
+				"Lorg/eclipse/rse/services/dstore/util/DownloadListener, updateDownloadState()V",
+				"Lorg/eclipse/jface/dialogs/ProgressMonitorDialog$ProgressMonitor, worked(I)V",
+				"Lorg/eclipse/jface/dialogs/ProgressMonitorDialog$ProgressMonitor, internalWorked(D)V",
+				"Lorg/eclipse/jface/dialogs/ProgressIndicator, worked(D)V",
+				"Application, Lorg/eclipse/swt/widgets/ProgressBar, getSelection()I",
+				"Application, Lorg/eclipse/swt/widgets/Widget, checkWidget()V"
+		};
+		List<AnomalyCallChain> chains = test.checkPathValidity(null, CG.RTA, startSig, pathNodesSigs);
+		System.out.println("Number of chains: " + chains.size());
+		
+		for(AnomalyCallChain chain : chains) {
+			System.out.println(chain.getFullCallChainAsString());
+			System.out.println(Globals.lineSep);
+		}
+		
+		assertEquals(1, chains.size());
 	}
 	
 	public void testEntryPointInCallGraph() throws IOException, ClassHierarchyException, IllegalArgumentException, CallGraphBuilderCancelException {
 		String myClass = "org.eclipse.dstore.internal.core.client.ClientUpdateHandler";
-
-		//PropagationCallGraphBuilder.DEBUG_ENTRYPOINTS = true;
 		
 		String appPath =  TestCommons.assemblyAppPath(getAppPath(), getDependentJars());
 		AnalysisScope scope = AnalysisScopeReader.makeJavaBinaryAnalysisScope(appPath,
