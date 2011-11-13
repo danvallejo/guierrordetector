@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -24,7 +25,10 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import com.ibm.wala.ipa.callgraph.CGNode;
+
 import edu.washington.cs.detector.AnomalyCallChain;
+import edu.washington.cs.detector.CallChainNode;
 
 public class Utils {
 	
@@ -229,6 +233,10 @@ public class Utils {
 		}
 	}
     
+    /**
+     * The only difference is this method append each anomaly call chain to a file
+     * without caching in a string buffer.
+     * */
     public static void dumpLargeAnomalyCallChains(Collection<AnomalyCallChain> chains, File f) throws IOException {
 		int count = 0;
 		for(AnomalyCallChain chain : chains) {
@@ -237,4 +245,42 @@ public class Utils {
 			Files.writeToFile(str, f, true);
 		}
     }
+    
+    /**
+     * Remove call chain repetitions by comparing their text format
+     * */
+    public static List<CallChainNode> removeRedundantCallChains(Collection<CallChainNode> nodeList) {
+		List<CallChainNode> uniqueNodeList = new LinkedList<CallChainNode>();
+		//keep track of unique list in the string form
+		Set<String> chainStrSet = new HashSet<String>();
+		//iterate through each call chain node
+		for(CallChainNode node : nodeList) {
+			//only comparing the string format
+			String chainStr = node.getChainToRootAsStr();
+			if(chainStrSet.contains(chainStr)) {
+				continue;
+			} else {
+				uniqueNodeList.add(node);
+				chainStrSet.add(chainStr);
+			}
+		}
+		return uniqueNodeList;
+	}
+    
+    /**
+     * Remove redundant call chain node
+     * */
+    public static List<CallChainNode> removeNodeRepetition(Collection<CallChainNode> nodes) {
+		List<CallChainNode> uniqueNodeList = new LinkedList<CallChainNode>();
+		Set<CGNode> uniqueNodes = new HashSet<CGNode>();
+		for(CallChainNode n : nodes) {
+			if(uniqueNodes.contains(n.node)) {
+				continue;
+			} else {
+				uniqueNodeList.add(n);
+				uniqueNodes.add(n.node);
+			}
+		}
+		return uniqueNodeList;
+	}
 }
