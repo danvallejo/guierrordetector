@@ -3,20 +3,15 @@ package edu.washington.cs.detector;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import com.ibm.wala.core.tests.callGraph.CallGraphTestUtil;
 import com.ibm.wala.ipa.callgraph.CGNode;
 import com.ibm.wala.ipa.callgraph.CallGraph;
-import com.ibm.wala.ipa.cha.ClassHierarchy;
 import com.ibm.wala.util.graph.Graph;
 import com.ibm.wala.util.io.FileProvider;
 
-import edu.washington.cs.detector.util.Files;
-import edu.washington.cs.detector.util.Globals;
 import edu.washington.cs.detector.util.Log;
 import edu.washington.cs.detector.util.Utils;
 
@@ -26,6 +21,8 @@ public class UIAnomalyDetector {
 	private final String appPath;
 	private String exclusion_file = CallGraphTestUtil.REGRESSION_EXCLUSIONS;
 	private List<FilterStrategy> filters = new LinkedList<FilterStrategy>();
+	private CGTraverseGuider threadStartGuider = null;
+	private CGTraverseGuider uiAnomalyGuider = null;
 	
 	public UIAnomalyDetector(String appPath) {
 		assert appPath != null;
@@ -57,6 +54,14 @@ public class UIAnomalyDetector {
 	//You can configure this detector for different UI models, e.g., swing
 	public void configureCheckingMethods(String configFilePath) {
 		UIAnomalyMethodFinder.setCheckingMethods(configFilePath);
+	}
+	
+	public void setThreadStartGuider(CGTraverseGuider threadStartGuider) {
+		this.threadStartGuider = threadStartGuider;
+	}
+	
+	public void setUIAnomalyGuider(CGTraverseGuider uiAnomalyGuider) {
+		this.uiAnomalyGuider = uiAnomalyGuider;
 	}
 	
 	/**
@@ -109,7 +114,8 @@ public class UIAnomalyDetector {
 		List<AnomalyCallChain> anomalyCallChains = new LinkedList<AnomalyCallChain>();
 	    //see all the reachable thread start method
 	    for(CGNode entry : entries) {
-	        ThreadStartFinder finder = new ThreadStartFinder(cg, entry);
+	        ThreadStartFinder finder = ThreadStartFinder.createInstance(cg, entry, this.threadStartGuider); 
+	        //new ThreadStartFinder(cg, entry);
 	        //finder.setCGTraverseGuider(new CGTraverseNoSystemCalls());
 	        
 	        Collection<CallChainNode> reachableStarts = finder.getReachableThreadStarts();
@@ -123,7 +129,8 @@ public class UIAnomalyDetector {
 	        
 	        for(CallChainNode threadStartNode : reachableStarts) {
 	        	//see its reachable UI method
-	        	AnomalyFinder anomalyFinder = new UIAnomalyMethodFinder(g, threadStartNode.getNode());
+	        	AnomalyFinder anomalyFinder = UIAnomalyMethodFinder.createInstance(g, threadStartNode.getNode(), this.uiAnomalyGuider); 
+	        		//new UIAnomalyMethodFinder(g, threadStartNode.getNode());
 	        	//anomalyFinder.setCGTraverseGuider(new CGTraverseNoSystemCalls());
 	        	
 	        	List<CallChainNode> resultNodes = anomalyFinder.findThreadUnsafeUINodes();

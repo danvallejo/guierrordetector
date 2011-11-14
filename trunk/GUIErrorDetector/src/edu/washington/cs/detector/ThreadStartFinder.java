@@ -32,8 +32,18 @@ public class ThreadStartFinder {
 	}
 	
 	public void setCGTraverseGuider(CGTraverseGuider guider) {
-		assert guider != null;
+		if(guider == null) {
+			throw new RuntimeException("Can not set a null guider");
+		}
 		this.guider = guider;
+	}
+	
+	public static ThreadStartFinder createInstance(Graph<CGNode> cg, CGNode startPoint, CGTraverseGuider guider) {
+		ThreadStartFinder finder = new ThreadStartFinder(cg, startPoint);
+		if(guider != null) {
+		    finder.setCGTraverseGuider(guider);
+		}
+		return finder;
 	}
 	
 	public Set<CallChainNode> getReachableThreadStarts() {
