@@ -114,9 +114,7 @@ public class UIAnomalyDetector {
 		List<AnomalyCallChain> anomalyCallChains = new LinkedList<AnomalyCallChain>();
 	    //see all the reachable thread start method
 	    for(CGNode entry : entries) {
-	        ThreadStartFinder finder = ThreadStartFinder.createInstance(cg, entry, this.threadStartGuider); 
-	        //new ThreadStartFinder(cg, entry);
-	        //finder.setCGTraverseGuider(new CGTraverseNoSystemCalls());
+	        ThreadStartFinder finder = ThreadStartFinder.createInstance(cg, entry, this.threadStartGuider);
 	        
 	        Collection<CallChainNode> reachableStarts = finder.getReachableThreadStarts();
 	        reachableStarts = Utils.removeRedundantCallChains(reachableStarts);
@@ -128,10 +126,8 @@ public class UIAnomalyDetector {
 	        System.out.println("Processing CGNode entry: " + entry + ",  with reachable starts: " + reachableStarts.size());
 	        
 	        for(CallChainNode threadStartNode : reachableStarts) {
-	        	//see its reachable UI method
+	        	//TODO this needs
 	        	AnomalyFinder anomalyFinder = UIAnomalyMethodFinder.createInstance(g, threadStartNode.getNode(), this.uiAnomalyGuider); 
-	        		//new UIAnomalyMethodFinder(g, threadStartNode.getNode());
-	        	//anomalyFinder.setCGTraverseGuider(new CGTraverseNoSystemCalls());
 	        	
 	        	List<CallChainNode> resultNodes = anomalyFinder.findThreadUnsafeUINodes();
 	        	resultNodes = Utils.removeRedundantCallChains(resultNodes);
@@ -150,9 +146,7 @@ public class UIAnomalyDetector {
 	        	System.out.println("Number of anomaly chain: " + anomalyCallChains.size() + " before applying: "
 	        			+ this.filters.size() + " filters");
 	        	if(!this.filters.isEmpty()) {
-	        		Log.logln("Number of anomaly chain before filtering: " + anomalyCallChains.size());
 	        		anomalyCallChains = CallChainFilter.filter(anomalyCallChains, this.filters);
-	        		Log.logln("Number of anomaly chain after filtering: " + anomalyCallChains.size());
 	        	}
 	        	System.out.println("    Number of anomaly chain: " + anomalyCallChains.size() + " after applying: "
 	        			+ this.filters.size() + " filters");
@@ -160,7 +154,15 @@ public class UIAnomalyDetector {
 	    }
 	    
 	    //for logging
-	    Log.logln("Number of unique thread.start: " + UIAnomalyMethodFinder.getCachedResult().size());
+	    this.logresult(anomalyCallChains);
+	    
+	    //clear the cache
+	    UIAnomalyMethodFinder.clearCachedResult();
+	    return anomalyCallChains;
+	}
+	
+	private void logresult(List<AnomalyCallChain> anomalyCallChains) {
+		Log.logln("Number of unique thread.start: " + UIAnomalyMethodFinder.getCachedResult().size());
 	    int count = 0;
 	    for(CGNode start : UIAnomalyMethodFinder.getCachedResult().keySet()) {
 	    	Log.logln("The " + (count++) + "-th entry, number of call chains: "
@@ -170,17 +172,11 @@ public class UIAnomalyDetector {
 	    		Log.logln(node.getChainToRootAsStr());
 	    	}
 	    }
-	    
-	    
 	    Log.logln("Total number of anomaly call chains returned: " + anomalyCallChains.size());
 	    for(int i = 0; i < anomalyCallChains.size(); i++) {
 	    	AnomalyCallChain chain = anomalyCallChains.get(i);
 	    	Log.logln("The " + i + "-th anomaly call chain");
 	    	Log.logln(chain.getFullCallChainAsString());
 	    }
-	    
-	    //clear the cache
-	    UIAnomalyMethodFinder.clearCachedResult();
-	    return anomalyCallChains;
 	}
 }
