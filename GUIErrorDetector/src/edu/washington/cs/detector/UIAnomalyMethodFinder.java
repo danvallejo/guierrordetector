@@ -44,6 +44,14 @@ public class UIAnomalyMethodFinder extends AbstractMethodFinder {
 		super(cg, startNode);
 	}
 	
+	public static UIAnomalyMethodFinder createInstance(Graph<CGNode> cg, CGNode startNode, CGTraverseGuider guider) {
+		UIAnomalyMethodFinder finder = new UIAnomalyMethodFinder(cg, startNode);
+		if(guider != null) {
+		    finder.setCGTraverseGuider(guider);
+		}
+		return finder;
+	}
+	
 	/** Use BFS to find all UI nodes that are reachable from {@link startNode}}
 	 * NOTE this method does not need to be a recursive one. since the async/syncExec method
 	 * will not fork a new thread, they just call the run method directly.

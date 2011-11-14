@@ -18,7 +18,9 @@ public abstract class AbstractMethodFinder implements AnomalyFinder {
 	}
 	
 	public void setCGTraverseGuider(CGTraverseGuider guider) {
-		assert guider != null;
+		if(guider == null) {
+			throw new RuntimeException("The guider can not be null.");
+		}
 		this.guider = guider;
 	}
 }
