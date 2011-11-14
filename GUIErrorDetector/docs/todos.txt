@@ -1,0 +1,5 @@
+A few method calls are safe in general:
+- Display.getDisplay() : though may spawn a new thread and check widget, it is likely that
+  the display object has already been initialized yet.
+- Display.getCurrent().getShells(): similar as above
+- Display.getDevice: similar as above
