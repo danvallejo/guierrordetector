@@ -41,6 +41,11 @@ public class TestSimpleExamples extends TestCase {
 	private void checkCallChainNumber(int expectedNum, String appPath) {
 		UIAnomalyDetector detector = new UIAnomalyDetector(appPath);
 		List<AnomalyCallChain> chains = detector.detectUIAnomaly();
+		int count = 0;
+		for(AnomalyCallChain chain : chains) {
+			System.out.println("The " + (count++) + "-th chain");
+			System.out.println(chain.getFullCallChainAsString());
+		}
 		assertEquals("The number of expected call chain is wrong", expectedNum, chains.size());
 	}
 	

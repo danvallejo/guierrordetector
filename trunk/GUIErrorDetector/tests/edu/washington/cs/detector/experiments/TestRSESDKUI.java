@@ -131,7 +131,7 @@ public class TestRSESDKUI extends AbstractUITest {
 		};
 		
 		List<FilterStrategy> filters = new LinkedList<FilterStrategy>();
-		filters.add(new RemoveSystemCallStrategy());
+		//filters.add(new RemoveSystemCallStrategy());
 		//filters.add(new MergeSameTailStrategy());
 		
 		AbstractUITest.DEBUG = true;
