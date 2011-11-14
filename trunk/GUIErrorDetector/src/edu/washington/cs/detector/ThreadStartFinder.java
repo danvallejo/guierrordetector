@@ -12,6 +12,8 @@ import com.ibm.wala.classLoader.IMethod;
 import com.ibm.wala.ipa.callgraph.CGNode;
 import com.ibm.wala.util.graph.Graph;
 
+import edu.washington.cs.detector.util.Log;
+
 public class ThreadStartFinder {
 
 	public final Graph<CGNode> cg;
@@ -20,11 +22,18 @@ public class ThreadStartFinder {
 	
 	public final static String THREAD_START_SIG = "java.lang.Thread.start()V";
 	
+	private CGTraverseGuider guider = new CGTraverseDefaultGuider();
+	
 	public ThreadStartFinder(Graph<CGNode> cg, CGNode startPoint) {
 		this.cg = cg;
 		this.startPoint = startPoint;
 		assert this.cg.containsNode(startPoint);
 		assert !this.startPoint.getMethod().getSignature().equals(THREAD_START_SIG);
+	}
+	
+	public void setCGTraverseGuider(CGTraverseGuider guider) {
+		assert guider != null;
+		this.guider = guider;
 	}
 	
 	public Set<CallChainNode> getReachableThreadStarts() {
@@ -65,6 +74,14 @@ public class ThreadStartFinder {
 			Iterator<CGNode> it = this.cg.getSuccNodes(node);
 			while(it.hasNext()) {
 				CGNode succNode = it.next();
+				
+				//should traverse or not
+				if(!this.guider.traverse(node, succNode)) {
+					//Log.logln("Skip traversing: " + succNode);
+					continue;
+				}
+				
+				//keep traversing
 				queue.add(succNode);
 				//check if it is already added
 				//It should be removed, other wise it will miss a few paths
