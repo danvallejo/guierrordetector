@@ -3,3 +3,15 @@ A few method calls are safe in general:
   the display object has already been initialized yet.
 - Display.getCurrent().getShells(): similar as above
 - Display.getDevice: similar as above
+
+
+
+
+
+
+
+
+== unclear parts of how WALA builds CG ====
+- how does WALA initialize the worklist
+- how does WALA do refinement.
+- a few classes: InstanceKey, InstancePointer, PointerKey
