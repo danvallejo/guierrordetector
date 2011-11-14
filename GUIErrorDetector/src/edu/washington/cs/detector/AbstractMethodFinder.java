@@ -9,9 +9,16 @@ public abstract class AbstractMethodFinder implements AnomalyFinder {
 	
 	public final CGNode startNode;
 	
+	protected CGTraverseGuider guider = new CGTraverseDefaultGuider();
+	
 	public AbstractMethodFinder(Graph<CGNode> cg, CGNode startNode) {
 		assert cg.containsNode(startNode);
 		this.cg = cg;
 		this.startNode = startNode;
+	}
+	
+	public void setCGTraverseGuider(CGTraverseGuider guider) {
+		assert guider != null;
+		this.guider = guider;
 	}
 }
