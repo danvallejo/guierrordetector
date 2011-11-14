@@ -96,10 +96,6 @@ public class UIAnomalyMethodFinder extends AbstractMethodFinder {
 				reachableUINodes.add(chainNode);
 			}
 			
-//			if(this.isCheckingMethod(node)) {
-//				throw new RuntimeException("Can not be a check node here");
-//			}
-			
 			//skip if already visited, otherwise, add to the visited set
 			if(visitedNodes.contains(node)) {
 				continue;
@@ -110,22 +106,6 @@ public class UIAnomalyMethodFinder extends AbstractMethodFinder {
 			Iterator<CGNode> succIt = this.cg.getSuccNodes(node);
 			while(succIt.hasNext()) {
 				CGNode succNode = succIt.next();
-				//check, should we continue to traverse or not
-				
-//				if(!super.guider.traverse(node, succNode)) {
-//					continue;
-//				}
-				
-//				if(this.isCheckingMethod(succNode)) {
-//					Log.logln("see chain here: ");
-//					
-//					CallChainNode finalNode = new CallChainNode(succNode, chainNode);
-//					
-//					Log.logln(finalNode.getChainToRootAsStr());
-//					
-//					reachableUINodes.add(finalNode);
-//					continue;
-//				}
 				
 				//Log.logln("  next node: " + succNode);
 				queue.add(succNode);
