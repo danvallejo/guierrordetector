@@ -12,17 +12,23 @@ import com.ibm.wala.ipa.callgraph.CallGraph;
 import com.ibm.wala.util.graph.Graph;
 import com.ibm.wala.util.io.FileProvider;
 
+import edu.washington.cs.detector.CGBuilder.CG;
 import edu.washington.cs.detector.util.Log;
 import edu.washington.cs.detector.util.Utils;
+import edu.washington.cs.detector.util.WALAUtils;
 
 //implements the algorithm
 public class UIAnomalyDetector {
+	
+	public static String EXCLUSION_FILE_SWING = "Java60RegressionExclusionsWithoutGUI.txt";
+	public static String EMPTY_FILE = "EmptyExclusion.txt";
 	
 	private final String appPath;
 	private String exclusion_file = CallGraphTestUtil.REGRESSION_EXCLUSIONS;
 	private List<FilterStrategy> filters = new LinkedList<FilterStrategy>();
 	private CGTraverseGuider threadStartGuider = null;
 	private CGTraverseGuider uiAnomalyGuider = null;
+	private CG cgOpt = null;
 	
 	public UIAnomalyDetector(String appPath) {
 		assert appPath != null;
@@ -56,12 +62,19 @@ public class UIAnomalyDetector {
 		UIAnomalyMethodFinder.setCheckingMethods(configFilePath);
 	}
 	
+	//it can be null
 	public void setThreadStartGuider(CGTraverseGuider threadStartGuider) {
 		this.threadStartGuider = threadStartGuider;
 	}
 	
+	//it can be null
 	public void setUIAnomalyGuider(CGTraverseGuider uiAnomalyGuider) {
 		this.uiAnomalyGuider = uiAnomalyGuider;
+	}
+	
+	//set precision of default cg builder
+	public void setDefaultCGType(CG type) {
+		this.cgOpt = type;
 	}
 	
 	/**
@@ -84,6 +97,9 @@ public class UIAnomalyDetector {
 	//use all main as entries
 	private CGBuilder getDefaultCGBuilder() throws IOException {
 		CGBuilder builder = new CGBuilder(this.appPath, FileProvider.getFile(exclusion_file));
+		if(this.cgOpt != null) {
+			builder.setCGType(cgOpt);
+		}
 		builder.buildCG();
 		return builder;
 	}
@@ -97,11 +113,11 @@ public class UIAnomalyDetector {
 		return detectUIAnomaly(FileProvider.getFile(exclusion_file), builder, entries);
 	}
 	
-	private List<AnomalyCallChain> detectUIAnomaly(File eclusionFile, CGBuilder builder, Collection<CGNode> entries) {
+	private List<AnomalyCallChain> detectUIAnomaly(File eclusionFile/*useless*/, CGBuilder builder, Collection<CGNode> entries) {
 		CallGraph cg = builder.getCallGraph();
 		Graph<CGNode> g = builder.getAppCallGraph();
 		
-		if(cg == null || g == null) {
+		if(cg == null || cg == null) {
 			throw new RuntimeException("please call buildCG first to construct the call graphs.");
 		}
 	    
@@ -127,31 +143,38 @@ public class UIAnomalyDetector {
 	        
 	        for(CallChainNode threadStartNode : reachableStarts) {
 	        	//TODO this needs
-	        	AnomalyFinder anomalyFinder = UIAnomalyMethodFinder.createInstance(g, threadStartNode.getNode(), this.uiAnomalyGuider); 
+	        	AnomalyFinder anomalyFinder = UIAnomalyMethodFinder.createInstance(g /*change from cg*/, threadStartNode.getNode(), this.uiAnomalyGuider); 
 	        	
 	        	List<CallChainNode> resultNodes = anomalyFinder.findThreadUnsafeUINodes();
 	        	resultNodes = Utils.removeRedundantCallChains(resultNodes);
 	        	
 	        	Log.logln("For thread start node: " + threadStartNode.getNode());
-	        	Log.logln("Path: " + threadStartNode.getChainToRootAsStr());
+	        	//Log.logln("Path: " + threadStartNode.getChainToRootAsStr());
 	        	Log.logln("  Number of UI anomaly nodes: " + resultNodes.size());
 	        	System.out.println("Number of UI anomaly nodes: " + resultNodes.size());
 	        	
+	        	List<AnomalyCallChain> newGeneratedChains = new LinkedList<AnomalyCallChain>(); 
 	        	for(CallChainNode resultNode : resultNodes) {
 	        		AnomalyCallChain chain = new AnomalyCallChain();
 	        		chain.addNodes(threadStartNode.getChainToRoot(), threadStartNode.getNode(), resultNode.getChainToRoot());
-	        		anomalyCallChains.add(chain);
+	        		//anomalyCallChains.add(chain);
+	        		newGeneratedChains.add(chain);
 	        	}
 	        	//do filtering after traversing from each thread start node
-	        	System.out.println("Number of anomaly chain: " + anomalyCallChains.size() + " before applying: "
+	        	System.out.println("Number of new anomaly chain: " + newGeneratedChains.size() + " before applying: "
 	        			+ this.filters.size() + " filters");
 	        	if(!this.filters.isEmpty()) {
-	        		anomalyCallChains = CallChainFilter.filter(anomalyCallChains, this.filters);
+	        		newGeneratedChains = CallChainFilter.filter(newGeneratedChains, this.filters);
 	        	}
-	        	System.out.println("    Number of anomaly chain: " + anomalyCallChains.size() + " after applying: "
-	        			+ this.filters.size() + " filters");
+	        	anomalyCallChains.addAll(newGeneratedChains);
+	        	System.out.println("    Number of new anomaly chain: " + newGeneratedChains.size() + " after applying: "
+	        			+ this.filters.size() + " filters" + ", in total it is: " + anomalyCallChains.size());
+	        	
 	        }
 	    }
+	    
+	    //filter again
+	    anomalyCallChains = CallChainFilter.filter(anomalyCallChains, this.filters);
 	    
 	    //for logging
 	    this.logresult(anomalyCallChains);

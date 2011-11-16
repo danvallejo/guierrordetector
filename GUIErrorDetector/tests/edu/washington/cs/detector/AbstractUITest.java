@@ -36,6 +36,10 @@ public abstract class AbstractUITest extends TestCase {
 	
 	protected abstract String getDependentJars();
 	
+	protected CGTraverseGuider getThreadStartGuider() {return null; }
+	
+	protected CGTraverseGuider getUIAnomalyGuider() {return null; }
+	
 	public void reportAppJars() {
 		TestCommons.getNonSourceNonTestsJars(getAppPath());
 	}
@@ -203,6 +207,8 @@ public abstract class AbstractUITest extends TestCase {
 		
 		//try to detect errors from all public methods
 		UIAnomalyDetector detector = new UIAnomalyDetector(appPath);
+		detector.setThreadStartGuider(this.getThreadStartGuider());
+		detector.setUIAnomalyGuider(this.getUIAnomalyGuider());
 		
 		//add filters
 		detector.addFilterStrategies(filters);

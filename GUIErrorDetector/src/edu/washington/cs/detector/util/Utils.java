@@ -283,4 +283,18 @@ public class Utils {
 		}
 		return uniqueNodeList;
 	}
+    
+    public static List<AnomalyCallChain> removeRedundantAnomalyCallChains(Collection<AnomalyCallChain> chains) {
+    	List<AnomalyCallChain> uniqueCallChains = new LinkedList<AnomalyCallChain>();
+		Set<String> chainStr = new HashSet<String>();
+		for(AnomalyCallChain c : chains) {
+			if(chainStr.contains(c.getFullCallChainAsString())) {
+				continue;
+			} else {
+				uniqueCallChains.add(c);
+				chainStr.add(c.getFullCallChainAsString());
+			}
+		}
+		return uniqueCallChains;
+    }
 }

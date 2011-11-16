@@ -14,8 +14,11 @@ import com.ibm.wala.util.graph.Graph;
 import edu.washington.cs.detector.util.Files;
 import edu.washington.cs.detector.util.Log;
 import edu.washington.cs.detector.util.Utils;
+import edu.washington.cs.detector.util.WALAUtils;
 
 public class UIAnomalyMethodFinder extends AbstractMethodFinder {
+	
+	public static boolean DEBUG = false;
 	
 	//some methods like Display#getBounds won't touch a UI element, but call checkDevice
 	//need to see the IR for more details. so we check if a thread.start method can
@@ -66,10 +69,15 @@ public class UIAnomalyMethodFinder extends AbstractMethodFinder {
 	 * visited anymore.
 	 * */
 	public List<CallChainNode> findThreadUnsafeUINodes() {
+
+		WALAUtils.viewCallGraph(this.cg, DEBUG);
+		
 		//first check the cache
 		if(cachedResult.containsKey(this.startNode)) {
 			System.out.println("Find: " + this.startNode + " in cache.");
 			return cachedResult.get(this.startNode);
+		} else {
+			System.out.println("Start to find reachable UI nodes: " + this.startNode + " in cache.");
 		}
 		
 		List<CallChainNode> reachableUINodes = new LinkedList<CallChainNode>();
@@ -81,13 +89,14 @@ public class UIAnomalyMethodFinder extends AbstractMethodFinder {
 		Set<CGNode> visitedNodes = new HashSet<CGNode>();
 		
 		//visit the succ nodes of the start node
-		//Log.logln("Visiting start: " + this.startNode);
+		Log.logln("Visiting start: " + this.startNode, DEBUG);
 		
 		Iterator<CGNode> nodeIt = this.cg.getSuccNodes(this.startNode);
 		while(nodeIt.hasNext()) {
 			CGNode node = nodeIt.next();
 			queue.add(node);
-			//Log.logln("  next node of start: " + node);
+			
+			Log.logln("  next node of start: " + node, DEBUG);
 			
 			assert !cgNodeMap.containsKey(node);
 			cgNodeMap.put(node, new CallChainNode(node, this.startNode));
@@ -95,17 +104,19 @@ public class UIAnomalyMethodFinder extends AbstractMethodFinder {
 		//perform BFS search here
 		while(!queue.isEmpty()) {
 			CGNode node = queue.remove(0);
-			//Log.logln("Visiting node: " + node);
+			Log.logln("Visiting node: " + node, DEBUG);
 			
 			assert cgNodeMap.containsKey(node);
 			CallChainNode chainNode = cgNodeMap.get(node);
 			
 			if(this.isCheckingMethod(node)) {
 				reachableUINodes.add(chainNode);
+				continue;
 			}
 			
 			//skip if already visited, otherwise, add to the visited set
 			if(visitedNodes.contains(node)) {
+				Log.logln("  -- skip node: " + node, DEBUG);
 				continue;
 			} else {
 			    visitedNodes.add(node);
@@ -115,12 +126,17 @@ public class UIAnomalyMethodFinder extends AbstractMethodFinder {
 			while(succIt.hasNext()) {
 				CGNode succNode = succIt.next();
 				
-				//Log.logln("  next node: " + succNode);
-				queue.add(succNode);
-				if(!cgNodeMap.containsKey(succNode) ) {
-					cgNodeMap.put(succNode, new CallChainNode(succNode, chainNode));
+				if(!super.guider.traverse(node, succNode)) {
+					Log.logln("  skip by guider: " + succNode, DEBUG);
+					continue;
 				}
 				
+				Log.logln("  next node: " + succNode, DEBUG);
+				queue.add(succNode);
+				if(!cgNodeMap.containsKey(succNode) //|| this.isCheckingMethod(succNode) 
+						) {
+					cgNodeMap.put(succNode, new CallChainNode(succNode, chainNode));
+				}
 			}
 		}
 		
@@ -137,6 +153,7 @@ public class UIAnomalyMethodFinder extends AbstractMethodFinder {
 	
 	private boolean isCheckingMethod(CGNode node) {
 		String methodSig = node.getMethod().getSignature();
+		//System.out.println(methodSig);
 		return Utils.<String>includedIn(methodSig, checking_methods);
 	}
 }

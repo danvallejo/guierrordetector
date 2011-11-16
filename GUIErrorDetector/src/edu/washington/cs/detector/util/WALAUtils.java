@@ -60,6 +60,12 @@ public class WALAUtils {
 		return new nCFABuilder(n, cha, options, cache, null, null);
 	}
 	
+	public static void viewCallGraph(Graph<CGNode> g, boolean flag) {
+		if(flag) {
+			viewCallGraph(g);
+		}
+	}
+	
 	public static void viewCallGraph(Graph<CGNode> g) {
 		 StringBuilder sb = new StringBuilder();
 		    for(CGNode node : g) {
