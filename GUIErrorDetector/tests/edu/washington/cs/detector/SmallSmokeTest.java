@@ -29,7 +29,8 @@ public class SmallSmokeTest extends TestCase {
 		
 		suite.addTest(TestUseCustomizedEntries.suite());
 		suite.addTest(TestSWTExamples.suite());
-		suite.addTest(TestSimpleExamples.suite());
+		suite.addTest(TestSimpleSWTExamples.suite());
+		suite.addTest(TestSimpleSwingExamples.suite());
 		suite.addTest(TestSimpleEclipsePlugins.suite());
 		
 		return suite;
