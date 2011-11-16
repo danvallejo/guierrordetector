@@ -20,6 +20,11 @@ public class TestSimpleExamples extends TestCase {
 		this.checkCallChainNumber(1, appPath);
 	}
 	
+	public void testThreadNoError() {
+		String appPath = TestCommons.testfolder + "threadnoerror" + Globals.pathSep +  SWTAppUIErrorMain.swtJar;
+		this.checkCallChainNumber(0, appPath);
+	}
+	
 	public void testSyncNoError() {
 		String appPath = TestCommons.testfolder + "syncnoerror" + Globals.pathSep +  SWTAppUIErrorMain.swtJar;
 		this.checkCallChainNumber(0, appPath);
@@ -35,11 +40,13 @@ public class TestSimpleExamples extends TestCase {
 	public void testThreadInsideAsync() {
 		Log.logConfig("./sampleprogram/test/threadinasync/report.txt");
 		String appPath = TestCommons.testfolder + "threadinasync" + Globals.pathSep +  SWTAppUIErrorMain.swtJar;
-		this.checkCallChainNumber(2, appPath);
+		this.checkCallChainNumber(1, appPath);
 	}
 
 	private void checkCallChainNumber(int expectedNum, String appPath) {
 		UIAnomalyDetector detector = new UIAnomalyDetector(appPath);
+		detector.setUIAnomalyGuider(new CGTraverseNoSystemCalls());
+		
 		List<AnomalyCallChain> chains = detector.detectUIAnomaly();
 		int count = 0;
 		for(AnomalyCallChain chain : chains) {
