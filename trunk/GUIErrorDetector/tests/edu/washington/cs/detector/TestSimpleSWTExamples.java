@@ -9,10 +9,10 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-public class TestSimpleExamples extends TestCase {
+public class TestSimpleSWTExamples extends TestCase {
 	
 	public static Test suite() {
-		return new TestSuite(TestSimpleExamples.class);
+		return new TestSuite(TestSimpleSWTExamples.class);
 	}
 	
 	public void testThreadError() {
