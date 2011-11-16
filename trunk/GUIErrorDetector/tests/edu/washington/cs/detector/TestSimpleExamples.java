@@ -21,6 +21,8 @@ public class TestSimpleExamples extends TestCase {
 	}
 	
 	public void testThreadNoError() {
+//		Log.logConfig("./log.txt");
+//		UIAnomalyMethodFinder.DEBUG = true;
 		String appPath = TestCommons.testfolder + "threadnoerror" + Globals.pathSep +  SWTAppUIErrorMain.swtJar;
 		this.checkCallChainNumber(0, appPath);
 	}
@@ -36,9 +38,10 @@ public class TestSimpleExamples extends TestCase {
 	}
 	
 	//XXX FIXME see the report, there is one redundant
+	//Already fixed: by added no system call traverse guider
 	//should figure out how to remove redundant!
 	public void testThreadInsideAsync() {
-		Log.logConfig("./sampleprogram/test/threadinasync/report.txt");
+		//Log.logConfig("./sampleprogram/test/threadinasync/report.txt");
 		String appPath = TestCommons.testfolder + "threadinasync" + Globals.pathSep +  SWTAppUIErrorMain.swtJar;
 		this.checkCallChainNumber(1, appPath);
 	}

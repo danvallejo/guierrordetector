@@ -48,6 +48,7 @@ public class ThreadNoError {
 			final Runnable r = new Runnable() {
 				@Override
 				public void run() {
+					//you have not started that by calling Thread.start()
 					Display.getDefault().asyncExec(new Runnable() {
 						public void run() {
 							helloWorldTest.setText("I want to change the text.");
