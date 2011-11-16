@@ -31,6 +31,9 @@ import com.ibm.wala.util.io.FileProvider;
 import edu.washington.cs.detector.AbstractUITest;
 import edu.washington.cs.detector.AnomalyCallChain;
 import edu.washington.cs.detector.CGEntryManager;
+import edu.washington.cs.detector.CGTraverseGuider;
+import edu.washington.cs.detector.CGTraverseNoSystemCalls;
+import edu.washington.cs.detector.CGTraverseSWTGuider;
 import edu.washington.cs.detector.CallChainFilter;
 import edu.washington.cs.detector.FilterStrategy;
 import edu.washington.cs.detector.SWTAppUIErrorMain;
@@ -104,6 +107,13 @@ public class TestRSESDKUI extends AbstractUITest {
 		//org.eclipse.rse.services.dstore.util.DownloadListener
 		AbstractUITest test = new AbstractUITest(){
 			final Collection<String> exposedClasses = TestCommons.getPluginExposedClasses(getAppPath(), "./logs/plugin_xml_classes.txt");
+			
+			@Override
+			protected CGTraverseGuider getThreadStartGuider() {return new CGTraverseSWTGuider(); }
+			
+			@Override
+			protected CGTraverseGuider getUIAnomalyGuider() {return new CGTraverseSWTGuider(); }
+			
 			@Override
 			protected boolean isUIClass(IClass kclass) {
 				return kclass.toString().indexOf("org/eclipse/dstore/internal/core/client/ClientUpdateHandler") != -1
@@ -131,12 +141,12 @@ public class TestRSESDKUI extends AbstractUITest {
 		};
 		
 		List<FilterStrategy> filters = new LinkedList<FilterStrategy>();
-		//filters.add(new RemoveSystemCallStrategy());
-		//filters.add(new MergeSameTailStrategy());
+		filters.add(new RemoveSystemCallStrategy());
+		filters.add(new MergeSameTailStrategy());
 		
 		AbstractUITest.DEBUG = true;
 		List<AnomalyCallChain> chains 
-		    = test.reportUIErrorsWithEntries(SWTAppUIErrorMain.default_log, CG.RTA, filters); //can change the CG type here
+		    = test.reportUIErrorsWithEntries(SWTAppUIErrorMain.default_log, CG.OneCFA, filters); //can change the CG type here
 		
 		System.out.println(chains.size());
 	}

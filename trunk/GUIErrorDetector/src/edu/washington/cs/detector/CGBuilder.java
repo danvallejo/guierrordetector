@@ -41,6 +41,10 @@ public class CGBuilder {
 		this.exclusionFile = FileProvider.getFile(CallGraphTestUtil.REGRESSION_EXCLUSIONS);
 	}
 	
+	public CGBuilder(String appPath, String filePath) throws IOException {
+		this(appPath, FileProvider.getFile(filePath));
+	}
+	
 	public CGBuilder(String appPath, File exclusionFile) {
 		this.appPath = appPath;
 		this.exclusionFile = exclusionFile;
