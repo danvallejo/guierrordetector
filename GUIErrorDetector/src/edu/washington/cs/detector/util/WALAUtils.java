@@ -126,6 +126,13 @@ public class WALAUtils {
 			return Utils.translateSlashToDot(packageName) + clazzName;
 		}
 		
+		//return like a.b.c  or "" for default package
+		public static String getJavaPackageName(IClass clazz) {
+			TypeName tn = clazz.getName();
+			String packageName = tn.getPackage() == null ? "" : tn.getPackage().toString();
+			return packageName;
+		}
+		
 		//dump all classes
 		public static void dumpClasses(ClassHierarchy cha, String fileName) {
 			StringBuilder sb = new StringBuilder();

@@ -35,6 +35,9 @@ public class AnomalyCallChain {
 		return this.start2check;
 	}
 	
+	/**
+	 * Return all nodes from UI method to the checking method
+	 * */
 	public List<CGNode> getFullCallChain() {
 		final List<CGNode> nodes = new LinkedList<CGNode>();
 		nodes.addAll(ui2start);
