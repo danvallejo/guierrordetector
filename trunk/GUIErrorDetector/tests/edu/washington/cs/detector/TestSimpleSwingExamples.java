@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import edu.washington.cs.detector.CGBuilder.CG;
+import edu.washington.cs.detector.experiments.filters.RemoveNoClientClassStrategy;
 import edu.washington.cs.detector.experiments.filters.RemoveSystemCallStrategy;
 import edu.washington.cs.detector.util.Log;
 import edu.washington.cs.detector.util.PDFViewer;
@@ -31,7 +32,7 @@ public class TestSimpleSwingExamples extends TestCase {
 		String appPath = TestCommons.testfolder + "swingnoerror";
 //		Log.logConfig("./log.txt");
 //		UIAnomalyMethodFinder.DEBUG = true;
-		this.checkCallChainNumber(1, appPath);
+		this.checkCallChainNumber(0, appPath);
 	}
 	
 	private void checkCallChainNumber(int expectedNum, String appPath) {
@@ -46,8 +47,14 @@ public class TestSimpleSwingExamples extends TestCase {
 		System.out.println("size of chains before removing redundancy: " + chains.size());
 		chains = Utils.removeRedundantAnomalyCallChains(chains);
 		System.out.println("size of chains after removing redundancy: " + chains.size());
+		
 		chains = CallChainFilter.filter(chains, new RemoveSystemCallStrategy());
+		
 		System.out.println("size of chains after removing system calls: " + chains.size());
+		
+		chains = CallChainFilter.filter(chains, new RemoveNoClientClassStrategy(new String[]{"test."}));
+		
+		System.out.println("size of chains after removing non client class chains: " + chains.size());
 		
 		int count = 0;
 		for(AnomalyCallChain chain : chains) {
