@@ -6,12 +6,14 @@ public class CGTraverseSWTGuider implements CGTraverseGuider {
 
 	CGTraverseGuider systemGuider = new CGTraverseNoSystemCalls();
 	
+	//Excluding the following method calls:
 	String[] swtCalls = new String[] {
 		"Lorg/eclipse/swt/graphics/GC, <init>(Lorg/eclipse/swt/graphics/Drawable;)V",
 		"Lorg/eclipse/swt/graphics/GC, <init>(Lorg/eclipse/swt/graphics/Drawable;I)V",
 		"Lorg/eclipse/swt/graphics/Device, getDevice()",
 		"Lorg/eclipse/swt/graphics/Display, getDefault()",
-		"Lorg/eclipse/swt/widgets/Display, getActiveShell()"
+		"Lorg/eclipse/swt/widgets/Display, getActiveShell()",
+		"Lorg/eclipse/swt/widgets/Widget, toString()"
 	};
 	
 	@Override
@@ -25,14 +27,7 @@ public class CGTraverseSWTGuider implements CGTraverseGuider {
 		}
 		return true;
 	}
-
-	/**
-	 * Excluding the following method calls:
-	 * - Lorg/eclipse/swt/graphics/GC, <init>(Lorg/eclipse/swt/graphics/Drawable;)V >
-	 * - Lorg/eclipse/swt/graphics/GC, <init>(Lorg/eclipse/swt/graphics/Drawable;I)V
-	 * - Lorg/eclipse/swt/graphics/Device, getDevice()
-	 * - Lorg/eclipse/swt/graphics/Display, getDefault()
-	 * */
+	
 	private boolean matchExcludedSWTCalls(CGNode dest) {
 		String destStr = dest.toString();
 		for(String str : swtCalls) {

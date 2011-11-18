@@ -192,14 +192,17 @@ public class UIAnomalyDetector {
 	private void logresult(List<AnomalyCallChain> anomalyCallChains) {
 		Log.logln("Number of unique thread.start: " + UIAnomalyMethodFinder.getCachedResult().size());
 	    int count = 0;
+	    int numOfStart2UI = 0;
 	    for(CGNode start : UIAnomalyMethodFinder.getCachedResult().keySet()) {
 	    	Log.logln("The " + (count++) + "-th entry, number of call chains: "
 	    			+ UIAnomalyMethodFinder.getCachedResult().get(start).size());
-	    	for(CallChainNode node : UIAnomalyMethodFinder.getCachedResult().get(start)) {
-	    		Log.logln("Call chain to UI: ");
-	    		Log.logln(node.getChainToRootAsStr());
-	    	}
+	    	numOfStart2UI += UIAnomalyMethodFinder.getCachedResult().get(start).size();
+//	    	for(CallChainNode node : UIAnomalyMethodFinder.getCachedResult().get(start)) {
+//	    		Log.logln("Call chain to UI: ");
+//	    		Log.logln(node.getChainToRootAsStr());
+//	    	}
 	    }
+	    Log.logln("Total number of call chains from start 2 UI: " + numOfStart2UI);
 	    Log.logln("Total number of anomaly call chains returned: " + anomalyCallChains.size());
 	    for(int i = 0; i < anomalyCallChains.size(); i++) {
 	    	AnomalyCallChain chain = anomalyCallChains.get(i);
