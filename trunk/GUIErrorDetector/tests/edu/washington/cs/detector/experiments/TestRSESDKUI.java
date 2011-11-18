@@ -41,6 +41,7 @@ import edu.washington.cs.detector.TestCommons;
 import edu.washington.cs.detector.CGBuilder.CG;
 import edu.washington.cs.detector.experiments.filters.MergeSameTailStrategy;
 import edu.washington.cs.detector.experiments.filters.RemoveContainingNodeStrategy;
+import edu.washington.cs.detector.experiments.filters.RemoveDoubleThreadStartStrategy;
 import edu.washington.cs.detector.experiments.filters.RemoveSameEntryStrategy;
 import edu.washington.cs.detector.experiments.filters.RemoveSystemCallStrategy;
 import edu.washington.cs.detector.util.EclipsePluginCommons;
@@ -143,6 +144,7 @@ public class TestRSESDKUI extends AbstractUITest {
 		List<FilterStrategy> filters = new LinkedList<FilterStrategy>();
 		filters.add(new RemoveSystemCallStrategy());
 		filters.add(new MergeSameTailStrategy());
+		filters.add(new RemoveDoubleThreadStartStrategy());
 		
 		AbstractUITest.DEBUG = true;
 		List<AnomalyCallChain> chains 
