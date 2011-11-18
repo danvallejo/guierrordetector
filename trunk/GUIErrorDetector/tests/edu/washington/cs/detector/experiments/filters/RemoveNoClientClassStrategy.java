@@ -19,8 +19,15 @@ public class RemoveNoClientClassStrategy extends FilterStrategy {
 	 * */
 	private final String[] clientPackageNames;
 	
+	private boolean onlyLookAfterStart = false;
+	
 	public RemoveNoClientClassStrategy(String[] packageNames) {
+		this(packageNames, false);
+	}
+	
+	public RemoveNoClientClassStrategy(String[] packageNames, boolean onlyAfterStart) {
 		this.clientPackageNames = packageNames;
+		this.onlyLookAfterStart = onlyAfterStart;
 	}
 	
 	public RemoveNoClientClassStrategy(Collection<String> packageNameList) {
@@ -40,6 +47,11 @@ public class RemoveNoClientClassStrategy extends FilterStrategy {
 
 	private boolean shouldRemove(AnomalyCallChain chain) {
 		List<CGNode> nodes = chain.getFullCallChain();
+		
+		if(this.onlyLookAfterStart) {
+			nodes = chain.getStart2Check();
+		}
+		
 		if(nodes.size() < 2) {
 			throw new RuntimeException("The chain size should never < 2");
 		}

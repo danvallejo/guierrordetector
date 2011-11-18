@@ -19,7 +19,8 @@ public class RemoveSystemCallStrategy extends FilterStrategy {
 		"Ljava/lang/System",
 		"Ljava/lang/Class",
 		"Ljava/lang/StringBuilder",
-		"Ljava/lang/reflect/Method"
+		"Ljava/lang/reflect/Method",
+		"Ljava/lang/reflect/Constructor"
 	};
 	
 	public static void setSystemClasses(String[] classes) {

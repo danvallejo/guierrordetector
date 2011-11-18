@@ -62,6 +62,14 @@ public class Utils {
 		}
 	}
 	
+	public static <T> void checkNoNull(T[] ts) {
+		for(int i = 0; i < ts.length; i++) {
+			if(ts[i] == null) {
+				throw new RuntimeException("The " + i + "-th element is null.");
+			}
+		}
+	}
+	
 	public static void checkPathEntryExistence(String path) {
 		String[] entries = path.split(Globals.pathSep);
 		for(String entry : entries) {
