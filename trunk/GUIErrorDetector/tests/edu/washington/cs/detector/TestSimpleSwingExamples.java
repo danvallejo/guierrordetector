@@ -61,5 +61,9 @@ public class TestSimpleSwingExamples extends TestCase {
 			System.out.println(chain.getFullCallChainAsString());
 		}
 		assertEquals("The number of expected call chain is wrong", expectedNum, chains.size());
+		
+		//resort the state to move dependent tests
+		UIAnomalyMethodFinder.setMethodEvaluator(null);
+		UIAnomalyMethodFinder.setCheckingMethods("./src/checking_methods.txt");
 	}
 }

@@ -20,8 +20,8 @@ import edu.washington.cs.detector.util.WALAUtils;
 //implements the algorithm
 public class UIAnomalyDetector {
 	
-	public static String EXCLUSION_FILE_SWING = "Java60RegressionExclusionsWithoutGUI.txt";
-	public static String EMPTY_FILE = "EmptyExclusion.txt";
+	public static final String EXCLUSION_FILE_SWING = "Java60RegressionExclusionsWithoutGUI.txt";
+	public static final String EMPTY_FILE = "EmptyExclusion.txt";
 	
 	private final String appPath;
 	private String exclusion_file = CallGraphTestUtil.REGRESSION_EXCLUSIONS;
