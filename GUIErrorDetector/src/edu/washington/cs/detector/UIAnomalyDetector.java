@@ -72,6 +72,11 @@ public class UIAnomalyDetector {
 		this.uiAnomalyGuider = uiAnomalyGuider;
 	}
 	
+	//set the evaluator
+	public void setAnomalyMethodEvaluator(MethodEvaluator evl) {
+		UIAnomalyMethodFinder.setMethodEvaluator(evl);
+	}
+	
 	//set precision of default cg builder
 	public void setDefaultCGType(CG type) {
 		this.cgOpt = type;
@@ -143,7 +148,7 @@ public class UIAnomalyDetector {
 	        
 	        for(CallChainNode threadStartNode : reachableStarts) {
 	        	//TODO this needs
-	        	AnomalyFinder anomalyFinder = UIAnomalyMethodFinder.createInstance(g /*change from cg*/, threadStartNode.getNode(), this.uiAnomalyGuider); 
+	        	AnomalyFinder anomalyFinder = UIAnomalyMethodFinder.createInstance(builder.getClassHierarchy(), g /*change from cg*/, threadStartNode.getNode(), this.uiAnomalyGuider); 
 	        	
 	        	List<CallChainNode> resultNodes = anomalyFinder.findThreadUnsafeUINodes();
 	        	resultNodes = Utils.removeRedundantCallChains(resultNodes);

@@ -8,7 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.ibm.wala.classLoader.IMethod;
 import com.ibm.wala.ipa.callgraph.CGNode;
+import com.ibm.wala.ipa.cha.ClassHierarchy;
 import com.ibm.wala.util.graph.Graph;
 
 import edu.washington.cs.detector.util.Files;
@@ -25,7 +27,13 @@ public class UIAnomalyMethodFinder extends AbstractMethodFinder {
 	//reach a few thread safety checking methods
 	private static String[] checking_methods
 	    = Files.readWholeNoExp("./src/checking_methods.txt").toArray(new String[0]);
+	
 	private static Map<CGNode, List<CallChainNode>> cachedResult = new LinkedHashMap<CGNode, List<CallChainNode>>();
+	
+	//bad design here
+	private static MethodEvaluator evaluator = null;
+	
+	private ClassHierarchy cha = null;
 	
 	/** reload all checking method for customization */
 	public static String[] getCheckingMethods() {
@@ -42,15 +50,27 @@ public class UIAnomalyMethodFinder extends AbstractMethodFinder {
 	public static void clearCachedResult() {
 		cachedResult.clear();
 	}
+	
+	/**Set the evaluator, evaluating whether a method is thread safe or not*/
+	public static void setMethodEvaluator(MethodEvaluator evl) {
+		evaluator = evl;
+	}
+	
+	public void setClassHierarchy(ClassHierarchy cha) {
+		this.cha = cha;
+	}
 
-	public UIAnomalyMethodFinder(Graph<CGNode> cg, CGNode startNode) {
+	private UIAnomalyMethodFinder(Graph<CGNode> cg, CGNode startNode) {
 		super(cg, startNode);
 	}
 	
-	public static UIAnomalyMethodFinder createInstance(Graph<CGNode> cg, CGNode startNode, CGTraverseGuider guider) {
+	public static UIAnomalyMethodFinder createInstance(ClassHierarchy cha, Graph<CGNode> cg, CGNode startNode, CGTraverseGuider guider) {
 		UIAnomalyMethodFinder finder = new UIAnomalyMethodFinder(cg, startNode);
 		if(guider != null) {
 		    finder.setCGTraverseGuider(guider);
+		}
+		if(cha!= null) {
+			finder.setClassHierarchy(cha);
 		}
 		return finder;
 	}
@@ -152,8 +172,18 @@ public class UIAnomalyMethodFinder extends AbstractMethodFinder {
 	}
 	
 	private boolean isCheckingMethod(CGNode node) {
-		String methodSig = node.getMethod().getSignature();
+		IMethod m = node.getMethod();
+		String methodSig = m.getSignature();
 		//System.out.println(methodSig);
-		return Utils.<String>includedIn(methodSig, checking_methods);
+		if(Utils.<String>includedIn(methodSig, checking_methods) ) {
+			return true;
+		} else if(evaluator != null) {
+			if(this.cha == null) {
+				throw new RuntimeException("If the evaluator is set, ClassHierarchy can not be null.");
+			}
+			return evaluator.isThreadUnsafeMethod(this.cha, m);
+		} else {
+			return false;
+		}
 	}
 }

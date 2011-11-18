@@ -117,6 +117,17 @@ public class WALAUtils {
 	      }
 	    }
 	  }
+	  
+	  //given class name like a.b.c.d
+	  public static IClass lookupClass(ClassHierarchy cha, String classFullName) {
+		  for(IClass c : cha) {
+				String fullName = WALAUtils.getJavaFullClassName(c);
+				if(fullName.equals(classFullName)) {
+					return c;
+				}
+			}
+			return null;
+	  }
 		
 		//return like a.b.c.d
 		public static String getJavaFullClassName(IClass clazz) {
@@ -130,7 +141,7 @@ public class WALAUtils {
 		public static String getJavaPackageName(IClass clazz) {
 			TypeName tn = clazz.getName();
 			String packageName = tn.getPackage() == null ? "" : tn.getPackage().toString();
-			return packageName;
+			return Utils.translateSlashToDot(packageName);
 		}
 		
 		//dump all classes

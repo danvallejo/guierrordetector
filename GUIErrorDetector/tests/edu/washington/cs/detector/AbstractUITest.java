@@ -343,7 +343,7 @@ public abstract class AbstractUITest extends TestCase {
 	}
 	
 	private List<CallChainNode> getStart2CheckNode(Graph<CGNode> cg, CGNode startNode) {
-		AnomalyFinder anomalyMethodFinder = new UIAnomalyMethodFinder(cg, startNode);
+		AnomalyFinder anomalyMethodFinder = UIAnomalyMethodFinder.createInstance(null, cg, startNode, null);
 		List<CallChainNode> chains = anomalyMethodFinder.findThreadUnsafeUINodes();
 		return chains;
 	}
