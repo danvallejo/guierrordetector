@@ -35,6 +35,17 @@ public class AnomalyCallChain {
 		return this.start2check;
 	}
 	
+	public CGNode getEntryNode() {
+		if(this.ui2start.size() < 2) {
+			throw new RuntimeException("The size of ui2start should >= 2");
+		}
+		return this.ui2start.get(0);
+	}
+	
+	public int size() {
+		return this.getFullCallChain().size();
+	}
+	
 	/**
 	 * Return all nodes from UI method to the checking method
 	 * */
