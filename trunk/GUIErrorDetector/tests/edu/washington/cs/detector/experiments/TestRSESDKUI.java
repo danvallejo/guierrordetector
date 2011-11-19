@@ -39,6 +39,7 @@ import edu.washington.cs.detector.FilterStrategy;
 import edu.washington.cs.detector.SWTAppUIErrorMain;
 import edu.washington.cs.detector.TestCommons;
 import edu.washington.cs.detector.CGBuilder.CG;
+import edu.washington.cs.detector.experiments.filters.MergeSamePrefixStrategy;
 import edu.washington.cs.detector.experiments.filters.MergeSameTailStrategy;
 import edu.washington.cs.detector.experiments.filters.RemoveContainingNodeStrategy;
 import edu.washington.cs.detector.experiments.filters.RemoveDoubleThreadStartStrategy;
@@ -145,6 +146,7 @@ public class TestRSESDKUI extends AbstractUITest {
 		filters.add(new RemoveSystemCallStrategy());
 		filters.add(new MergeSameTailStrategy());
 		filters.add(new RemoveDoubleThreadStartStrategy());
+		filters.add(new MergeSamePrefixStrategy(6));
 		
 		AbstractUITest.DEBUG = true;
 		List<AnomalyCallChain> chains 
