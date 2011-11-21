@@ -41,12 +41,22 @@ public class SwingErrorExample {
 				t.start();
 			}
 		});
+		
 		frame.pack();
 		frame.setVisible(true);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 
 	public static void main(String[] args) {
-		SwingErrorExample b = new SwingErrorExample();
+		SwingUtilities.invokeLater(new Runnable() {
+			
+			@Override
+			public void run() {
+				SwingErrorExample b = new SwingErrorExample();
+			}
+		});
+		
+		System.out.println("main thread return");
 	}
 
 	class WorkingThread extends Thread {
