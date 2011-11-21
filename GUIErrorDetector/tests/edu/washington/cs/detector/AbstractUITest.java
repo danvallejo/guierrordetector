@@ -122,7 +122,7 @@ public abstract class AbstractUITest extends TestCase {
 		Utils.dumpCollection(entries, "./logs/entries.txt");
 		
 		if(DEBUG) {
-		    WALAUtils.viewCallGraph(builder.getAppCallGraph());
+		    WALAUtils.logCallGraph(builder.getAppCallGraph());
 		    Files.writeToFile(builder.getAppCallGraph().toString(), "./logs/callgraph.txt");
 		}
 		if(outputFilePath != null) {
@@ -198,7 +198,7 @@ public abstract class AbstractUITest extends TestCase {
 		System.out.println("App CG node num: " + builder.getAppCallGraph().getNumberOfNodes());
 		
 		if(DEBUG) {
-		    WALAUtils.viewCallGraph(builder.getAppCallGraph());
+		    WALAUtils.logCallGraph(builder.getAppCallGraph());
 		    Files.writeToFile(builder.getAppCallGraph().toString(), "./logs/callgraph.txt");
 		}
 		if(outputFilePath != null) {

@@ -20,6 +20,8 @@ import edu.washington.cs.detector.util.WALAUtils;
 //implements the algorithm
 public class UIAnomalyDetector {
 	
+	public static boolean DEBUG = false;
+	
 	public static final String EXCLUSION_FILE_SWING = "Java60RegressionExclusionsWithoutGUI.txt";
 	public static final String EMPTY_FILE = "EmptyExclusion.txt";
 	
@@ -99,8 +101,8 @@ public class UIAnomalyDetector {
 		}
 	}
 	
-	//use all main as entries
-	private CGBuilder getDefaultCGBuilder() throws IOException {
+	//use all main as entries in building CG, the CG has already been builded
+	public CGBuilder getDefaultCGBuilder() throws IOException {
 		CGBuilder builder = new CGBuilder(this.appPath, FileProvider.getFile(exclusion_file));
 		if(this.cgOpt != null) {
 			builder.setCGType(cgOpt);
@@ -121,6 +123,8 @@ public class UIAnomalyDetector {
 	private List<AnomalyCallChain> detectUIAnomaly(File eclusionFile/*useless*/, CGBuilder builder, Collection<CGNode> entries) {
 		CallGraph cg = builder.getCallGraph();
 		Graph<CGNode> g = builder.getAppCallGraph();
+		
+		WALAUtils.logCallGraph(g, DEBUG);
 		
 		if(cg == null || cg == null) {
 			throw new RuntimeException("please call buildCG first to construct the call graphs.");

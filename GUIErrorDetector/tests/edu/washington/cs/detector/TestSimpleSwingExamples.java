@@ -1,7 +1,11 @@
 package edu.washington.cs.detector;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
+
+import com.ibm.wala.ipa.callgraph.CGNode;
 
 import edu.washington.cs.detector.CGBuilder.CG;
 import edu.washington.cs.detector.experiments.filters.RemoveNoClientClassStrategy;
@@ -23,19 +27,19 @@ public class TestSimpleSwingExamples extends TestCase {
 	
 	public void testSwingError() throws IOException {
 		String appPath = TestCommons.testfolder + "swingerror";
-//		Log.logConfig("./log.txt");
-//		UIAnomalyMethodFinder.DEBUG = true;
-		this.checkCallChainNumber(2, appPath);
+		Log.logConfig("./log.txt");
+		UIAnomalyMethodFinder.DEBUG = true;
+		this.checkCallChainNumber(2, appPath, new String[]{"SwingErrorExample$1, actionPerformed"});
 	}
 	
 	public void testSwingNoError() throws IOException {
 		String appPath = TestCommons.testfolder + "swingnoerror";
 //		Log.logConfig("./log.txt");
 //		UIAnomalyMethodFinder.DEBUG = true;
-		this.checkCallChainNumber(0, appPath);
+		this.checkCallChainNumber(0, appPath, new String[]{"SwingErrorExample$1, actionPerformed"});
 	}
 	
-	private void checkCallChainNumber(int expectedNum, String appPath) {
+	private void checkCallChainNumber(int expectedNum, String appPath, String[] actionHandlers) throws IOException {
 		UIAnomalyDetector detector = new UIAnomalyDetector(appPath);
 		
 		/** a few configurations to configure the tool for swing*/
@@ -43,9 +47,26 @@ public class TestSimpleSwingExamples extends TestCase {
 		detector.setExclusionFile(UIAnomalyDetector.EXCLUSION_FILE_SWING);
 		detector.configureCheckingMethods("./tests/edu/washington/cs/detector/checkingmethods_for_swing.txt");
 		detector.setAnomalyMethodEvaluator(new SwingUIMethodEvaluator());
+		detector.setThreadStartGuider(new CGTraverseSwingGuider());
+		
+		CGBuilder builder = detector.getDefaultCGBuilder();
+		//get all entries
+		Collection<CGNode> nodes = new LinkedList<CGNode>();
+		for(CGNode node : builder.getAppCallGraph()) {
+			boolean matched = false;
+			for(String handler : actionHandlers) {
+				if(node.toString().indexOf(handler) != -1) {
+					matched = true;
+					break;
+				}
+			}
+			if(matched) {
+				nodes.add(node);
+			}
+		}
 		
 		/** detect UI anomaly */
-		List<AnomalyCallChain> chains = detector.detectUIAnomaly();
+		List<AnomalyCallChain> chains = detector.detectUIAnomaly(builder, nodes);
 		
 		System.out.println("size of chains before removing redundancy: " + chains.size());
 		chains = Utils.removeRedundantAnomalyCallChains(chains);
