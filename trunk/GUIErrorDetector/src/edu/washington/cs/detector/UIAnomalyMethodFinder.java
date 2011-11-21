@@ -90,7 +90,7 @@ public class UIAnomalyMethodFinder extends AbstractMethodFinder {
 	 * */
 	public List<CallChainNode> findThreadUnsafeUINodes() {
 
-		WALAUtils.viewCallGraph(this.cg, DEBUG);
+		WALAUtils.logCallGraph(this.cg, DEBUG);
 		
 		//first check the cache
 		if(cachedResult.containsKey(this.startNode)) {
