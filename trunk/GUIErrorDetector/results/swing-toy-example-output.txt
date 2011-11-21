@@ -1,0 +1,27 @@
+The 0-th chain
+Node: < Application, Ltest/swingerror/SwingErrorExample, main([Ljava/lang/String;)V > Context: Everywhere, line: 48
+ -> Node: < Application, Ltest/swingerror/SwingErrorExample, <init>()V > Context: Everywhere, line: 19
+ -> Node: < Primordial, Ljava/awt/Window, setVisible(Z)V > Context: Everywhere, line: -1
+ -> Node: < Primordial, Ljava/awt/Component, setVisible(Z)V > Context: Everywhere, line: -1
+ -> Node: < Primordial, Ljava/awt/Component, show(Z)V > Context: Everywhere, line: -1
+ -> Node: < Primordial, Ljava/awt/Window, show()V > Context: Everywhere, line: -1
+ -> Node: < Primordial, Ljava/awt/Dialog, show()V > Context: Everywhere, line: -1
+ -> Node: synthetic < Primordial, Ljava/security/AccessController, doPrivileged(Ljava/security/PrivilegedAction;)Ljava/lang/Object; > Context: Everywhere, line: -1
+ -> Node: < Primordial, Ljavax/swing/TimerQueue$1, run()Ljava/lang/Object; > Context: Everywhere, line: -1
+ -> Node: synthetic < Primordial, Ljava/lang/Thread, start()V > Context: Everywhere, line: -1
+ -> Node: < Application, Ltest/swingerror/SwingErrorExample$WorkingThread, run()V > Context: Everywhere, line: 53
+ -> Node: < Primordial, Ljavax/swing/DefaultListModel, removeElement(Ljava/lang/Object;)Z > Context: Everywhere, line: -1
+
+The 1-th chain
+Node: < Application, Ltest/swingerror/SwingErrorExample, main([Ljava/lang/String;)V > Context: Everywhere, line: 48
+ -> Node: < Application, Ltest/swingerror/SwingErrorExample, <init>()V > Context: Everywhere, line: 19
+ -> Node: < Primordial, Ljava/awt/Window, setVisible(Z)V > Context: Everywhere, line: -1
+ -> Node: < Primordial, Ljava/awt/Component, setVisible(Z)V > Context: Everywhere, line: -1
+ -> Node: < Primordial, Ljava/awt/Component, show(Z)V > Context: Everywhere, line: -1
+ -> Node: < Primordial, Ljava/awt/Window, show()V > Context: Everywhere, line: -1
+ -> Node: < Primordial, Ljava/awt/Dialog, show()V > Context: Everywhere, line: -1
+ -> Node: synthetic < Primordial, Ljava/security/AccessController, doPrivileged(Ljava/security/PrivilegedAction;)Ljava/lang/Object; > Context: Everywhere, line: -1
+ -> Node: < Primordial, Ljavax/swing/TimerQueue$1, run()Ljava/lang/Object; > Context: Everywhere, line: -1
+ -> Node: synthetic < Primordial, Ljava/lang/Thread, start()V > Context: Everywhere, line: -1
+ -> Node: < Application, Ltest/swingerror/SwingErrorExample$WorkingThread, run()V > Context: Everywhere, line: 53
+ -> Node: < Primordial, Ljavax/swing/DefaultListModel, addElement(Ljava/lang/Object;)V > Context: Everywhere, line: -1
