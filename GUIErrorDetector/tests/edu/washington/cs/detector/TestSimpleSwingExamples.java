@@ -51,22 +51,25 @@ public class TestSimpleSwingExamples extends TestCase {
 		
 		CGBuilder builder = detector.getDefaultCGBuilder();
 		//get all entries
-		Collection<CGNode> nodes = new LinkedList<CGNode>();
-		for(CGNode node : builder.getAppCallGraph()) {
-			boolean matched = false;
-			for(String handler : actionHandlers) {
-				if(node.toString().indexOf(handler) != -1) {
-					matched = true;
-					break;
+		List<AnomalyCallChain> chains = null;
+		if (actionHandlers != null) {
+			Collection<CGNode> nodes = new LinkedList<CGNode>();
+			for (CGNode node : builder.getAppCallGraph()) {
+				boolean matched = false;
+				for (String handler : actionHandlers) {
+					if (node.toString().indexOf(handler) != -1) {
+						matched = true;
+						break;
+					}
+				}
+				if (matched) {
+					nodes.add(node);
 				}
 			}
-			if(matched) {
-				nodes.add(node);
-			}
-		}
-		
-		/** detect UI anomaly */
-		List<AnomalyCallChain> chains = detector.detectUIAnomaly(builder, nodes);
+			chains = detector.detectUIAnomaly(builder, nodes);
+		} else {
+			chains = detector.detectUIAnomaly(builder);
+		} 
 		
 		System.out.println("size of chains before removing redundancy: " + chains.size());
 		chains = Utils.removeRedundantAnomalyCallChains(chains);

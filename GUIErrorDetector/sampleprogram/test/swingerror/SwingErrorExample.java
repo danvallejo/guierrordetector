@@ -48,13 +48,13 @@ public class SwingErrorExample {
 	}
 
 	public static void main(String[] args) {
-		SwingUtilities.invokeLater(new Runnable() {
-			
-			@Override
-			public void run() {
+//		SwingUtilities.invokeLater(new Runnable() {
+//			
+//			@Override
+//			public void run() {
 				SwingErrorExample b = new SwingErrorExample();
-			}
-		});
+//			}
+//		});
 		
 		System.out.println("main thread return");
 	}
