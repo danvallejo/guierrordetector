@@ -28,8 +28,15 @@ public class SwingErrorExample {
 		p = new JPanel();
 		p.add(b);
 		frame.getContentPane().add(p, "North");
+		
+		//this is not the EventDispatchThread
+		System.out.println("Current thread: " + SwingUtilities.isEventDispatchThread());
+		
 		b.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
+				//this is the EventDispatchThread
+				System.out.println("Current thread@actionperformed: " + SwingUtilities.isEventDispatchThread());
+				
 				WorkingThread t = new WorkingThread();
 				t.start();
 			}
