@@ -4,6 +4,7 @@ import java.io.IOException;
 
 /**
  * Test a swing program, too large, can not finish.
+ * It can not complete in 2 hours
  * */
 public class TestJEdit extends AbstractSwingTest {
 
