@@ -188,6 +188,7 @@ public class SwingUtils {
 		return eventlistener;
 	}
 	
+	//tested, every class is loaded
 	public static IClass[] getListeners(ClassHierarchy cha) {
 		if(listeners != null) {
 			return listeners;
