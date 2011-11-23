@@ -7,6 +7,8 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import com.ibm.wala.core.tests.callGraph.CallGraphTestUtil;
+import com.ibm.wala.ipa.callgraph.Entrypoint;
+import com.ibm.wala.ipa.cha.ClassHierarchyException;
 import com.ibm.wala.util.io.FileProvider;
 
 import edu.washington.cs.detector.CGBuilder.CG;
@@ -34,6 +36,25 @@ public class TestCGWithPDFViewer extends TestCase {
 		
 		assertEquals(23, builder.getAppCallGraph().getNumberOfNodes());
 		PDFViewer.viewCG("multithread.pdf", builder.getAppCallGraph());
+	}
+	
+	public void testCGWithoutConstructor() throws IOException, ClassHierarchyException {
+		String appPath =  TestCommons.testfolder + "cgiwthoutnew";
+		CGBuilder builder = new CGBuilder(appPath, FileProvider.getFile(CallGraphTestUtil.REGRESSION_EXCLUSIONS));
+		builder.makeScopeAndClassHierarchy();
+		
+		//builder.setCGType(CG.RTA);
+		
+		Iterable<Entrypoint> entries = CGEntryManager.getAllPublicMethods(builder,
+				"test.cgiwthoutnew.CGWithoutConstructor", "test.cgiwthoutnew.A");
+		builder.buildCG(entries);
+		
+//		builder.buildCG();
+		
+		//assertEquals(3, builder.getAppCallGraph().getNumberOfNodes());
+		
+		PDFViewer.viewCG("cgNoConstructor.pdf", builder.getAppCallGraph());
+		
 	}
 	
 	public void testDisplaySmallCG() throws IOException {
