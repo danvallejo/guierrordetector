@@ -1,6 +1,7 @@
 package edu.washington.cs.detector;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -13,6 +14,8 @@ import com.ibm.wala.ipa.cha.ClassHierarchyException;
 import com.ibm.wala.util.graph.Graph;
 
 import edu.washington.cs.detector.CGBuilder.CG;
+import edu.washington.cs.detector.util.AndroidUtils;
+import edu.washington.cs.detector.util.Files;
 import edu.washington.cs.detector.util.Globals;
 import edu.washington.cs.detector.util.Log;
 import edu.washington.cs.detector.util.WALAUtils;
@@ -33,14 +36,23 @@ public class TestSimpleAndroidExamples extends TestCase {
 	    
 	    //find all UI classes
 	    ClassHierarchy cha = builder.getClassHierarchy();
-	    int i = 0;
 	    List<String> uiClasses = new LinkedList<String>();
 	    for(IClass c : cha) {
 	    	if(c.toString().indexOf("test/android/TestAndroidActivity") != -1) {
 	    		uiClasses.add(WALAUtils.getJavaFullClassName(c));
 	    	}
 	    }
-	    Iterable<Entrypoint> entries = CGEntryManager.getAllPublicMethods(builder, uiClasses);
+	    Iterable<Entrypoint> uiEntries = CGEntryManager.getAllPublicMethods(builder, uiClasses);
+	    
+	    //add other reflectively created class
+	    String path = "D:\\research\\guierror\\eclipsews\\TestAndroid\\res\\layout\\main.xml";
+		String xmlContent = Files.getFileContents(path);
+		Collection<String> declaredClasses  = AndroidUtils.extractWidgets(xmlContent);
+	    Iterable<Entrypoint> widgetConstructors = CGEntryManager.getConstructors(builder, declaredClasses);
+	    
+	    //Merge2 entries
+	    Iterable<Entrypoint> entries = CGEntryManager.mergeEntrypoints(uiEntries, widgetConstructors);
+	    
 		int size = 0;
 		for(Entrypoint entry : entries) {
 			assertTrue(entry != null);

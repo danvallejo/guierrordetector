@@ -20,8 +20,20 @@ import com.ibm.wala.types.TypeReference;
 import com.ibm.wala.util.collections.HashSetFactory;
 
 import edu.washington.cs.detector.util.Utils;
+import edu.washington.cs.detector.util.WALAUtils;
 
 public class CGEntryManager {
+
+	public static Iterable<Entrypoint> mergeEntrypoints(Iterable<Entrypoint> ep1, Iterable<Entrypoint> ep2) {
+		final HashSet<Entrypoint> result = HashSetFactory.make();
+		for(Entrypoint ep : ep1) {
+			result.add(ep);
+		}
+		for(Entrypoint ep : ep2) {
+			result.add(ep);
+		}
+		return result;
+	}
 	
 	//superClassFullName: a.b.c.ClassName; appClassPackage: a.b.c
 	public static Iterable<Entrypoint> getAppPublicMethodsInSubclasses(AnalysisScope scope, ClassHierarchy cha, String superClassFullName,
@@ -62,6 +74,55 @@ public class CGEntryManager {
 			}
 		}
 		
+		return new Iterable<Entrypoint>() {
+			public Iterator<Entrypoint> iterator() {
+				return result.iterator();
+			}
+		};
+	}
+	
+	public static Iterable<Entrypoint> getConstructors(CGBuilder builder, Collection<String> methodClasses) {
+		String[] array = new String[methodClasses.size()];
+		int i = 0;
+		for(String str : methodClasses) {
+			array[i++] = str;
+		}
+		return getConstructors(builder, array);
+	}
+	
+	public static Iterable<Entrypoint> getConstructors(CGBuilder builder, String...methodClasses) {
+		AnalysisScope scope = builder.getAnalysisScope();
+		ClassHierarchy cha = builder.getClassHierarchy();
+		final HashSet<Entrypoint> result = HashSetFactory.make();
+		for(String methodClass : methodClasses) {
+			Iterable<Entrypoint> eps = getConstructors(scope, cha, methodClass);
+			for(Entrypoint ep : eps) {
+				result.add(ep);
+			}
+		}
+		return result;
+	}
+	
+	// class name: a.b.c.d class
+	public static Iterable<Entrypoint> getConstructors(AnalysisScope scope,
+			ClassHierarchy cha, String methodClass) {
+		final HashSet<Entrypoint> result = HashSetFactory.make();
+		for (IClass klass : cha) {
+			// check the class name
+            if(!WALAUtils.getJavaFullClassName(klass).equals(methodClass)) {
+            	continue;
+            }
+            //get all constructors
+			Collection<IMethod> allMethods = klass.getDeclaredMethods();
+			for (IMethod m : allMethods) {
+				if (!m.isPublic()) {
+					continue;
+				}
+				if (m.getName().toString().equals("<init>")) {
+					result.add(new DefaultEntrypoint(m, cha));
+				}
+			}
+		}
 		return new Iterable<Entrypoint>() {
 			public Iterator<Entrypoint> iterator() {
 				return result.iterator();
@@ -115,6 +176,7 @@ public class CGEntryManager {
 	}
 	
 	//methodClass: a.b.c.d
+	//XXX be aware, it only considers app class loader
 	public static Iterable<Entrypoint> getAppPublicMethodsByClass(AnalysisScope scope, ClassHierarchy cha, String methodClass, boolean useSubClass) {
 		if (cha == null) {
 			throw new IllegalArgumentException("cha is null");
