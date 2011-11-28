@@ -16,6 +16,14 @@ public class TestUtils extends TestCase {
 	public static Test suite() {
 		return new TestSuite(TestUtils.class);
 	}
+	
+	public void testClassesInAndroidLayout() throws IOException {
+		String path = "D:\\research\\guierror\\eclipsews\\TestAndroid\\res\\layout\\main.xml";
+		String xmlContent = Files.getFileContents(path);
+		Collection<String> declaredClasses  = AndroidUtils.extractWidgets(xmlContent);
+		System.out.println(declaredClasses);
+		assertEquals("No of declared classes is incorrect", 3, declaredClasses.size() );
+	}
 
 	public void testExtractPluginXML() throws IOException {
 		String content = Utils
