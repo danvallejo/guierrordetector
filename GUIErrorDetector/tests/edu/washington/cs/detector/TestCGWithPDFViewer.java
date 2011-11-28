@@ -44,14 +44,11 @@ public class TestCGWithPDFViewer extends TestCase {
 		builder.makeScopeAndClassHierarchy();
 		
 		//builder.setCGType(CG.RTA);
+//		Iterable<Entrypoint> entries = CGEntryManager.getAllPublicMethods(builder,
+//				"test.cgiwthoutnew.CGWithoutConstructor", "test.cgiwthoutnew.A");
+//		builder.buildCG(entries);
 		
-		Iterable<Entrypoint> entries = CGEntryManager.getAllPublicMethods(builder,
-				"test.cgiwthoutnew.CGWithoutConstructor", "test.cgiwthoutnew.A");
-		builder.buildCG(entries);
-		
-//		builder.buildCG();
-		
-		//assertEquals(3, builder.getAppCallGraph().getNumberOfNodes());
+		builder.buildCG();
 		
 		PDFViewer.viewCG("cgNoConstructor.pdf", builder.getAppCallGraph());
 		
