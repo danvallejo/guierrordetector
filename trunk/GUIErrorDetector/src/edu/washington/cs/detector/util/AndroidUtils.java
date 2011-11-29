@@ -1,11 +1,23 @@
 package edu.washington.cs.detector.util;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
+import java.util.zip.ZipFile;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -16,6 +28,57 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 public class AndroidUtils {
+	
+	public static Collection<String> extractAllWidgets(File f) throws ZipException, IOException {
+		List<Reader> xmlFileReaders = new LinkedList<Reader>();
+		if(f.isDirectory()) {
+			//check whether the dir "res" exists
+			List<File> allFiles = Files.getFileListing(f);
+			String desiredPath = f.getAbsolutePath() + Globals.fileSep + "res" + Globals.fileSep + "layout";
+			for(File file : allFiles) {
+				if(file.getName().endsWith(".xml") && file.getAbsolutePath().startsWith(desiredPath)) {
+					//System.out.println(file);
+					BufferedReader in = new BufferedReader(new FileReader(file));
+					xmlFileReaders.add(in);
+				}
+			}
+		} else {
+			//f must be an apk file
+			if(!f.getName().endsWith(".apk")) {
+				throw new RuntimeException("It must be an apk file: " + f.getAbsolutePath());
+			}
+			ZipFile jarFile = new ZipFile(f);
+			Enumeration<? extends ZipEntry> e = jarFile.entries();
+			while(e.hasMoreElements()) {
+				ZipEntry ze = e.nextElement();
+				if(ze.toString().indexOf("res/layout") != -1
+						&& ze.toString().endsWith(".xml")) {
+				    System.out.println(ze);
+					BufferedReader in = new BufferedReader(
+							new InputStreamReader(jarFile.getInputStream(ze)));
+					xmlFileReaders.add(in);
+				}
+			}
+		}
+		
+		//read each xml file one by one
+		Collection<String> widgetClasses = new LinkedList<String>();
+		for(Reader reader : xmlFileReaders) {
+			String xmlContent = Files.getFileContents(reader);
+			//System.out.println(xmlContent);
+			widgetClasses.addAll(extractWidgets(xmlContent));
+		}
+		return widgetClasses;
+	}
+	
+	//f is a single xml file
+	public static Collection<String> extractWidgets(File xmlFile) {
+		try {
+			return extractWidgets(Files.getFileContents(xmlFile));
+		} catch (IOException e) {
+			throw new RuntimeException();
+		}
+	}
 	
 	//return the class full name like: a.b.c.d
 	public static Collection<String> extractWidgets(String xmlContent) {
@@ -41,6 +104,28 @@ public class AndroidUtils {
 							declaredWidgets.add(qName);
 						}
 					}
+					//check the attributes
+					if(attributes != null) {
+					    for(int i = 0; i < attributes.getLength(); i++) {
+						    if(attributes.getQName(i).equals("class")) {
+						    	String clazzValue = attributes.getValue(i);
+						    	if(clazzValue.startsWith(".")) { //be aware of ., it can be specified as <class=".clzzName"/>
+						    		clazzValue = clazzValue.substring(1);
+						    	}
+						    	if(allWidgets.contains(clazzValue)) {
+						    		declaredWidgets.add(WIDGET_PACKAGE + "." + clazzValue);
+						    	} else {
+						    		if(clazzValue.startsWith(WIDGET_PACKAGE)) {
+										//double check
+										if(!allWidgets.contains(clazzValue.substring(WIDGET_PACKAGE.length()))) {
+											throw new RuntimeException("The widget list is not complete, it miss: " + clazzValue);
+										}
+										declaredWidgets.add(clazzValue);
+									}
+						    	}
+						    }
+					    }
+					}
 				}
 			};
 			byte[] bytes = xmlContent.getBytes("UTF8");
@@ -62,6 +147,8 @@ public class AndroidUtils {
 	}
 	
 	public static String WIDGET_PACKAGE = "android.widget";
+	
+	//FIXME, should it be ClassA$ClassB or ClassA.ClassB
 	private static String[] widgetShortNames = new String[] {
 		"AbsListView",
 		"AbsListView.LayoutParams",

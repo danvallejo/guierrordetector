@@ -1,10 +1,12 @@
 package edu.washington.cs.detector.util;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.zip.ZipException;
 
 import edu.washington.cs.detector.TestCommons;
 
@@ -15,6 +17,14 @@ import junit.framework.TestSuite;
 public class TestUtils extends TestCase {
 	public static Test suite() {
 		return new TestSuite(TestUtils.class);
+	}
+	
+	public void testGetDeclardWidget() throws ZipException, IOException {
+		String path = //"E:\\market_20101102.tar\\market_20101102\\applications\\Comics\\cat.bcnmultimedia.paraboles.apk";
+			"D:\\research\\guierror\\eclipsews\\TestAndroid";
+		Collection<String> widgets = AndroidUtils.extractAllWidgets(new File(path));
+		System.out.println(widgets);
+		assertEquals(3, widgets.size());
 	}
 	
 	public void testClassesInAndroidLayout() throws IOException {
