@@ -38,6 +38,7 @@ public class TestAndroidAndPluginUtils extends TestCase {
 				System.out.println(num++ + "  -  " + c);
 			}
 		}
+		assertEquals(62, num);
 	}
 	
 	public void testLoadAllListener() throws IOException, ClassHierarchyException {
@@ -59,6 +60,7 @@ public class TestAndroidAndPluginUtils extends TestCase {
 			}
 		}
 		System.out.println(set.size());
+		assertEquals(170, set.size());
 	}
 	
 	public void testGetCustomizedWidget() throws IOException, ClassHierarchyException {
@@ -71,6 +73,7 @@ public class TestAndroidAndPluginUtils extends TestCase {
 		String xmlContent = Files.getFileContents("D:\\research\\guierror\\eclipsews\\TestAndroid\\res\\layout\\main.xml");
 		Collection<String> classes = AndroidUtils.extractCustomizedUIs(builder.getClassHierarchy(), xmlContent);
 		System.out.println(classes);
+		assertEquals(1, classes.size());
 	}
 	
 	public void testGetDeclardWidget() throws ZipException, IOException, ClassHierarchyException {
@@ -106,6 +109,7 @@ public class TestAndroidAndPluginUtils extends TestCase {
 		Collection<String> all = AndroidUtils.extractAllUIs(builder.getClassHierarchy(), new File(path));
 		System.out.println("No: " + all.size());
 		System.out.println(all);
+		assertEquals(4, all.size());
 	}
 	
 	public void testClassesInAndroidLayout() throws IOException {
@@ -124,6 +128,7 @@ public class TestAndroidAndPluginUtils extends TestCase {
 		for(String clazz : clazzList) {
 			System.out.println(clazz);
 		}
+		assertEquals(88, clazzList.size());
 	}
 	
 	public void testExtractAllPluginXML() throws IOException {
@@ -135,5 +140,6 @@ public class TestAndroidAndPluginUtils extends TestCase {
 			allClasses.addAll(Utils.extractClassFromPluginXML(jarFile));
 		}
 		System.out.println("Number of exposed class: " + allClasses.size());
+		assertEquals(101, allClasses.size());
 	}
 }
