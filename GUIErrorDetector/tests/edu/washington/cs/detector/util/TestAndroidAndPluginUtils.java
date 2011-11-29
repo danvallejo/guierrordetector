@@ -11,6 +11,7 @@ import java.util.zip.ZipException;
 
 import com.ibm.wala.classLoader.IClass;
 import com.ibm.wala.classLoader.IMethod;
+import com.ibm.wala.ipa.cha.ClassHierarchy;
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
 
 import edu.washington.cs.detector.CGBuilder;
@@ -20,9 +21,23 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-public class TestUtils extends TestCase {
+public class TestAndroidAndPluginUtils extends TestCase {
 	public static Test suite() {
-		return new TestSuite(TestUtils.class);
+		return new TestSuite(TestAndroidAndPluginUtils.class);
+	}
+	
+	public void testGetAllWidget() throws IOException, ClassHierarchyException {
+		String jarPath = "D:\\Java\\android-sdk-windows\\platforms\\android-8\\android.jar";
+		CGBuilder builder = new CGBuilder(jarPath);
+		builder.makeScopeAndClassHierarchy();
+		ClassHierarchy cha = builder.getClassHierarchy();
+		IClass view = AndroidUtils.getWidgetView(cha);
+		int num = 0;
+		for(IClass c : cha) {
+			if(cha.isAssignableFrom(view, c)) {
+				System.out.println(num++ + "  -  " + c);
+			}
+		}
 	}
 	
 	public void testLoadAllListener() throws IOException, ClassHierarchyException {
@@ -41,15 +56,9 @@ public class TestUtils extends TestCase {
 					continue;
 				}
 				set.add(m.getName().toString());
-//				if(m.getName().toString().equals("ok")) {
-//					System.out.println(c);
-//				}
 			}
 		}
 		System.out.println(set.size());
-//		for(String m : set) {
-//			System.out.println(m);
-//		}
 	}
 	
 	public void testGetCustomizedWidget() throws IOException, ClassHierarchyException {
@@ -59,15 +68,8 @@ public class TestUtils extends TestCase {
 		CGBuilder builder = new CGBuilder(appPath);
 		builder.makeScopeAndClassHierarchy();
 		
-//		for(IClass c : builder.getClassHierarchy()) {
-//			if(c.toString().indexOf("Listener") != -1) {
-//				System.out.println(c);
-//			}
-//		}
-//		System.err.println(WALAUtils.lookupClass(builder.getClassHierarchy(), "android.media.MediaPlayer$OnSeekCompleteListener"));
-		
 		String xmlContent = Files.getFileContents("D:\\research\\guierror\\eclipsews\\TestAndroid\\res\\layout\\main.xml");
-		Collection<String> classes = AndroidUtils.extractCustomizedWidgets(builder.getClassHierarchy(), xmlContent);
+		Collection<String> classes = AndroidUtils.extractCustomizedUIs(builder.getClassHierarchy(), xmlContent);
 		System.out.println(classes);
 	}
 	
@@ -81,15 +83,35 @@ public class TestUtils extends TestCase {
 		CGBuilder builder = new CGBuilder(appPath);
 		builder.makeScopeAndClassHierarchy();
 		
-		Collection<String> widgets = AndroidUtils.extractAllWidgets(builder.getClassHierarchy(), new File(path));
+		Collection<String> widgets = AndroidUtils.extractAllUIs(builder.getClassHierarchy(), new File(path));
 		System.out.println(widgets);
 		assertEquals(4, widgets.size());
+	}
+	
+	public void testGetDeclaredWidgetSchoolCartoon() throws ZipException, IOException, ClassHierarchyException {
+		String path = "D:\\develop-tools\\apktool\\tmp";
+		List<File> files = Files.getFileListing(new File(path));
+		for(File f : files) {
+			if(f.getAbsolutePath().indexOf("res" + Globals.fileSep + "layout") != -1
+					&& f.getName().endsWith(".xml")) {
+				System.out.println(f);
+				Collection<String> widgets = AndroidUtils.extractAndroidUIs(Files.getFileContents(f));
+				System.out.println("  - no: " +widgets.size());
+				System.out.println("  -: " + widgets);
+			}
+		}
+		//for all
+		CGBuilder builder = new CGBuilder("D:\\Java\\android-sdk-windows\\platforms\\android-8\\android.jar");
+		builder.makeScopeAndClassHierarchy();
+		Collection<String> all = AndroidUtils.extractAllUIs(builder.getClassHierarchy(), new File(path));
+		System.out.println("No: " + all.size());
+		System.out.println(all);
 	}
 	
 	public void testClassesInAndroidLayout() throws IOException {
 		String path = "D:\\research\\guierror\\eclipsews\\TestAndroid\\res\\layout\\main.xml";
 		String xmlContent = Files.getFileContents(path);
-		Collection<String> declaredClasses  = AndroidUtils.extractAndroidWidgets(xmlContent);
+		Collection<String> declaredClasses  = AndroidUtils.extractAndroidUIs(xmlContent);
 		System.out.println(declaredClasses);
 		assertEquals("No of declared classes is incorrect", 3, declaredClasses.size() );
 	}
