@@ -12,6 +12,7 @@ import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -63,6 +64,54 @@ public final class Files {
     // The directory is now empty so delete it
     return dir.delete();
   }
+  
+	public static List<File> getFileListing(File aStartingDir)
+			throws FileNotFoundException {
+		validateDirectory(aStartingDir);
+		List<File> result = getFileListingNoSort(aStartingDir);
+		Collections.sort(result);
+		return result;
+	}
+
+	static private List<File> getFileListingNoSort(File aStartingDir)
+			throws FileNotFoundException {
+		List<File> result = new ArrayList<File>();
+		File[] filesAndDirs = aStartingDir.listFiles();
+		List<File> filesDirs = Arrays.asList(filesAndDirs);
+		for (File file : filesDirs) {
+			result.add(file); // always add, even if directory
+			if (!file.isFile()) {
+				// must be a directory
+				// recursive call!
+				List<File> deeperList = getFileListingNoSort(file);
+				result.addAll(deeperList);
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * Directory is valid if it exists, does not represent a file, and can be
+	 * read.
+	 */
+	static private void validateDirectory(File aDirectory)
+			throws FileNotFoundException {
+		if (aDirectory == null) {
+			throw new IllegalArgumentException("Directory should not be null.");
+		}
+		if (!aDirectory.exists()) {
+			throw new FileNotFoundException("Directory does not exist: "
+					+ aDirectory);
+		}
+		if (!aDirectory.isDirectory()) {
+			throw new IllegalArgumentException("Is not a directory: "
+					+ aDirectory);
+		}
+		if (!aDirectory.canRead()) {
+			throw new IllegalArgumentException("Directory cannot be read: "
+					+ aDirectory);
+		}
+	}
 
   public static List<String> findFilesInDir(String dirPath, String startsWith, String endsWith) {
 	  return findFilesInDir(new File(dirPath), startsWith, endsWith);
@@ -172,6 +221,21 @@ public final class Files {
       in.close();
     }
   }
+  
+  public static String getFileContents(Reader in) throws IOException {
+	    StringBuilder result = new StringBuilder();  
+	    try{
+	      int c;
+	      while ((c = in.read()) != -1)
+	      {
+	        result.append((char)c);
+	      }
+	      in.close();
+	      return result.toString();
+	    } finally{
+	      in.close();
+	    }
+	  }
 
   /**
    * Reads the whole file. Returns one big String.
