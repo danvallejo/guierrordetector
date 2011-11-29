@@ -3,12 +3,14 @@ package edu.washington.cs.detector.util;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.zip.ZipException;
 
 import com.ibm.wala.classLoader.IClass;
+import com.ibm.wala.classLoader.IMethod;
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
 
 import edu.washington.cs.detector.CGBuilder;
@@ -23,12 +25,46 @@ public class TestUtils extends TestCase {
 		return new TestSuite(TestUtils.class);
 	}
 	
+	public void testLoadAllListener() throws IOException, ClassHierarchyException {
+		String appPath = "D:\\research\\guierror\\eclipsews\\TestAndroid\\bin\\classes\\test\\android"
+			+ Globals.pathSep +
+			"D:\\Java\\android-sdk-windows\\platforms\\android-8\\android.jar";
+		CGBuilder builder = new CGBuilder(appPath);
+		builder.makeScopeAndClassHierarchy();
+		List<IClass> allListeners = AndroidUtils.getAndroidListenerClasses(builder.getClassHierarchy());
+		assertEquals(115, allListeners.size());
+		
+		Set<String> set = new HashSet<String>();
+		for(IClass c : allListeners) {
+			for(IMethod m : c.getDeclaredMethods()) {
+				if(m.isPrivate()) {
+					continue;
+				}
+				set.add(m.getName().toString());
+//				if(m.getName().toString().equals("ok")) {
+//					System.out.println(c);
+//				}
+			}
+		}
+		System.out.println(set.size());
+//		for(String m : set) {
+//			System.out.println(m);
+//		}
+	}
+	
 	public void testGetCustomizedWidget() throws IOException, ClassHierarchyException {
 		String appPath = "D:\\research\\guierror\\eclipsews\\TestAndroid\\bin\\classes\\test\\android"
 			+ Globals.pathSep +
 			"D:\\Java\\android-sdk-windows\\platforms\\android-8\\android.jar";
 		CGBuilder builder = new CGBuilder(appPath);
 		builder.makeScopeAndClassHierarchy();
+		
+//		for(IClass c : builder.getClassHierarchy()) {
+//			if(c.toString().indexOf("Listener") != -1) {
+//				System.out.println(c);
+//			}
+//		}
+//		System.err.println(WALAUtils.lookupClass(builder.getClassHierarchy(), "android.media.MediaPlayer$OnSeekCompleteListener"));
 		
 		String xmlContent = Files.getFileContents("D:\\research\\guierror\\eclipsews\\TestAndroid\\res\\layout\\main.xml");
 		Collection<String> classes = AndroidUtils.extractCustomizedWidgets(builder.getClassHierarchy(), xmlContent);

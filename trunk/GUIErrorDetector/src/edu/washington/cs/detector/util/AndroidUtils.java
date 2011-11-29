@@ -28,6 +28,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import com.ibm.wala.classLoader.IClass;
+import com.ibm.wala.classLoader.IMethod;
 import com.ibm.wala.ipa.cha.ClassHierarchy;
 
 public class AndroidUtils {
@@ -317,5 +318,366 @@ public class AndroidUtils {
 		"ZoomButton ",
 		"ZoomButtonsController",
 		"ZoomControls"
+	};
+	
+	/***
+	 * All Android listener classes
+	 * */
+	public static List<IClass> getAndroidListenerClasses(ClassHierarchy cha) {
+		if(listener_classes != null) {
+			return listener_classes;
+		}
+		listener_classes = new LinkedList<IClass>();
+		for(String l : listeners) {
+			IClass c = WALAUtils.lookupClass(cha, l);
+			if(c == null) {
+				throw new RuntimeException("No class loaded for: " + l);
+			}
+			listener_classes.add(c);
+		}
+		return listener_classes;
+	}
+	public static boolean isAndroidListener(String fullClassName) {
+		for(String l : listeners) {
+			if(l.equals(fullClassName)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	public static boolean isCustomizedListener(ClassHierarchy cha, String classFullName) {
+		IClass cL = WALAUtils.lookupClass(cha, classFullName);
+		if(cL == null) {
+			throw new RuntimeException("No class for: " + classFullName);
+		}
+		List<IClass> androidListeners = getAndroidListenerClasses(cha);
+		for(IClass listener : androidListeners) {
+			if(cha.isAssignableFrom(listener, cL)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	
+	private static List<IClass> listener_classes = null;
+	private static String[] listeners = new String[] {
+		"android.view.animation.Animation$AnimationListener",
+		"android.view.ViewGroup$OnHierarchyChangeListener",
+		"android.view.GestureDetector$OnGestureListener",
+		"android.view.ViewTreeObserver$OnGlobalFocusChangeListener",
+		"android.view.ViewTreeObserver$OnPreDrawListener",
+		"android.view.GestureDetector$SimpleOnGestureListener",
+		"android.view.OrientationListener",
+		"android.view.View$OnFocusChangeListener",
+		"android.view.ScaleGestureDetector$SimpleOnScaleGestureListener",
+		"android.view.MenuItem$OnMenuItemClickListener",
+		"android.view.ViewStub$OnInflateListener",
+		"android.view.View$OnCreateContextMenuListener",
+		"android.view.View$OnClickListener",
+		"android.view.View$OnTouchListener",
+		"android.view.ViewTreeObserver$OnTouchModeChangeListener",
+		"android.view.View$OnKeyListener",
+		"android.view.ViewTreeObserver$OnScrollChangedListener",
+		"android.view.View$OnLongClickListener",
+		"android.view.ScaleGestureDetector$OnScaleGestureListener",
+		"android.view.GestureDetector$OnDoubleTapListener",
+		"android.view.ViewTreeObserver$OnGlobalLayoutListener",
+		"android.view.OrientationEventListener",
+		"android.media.MediaPlayer$OnSeekCompleteListener",
+		"android.media.MediaPlayer$OnInfoListener",
+		"android.media.MediaScannerConnection$OnScanCompletedListener",
+		"android.media.MediaRecorder$OnInfoListener",
+		"android.media.MediaPlayer$OnBufferingUpdateListener",
+		"android.media.MediaPlayer$OnVideoSizeChangedListener",
+		"android.media.MediaPlayer$OnCompletionListener",
+		"android.media.SoundPool$OnLoadCompleteListener",
+		"android.media.MediaPlayer$OnErrorListener",
+		"android.media.JetPlayer$OnJetEventListener",
+		"android.media.AudioTrack$OnPlaybackPositionUpdateListener",
+		"android.media.MediaRecorder$OnErrorListener",
+		"android.media.MediaPlayer$OnPreparedListener",
+		"android.media.AudioManager$OnAudioFocusChangeListener",
+		"android.media.AudioRecord$OnRecordPositionUpdateListener",
+		"android.text.method.TimeKeyListener",
+		"android.text.method.TextKeyListener",
+		"android.text.method.MultiTapKeyListener",
+		"android.text.method.DateTimeKeyListener",
+		"android.text.method.DigitsKeyListener",
+		"android.text.method.NumberKeyListener",
+		"android.text.method.QwertyKeyListener",
+		"android.text.method.KeyListener",
+		"android.text.method.MetaKeyKeyListener",
+		"android.text.method.DateKeyListener",
+		"android.text.method.TextKeyListener$Capitalize",
+		"android.text.method.BaseKeyListener",
+		"android.text.method.DialerKeyListener",
+		"android.preference.PreferenceManager$OnActivityDestroyListener",
+		"android.preference.PreferenceManager$OnActivityStopListener",
+		"android.preference.PreferenceManager$OnActivityResultListener",
+		"android.preference.Preference$OnPreferenceChangeListener",
+		"android.preference.Preference$OnPreferenceClickListener",
+		"android.content.DialogInterface$OnMultiChoiceClickListener",
+		"android.content.DialogInterface$OnDismissListener",
+		"android.content.DialogInterface$OnCancelListener",
+		"android.content.SharedPreferences$OnSharedPreferenceChangeListener",
+		"android.content.DialogInterface$OnKeyListener",
+		"android.content.DialogInterface$OnClickListener",
+		"android.content.DialogInterface$OnShowListener",
+		"android.widget.AdapterView$OnItemLongClickListener",
+		"android.widget.PopupWindow$OnDismissListener",
+		"android.widget.TabHost$OnTabChangeListener",
+		"android.widget.RadioGroup$OnCheckedChangeListener",
+		"android.widget.AdapterView$OnItemClickListener",
+		"android.widget.Chronometer$OnChronometerTickListener",
+		"android.widget.ExpandableListView$OnGroupCollapseListener",
+		"android.widget.AbsListView$OnScrollListener",
+		"android.widget.TimePicker$OnTimeChangedListener",
+		"android.widget.TextView$OnEditorActionListener",
+		"android.widget.ExpandableListView$OnGroupClickListener",
+		"android.widget.ExpandableListView$OnChildClickListener",
+		"android.widget.CompoundButton$OnCheckedChangeListener",
+		"android.widget.SlidingDrawer$OnDrawerScrollListener",
+		"android.widget.AbsListView$RecyclerListener",
+		"android.widget.Filter$FilterListener",
+		"android.widget.SeekBar$OnSeekBarChangeListener",
+		"android.widget.RatingBar$OnRatingBarChangeListener",
+		"android.widget.SlidingDrawer$OnDrawerCloseListener",
+		"android.widget.ZoomButtonsController$OnZoomListener",
+		"android.widget.ExpandableListView$OnGroupExpandListener",
+		"android.widget.AdapterView$OnItemSelectedListener",
+		"android.widget.DatePicker$OnDateChangedListener",
+		"android.widget.SlidingDrawer$OnDrawerOpenListener",
+		"android.app.SearchManager$OnDismissListener",
+		"android.app.DatePickerDialog$OnDateSetListener",
+		"android.app.SearchManager$OnCancelListener",
+		"android.app.TimePickerDialog$OnTimeSetListener",
+		"android.speech.tts.TextToSpeech$OnInitListener",
+		"android.speech.tts.TextToSpeech$OnUtteranceCompletedListener",
+		"android.speech.RecognitionListener",
+		"android.gesture.GestureOverlayView$OnGesturePerformedListener",
+		"android.gesture.GestureOverlayView$OnGestureListener",
+		"android.gesture.GestureOverlayView$OnGesturingListener",
+		"android.sax.ElementListener",
+		"android.sax.EndElementListener",
+		"android.sax.EndTextElementListener",
+		"android.sax.TextElementListener",
+		"android.sax.StartElementListener",
+		"android.webkit.WebView$PictureListener",
+		"android.webkit.WebIconDatabase$IconListener",
+		"android.webkit.DownloadListener",
+		"android.database.sqlite.SQLiteTransactionListener",
+		"android.location.GpsStatus$NmeaListener",
+		"android.location.LocationListener",
+		"android.location.GpsStatus$Listener",
+		"android.os.RecoverySystem$ProgressListener",
+		"android.telephony.PhoneStateListener",
+		"android.hardware.SensorListener",
+		"android.hardware.Camera$OnZoomChangeListener",
+		"android.hardware.SensorEventListener",
+		"android.accounts.OnAccountsUpdateListener",
+		"android.inputmethodservice.KeyboardView$OnKeyboardActionListener"
+	};
+	
+	//approximately, but i do believe it works well enough in practice
+	public static boolean isEventHandlingMethod(IMethod m, ClassHierarchy cha) {
+		String name = m.getName().toString();
+		
+		//first see the method name
+		boolean matchMethod = false;
+		for(String e : eventHandlers) {
+			if(name.equals(e)) {
+				matchMethod = true;
+			}
+		}
+		if(!matchMethod) {
+			return false;
+		}
+		
+		//check the class that defines the method
+		IClass declaredClass = m.getDeclaringClass();
+		String fullName = WALAUtils.getJavaFullClassName(declaredClass);
+		if(isAndroidListener(fullName)) {
+			return true;
+		}
+		
+		if(isCustomizedListener(cha, fullName)) {
+			return true;
+		}
+		
+		return false;
+	}
+	
+	private static String[] eventHandlers = new String[] {
+		"onJetEvent",
+		"onDateChanged",
+		"onAnimationRepeat",
+		"onGpsStatusChanged",
+		"onChildClick",
+		"onItemLongClick",
+		"onDataActivity",
+		"onGesturePerformed",
+		"onScale",
+		"onZoom",
+		"onProviderEnabled",
+		"onLongPress",
+		"onUtteranceCompleted",
+		"onScroll",
+		"onSingleTapConfirmed",
+		"onVideoSizeChanged",
+		"onRelease",
+		"onTimeSet",
+		"onRatingChanged",
+		"onGestureStarted",
+		"onKeyUp",
+		"onItemClick",
+		"onCellLocationChanged",
+		"onSensorChanged",
+		"onNmeaReceived",
+		"onShowPress",
+		"onJetNumQueuedSegmentUpdate",
+		"onTabChanged",
+		"onGestureCancelled",
+		"onJetUserIdUpdate",
+		"onAnimationStart",
+		"onStartTrackingTouch",
+		"onFilterComplete",
+		"onAnimationEnd",
+		"onScrollChanged",
+		"onTouch",
+		"onRollback",
+		"onCancel",
+		"onDrawerOpened",
+		"onError",
+		"onPeriodicNotification",
+		"onEndOfSpeech",
+		"onCompletion",
+		"onInfo",
+		"onScaleBegin",
+		"onCallForwardingIndicatorChanged",
+		"onFocusChange",
+		"onTimeChanged",
+		"onMenuItemClick",
+		"onDoubleTapEvent",
+		"onBufferingUpdate",
+		"onCallStateChanged",
+		"onMessageWaitingIndicatorChanged",
+		"onSignalStrengthChanged",
+		"onScrollStateChanged",
+		"onAccuracyChanged",
+		"onText",
+		"onSpanAdded",
+		"onDismiss",
+		"onReceivedIcon",
+		"onPreferenceClick",
+		"onCommit",
+		"onProgress",
+		"onEvent",
+		"onGlobalFocusChanged",
+		"onGesturingEnded",
+		"onChronometerTick",
+		"onPartialResults",
+		"onBeginningOfSpeech",
+		"onGestureEnded",
+		"onPreDraw",
+		"onNothingSelected",
+		"onDrawerClosed",
+		"onOrientationChanged",
+		"onClick",
+		"onAccountsUpdated",
+		"onSingleTapUp",
+		"onZoomChange",
+		"onLocationChanged",
+		"onResults",
+		"onScrollStarted",
+		"onScaleEnd",
+		"onLoadComplete",
+		"onAudioFocusChange",
+		"onChildViewAdded",
+		"onMovedToScrapHeap",
+		"onGroupExpand",
+		"onPress",
+		"onKeyDown",
+		"onKey",
+		"onInflate",
+		"onBufferReceived",
+		"onDateSet",
+		"onPreferenceChange",
+		"onSharedPreferenceChanged",
+		"onCreateContextMenu",
+		"onFling",
+		"onDataConnectionStateChanged",
+		"onSpanChanged",
+		"onBegin",
+		"onGlobalLayout",
+		"onScrollEnded",
+		"onKeyOther",
+		"onCheckedChanged",
+		"onDownloadStart",
+		"onJetPauseUpdate",
+		"onDoubleTap",
+		"onSeekComplete",
+		"onChildViewRemoved",
+		"onProviderDisabled",
+		"onLongClick",
+		"onTouchModeChanged",
+		"onSpanRemoved",
+		"onEditorAction",
+		"onSignalStrengthsChanged",
+		"onReadyForSpeech",
+		"onNewPicture",
+		"onGesture",
+		"onGroupClick",
+		"onStopTrackingTouch",
+		"onScanCompleted",
+		"onVisibilityChanged",
+		"onProgressChanged",
+		"onGesturingStarted",
+		"onRmsChanged",
+		"onItemSelected",
+		"onPrepared",
+		"onDown",
+		"onInit",
+		"onMarkerReached",
+		"onActivityResult",
+		"onServiceStateChanged",
+		"onGroupCollapse",
+		"onStatusChanged",
+		"onShow",
+		"onActivityDestroy",
+		"onActivityStop",
+		
+		//XXX not sure
+		"canDetectOrientation",
+		"lookup",
+		"clearMetaKeyState",
+		"ok",
+		"getMetaState",
+		"markAsReplaced",
+		"swipeUp",
+		"swipeRight",
+		"start",
+		"clear",
+		"isSelectingMetaTracker",
+		"swipeDown",
+		"valueOf",
+		"end",
+		"adjustMetaAfterKeypress",
+		"isMetaTracker",
+		"resetLockedMeta",
+		"handleKeyUp",
+		"enable",
+		"resetMetaState",
+		"handleKeyDown",
+		"values",
+		"getInstance",
+		"release",
+		"getInputType",
+		"filter",
+		"shouldCap",
+		"backspace",
+		"getAcceptedChars",
+		"disable",
+		"swipeLeft"
 	};
 }
