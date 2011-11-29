@@ -27,9 +27,12 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import com.ibm.wala.classLoader.IClass;
+import com.ibm.wala.ipa.cha.ClassHierarchy;
+
 public class AndroidUtils {
 	
-	public static Collection<String> extractAllWidgets(File f) throws ZipException, IOException {
+	public static Collection<String> extractAllWidgets(final ClassHierarchy cha, File f) throws ZipException, IOException {
 		List<Reader> xmlFileReaders = new LinkedList<Reader>();
 		if(f.isDirectory()) {
 			//check whether the dir "res" exists
@@ -65,23 +68,65 @@ public class AndroidUtils {
 		Collection<String> widgetClasses = new LinkedList<String>();
 		for(Reader reader : xmlFileReaders) {
 			String xmlContent = Files.getFileContents(reader);
-			//System.out.println(xmlContent);
-			widgetClasses.addAll(extractWidgets(xmlContent));
+			//extract Android widgets
+			widgetClasses.addAll(extractAndroidWidgets(xmlContent));
+			//extract customized widgets
+			widgetClasses.addAll(extractCustomizedWidgets(cha, xmlContent));
 		}
 		return widgetClasses;
 	}
 	
-	//f is a single xml file
-	public static Collection<String> extractWidgets(File xmlFile) {
+	//XXX FIXME not consider short form with included package name, like <MyButton />
+	public static Collection<String> extractCustomizedWidgets(final ClassHierarchy cha, String xmlContent) {
+		final Set<String> customizedWidgets = new LinkedHashSet<String>();
+		final IClass view = getWidgetView(cha);
 		try {
-			return extractWidgets(Files.getFileContents(xmlFile));
-		} catch (IOException e) {
-			throw new RuntimeException();
+			//init a sax parser factory
+			SAXParserFactory factory = SAXParserFactory.newInstance();
+			SAXParser saxParser = factory.newSAXParser();
+			DefaultHandler handler = new DefaultHandler() {
+				public void startElement(String uri, String localName,
+						String qName, Attributes attributes) throws SAXException {
+					//FIXME it assume to use full class name
+					if(qName.indexOf(".") != -1) {
+						IClass c = WALAUtils.lookupClass(cha, qName);
+						if(c != null) {
+							if(cha.isAssignableFrom(view, c)) {
+								customizedWidgets.add(qName);
+							}
+						}
+					}
+					//check the attributes
+					if(attributes != null) {
+					    for(int i = 0; i < attributes.getLength(); i++) {
+						    if(attributes.getQName(i).equals("class")) {
+						    	String clazzValue = attributes.getValue(i);
+						    	//FIXME here
+						    	if(clazzValue.indexOf(".") != -1) {
+						    		IClass c = WALAUtils.lookupClass(cha, clazzValue);
+						    		if(c != null) {
+						    			if(cha.isAssignableFrom(view, c)) {
+						    				customizedWidgets.add(clazzValue);
+						    			}
+						    		}
+						    	}
+						    }
+					    }
+					}
+				}
+			};
+			byte[] bytes = xmlContent.getBytes("UTF8");
+			InputStream inputStream = new ByteArrayInputStream(bytes);
+			InputSource source = new InputSource(inputStream);
+			saxParser.parse(source, handler);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
+		return customizedWidgets;
 	}
 	
 	//return the class full name like: a.b.c.d
-	public static Collection<String> extractWidgets(String xmlContent) {
+	public static Collection<String> extractAndroidWidgets(String xmlContent) {
 		final Set<String> declaredWidgets = new LinkedHashSet<String>();
 		try {
 			//achieve all widgets
@@ -92,10 +137,11 @@ public class AndroidUtils {
 			DefaultHandler handler = new DefaultHandler() {
 				public void startElement(String uri, String localName,
 						String qName, Attributes attributes) throws SAXException {
-					//check the short name
+					//check the short name, like <Button attributes = ""/>
 					if(allWidgets.contains(qName)) {
 						declaredWidgets.add(WIDGET_PACKAGE + "." + qName);
 					} else {
+						//check the long name, like <android.widget.Button  attributes = ""/>
 						if(qName.startsWith(WIDGET_PACKAGE)) {
 							//double check
 							if(!allWidgets.contains(qName.substring(WIDGET_PACKAGE.length()))) {
@@ -138,7 +184,7 @@ public class AndroidUtils {
 		return declaredWidgets;
 	}
 	
-	public static Set<String> getAllWidgets() {
+	private static Set<String> getAllWidgets() {
 		Set<String> widgetSet = new HashSet<String>();
 		for(String widgetName : widgetShortNames) {
 			widgetSet.add(widgetName);
@@ -146,9 +192,24 @@ public class AndroidUtils {
 		return widgetSet;
 	}
 	
-	public static String WIDGET_PACKAGE = "android.widget";
+	private static String WIDGET_PACKAGE = "android.widget";
 	
-	//FIXME, should it be ClassA$ClassB or ClassA.ClassB
+	private static IClass VIEW = null;
+	
+	private static String VIEW_CLASS = "android.view.View";
+	
+	public static IClass getWidgetView(ClassHierarchy cha) {
+		if(VIEW != null) {
+			return VIEW;
+		}
+		VIEW = WALAUtils.lookupClass(cha, VIEW_CLASS);
+		if(VIEW == null) {
+			throw new RuntimeException("Can not load: android.view.View");
+		}
+		return VIEW;
+	}
+	
+	//FIXME, should it be ClassA$ClassB or ClassA.ClassB? need to confirm?
 	private static String[] widgetShortNames = new String[] {
 		"AbsListView",
 		"AbsListView.LayoutParams",
