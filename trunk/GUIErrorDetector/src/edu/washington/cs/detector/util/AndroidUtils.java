@@ -33,7 +33,7 @@ import com.ibm.wala.ipa.cha.ClassHierarchy;
 
 public class AndroidUtils {
 	
-	public static Collection<String> extractAllWidgets(final ClassHierarchy cha, File f) throws ZipException, IOException {
+	public static Collection<String> extractAllUIs(final ClassHierarchy cha, File f) throws ZipException, IOException {
 		List<Reader> xmlFileReaders = new LinkedList<Reader>();
 		if(f.isDirectory()) {
 			//check whether the dir "res" exists
@@ -66,20 +66,20 @@ public class AndroidUtils {
 		}
 		
 		//read each xml file one by one
-		Collection<String> widgetClasses = new LinkedList<String>();
+		Collection<String> widgetClasses = new LinkedHashSet<String>();
 		for(Reader reader : xmlFileReaders) {
 			String xmlContent = Files.getFileContents(reader);
 			//extract Android widgets
-			widgetClasses.addAll(extractAndroidWidgets(xmlContent));
+			widgetClasses.addAll(extractAndroidUIs(xmlContent));
 			//extract customized widgets
-			widgetClasses.addAll(extractCustomizedWidgets(cha, xmlContent));
+			widgetClasses.addAll(extractCustomizedUIs(cha, xmlContent));
 		}
 		return widgetClasses;
 	}
 	
 	//XXX FIXME not consider short form with included package name, like <MyButton />
-	public static Collection<String> extractCustomizedWidgets(final ClassHierarchy cha, String xmlContent) {
-		final Set<String> customizedWidgets = new LinkedHashSet<String>();
+	public static Collection<String> extractCustomizedUIs(final ClassHierarchy cha, String xmlContent) {
+		final Set<String> customizedUIs = new LinkedHashSet<String>();
 		final IClass view = getWidgetView(cha);
 		try {
 			//init a sax parser factory
@@ -93,7 +93,7 @@ public class AndroidUtils {
 						IClass c = WALAUtils.lookupClass(cha, qName);
 						if(c != null) {
 							if(cha.isAssignableFrom(view, c)) {
-								customizedWidgets.add(qName);
+								customizedUIs.add(qName);
 							}
 						}
 					}
@@ -107,7 +107,7 @@ public class AndroidUtils {
 						    		IClass c = WALAUtils.lookupClass(cha, clazzValue);
 						    		if(c != null) {
 						    			if(cha.isAssignableFrom(view, c)) {
-						    				customizedWidgets.add(clazzValue);
+						    				customizedUIs.add(clazzValue);
 						    			}
 						    		}
 						    	}
@@ -123,15 +123,16 @@ public class AndroidUtils {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return customizedWidgets;
+		return customizedUIs;
 	}
 	
 	//return the class full name like: a.b.c.d
-	public static Collection<String> extractAndroidWidgets(String xmlContent) {
-		final Set<String> declaredWidgets = new LinkedHashSet<String>();
+	public static Collection<String> extractAndroidUIs(String xmlContent) {
+		final Set<String> declaredUIComponents = new LinkedHashSet<String>();
 		try {
 			//achieve all widgets
-			final Set<String> allWidgets = getAllWidgets();
+			final Set<String> androidWidgetShortName = getLibWidgets();
+			final Set<String> otherAndroidUIFullName = getOtherUIs();
 			//init a sax parser factory
 			SAXParserFactory factory = SAXParserFactory.newInstance();
 			SAXParser saxParser = factory.newSAXParser();
@@ -139,16 +140,29 @@ public class AndroidUtils {
 				public void startElement(String uri, String localName,
 						String qName, Attributes attributes) throws SAXException {
 					//check the short name, like <Button attributes = ""/>
-					if(allWidgets.contains(qName)) {
-						declaredWidgets.add(WIDGET_PACKAGE + "." + qName);
+					if(androidWidgetShortName.contains(qName)) {
+						declaredUIComponents.add(WIDGET_PACKAGE + "." + qName);
 					} else {
 						//check the long name, like <android.widget.Button  attributes = ""/>
 						if(qName.startsWith(WIDGET_PACKAGE)) {
 							//double check
-							if(!allWidgets.contains(qName.substring(WIDGET_PACKAGE.length()))) {
+							if(!androidWidgetShortName.contains(qName.substring(WIDGET_PACKAGE.length()))) {
 								throw new RuntimeException("The widget list is not complete, it miss: " + qName);
 							}
-							declaredWidgets.add(qName);
+							declaredUIComponents.add(qName);
+						} else {
+							if(otherAndroidUIFullName.contains(qName)) {
+								declaredUIComponents.add(qName);
+							} else {
+								// check short name
+								for (String uiName : otherAndroidUIFullName) {
+									if (uiName.endsWith("." + qName)) {
+										declaredUIComponents.add(uiName);
+										break;
+									}
+								}
+							}
+							
 						}
 					}
 					//check the attributes
@@ -159,15 +173,16 @@ public class AndroidUtils {
 						    	if(clazzValue.startsWith(".")) { //be aware of ., it can be specified as <class=".clzzName"/>
 						    		clazzValue = clazzValue.substring(1);
 						    	}
-						    	if(allWidgets.contains(clazzValue)) {
-						    		declaredWidgets.add(WIDGET_PACKAGE + "." + clazzValue);
+					    		//can not specify like  <View class="Button"/>, so just check the short name
+						    	if(androidWidgetShortName.contains(clazzValue) /*possible?*/ || otherAndroidUIFullName.contains(clazzValue)) {
+						    		declaredUIComponents.add(WIDGET_PACKAGE + "." + clazzValue);
 						    	} else {
 						    		if(clazzValue.startsWith(WIDGET_PACKAGE)) {
 										//double check
-										if(!allWidgets.contains(clazzValue.substring(WIDGET_PACKAGE.length()))) {
+										if(!androidWidgetShortName.contains(clazzValue.substring(WIDGET_PACKAGE.length()))) {
 											throw new RuntimeException("The widget list is not complete, it miss: " + clazzValue);
 										}
-										declaredWidgets.add(clazzValue);
+										declaredUIComponents.add(clazzValue);
 									}
 						    	}
 						    }
@@ -182,10 +197,10 @@ public class AndroidUtils {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return declaredWidgets;
+		return declaredUIComponents;
 	}
 	
-	private static Set<String> getAllWidgets() {
+	private static Set<String> getLibWidgets() {
 		Set<String> widgetSet = new HashSet<String>();
 		for(String widgetName : widgetShortNames) {
 			widgetSet.add(widgetName);
@@ -320,6 +335,27 @@ public class AndroidUtils {
 		"ZoomControls"
 	};
 	
+	private static Set<String> getOtherUIs() {
+		Set<String> uiSet = new HashSet<String>();
+		for(String uiName : otherUIs) {
+			uiSet.add(uiName);
+		}
+		return uiSet;
+	}
+	
+	private static String[] otherUIs = new String[] {
+		"android.view.View", 
+		"android.view.ViewGroup",
+		"android.view.ViewStub",
+		"android.view.SurfaceView",
+		"android.webkit.WebView",
+		"android.gesture.GestureOverlayView",
+		"android.appwidget.AppWidgetHostView",
+		"android.inputmethodservice.ExtractEditText",
+		"android.inputmethodservice.KeyboardView",
+		"android.opengl.GLSurfaceView"
+	};
+	
 	/***
 	 * All Android listener classes
 	 * */
@@ -360,6 +396,9 @@ public class AndroidUtils {
 	}
 	
 	
+	/**
+	 * This is dumped by searching all classes ending with "Listener" in Android's lib
+	 * */
 	private static List<IClass> listener_classes = null;
 	private static String[] listeners = new String[] {
 		"android.view.animation.Animation$AnimationListener",

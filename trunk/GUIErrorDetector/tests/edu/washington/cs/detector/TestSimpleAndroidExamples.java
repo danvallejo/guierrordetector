@@ -47,7 +47,7 @@ public class TestSimpleAndroidExamples extends TestCase {
 	    //add other reflectively created class
 	    String path = "D:\\research\\guierror\\eclipsews\\TestAndroid\\res\\layout\\main.xml";
 		String xmlContent = Files.getFileContents(path);
-		Collection<String> declaredClasses  = AndroidUtils.extractAndroidWidgets(xmlContent);
+		Collection<String> declaredClasses  = AndroidUtils.extractAndroidUIs(xmlContent);
 	    Iterable<Entrypoint> widgetConstructors = CGEntryManager.getConstructors(builder, declaredClasses);
 	    
 	    //Merge2 entries
