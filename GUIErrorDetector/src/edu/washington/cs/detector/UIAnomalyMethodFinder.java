@@ -114,8 +114,13 @@ public class UIAnomalyMethodFinder extends AbstractMethodFinder {
 		Iterator<CGNode> nodeIt = this.cg.getSuccNodes(this.startNode);
 		while(nodeIt.hasNext()) {
 			CGNode node = nodeIt.next();
-			queue.add(node);
 			
+			if(!super.guider.traverse(this.startNode, node)) {
+				Log.logln("  skip by guider after start: " + node, DEBUG);
+				continue;
+			}
+			
+			queue.add(node);
 			Log.logln("  next node of start: " + node, DEBUG);
 			
 			assert !cgNodeMap.containsKey(node);
