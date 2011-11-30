@@ -26,7 +26,7 @@ public class CGTraverseOnlyClientRunnableStrategy implements CGTraverseGuider {
 			
 			
 			if(destPackage != null && destPackage.startsWith("android.")) {
-				System.err.println("thread start: " + dest);
+				//System.err.println("thread start: " + dest);
 				return false;
 			}
 		}
