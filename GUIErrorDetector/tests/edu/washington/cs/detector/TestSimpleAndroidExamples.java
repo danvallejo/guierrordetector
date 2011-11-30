@@ -14,10 +14,12 @@ import com.ibm.wala.ipa.cha.ClassHierarchyException;
 import com.ibm.wala.util.graph.Graph;
 
 import edu.washington.cs.detector.CGBuilder.CG;
+import edu.washington.cs.detector.experiments.filters.RemoveSubsumedChainStrategy;
 import edu.washington.cs.detector.util.AndroidUtils;
 import edu.washington.cs.detector.util.Files;
 import edu.washington.cs.detector.util.Globals;
 import edu.washington.cs.detector.util.Log;
+import edu.washington.cs.detector.util.Utils;
 import edu.washington.cs.detector.util.WALAUtils;
 import junit.framework.TestCase;
 
@@ -26,9 +28,7 @@ public class TestSimpleAndroidExamples extends TestCase {
 	public String appPath =
 		"D:\\research\\guierror\\eclipsews\\TestAndroid\\bin\\classes\\test\\android"
 		+ Globals.pathSep +
-		"D:\\Java\\android-sdk-windows\\platforms\\android-8\\android.jar"
-		+ Globals.pathSep
-		+ "D:\\Java\\android-sdk-windows\\platforms\\android-8\\data\\layoutlib.jar";
+		"D:\\research\\guierror\\eclipsews\\GUIErrorDetector\\exp-subjects\\original-android.jar";
 	
 	public void testAndroidApp() throws IOException, ClassHierarchyException {
 		CGBuilder builder = new CGBuilder(appPath,UIAnomalyDetector.EXCLUSION_FILE_SWING);
@@ -48,18 +48,13 @@ public class TestSimpleAndroidExamples extends TestCase {
 	    String path = "D:\\research\\guierror\\eclipsews\\TestAndroid\\res\\layout\\main.xml";
 		String xmlContent = Files.getFileContents(path);
 		Collection<String> declaredClasses  = AndroidUtils.extractAndroidUIs(xmlContent);
-	    Iterable<Entrypoint> widgetConstructors = CGEntryManager.getConstructors(builder, declaredClasses);
+	    Iterable<Entrypoint> widgetConstructors = //new LinkedList<Entrypoint>(); 
+	    	CGEntryManager.getConstructors(builder, declaredClasses);
 	    
 	    //Merge2 entries
 	    Iterable<Entrypoint> entries = CGEntryManager.mergeEntrypoints(uiEntries, widgetConstructors);
 	    
-		int size = 0;
-		for(Entrypoint entry : entries) {
-			assertTrue(entry != null);
-			System.out.println(" -- " + entry );
-			size++;
-		}
-		System.out.println("Number of entries for building CG: " + size);
+		System.out.println("Number of entries for building CG: " + Utils.countIterable(entries));
 		builder.setCGType(CG.RTA);
 		builder.buildCG(entries);
 		
@@ -67,9 +62,31 @@ public class TestSimpleAndroidExamples extends TestCase {
 		System.out.println("CG node num: " + builder.getCallGraph().getNumberOfNodes());
 		System.out.println("App CG node num: " + builder.getAppCallGraph().getNumberOfNodes());
 		
-		Graph<CGNode> graph = builder.getAppCallGraph();
+//		Graph<CGNode> graph = builder.getAppCallGraph();
 		Log.logConfig("./log.txt");
-		WALAUtils.logCallGraph(graph);
+//		WALAUtils.logCallGraph(graph);
+		
+		//set up the anomaly detection
+		UIAnomalyDetector detector = new UIAnomalyDetector(appPath);
+		detector.configureCheckingMethods("./tests/edu/washington/cs/detector/checkingmethods_for_android.txt");
+		detector.setThreadStartGuider(new CGTraverseNoSystemCalls());
+		detector.setUIAnomalyGuider(new CGTraverseOnlyClientRunnableStrategy());
+		UIAnomalyDetector.DEBUG = true;
+		UIAnomalyMethodFinder.DEBUG = true;
+		
+		List<AnomalyCallChain> chains = detector.detectUIAnomaly(builder, builder.getCallGraphEntryNodes(uiEntries));
+		
+		System.out.println("Number of chains: " + chains.size());
+		chains = CallChainFilter.filter(chains, new RemoveSubsumedChainStrategy());
+		System.out.println("Number of chains after removing subsumption: " + chains.size());
+		
+		for(AnomalyCallChain c : chains) {
+			System.out.println(c.getFullCallChainAsString());
+		}
+		
+		//set it back
+		UIAnomalyMethodFinder.setCheckingMethods("./src/checking_methods.txt");
+		UIAnomalyDetector.DEBUG = false;
 	}
 
 }
