@@ -1,96 +1,32 @@
-error in processing: D:\develop-tools\apktool\all_1100_apps\applications\Comics\com.jj.comics.apk
-   get exception: java.lang.Error: Non-zero exit flag when running command [cmd.exe, /c, D:\develop-tools\apktool\apktool, d, -f, E:\market_20101102\applications\Comics\com.jj.comics.apk, D:\develop-tools\apktool\all_1100_apps\applications\Comics\com.jj.comics.apk]
-
-error in processing: D:\develop-tools\apktool\all_1100_apps\applications\Communication\com.icq.mobile.client.apk
-   get exception: java.lang.Error: Non-zero exit flag when running command [cmd.exe, /c, D:\develop-tools\apktool\apktool, d, -f, E:\market_20101102\applications\Communication\com.icq.mobile.client.apk, D:\develop-tools\apktool\all_1100_apps\applications\Communication\com.icq.mobile.client.apk]
-
-error in processing: D:\develop-tools\apktool\all_1100_apps\applications\Communication\com.nimbuzz.apk
-   get exception: java.lang.Error: Non-zero exit flag when running command [cmd.exe, /c, D:\develop-tools\apktool\apktool, d, -f, E:\market_20101102\applications\Communication\com.nimbuzz.apk, D:\develop-tools\apktool\all_1100_apps\applications\Communication\com.nimbuzz.apk]
-
-error in processing: D:\develop-tools\apktool\all_1100_apps\applications\Communication\com.pgmsoft.wifinder.apk
-   get exception: java.lang.Error: Non-zero exit flag when running command [cmd.exe, /c, D:\develop-tools\apktool\apktool, d, -f, E:\market_20101102\applications\Communication\com.pgmsoft.wifinder.apk, D:\develop-tools\apktool\all_1100_apps\applications\Communication\com.pgmsoft.wifinder.apk]
-
-error in processing: D:\develop-tools\apktool\all_1100_apps\applications\Communication\com.uc.browser.apk
-   get exception: java.lang.Error: Non-zero exit flag when running command [cmd.exe, /c, D:\develop-tools\apktool\apktool, d, -f, E:\market_20101102\applications\Communication\com.uc.browser.apk, D:\develop-tools\apktool\all_1100_apps\applications\Communication\com.uc.browser.apk]
-
-error in processing: D:\develop-tools\apktool\all_1100_apps\applications\Communication\com.webrich.ukdrivinglite.apk
-   get exception: java.lang.Error: Non-zero exit flag when running command [cmd.exe, /c, D:\develop-tools\apktool\apktool, d, -f, E:\market_20101102\applications\Communication\com.webrich.ukdrivinglite.apk, D:\develop-tools\apktool\all_1100_apps\applications\Communication\com.webrich.ukdrivinglite.apk]
-
-error in processing: D:\develop-tools\apktool\all_1100_apps\applications\Finance\com.bloomberg.android.apk
-   get exception: java.lang.Error: Non-zero exit flag when running command [cmd.exe, /c, D:\develop-tools\apktool\apktool, d, -f, E:\market_20101102\applications\Finance\com.bloomberg.android.apk, D:\develop-tools\apktool\all_1100_apps\applications\Finance\com.bloomberg.android.apk]
-
-error in processing: D:\develop-tools\apktool\all_1100_apps\applications\Finance\com.calculator.mortgage.apk
-   get exception: java.lang.Error: Non-zero exit flag when running command [cmd.exe, /c, D:\develop-tools\apktool\apktool, d, -f, E:\market_20101102\applications\Finance\com.calculator.mortgage.apk, D:\develop-tools\apktool\all_1100_apps\applications\Finance\com.calculator.mortgage.apk]
-
-error in processing: D:\develop-tools\apktool\all_1100_apps\applications\Finance\com.istockmanager.apk
-   get exception: java.lang.Error: Non-zero exit flag when running command [cmd.exe, /c, D:\develop-tools\apktool\apktool, d, -f, E:\market_20101102\applications\Finance\com.istockmanager.apk, D:\develop-tools\apktool\all_1100_apps\applications\Finance\com.istockmanager.apk]
-
-error in processing: D:\develop-tools\apktool\all_1100_apps\applications\Finance\com.linkzen.app.apk
-   get exception: java.lang.Error: Non-zero exit flag when running command [cmd.exe, /c, D:\develop-tools\apktool\apktool, d, -f, E:\market_20101102\applications\Finance\com.linkzen.app.apk, D:\develop-tools\apktool\all_1100_apps\applications\Finance\com.linkzen.app.apk]
-
-error in processing: D:\develop-tools\apktool\all_1100_apps\applications\Finance\masterofmuppets.tipcalc.apk
-   get exception: java.lang.Error: Non-zero exit flag when running command [cmd.exe, /c, D:\develop-tools\apktool\apktool, d, -f, E:\market_20101102\applications\Finance\masterofmuppets.tipcalc.apk, D:\develop-tools\apktool\all_1100_apps\applications\Finance\masterofmuppets.tipcalc.apk]
-
-error in processing: D:\develop-tools\apktool\all_1100_apps\applications\Health\com.youdroid.bmi.apk
-   get exception: java.lang.Error: Non-zero exit flag when running command [cmd.exe, /c, D:\develop-tools\apktool\apktool, d, -f, E:\market_20101102\applications\Health\com.youdroid.bmi.apk, D:\develop-tools\apktool\all_1100_apps\applications\Health\com.youdroid.bmi.apk]
-
-error in processing: D:\develop-tools\apktool\all_1100_apps\applications\Lifestyle\com.layar.apk
-   get exception: java.lang.Error: Non-zero exit flag when running command [cmd.exe, /c, D:\develop-tools\apktool\apktool, d, -f, E:\market_20101102\applications\Lifestyle\com.layar.apk, D:\develop-tools\apktool\all_1100_apps\applications\Lifestyle\com.layar.apk]
-
-error in processing: D:\develop-tools\apktool\all_1100_apps\applications\Lifestyle\kr.mobilefirst.carrierplan.apk
-   get exception: java.lang.Error: Non-zero exit flag when running command [cmd.exe, /c, D:\develop-tools\apktool\apktool, d, -f, E:\market_20101102\applications\Lifestyle\kr.mobilefirst.carrierplan.apk, D:\develop-tools\apktool\all_1100_apps\applications\Lifestyle\kr.mobilefirst.carrierplan.apk]
-
-error in processing: D:\develop-tools\apktool\all_1100_apps\applications\Multimedia\com.slacker.radio.apk
-   get exception: java.lang.Error: Non-zero exit flag when running command [cmd.exe, /c, D:\develop-tools\apktool\apktool, d, -f, E:\market_20101102\applications\Multimedia\com.slacker.radio.apk, D:\develop-tools\apktool\all_1100_apps\applications\Multimedia\com.slacker.radio.apk]
-
-error in processing: D:\develop-tools\apktool\all_1100_apps\applications\Multimedia\tunein.player.apk
-   get exception: java.lang.Error: Non-zero exit flag when running command [cmd.exe, /c, D:\develop-tools\apktool\apktool, d, -f, E:\market_20101102\applications\Multimedia\tunein.player.apk, D:\develop-tools\apktool\all_1100_apps\applications\Multimedia\tunein.player.apk]
-
-error in processing: D:\develop-tools\apktool\all_1100_apps\applications\Multimedia\vStudio.Android.GPhoto.apk
-   get exception: java.lang.Error: Non-zero exit flag when running command [cmd.exe, /c, D:\develop-tools\apktool\apktool, d, -f, E:\market_20101102\applications\Multimedia\vStudio.Android.GPhoto.apk, D:\develop-tools\apktool\all_1100_apps\applications\Multimedia\vStudio.Android.GPhoto.apk]
-
-error in processing: D:\develop-tools\apktool\all_1100_apps\applications\Productivity\com.adobe.reader.apk
-   get exception: java.lang.Error: Non-zero exit flag when running command [cmd.exe, /c, D:\develop-tools\apktool\apktool, d, -f, E:\market_20101102\applications\Productivity\com.adobe.reader.apk, D:\develop-tools\apktool\all_1100_apps\applications\Productivity\com.adobe.reader.apk]
-
-error in processing: D:\develop-tools\apktool\all_1100_apps\applications\Productivity\com.metago.astro.apk
-   get exception: java.lang.Error: Non-zero exit flag when running command [cmd.exe, /c, D:\develop-tools\apktool\apktool, d, -f, E:\market_20101102\applications\Productivity\com.metago.astro.apk, D:\develop-tools\apktool\all_1100_apps\applications\Productivity\com.metago.astro.apk]
-
-error in processing: D:\develop-tools\apktool\all_1100_apps\applications\Productivity\com.touchtype.swiftkey.trial.apk
-   get exception: java.lang.Error: Non-zero exit flag when running command [cmd.exe, /c, D:\develop-tools\apktool\apktool, d, -f, E:\market_20101102\applications\Productivity\com.touchtype.swiftkey.trial.apk, D:\develop-tools\apktool\all_1100_apps\applications\Productivity\com.touchtype.swiftkey.trial.apk]
-
-error in processing: D:\develop-tools\apktool\all_1100_apps\applications\Productivity\jp.co.johospace.jorte.apk
-   get exception: java.lang.Error: Non-zero exit flag when running command [cmd.exe, /c, D:\develop-tools\apktool\apktool, d, -f, E:\market_20101102\applications\Productivity\jp.co.johospace.jorte.apk, D:\develop-tools\apktool\all_1100_apps\applications\Productivity\jp.co.johospace.jorte.apk]
-
-error in processing: D:\develop-tools\apktool\all_1100_apps\applications\Shopping\com.cwesoftware.tipcalc.apk
-   get exception: java.lang.Error: Non-zero exit flag when running command [cmd.exe, /c, D:\develop-tools\apktool\apktool, d, -f, E:\market_20101102\applications\Shopping\com.cwesoftware.tipcalc.apk, D:\develop-tools\apktool\all_1100_apps\applications\Shopping\com.cwesoftware.tipcalc.apk]
-
-error in processing: D:\develop-tools\apktool\all_1100_apps\applications\Social\com.okcupid.okcupid.apk
-   get exception: java.lang.Error: Non-zero exit flag when running command [cmd.exe, /c, D:\develop-tools\apktool\apktool, d, -f, E:\market_20101102\applications\Social\com.okcupid.okcupid.apk, D:\develop-tools\apktool\all_1100_apps\applications\Social\com.okcupid.okcupid.apk]
-
-error in processing: D:\develop-tools\apktool\all_1100_apps\applications\Social\jp.r246.twicca.apk
-   get exception: java.lang.Error: Non-zero exit flag when running command [cmd.exe, /c, D:\develop-tools\apktool\apktool, d, -f, E:\market_20101102\applications\Social\jp.r246.twicca.apk, D:\develop-tools\apktool\all_1100_apps\applications\Social\jp.r246.twicca.apk]
-
-error in processing: D:\develop-tools\apktool\all_1100_apps\applications\Software libraries\com.koufeikexing.apk
-   get exception: java.lang.Error: Non-zero exit flag when running command [cmd.exe, /c, D:\develop-tools\apktool\apktool, d, -f, E:\market_20101102\applications\Software libraries\com.koufeikexing.apk, D:\develop-tools\apktool\all_1100_apps\applications\Software libraries\com.koufeikexing.apk]
-
-error in processing: D:\develop-tools\apktool\all_1100_apps\applications\Themes\com.anifree.anipet.aquarium.ad.apk
-   get exception: java.lang.Error: Non-zero exit flag when running command [cmd.exe, /c, D:\develop-tools\apktool\apktool, d, -f, E:\market_20101102\applications\Themes\com.anifree.anipet.aquarium.ad.apk, D:\develop-tools\apktool\all_1100_apps\applications\Themes\com.anifree.anipet.aquarium.ad.apk]
-
-error in processing: D:\develop-tools\apktool\all_1100_apps\applications\Themes\com.anifree.anipet.koi.ad.apk
-   get exception: java.lang.Error: Non-zero exit flag when running command [cmd.exe, /c, D:\develop-tools\apktool\apktool, d, -f, E:\market_20101102\applications\Themes\com.anifree.anipet.koi.ad.apk, D:\develop-tools\apktool\all_1100_apps\applications\Themes\com.anifree.anipet.koi.ad.apk]
-
-error in processing: D:\develop-tools\apktool\all_1100_apps\applications\Tools\com.google.android.apps.translate.apk
-   get exception: java.lang.Error: Non-zero exit flag when running command [cmd.exe, /c, D:\develop-tools\apktool\apktool, d, -f, E:\market_20101102\applications\Tools\com.google.android.apps.translate.apk, D:\develop-tools\apktool\all_1100_apps\applications\Tools\com.google.android.apps.translate.apk]
-
-error in processing: D:\develop-tools\apktool\all_1100_apps\applications\Tools\com.motalen.batterytimelite.apk
-   get exception: java.lang.Error: Non-zero exit flag when running command [cmd.exe, /c, D:\develop-tools\apktool\apktool, d, -f, E:\market_20101102\applications\Tools\com.motalen.batterytimelite.apk, D:\develop-tools\apktool\all_1100_apps\applications\Tools\com.motalen.batterytimelite.apk]
-
-error in processing: D:\develop-tools\apktool\all_1100_apps\applications\Travel\com.yelp.android.apk
-   get exception: java.lang.Error: Non-zero exit flag when running command [cmd.exe, /c, D:\develop-tools\apktool\apktool, d, -f, E:\market_20101102\applications\Travel\com.yelp.android.apk, D:\develop-tools\apktool\all_1100_apps\applications\Travel\com.yelp.android.apk]
-
-error in processing: D:\develop-tools\apktool\all_1100_apps\games\Brain & Puzzle\com.dahl.brendan.wordsearch.view.apk
-   get exception: java.lang.Error: Non-zero exit flag when running command [cmd.exe, /c, D:\develop-tools\apktool\apktool, d, -f, E:\market_20101102\games\Brain & Puzzle\com.dahl.brendan.wordsearch.view.apk, D:\develop-tools\apktool\all_1100_apps\games\Brain & Puzzle\com.dahl.brendan.wordsearch.view.apk]
-
-error in processing: D:\develop-tools\apktool\all_1100_apps\games\Cards & Casino\com.patience.revisited.apk
-   get exception: java.lang.Error: Non-zero exit flag when running command [cmd.exe, /c, D:\develop-tools\apktool\apktool, d, -f, E:\market_20101102\games\Cards & Casino\com.patience.revisited.apk, D:\develop-tools\apktool\all_1100_apps\games\Cards & Casino\com.patience.revisited.apk]
-
+\applications\Comics\com.jj.comics.apk
+\applications\Communication\com.icq.mobile.client.apk
+\applications\Communication\com.nimbuzz.apk
+\applications\Communication\com.pgmsoft.wifinder.apk
+\applications\Communication\com.uc.browser.apk
+\applications\Communication\com.webrich.ukdrivinglite.apk
+\applications\Finance\com.bloomberg.android.apk
+\applications\Finance\com.calculator.mortgage.apk
+\applications\Finance\com.istockmanager.apk
+\applications\Finance\com.linkzen.app.apk
+\applications\Finance\masterofmuppets.tipcalc.apk
+\applications\Health\com.youdroid.bmi.apk
+\applications\Lifestyle\com.layar.apk
+\applications\Lifestyle\kr.mobilefirst.carrierplan.apk
+\applications\Multimedia\com.slacker.radio.apk
+\applications\Multimedia\tunein.player.apk
+\applications\Multimedia\vStudio.Android.GPhoto.apk
+\applications\Productivity\com.adobe.reader.apk
+\applications\Productivity\com.metago.astro.apk
+\applications\Productivity\com.touchtype.swiftkey.trial.apk
+\applications\Productivity\jp.co.johospace.jorte.apk
+\applications\Shopping\com.cwesoftware.tipcalc.apk
+\applications\Social\com.okcupid.okcupid.apk
+\applications\Social\jp.r246.twicca.apk
+\applications\Software libraries\com.koufeikexing.apk
+\applications\Themes\com.anifree.anipet.aquarium.ad.apk
+\applications\Themes\com.anifree.anipet.koi.ad.apk
+\applications\Tools\com.google.android.apps.translate.apk
+\applications\Tools\com.motalen.batterytimelite.apk
+\applications\Travel\com.yelp.android.apk
+\games\Brain & Puzzle\com.dahl.brendan.wordsearch.view.apk
+\games\Cards & Casino\com.patience.revisited.apk
