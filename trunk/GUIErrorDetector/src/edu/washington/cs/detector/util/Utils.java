@@ -148,6 +148,19 @@ public class Utils {
 		return classList;
 	}
 	
+	public static String concatenate(String[] strs, String sep) {
+		StringBuilder sb = new StringBuilder();
+		int count = 0;
+		for(String str : strs) {
+			if(count != 0) {
+				sb.append(sep);
+			}
+			sb.append(str);
+			count++;
+		}
+		return sb.toString();
+	}
+	
 	public static String conToPath(List<String> strs) {
 		StringBuilder sb = new StringBuilder();
 		int count = 0;
