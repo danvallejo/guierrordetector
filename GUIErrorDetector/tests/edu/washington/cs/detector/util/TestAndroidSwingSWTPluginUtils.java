@@ -2,6 +2,7 @@ package edu.washington.cs.detector.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -16,14 +17,15 @@ import com.ibm.wala.ipa.cha.ClassHierarchyException;
 
 import edu.washington.cs.detector.CGBuilder;
 import edu.washington.cs.detector.TestCommons;
+import edu.washington.cs.detector.UIAnomalyDetector;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-public class TestAndroidAndPluginUtils extends TestCase {
+public class TestAndroidSwingSWTPluginUtils extends TestCase {
 	public static Test suite() {
-		return new TestSuite(TestAndroidAndPluginUtils.class);
+		return new TestSuite(TestAndroidSwingSWTPluginUtils.class);
 	}
 	
 	public void testGetAllWidget() throws IOException, ClassHierarchyException {
@@ -141,5 +143,46 @@ public class TestAndroidAndPluginUtils extends TestCase {
 		}
 		System.out.println("Number of exposed class: " + allClasses.size());
 		assertEquals(101, allClasses.size());
+	}
+	
+	public void testExtractAllSwingAWTListeners() throws IOException, ClassHierarchyException {
+		String appPath = TestCommons.testfolder + "swingerror";
+		CGBuilder builder = new CGBuilder(appPath, UIAnomalyDetector.EXCLUSION_FILE_SWING);
+		builder.makeScopeAndClassHierarchy();
+		Collection<String> listeners = SwingUtils.getAllPublicSwingAWTListeners(builder.getClassHierarchy());
+//		int i = 0;
+//		for(String l : listeners) {
+//			i++;
+//			System.out.println(l);
+//		}
+		
+		assertEquals(218, listeners.size());
+		
+		//test load all listeners
+		Collection<String> methods = new HashSet<String>();
+		for(String l : listeners) {
+			IClass c = WALAUtils.lookupClass(builder.getClassHierarchy(), l);
+			assertNotNull(c);
+			
+			if(!c.isInterface()) {
+				continue;
+			}
+			
+			for(IMethod m : c.getDeclaredMethods()) {
+				if(m.isPrivate() || m.isNative() || m.isStatic() || m.isSynthetic()) {
+					continue;
+				}
+				if(m.isInit() || m.isClinit()) {
+					continue;
+				}
+				methods.add(m.getName().toString());
+			}
+			
+		}
+		
+		assertEquals(98, methods.size());
+		for(String m : methods) {
+			System.out.println(m);
+		}
 	}
 }
