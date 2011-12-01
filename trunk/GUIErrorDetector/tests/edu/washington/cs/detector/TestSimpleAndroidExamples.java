@@ -48,6 +48,9 @@ public class TestSimpleAndroidExamples extends TestCase {
 	    String path = "D:\\research\\guierror\\eclipsews\\TestAndroid\\res\\layout\\main.xml";
 		String xmlContent = Files.getFileContents(path);
 		Collection<String> declaredClasses  = AndroidUtils.extractAndroidUIs(xmlContent);
+		
+		//declaredClasses.add("android.view.ViewRoot");
+		
 	    Iterable<Entrypoint> widgetConstructors = //new LinkedList<Entrypoint>(); 
 	    	CGEntryManager.getConstructors(builder, declaredClasses);
 	    
@@ -55,7 +58,7 @@ public class TestSimpleAndroidExamples extends TestCase {
 	    Iterable<Entrypoint> entries = CGEntryManager.mergeEntrypoints(uiEntries, widgetConstructors);
 	    
 		System.out.println("Number of entries for building CG: " + Utils.countIterable(entries));
-		builder.setCGType(CG.RTA);
+		builder.setCGType(CG.ZeroCFA);
 		builder.buildCG(entries);
 		
 		System.out.println("number of entry node in the built CG: " + builder.getCallGraph().getEntrypointNodes().size());
@@ -72,7 +75,7 @@ public class TestSimpleAndroidExamples extends TestCase {
 		detector.setThreadStartGuider(new CGTraverseNoSystemCalls());
 		detector.setUIAnomalyGuider(new CGTraverseOnlyClientRunnableStrategy());
 		UIAnomalyDetector.DEBUG = true;
-		UIAnomalyMethodFinder.DEBUG = true;
+		//UIAnomalyMethodFinder.DEBUG = true;
 		
 		List<AnomalyCallChain> chains = detector.detectUIAnomaly(builder, builder.getCallGraphEntryNodes(uiEntries));
 		
