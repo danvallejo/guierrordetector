@@ -2,6 +2,7 @@ package edu.washington.cs.detector.util;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Set;
 
@@ -91,6 +92,9 @@ public class SwingUtils {
 		if(cha.isAssignableFrom(getJComponent(cha), clazz)) {
 			return true;
 		}
+		
+		//XXX FIXME need to check other components here?
+		
 		//sub class of a model?
 		if(isSubClass(clazz, getModels(cha), cha)) {
 			return true;
@@ -111,6 +115,11 @@ public class SwingUtils {
 	public static boolean isInSwingPackage(IClass clazz) {
 		String packageName = WALAUtils.getJavaPackageName(clazz);
 		return packageName.startsWith("javax.swing.");
+	}
+	
+	public static boolean isInAWTPackage(IClass clazz) {
+		String packageName = WALAUtils.getJavaPackageName(clazz);
+		return packageName.startsWith("java.awt.");
 	}
 	
 	/***
@@ -193,46 +202,235 @@ public class SwingUtils {
 		if(listeners != null) {
 			return listeners;
 		} else {
-			//listerner numbers: 15 awt + 21 swing 
-			listeners = new IClass[15 + 21];
-			//all listeners from AWT implements EventListener
-			listeners[0] = WALAUtils.lookupClass(cha, "java.awt.event.ActionListener");
-			listeners[1] = WALAUtils.lookupClass(cha, "java.awt.event.AdjustmentListener");
-			listeners[2] = WALAUtils.lookupClass(cha, "java.awt.event.AWTEventListener");
-			listeners[3] = WALAUtils.lookupClass(cha, "java.awt.event.ComponentListener");
-			listeners[4] = WALAUtils.lookupClass(cha, "java.awt.event.ContainerListener");
-			listeners[5] = WALAUtils.lookupClass(cha, "java.awt.event.FocusListener");
-			listeners[6] = WALAUtils.lookupClass(cha, "java.awt.event.HierarchyBoundsListener");
-			listeners[7] = WALAUtils.lookupClass(cha, "java.awt.event.HierarchyListener");
-			listeners[8] = WALAUtils.lookupClass(cha, "java.awt.event.InputMethodListener");
-			listeners[9] = WALAUtils.lookupClass(cha, "java.awt.event.ItemListener");
-			listeners[10] = WALAUtils.lookupClass(cha, "java.awt.event.KeyListener");
-			listeners[11] = WALAUtils.lookupClass(cha, "java.awt.event.MouseListener");
-			listeners[12] = WALAUtils.lookupClass(cha, "java.awt.event.MouseMotionListener");
-			listeners[13] = WALAUtils.lookupClass(cha, "java.awt.event.TextListener");
-			listeners[14] = WALAUtils.lookupClass(cha, "java.awt.event.WindowListener");
-			
-			listeners[15] = WALAUtils.lookupClass(cha, "javax.swing.event.AncestorListener");
-			listeners[16] = WALAUtils.lookupClass(cha, "javax.swing.event.CaretListener");
-			listeners[17] = WALAUtils.lookupClass(cha, "javax.swing.event.CellEditorListener");
-			listeners[18] = WALAUtils.lookupClass(cha, "javax.swing.event.ChangeListener");
-			listeners[19] = WALAUtils.lookupClass(cha, "javax.swing.event.TreeWillExpandListener");
-			listeners[20] = WALAUtils.lookupClass(cha, "javax.swing.event.UndoableEditListener");
-			listeners[21] = WALAUtils.lookupClass(cha, "javax.swing.event.DocumentListener");
-			listeners[22] = WALAUtils.lookupClass(cha, "javax.swing.event.HyperlinkListener");
-			listeners[23] = WALAUtils.lookupClass(cha, "javax.swing.event.InternalFrameListener");
-			listeners[24] = WALAUtils.lookupClass(cha, "javax.swing.event.ListDataListener");
-			listeners[25] = WALAUtils.lookupClass(cha, "javax.swing.event.ListSelectionListener");
-			listeners[26] = WALAUtils.lookupClass(cha, "javax.swing.event.MenuDragMouseListener");
-			listeners[27] = WALAUtils.lookupClass(cha, "javax.swing.event.MenuKeyListener");
-			listeners[28] = WALAUtils.lookupClass(cha, "javax.swing.event.MenuListener");
-			listeners[29] = WALAUtils.lookupClass(cha, "javax.swing.event.MouseInputListener");
-			listeners[30] = WALAUtils.lookupClass(cha, "javax.swing.event.PopupMenuListener");
-			listeners[31] = WALAUtils.lookupClass(cha, "javax.swing.event.TableColumnModelListener");
-			listeners[32] = WALAUtils.lookupClass(cha, "javax.swing.event.TableModelListener");
-			listeners[33] = WALAUtils.lookupClass(cha, "javax.swing.event.TreeExpansionListener");
-			listeners[34] = WALAUtils.lookupClass(cha, "javax.swing.event.TreeModelListener");
-			listeners[35] = WALAUtils.lookupClass(cha, "javax.swing.event.TreeSelectionListener");
+			listeners = new IClass[] {
+					WALAUtils.lookupClass(cha, "javax.swing.event.InternalFrameAdapter"),
+					WALAUtils.lookupClass(cha, "javax.swing.event.DocumentListener"),
+					WALAUtils.lookupClass(cha, "javax.swing.event.UndoableEditListener"),
+					WALAUtils.lookupClass(cha, "javax.swing.event.CaretListener"),
+					WALAUtils.lookupClass(cha, "javax.swing.event.MenuListener"),
+					WALAUtils.lookupClass(cha, "javax.swing.event.CellEditorListener"),
+					WALAUtils.lookupClass(cha, "javax.swing.event.RowSorterListener"),
+					WALAUtils.lookupClass(cha, "javax.swing.event.HyperlinkListener"),
+					WALAUtils.lookupClass(cha, "javax.swing.event.TreeSelectionListener"),
+					WALAUtils.lookupClass(cha, "javax.swing.event.ListDataListener"),
+					WALAUtils.lookupClass(cha, "javax.swing.event.AncestorListener"),
+					WALAUtils.lookupClass(cha, "javax.swing.event.MouseInputListener"),
+					WALAUtils.lookupClass(cha, "javax.swing.event.ListSelectionListener"),
+					WALAUtils.lookupClass(cha, "javax.swing.event.TableModelListener"),
+					WALAUtils.lookupClass(cha, "javax.swing.event.ChangeListener"),
+					WALAUtils.lookupClass(cha, "javax.swing.event.TreeWillExpandListener"),
+					WALAUtils.lookupClass(cha, "javax.swing.event.InternalFrameListener"),
+					WALAUtils.lookupClass(cha, "javax.swing.event.TreeExpansionListener"),
+					WALAUtils.lookupClass(cha, "javax.swing.event.MenuDragMouseListener"),
+					WALAUtils.lookupClass(cha, "javax.swing.event.MenuKeyListener"),
+					WALAUtils.lookupClass(cha, "javax.swing.event.TableColumnModelListener"),
+					WALAUtils.lookupClass(cha, "javax.swing.event.PopupMenuListener"),
+					WALAUtils.lookupClass(cha, "javax.swing.event.TreeModelListener"),
+					WALAUtils.lookupClass(cha, "javax.swing.event.MouseInputAdapter"),
+					WALAUtils.lookupClass(cha, "java.awt.event.MouseMotionAdapter"),
+					WALAUtils.lookupClass(cha, "java.awt.event.TextListener"),
+					WALAUtils.lookupClass(cha, "java.awt.event.HierarchyBoundsListener"),
+					WALAUtils.lookupClass(cha, "java.awt.event.KeyListener"),
+					WALAUtils.lookupClass(cha, "java.awt.event.AWTEventListener"),
+					WALAUtils.lookupClass(cha, "java.awt.event.MouseAdapter"),
+					WALAUtils.lookupClass(cha, "java.awt.event.ContainerAdapter"),
+					WALAUtils.lookupClass(cha, "java.awt.event.WindowFocusListener"),
+					WALAUtils.lookupClass(cha, "java.awt.event.ContainerListener"),
+					WALAUtils.lookupClass(cha, "java.awt.event.FocusAdapter"),
+					WALAUtils.lookupClass(cha, "java.awt.event.MouseWheelListener"),
+					WALAUtils.lookupClass(cha, "java.awt.event.AdjustmentListener"),
+					WALAUtils.lookupClass(cha, "java.awt.event.AWTEventListenerProxy"),
+					WALAUtils.lookupClass(cha, "java.awt.event.MouseMotionListener"),
+					WALAUtils.lookupClass(cha, "java.awt.event.KeyAdapter"),
+					WALAUtils.lookupClass(cha, "java.awt.event.WindowStateListener"),
+					WALAUtils.lookupClass(cha, "java.awt.event.MouseListener"),
+					WALAUtils.lookupClass(cha, "java.awt.event.HierarchyListener"),
+					WALAUtils.lookupClass(cha, "java.awt.event.WindowListener"),
+					WALAUtils.lookupClass(cha, "java.awt.event.WindowAdapter"),
+					WALAUtils.lookupClass(cha, "java.awt.event.ItemListener"),
+					WALAUtils.lookupClass(cha, "java.awt.event.FocusListener"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicScrollPaneUI$ViewportChangeHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicMenuUI$MouseInputHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicScrollPaneUI$MouseWheelHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicTreeUI$KeyHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicInternalFrameTitlePane$CloseAction"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicSplitPaneUI$KeyboardResizeToggleHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicSliderUI$PropertyChangeHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicInternalFrameTitlePane$MoveAction"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicTreeUI$FocusHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.metal.MetalLabelUI"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicToolBarUI$DockingListener"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicSplitPaneUI$PropertyHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicTreeUI$ComponentHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicTabbedPaneUI$FocusHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.metal.MetalToolBarUI$MetalRolloverListener"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicComboPopup$PropertyChangeHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicRootPaneUI"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicTreeUI$TreeTraverseAction"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicComboPopup$ListSelectionHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicComboPopup$ListDataHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicSliderUI$FocusHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicListUI$ListDataHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.metal.MetalComboBoxEditor"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicComboBoxUI$ListDataHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicFileChooserUI$DoubleClickListener"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicComboBoxUI$KeyHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.metal.MetalFileChooserUI$DirectoryComboBoxAction"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicTreeUI$TreeHomeAction"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicDesktopPaneUI$OpenAction"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicInternalFrameUI$BorderListener"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicSliderUI$ActionScroller"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicSplitPaneUI$KeyboardEndHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicTableHeaderUI$MouseInputHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicFileChooserUI$NewFolderAction"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicLabelUI"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.metal.MetalFileChooserUI$SingleClickListener"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.metal.MetalToolBarUI$MetalContainerListener"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicDesktopPaneUI$NavigateAction"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicSplitPaneDivider$MouseHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicTreeUI$SelectionModelPropertyChangeHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicListUI$ListSelectionHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicTreeUI$TreeExpansionHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicScrollBarUI$ScrollListener"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicInternalFrameTitlePane$SizeAction"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicTableUI$FocusHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicFileChooserUI$CancelSelectionAction"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicComboPopup$InvocationMouseMotionHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicTreeUI$PropertyChangeHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicComboPopup$ItemHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicOptionPaneUI$PropertyChangeHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.metal.MetalFileChooserUI$FilterComboBoxModel"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicInternalFrameUI$BasicInternalFrameListener"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicTabbedPaneUI$PropertyChangeHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.metal.MetalComboBoxUI$MetalPropertyChangeListener"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicInternalFrameTitlePane$RestoreAction"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicScrollPaneUI$PropertyChangeHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicSplitPaneUI$KeyboardHomeHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicFileChooserUI$SelectionListener"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicOptionPaneUI$ButtonActionListener"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicSplitPaneUI$FocusHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicComboPopup$ListMouseHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicToolBarUI$FrameListener"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicColorChooserUI$PropertyHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicListUI$MouseInputHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicTreeUI$TreeToggleAction"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicTreeUI$MouseHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicTreeUI$TreeCancelEditingAction"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicInternalFrameTitlePane$MaximizeAction"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicScrollPaneUI$VSBChangeListener"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicScrollBarUI$ArrowButtonListener"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicTableUI$MouseInputHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicTextUI$BasicCaret"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicSliderUI$TrackListener"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicFileChooserUI$GoHomeAction"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicMenuItemUI$MouseInputHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicTabbedPaneUI$MouseHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicComboPopup$InvocationMouseHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.metal.MetalSliderUI$MetalPropertyListener"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicTreeUI$TreeModelHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicScrollBarUI$PropertyChangeHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicSliderUI$ScrollListener"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicSplitPaneUI$KeyboardDownRightHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicScrollPaneUI$HSBChangeListener"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicToolBarUI$ToolBarContListener"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicScrollBarUI$ModelListener"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicComboBoxUI$FocusHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicFileChooserUI$ApproveSelectionAction"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicProgressBarUI$ChangeHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicComboBoxUI$PropertyChangeHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicFileChooserUI$UpdateAction"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicSplitPaneDivider"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicInternalFrameUI$GlassPaneDispatcher"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicListUI$FocusHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicComboPopup$InvocationKeyHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicTreeUI$TreePageAction"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicDesktopPaneUI$CloseAction"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicComboBoxUI$ItemHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicButtonListener"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicTableUI$KeyHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicDesktopPaneUI$MinimizeAction"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.metal.MetalComboBoxEditor$UIResource"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicToolBarUI$ToolBarFocusListener"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicSliderUI$ChangeHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicSliderUI$ComponentHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicTabbedPaneUI$TabSelectionHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicTreeUI$TreeSelectionHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicScrollBarUI$TrackListener"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicDesktopPaneUI$MaximizeAction"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicSplitPaneUI$KeyboardUpLeftHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicComboPopup$ListMouseMotionHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicTreeUI$MouseInputHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicFileChooserUI$ChangeToParentDirectoryAction"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicComboBoxEditor"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.metal.MetalToolBarUI$MetalDockingListener"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicTreeUI$CellEditorHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicInternalFrameUI$ComponentHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicInternalFrameUI$InternalFramePropertyChangeListener"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.metal.MetalRootPaneUI"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicToolBarUI$PropertyListener"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicInternalFrameTitlePane$PropertyChangeHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicMenuUI$ChangeHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicInternalFrameTitlePane$IconifyAction"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicDesktopIconUI$MouseInputHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicDirectoryModel"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicListUI$PropertyChangeHandler"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicComboBoxEditor$UIResource"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.basic.BasicTreeUI$TreeIncrementAction"),
+					WALAUtils.lookupClass(cha, "javax.swing.plaf.synth.SynthSliderUI$SynthTrackListener"),
+					WALAUtils.lookupClass(cha, "javax.swing.text.StyledEditorKit$UnderlineAction"),
+					WALAUtils.lookupClass(cha, "javax.swing.text.DefaultEditorKit$InsertTabAction"),
+					WALAUtils.lookupClass(cha, "javax.swing.text.DefaultCaret"),
+					WALAUtils.lookupClass(cha, "javax.swing.text.StyledEditorKit$ItalicAction"),
+					WALAUtils.lookupClass(cha, "javax.swing.text.DefaultEditorKit$InsertContentAction"),
+					WALAUtils.lookupClass(cha, "javax.swing.text.html.HTMLEditorKit$HTMLTextAction"),
+					WALAUtils.lookupClass(cha, "javax.swing.text.StyledEditorKit$FontSizeAction"),
+					WALAUtils.lookupClass(cha, "javax.swing.text.DefaultEditorKit$CopyAction"),
+					WALAUtils.lookupClass(cha, "javax.swing.text.JTextComponent$AccessibleJTextComponent"),
+					WALAUtils.lookupClass(cha, "javax.swing.text.html.HTMLEditorKit$InsertHTMLTextAction"),
+					WALAUtils.lookupClass(cha, "javax.swing.text.DefaultEditorKit$BeepAction"),
+					WALAUtils.lookupClass(cha, "javax.swing.text.DefaultEditorKit$CutAction"),
+					WALAUtils.lookupClass(cha, "javax.swing.text.html.HTMLEditorKit$LinkController"),
+					WALAUtils.lookupClass(cha, "javax.swing.text.TextAction"),
+					WALAUtils.lookupClass(cha, "javax.swing.text.html.FormView"),
+					WALAUtils.lookupClass(cha, "javax.swing.text.StyledEditorKit$FontFamilyAction"),
+					WALAUtils.lookupClass(cha, "javax.swing.text.StyledEditorKit$StyledTextAction"),
+					WALAUtils.lookupClass(cha, "javax.swing.text.DefaultEditorKit$InsertBreakAction"),
+					WALAUtils.lookupClass(cha, "javax.swing.text.StyledEditorKit$AlignmentAction"),
+					WALAUtils.lookupClass(cha, "javax.swing.text.StyledEditorKit$BoldAction"),
+					WALAUtils.lookupClass(cha, "javax.swing.text.DefaultEditorKit$DefaultKeyTypedAction"),
+					WALAUtils.lookupClass(cha, "javax.swing.text.DefaultEditorKit$PasteAction"),
+					WALAUtils.lookupClass(cha, "javax.swing.text.StyledEditorKit$ForegroundAction"),
+					WALAUtils.lookupClass(cha, "javax.swing.text.html.FormView$MouseEventListener"),
+					WALAUtils.lookupClass(cha, "javax.swing.tree.DefaultTreeCellEditor"),
+					WALAUtils.lookupClass(cha, "javax.swing.table.DefaultTableColumnModel"),
+					WALAUtils.lookupClass(cha, "javax.swing.table.JTableHeader"),
+					WALAUtils.lookupClass(cha, "javax.swing.undo.UndoManager"),
+					WALAUtils.lookupClass(cha, "java.awt.TextField$AccessibleAWTTextField"),
+					WALAUtils.lookupClass(cha, "java.awt.TextArea$AccessibleAWTTextArea"),
+					WALAUtils.lookupClass(cha, "java.awt.Checkbox$AccessibleAWTCheckbox"),
+					WALAUtils.lookupClass(cha, "java.awt.List$AccessibleAWTList"),
+					WALAUtils.lookupClass(cha, "java.awt.Container$AccessibleAWTContainer$AccessibleContainerHandler"),
+					WALAUtils.lookupClass(cha, "java.awt.AWTEventMulticaster"),
+					WALAUtils.lookupClass(cha, "java.awt.Component$AccessibleAWTComponent$AccessibleAWTComponentHandler"),
+					WALAUtils.lookupClass(cha, "java.awt.TextComponent$AccessibleAWTTextComponent"),
+					WALAUtils.lookupClass(cha, "java.awt.datatransfer.FlavorListener"),
+					WALAUtils.lookupClass(cha, "java.awt.Component$AccessibleAWTComponent$AccessibleAWTFocusHandler"),
+					WALAUtils.lookupClass(cha, "java.awt.event.ActionListener"),
+					WALAUtils.lookupClass(cha, "java.awt.event.InputMethodListener"),
+					WALAUtils.lookupClass(cha, "java.awt.event.HierarchyBoundsAdapter"),
+					WALAUtils.lookupClass(cha, "java.awt.event.ComponentAdapter"),
+					WALAUtils.lookupClass(cha, "java.awt.event.ComponentListener"),
+					WALAUtils.lookupClass(cha, "java.awt.dnd.DropTargetAdapter"),
+					WALAUtils.lookupClass(cha, "java.awt.dnd.DropTarget"),
+					WALAUtils.lookupClass(cha, "java.awt.dnd.DragSourceListener"),
+					WALAUtils.lookupClass(cha, "java.awt.dnd.DropTargetListener"),
+					WALAUtils.lookupClass(cha, "java.awt.dnd.DragSourceMotionListener"),
+					WALAUtils.lookupClass(cha, "java.awt.dnd.DropTarget$DropTargetAutoScroller"),
+					WALAUtils.lookupClass(cha, "java.awt.dnd.DragSourceAdapter"),
+					WALAUtils.lookupClass(cha, "java.awt.dnd.MouseDragGestureRecognizer"),
+					WALAUtils.lookupClass(cha, "java.awt.dnd.DragGestureListener"),
+					WALAUtils.lookupClass(cha, "java.awt.dnd.DragSourceContext")	
+			};
 			
 			Utils.checkNoNull(listeners);
 			
@@ -247,89 +445,123 @@ public class SwingUtils {
 			handlerNames = new HashSet<String>();
 			
 			//event handling method names from AWT
-			handlerNames.add("actionPerformed");
-			handlerNames.add("adjustmentValueChanged");
-			handlerNames.add("eventDispatched");
-			handlerNames.add("componentHidden");
-			handlerNames.add("componentMoved");
-			handlerNames.add("componentResized");
-			handlerNames.add("componentShown");
-			handlerNames.add("componentAdded");
-			handlerNames.add("componentRemoved");
-			handlerNames.add("focusGained");
-			handlerNames.add("focusLost");
-			handlerNames.add("ancestorMoved");
-			handlerNames.add("ancestorResized");
-			handlerNames.add("hierarchyChanged");
-			handlerNames.add("caretPositionChanged");
-			handlerNames.add("inputMethodTextChanged");
-			handlerNames.add("itemStateChanged");
 			handlerNames.add("mouseClicked");
-			handlerNames.add("mouseEntered");
-			handlerNames.add("mouseExited");
-			handlerNames.add("mousePressed");
-			handlerNames.add("mouseReleased");
-			handlerNames.add("mouseDragged");
-			handlerNames.add("mouseMoved");
-			handlerNames.add("textValueChanged");
-			handlerNames.add("windowActivated");
-			handlerNames.add("windowClosed");
-			handlerNames.add("windowClosing");
-			handlerNames.add("windowDeactivated");
-			handlerNames.add("windowDeiconified");
 			handlerNames.add("windowIconified");
-			handlerNames.add("windowOpened");
-
-			//event handling method names from Swing
-			handlerNames.add("ancestorAdded");
-			handlerNames.add("ancestorMoved");
-			handlerNames.add("ancestorRemoved");
-			handlerNames.add("caretUpdate");
-			handlerNames.add("editingCanceled");
-			handlerNames.add("editingStopped");
-			handlerNames.add("stateChanged");
-			handlerNames.add("changedUpdate");
-			handlerNames.add("insertUpdate");
-			handlerNames.add("removeUpdate");
+			handlerNames.add("menuCanceled");
 			handlerNames.add("hyperlinkUpdate");
-			handlerNames.add("internalFrameActivated");
-			handlerNames.add("internalFrameClosed");
-			handlerNames.add("internalFrameClosing");
-			handlerNames.add("internalFrameDeactivated");
-			handlerNames.add("internalFrameDeiconified");
-			handlerNames.add("internalFrameIconified");
-			handlerNames.add("internalFrameOpened");
-			handlerNames.add("contentsChanged");
+			handlerNames.add("windowDeiconified");
+			handlerNames.add("dragEnter");
 			handlerNames.add("intervalAdded");
-			handlerNames.add("intervalRemoved");
-			handlerNames.add("valueChanged");
+			handlerNames.add("internalFrameDeactivated");
+			handlerNames.add("mouseWheelMoved");
+			handlerNames.add("undoableEditHappened");
+			handlerNames.add("keyPressed");
+			handlerNames.add("treeExpanded");
+			handlerNames.add("inputMethodTextChanged");
+			handlerNames.add("treeCollapsed");
+			handlerNames.add("focusLost");
 			handlerNames.add("menuDragMouseDragged");
 			handlerNames.add("menuDragMouseEntered");
-			handlerNames.add("menuDragMouseExited");
-			handlerNames.add("menuDragMouseReleased");
-			handlerNames.add("menuCanceled");
+			handlerNames.add("componentAdded");
+			handlerNames.add("keyReleased");
 			handlerNames.add("menuDeselected");
-			handlerNames.add("menuSelected");
-			handlerNames.add("popupMenuCanceled");
-			handlerNames.add("popupMenuWillBecomeInvisible");
-			handlerNames.add("popupMenuWillBecomeVisible");
-			handlerNames.add("columnAdded");
-			handlerNames.add("columnMarginChanged");
-			handlerNames.add("columnMoved");
-			handlerNames.add("columnRemoved");
-			handlerNames.add("columnSelectionChanged");
-			handlerNames.add("tableChanged");
-			handlerNames.add("treeNodesChanged");
-			handlerNames.add("treeNodesInserted");
-			handlerNames.add("treeNodesRemoved");
-			handlerNames.add("treeStructureChanged");
-			handlerNames.add("valueChanged");
 			handlerNames.add("treeWillCollapse");
+			handlerNames.add("componentResized");
+			handlerNames.add("mouseReleased");
+			handlerNames.add("keyTyped");
+			handlerNames.add("valueChanged");
 			handlerNames.add("treeWillExpand");
-			handlerNames.add("undoableEditHappened");
+			handlerNames.add("windowClosed");
+			handlerNames.add("dragGestureRecognized");
+			handlerNames.add("dragDropEnd");
+			handlerNames.add("menuKeyReleased");
+			handlerNames.add("internalFrameOpened");
+			handlerNames.add("contentsChanged");
+			handlerNames.add("windowActivated");
+			handlerNames.add("internalFrameClosing");
+			handlerNames.add("menuDragMouseReleased");
+			handlerNames.add("focusGained");
+			handlerNames.add("columnSelectionChanged");
+			handlerNames.add("windowClosing");
+			handlerNames.add("caretUpdate");
+			handlerNames.add("editingCanceled");
+			handlerNames.add("treeNodesInserted");
+			handlerNames.add("adjustmentValueChanged");
+			handlerNames.add("tableChanged");
+			handlerNames.add("popupMenuWillBecomeVisible");
+			handlerNames.add("actionPerformed");
+			handlerNames.add("dragOver");
+			handlerNames.add("windowStateChanged");
+			handlerNames.add("ancestorRemoved");
+			handlerNames.add("columnRemoved");
+			handlerNames.add("internalFrameClosed");
+			handlerNames.add("componentMoved");
+			handlerNames.add("editingStopped");
+			handlerNames.add("mouseDragged");
+			handlerNames.add("windowGainedFocus");
+			handlerNames.add("popupMenuWillBecomeInvisible");
+			handlerNames.add("dragMouseMoved");
+			handlerNames.add("mousePressed");
+			handlerNames.add("drop");
+			handlerNames.add("ancestorMoved");
+			handlerNames.add("treeNodesRemoved");
+			handlerNames.add("windowLostFocus");
+			handlerNames.add("componentHidden");
+			handlerNames.add("menuKeyPressed");
+			handlerNames.add("internalFrameActivated");
+			handlerNames.add("menuKeyTyped");
+			handlerNames.add("textValueChanged");
+			handlerNames.add("internalFrameIconified");
+			handlerNames.add("componentRemoved");
+			handlerNames.add("itemStateChanged");
+			handlerNames.add("stateChanged");
+			handlerNames.add("dragExit");
+			handlerNames.add("ancestorResized");
+			handlerNames.add("mouseMoved");
+			handlerNames.add("popupMenuCanceled");
+			handlerNames.add("menuSelected");
+			handlerNames.add("componentShown");
+			handlerNames.add("ancestorAdded");
+			handlerNames.add("dropActionChanged");
+			handlerNames.add("mouseExited");
+			handlerNames.add("columnMarginChanged");
+			handlerNames.add("menuDragMouseExited");
+			handlerNames.add("windowOpened");
+			handlerNames.add("changedUpdate");
+			handlerNames.add("mouseEntered");
+			handlerNames.add("windowDeactivated");
+			handlerNames.add("sorterChanged");
+			handlerNames.add("internalFrameDeiconified");
+			handlerNames.add("treeStructureChanged");
+			handlerNames.add("eventDispatched");
+			handlerNames.add("flavorsChanged");
+			handlerNames.add("columnMoved");
+			handlerNames.add("removeUpdate");
+			handlerNames.add("insertUpdate");
+			handlerNames.add("columnAdded");
+			handlerNames.add("hierarchyChanged");
+			handlerNames.add("caretPositionChanged");
+			handlerNames.add("treeNodesChanged");
+			handlerNames.add("intervalRemoved");
 			
 			return handlerNames;
 		}
+	}
+	
+	/**
+	 * Get all listeners
+	 * */
+	public static Collection<String> getAllPublicSwingAWTListeners(ClassHierarchy cha) {
+		Collection<String> listeners = new LinkedHashSet<String>();
+		
+		IClass eventListener = getEventListener(cha);
+		for(IClass c : cha) {
+			if(c.isPublic() && cha.isAssignableFrom(eventListener, c) && (isInSwingPackage(c) || isInAWTPackage(c))) {
+				listeners.add(WALAUtils.getJavaFullClassName(c));
+			}
+		}
+		
+		return listeners;
 	}
 	
 }
