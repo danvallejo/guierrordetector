@@ -226,6 +226,7 @@ public class AndroidUtils {
 	}
 	
 	//FIXME, should it be ClassA$ClassB or ClassA.ClassB? need to confirm?
+	//no it should be as follows, since users will not write A$B in their code
 	private static String[] widgetShortNames = new String[] {
 		"AbsListView",
 		"AbsListView.LayoutParams",
