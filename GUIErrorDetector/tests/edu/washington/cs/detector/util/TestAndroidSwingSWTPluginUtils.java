@@ -40,7 +40,7 @@ public class TestAndroidSwingSWTPluginUtils extends TestCase {
 				System.out.println(num++ + "  -  " + c);
 			}
 		}
-		assertEquals(62, num);
+		assertEquals(63, num);
 	}
 	
 	public void testLoadAllListener() throws IOException, ClassHierarchyException {
@@ -111,9 +111,12 @@ public class TestAndroidSwingSWTPluginUtils extends TestCase {
 		Collection<String> all = AndroidUtils.extractAllUIs(builder.getClassHierarchy(), new File(path));
 		System.out.println("No: " + all.size());
 		System.out.println(all);
-		assertEquals(4, all.size());
+		assertEquals(9, all.size());
 	}
 	
+	/**
+	 * This test is fragile, no surprise if it fails.
+	 * */
 	public void testClassesInAndroidLayout() throws IOException {
 		String path = "D:\\research\\guierror\\eclipsews\\TestAndroid\\res\\layout\\main.xml";
 		String xmlContent = Files.getFileContents(path);

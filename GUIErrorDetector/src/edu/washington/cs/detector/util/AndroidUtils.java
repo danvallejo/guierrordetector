@@ -3,21 +3,18 @@ package edu.washington.cs.detector.util;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.Collection;
-import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
-import java.util.zip.ZipFile;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -33,48 +30,45 @@ import com.ibm.wala.ipa.cha.ClassHierarchy;
 
 public class AndroidUtils {
 	
-	public static Collection<String> extractAllUIs(final ClassHierarchy cha, File f) throws ZipException, IOException {
-		List<Reader> xmlFileReaders = new LinkedList<Reader>();
-		if(f.isDirectory()) {
-			//check whether the dir "res" exists
-			List<File> allFiles = Files.getFileListing(f);
-			String desiredPath = f.getAbsolutePath() + Globals.fileSep + "res" + Globals.fileSep + "layout";
-			for(File file : allFiles) {
-				if(file.getName().endsWith(".xml") && file.getAbsolutePath().startsWith(desiredPath)) {
-					//System.out.println(file);
-					BufferedReader in = new BufferedReader(new FileReader(file));
-					xmlFileReaders.add(in);
-				}
-			}
-		} else {
-			//f must be an apk file
-			if(!f.getName().endsWith(".apk")) {
-				throw new RuntimeException("It must be an apk file: " + f.getAbsolutePath());
-			}
-			ZipFile jarFile = new ZipFile(f);
-			Enumeration<? extends ZipEntry> e = jarFile.entries();
-			while(e.hasMoreElements()) {
-				ZipEntry ze = e.nextElement();
-				if(ze.toString().indexOf("res/layout") != -1
-						&& ze.toString().endsWith(".xml")) {
-				    System.out.println(ze);
-					BufferedReader in = new BufferedReader(
-							new InputStreamReader(jarFile.getInputStream(ze)));
-					xmlFileReaders.add(in);
-				}
-			}
-		}
+	public static Collection<String> extractAllUIs(final ClassHierarchy cha, File dir) throws ZipException, IOException {
+		//need 2 copies, since a reader will be closed in extractAndroidUI / extractCustomizedUIs
+		List<Reader> xmlFileReaders1 = getAllLayoutXMLFromDir(dir);
+		List<Reader> xmlFileReaders2 = getAllLayoutXMLFromDir(dir);
 		
 		//read each xml file one by one
 		Collection<String> widgetClasses = new LinkedHashSet<String>();
-		for(Reader reader : xmlFileReaders) {
-			String xmlContent = Files.getFileContents(reader);
-			//extract Android widgets
-			widgetClasses.addAll(extractAndroidUIs(xmlContent));
-			//extract customized widgets
-			widgetClasses.addAll(extractCustomizedUIs(cha, xmlContent));
-		}
+
+		widgetClasses.addAll(extractAndroidUIs(xmlFileReaders1));
+		widgetClasses.addAll(extractCustomizedUIs(cha, xmlFileReaders2));
+		
 		return widgetClasses;
+	}
+	
+	public static List<Reader> getAllLayoutXMLFromDir(File dir) throws FileNotFoundException {
+		Utils.checkDirExistence(dir.getAbsolutePath());
+		File f = dir;
+		
+		List<Reader> xmlFileReaders = new LinkedList<Reader>();
+		//check whether the dir "res" exists
+		List<File> allFiles = Files.getFileListing(f);
+		String desiredPath = f.getAbsolutePath() + Globals.fileSep + "res" + Globals.fileSep + "layout";
+		for(File file : allFiles) {
+		    if(file.getName().endsWith(".xml") && file.getAbsolutePath().startsWith(desiredPath)) {
+			//System.out.println(file);
+			BufferedReader in = new BufferedReader(new FileReader(file));
+			xmlFileReaders.add(in);
+			}
+		}
+		return xmlFileReaders;
+	}
+	
+	public static Collection<String> extractCustomizedUIs(final ClassHierarchy cha, List<Reader> readers) throws IOException {
+		Collection<String> uis = new LinkedHashSet<String>();
+		for(Reader reader : readers) {
+			String xmlContent = Files.getFileContents(reader);
+			uis.addAll(extractCustomizedUIs(cha, xmlContent));
+		}
+		return uis;
 	}
 	
 	//XXX FIXME not consider short form with included package name, like <MyButton />
@@ -124,6 +118,15 @@ public class AndroidUtils {
 			e.printStackTrace();
 		}
 		return customizedUIs;
+	}
+	
+	public static Collection<String> extractAndroidUIs(List<Reader> readers) throws IOException {
+		Collection<String> uis = new LinkedHashSet<String>();
+		for(Reader reader : readers) {
+			String xmlContent = Files.getFileContents(reader);
+			uis.addAll(extractAndroidUIs(xmlContent));
+		}
+		return uis;
 	}
 	
 	//return the class full name like: a.b.c.d
