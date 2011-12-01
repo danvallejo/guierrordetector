@@ -13,6 +13,8 @@ public class TestApkUtils extends TestCase {
 		String resultDir = ApkUtils.decryptXMFiles(apkFile, extractDir);
 		
 		assertEquals(resultDir, extractDir);
+		
+		ApkUtils.restoreToDefault();
 	}
 
 }
