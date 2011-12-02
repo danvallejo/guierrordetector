@@ -1,4 +1,4 @@
-package edu.washington.cs.detector;
+package edu.washington.cs.detector.guider;
 
 import com.ibm.wala.ipa.callgraph.CGNode;
 

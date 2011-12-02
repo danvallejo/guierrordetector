@@ -8,13 +8,13 @@ import com.ibm.wala.ipa.callgraph.CGNode;
 
 import edu.washington.cs.detector.AnomalyCallChain;
 import edu.washington.cs.detector.CGBuilder;
-import edu.washington.cs.detector.CGTraverseSwingGuider;
 import edu.washington.cs.detector.CallChainFilter;
 import edu.washington.cs.detector.SwingUIMethodEvaluator;
 import edu.washington.cs.detector.UIAnomalyDetector;
 import edu.washington.cs.detector.UIAnomalyMethodFinder;
 import edu.washington.cs.detector.experiments.filters.RemoveNoClientClassStrategy;
 import edu.washington.cs.detector.experiments.filters.RemoveSystemCallStrategy;
+import edu.washington.cs.detector.guider.CGTraverseSwingGuider;
 import edu.washington.cs.detector.util.SwingUtils;
 import edu.washington.cs.detector.util.Utils;
 import junit.framework.TestCase;

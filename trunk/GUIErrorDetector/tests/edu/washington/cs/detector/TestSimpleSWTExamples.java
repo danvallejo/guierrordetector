@@ -2,6 +2,7 @@ package edu.washington.cs.detector;
 
 import java.util.List;
 
+import edu.washington.cs.detector.guider.CGTraverseNoSystemCalls;
 import edu.washington.cs.detector.util.Globals;
 import edu.washington.cs.detector.util.Log;
 

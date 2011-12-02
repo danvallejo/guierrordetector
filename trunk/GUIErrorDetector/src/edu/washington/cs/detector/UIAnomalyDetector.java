@@ -13,6 +13,7 @@ import com.ibm.wala.util.graph.Graph;
 import com.ibm.wala.util.io.FileProvider;
 
 import edu.washington.cs.detector.CGBuilder.CG;
+import edu.washington.cs.detector.guider.CGTraverseGuider;
 import edu.washington.cs.detector.util.Log;
 import edu.washington.cs.detector.util.Utils;
 import edu.washington.cs.detector.util.WALAUtils;

@@ -3,6 +3,9 @@ package edu.washington.cs.detector;
 import com.ibm.wala.ipa.callgraph.CGNode;
 import com.ibm.wala.util.graph.Graph;
 
+import edu.washington.cs.detector.guider.CGTraverseDefaultGuider;
+import edu.washington.cs.detector.guider.CGTraverseGuider;
+
 public abstract class AbstractMethodFinder implements AnomalyFinder {
 	
     public final Graph<CGNode> cg;

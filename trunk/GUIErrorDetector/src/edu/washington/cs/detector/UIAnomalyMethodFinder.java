@@ -13,6 +13,7 @@ import com.ibm.wala.ipa.callgraph.CGNode;
 import com.ibm.wala.ipa.cha.ClassHierarchy;
 import com.ibm.wala.util.graph.Graph;
 
+import edu.washington.cs.detector.guider.CGTraverseGuider;
 import edu.washington.cs.detector.util.Files;
 import edu.washington.cs.detector.util.Log;
 import edu.washington.cs.detector.util.Utils;
