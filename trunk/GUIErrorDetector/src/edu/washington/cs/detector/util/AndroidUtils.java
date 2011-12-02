@@ -225,12 +225,16 @@ public class AndroidUtils {
 	 * Is the class an instance of activity
 	 * */
 	public static boolean isAppActivity(ClassHierarchy cha, IClass c) {
-		String packageName = WALAUtils.getJavaPackageName(c);
-		if(packageName.startsWith("android.")) {
+		String className = WALAUtils.getJavaFullClassName(c);
+		if(isInAndroidLib(className)) {
 			return false;
 		}
 		IClass activity = getActivity(cha);
 		return cha.isAssignableFrom(activity, c);
+	}
+	
+	public static boolean isInAndroidLib(String className) {
+		return className.startsWith("android.") || className.startsWith("com.android.");
 	}
 	
 	private static String ACTIVITY_CLASS = "android.app.Activity";
@@ -397,6 +401,7 @@ public class AndroidUtils {
 		"android.opengl.GLSurfaceView"
 	};
 	
+	
 	/***
 	 * All Android listener classes
 	 * */
@@ -422,10 +427,27 @@ public class AndroidUtils {
 		}
 		return false;
 	}
+	
+
+	public static List<IClass> getAppListenerClasses(ClassHierarchy cha) {
+		List<IClass> appListeners = new LinkedList<IClass>();
+		
+		for(IClass c : cha) {
+			if(isCustomizedListener(cha, WALAUtils.getJavaFullClassName(c))) {
+				appListeners.add(c);
+			}
+		}
+		
+		return appListeners;
+	}
+	
 	public static boolean isCustomizedListener(ClassHierarchy cha, String classFullName) {
 		IClass cL = WALAUtils.lookupClass(cha, classFullName);
 		if(cL == null) {
 			throw new RuntimeException("No class for: " + classFullName);
+		}
+		if(AndroidUtils.isInAndroidLib(classFullName)) {
+			return false;
 		}
 		List<IClass> androidListeners = getAndroidListenerClasses(cha);
 		for(IClass listener : androidListeners) {

@@ -14,6 +14,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 public final class Files {
@@ -64,6 +65,20 @@ public final class Files {
     // The directory is now empty so delete it
     return dir.delete();
   }
+  
+   public static List<File> getFileListing(File aStartingDir, String suffix) throws FileNotFoundException {
+	   if(suffix == null) {
+		   return getFileListing(aStartingDir);
+	   }
+	   List<File> files = getFileListing(aStartingDir);
+	   List<File> retFiles = new LinkedList<File>();
+	   for(File f : files) {
+		   if(f.getName().endsWith(suffix)) {
+			   retFiles.add(f);
+		   }
+	   }
+	   return retFiles;
+   }
   
 	public static List<File> getFileListing(File aStartingDir)
 			throws FileNotFoundException {

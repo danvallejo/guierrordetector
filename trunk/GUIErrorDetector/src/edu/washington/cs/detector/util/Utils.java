@@ -3,6 +3,7 @@ package edu.washington.cs.detector.util;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -79,7 +80,34 @@ public class Utils {
 			}
 		}
 	}
-	//find all jar files
+	
+	//must wrap in a try - catch, since this will be used in a field initializer
+	public static List<String> getClassesRecursive(String dir) {
+		try {
+			List<String> fileNames = new LinkedList<String>();
+			for (File f : Files.getFileListing(new File(dir), ".class")) {
+				fileNames.add(f.getAbsolutePath());
+			}
+			return fileNames;
+		} catch (Throwable e) {
+			throw new Error(e);
+		}
+	}
+	
+	//find all class files
+	public static List<String> getJars(String dir, boolean recursive) throws FileNotFoundException {
+		if(!recursive) {
+			return getJars(dir);
+		} else {
+			List<String> fileNames = new LinkedList<String>();
+			for(File f : Files.getFileListing(new File(dir), ".jar") ) {
+				fileNames.add(f.getAbsolutePath());
+			}
+			return fileNames;
+		}
+	}
+	
+	//find all jar files, not this is not recursive
 	public static List<String> getJars(String dir) {
 		List<String> files = Files.findFilesInDir(dir, null, ".jar");
 		List<String> fullPaths = new LinkedList<String>();
@@ -148,6 +176,19 @@ public class Utils {
 		return classList;
 	}
 	
+	public static String concatenate(Iterable<String> strs, String sep) {
+		StringBuilder sb = new StringBuilder();
+		int count = 0;
+		for(String str : strs) {
+			if(count != 0) {
+				sb.append(sep);
+			}
+			sb.append(str);
+			count++;
+		}
+		return sb.toString();
+	}
+	
 	public static String concatenate(String[] strs, String sep) {
 		StringBuilder sb = new StringBuilder();
 		int count = 0;
@@ -193,6 +234,13 @@ public class Utils {
 		}
 		return collection;
  	}
+	
+	public static <T> void removeRedundant(Collection<T> coll) {
+		Set<T> set = new LinkedHashSet<T>();
+		set.addAll(coll);
+		coll.clear();
+		coll.addAll(set);
+	}
 	
 	//check if every element of its is included in all
 	public static <T> boolean includedIn(Iterable<T> its, Iterable<T> all) {

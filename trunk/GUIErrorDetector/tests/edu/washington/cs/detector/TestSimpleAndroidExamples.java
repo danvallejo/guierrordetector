@@ -1,5 +1,6 @@
 package edu.washington.cs.detector;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -26,9 +27,12 @@ import junit.framework.TestCase;
 public class TestSimpleAndroidExamples extends TestCase {
 	
 	public String appPath =
-		"D:\\research\\guierror\\eclipsews\\TestAndroid\\bin\\classes\\test\\android"
+		//"D:\\research\\guierror\\eclipsews\\TestAndroid\\bin\\classes\\"
+		Utils.concatenate(Utils.getClassesRecursive("D:\\research\\guierror\\eclipsews\\TestAndroid\\bin"), Globals.pathSep) 
 		+ Globals.pathSep +
 		"D:\\research\\guierror\\eclipsews\\GUIErrorDetector\\exp-subjects\\original-android.jar";
+	
+	public String dirPath = "D:\\research\\guierror\\eclipsews\\TestAndroid";
 	
 	public void testAndroidApp() throws IOException, ClassHierarchyException {
 		CGBuilder builder = new CGBuilder(appPath,UIAnomalyDetector.EXCLUSION_FILE_SWING);
@@ -37,19 +41,32 @@ public class TestSimpleAndroidExamples extends TestCase {
 	    //find all UI classes
 	    ClassHierarchy cha = builder.getClassHierarchy();
 	    List<String> uiClasses = new LinkedList<String>();
+	    
+	    Collection<IClass> activities = AndroidUtils.getAppActivityClasses(cha);
+	    for(IClass activity : activities) {
+	    	uiClasses.add(WALAUtils.getJavaFullClassName(activity));
+	    	System.out.println("activity class: " + activity);
+	    }
+	    
 	    for(IClass c : cha) {
-	    	if(c.toString().indexOf("test/android/TestAndroidActivity") != -1) {
-	    		uiClasses.add(WALAUtils.getJavaFullClassName(c));
+	    	String fullClassName = WALAUtils.getJavaFullClassName(c);
+	    	if(AndroidUtils.isInAndroidLib(fullClassName)) {
+	    		continue;
+	    	}
+	    	if(AndroidUtils.isCustomizedListener(cha, fullClassName)) {
+	    	    uiClasses.add(fullClassName);
+	    	    System.out.println("listener class: " + fullClassName);
 	    	}
 	    }
-	    Iterable<Entrypoint> uiEntries = CGEntryManager.getAllPublicMethods(builder, uiClasses);
 	    
-	    //add other reflectively created class
-	    String path = "D:\\research\\guierror\\eclipsews\\TestAndroid\\res\\layout\\main.xml";
-		String xmlContent = Files.getFileContents(path);
-		Collection<String> declaredClasses  = AndroidUtils.extractAndroidUIs(xmlContent);
+	    Utils.removeRedundant(uiClasses);
+	    
+	    Iterable<Entrypoint> uiEntries = CGEntryManager.getAllPublicMethods(builder, uiClasses);
 		
-		//declaredClasses.add("android.view.ViewRoot");
+		Collection<String> declaredClasses = AndroidUtils.extractAllUIs(cha, new File(dirPath));
+		
+		System.out.println("Number of declared UI: " + declaredClasses.size());
+		System.out.println("     " + declaredClasses);
 		
 	    Iterable<Entrypoint> widgetConstructors = //new LinkedList<Entrypoint>(); 
 	    	CGEntryManager.getConstructors(builder, declaredClasses);
@@ -58,7 +75,7 @@ public class TestSimpleAndroidExamples extends TestCase {
 	    Iterable<Entrypoint> entries = CGEntryManager.mergeEntrypoints(uiEntries, widgetConstructors);
 	    
 		System.out.println("Number of entries for building CG: " + Utils.countIterable(entries));
-		builder.setCGType(CG.ZeroCFA);
+		builder.setCGType(CG.RTA);
 		builder.buildCG(entries);
 		
 		System.out.println("number of entry node in the built CG: " + builder.getCallGraph().getEntrypointNodes().size());
