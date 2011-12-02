@@ -16,6 +16,8 @@ import com.ibm.wala.util.graph.Graph;
 
 import edu.washington.cs.detector.CGBuilder.CG;
 import edu.washington.cs.detector.experiments.filters.RemoveSubsumedChainStrategy;
+import edu.washington.cs.detector.guider.CGTraverseNoSystemCalls;
+import edu.washington.cs.detector.guider.CGTraverseOnlyClientRunnableStrategy;
 import edu.washington.cs.detector.util.AndroidUtils;
 import edu.washington.cs.detector.util.Files;
 import edu.washington.cs.detector.util.Globals;

@@ -12,6 +12,8 @@ import com.ibm.wala.classLoader.IMethod;
 import com.ibm.wala.ipa.callgraph.CGNode;
 import com.ibm.wala.util.graph.Graph;
 
+import edu.washington.cs.detector.guider.CGTraverseDefaultGuider;
+import edu.washington.cs.detector.guider.CGTraverseGuider;
 import edu.washington.cs.detector.util.Log;
 
 public class ThreadStartFinder {
