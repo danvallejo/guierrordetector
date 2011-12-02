@@ -1,5 +1,6 @@
 package edu.washington.cs.detector.experiments;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -24,29 +25,48 @@ import edu.washington.cs.detector.util.AndroidUtils;
 import edu.washington.cs.detector.util.Files;
 import edu.washington.cs.detector.util.Log;
 import edu.washington.cs.detector.util.Utils;
+import edu.washington.cs.detector.util.WALAUtils;
 import junit.framework.TestCase;
 
-public class AbstractAndroidTest extends TestCase {
+public abstract class AbstractAndroidTest extends TestCase {
 	
-	protected void checkCallChainNumber(int num, String appPath, String xmlPath, String[] extraClasses)
-	    throws IOException, ClassHierarchyException {
-		
-		CGBuilder builder = new CGBuilder(appPath,UIAnomalyDetector.EXCLUSION_FILE_SWING);
+	abstract protected String getAppPath();
+	
+	abstract protected String getDirPath();
+	
+	public void testAndroidApp() throws IOException, ClassHierarchyException {
+		CGBuilder builder = new CGBuilder(getAppPath(),UIAnomalyDetector.EXCLUSION_FILE_SWING);
 	    builder.makeScopeAndClassHierarchy();
 	    
 	    //find all UI classes
+	    ClassHierarchy cha = builder.getClassHierarchy();
 	    List<String> uiClasses = new LinkedList<String>();
 	    
-	    for(String extracClass : extraClasses) {
-	    	uiClasses.add(extracClass);
+	    Collection<IClass> activities = AndroidUtils.getAppActivityClasses(cha);
+	    for(IClass activity : activities) {
+	    	uiClasses.add(WALAUtils.getJavaFullClassName(activity));
+	    	System.out.println("activity class: " + activity);
 	    }
 	    
-	    Iterable<Entrypoint> uiEntries = CGEntryManager.getAllPublicMethods(builder, uiClasses);
+	    for(IClass c : cha) {
+	    	String fullClassName = WALAUtils.getJavaFullClassName(c);
+	    	if(AndroidUtils.isInAndroidLib(fullClassName)) {
+	    		continue;
+	    	}
+	    	if(AndroidUtils.isCustomizedListener(cha, fullClassName)) {
+	    	    uiClasses.add(fullClassName);
+	    	    System.out.println("listener class: " + fullClassName);
+	    	}
+	    }
 	    
-		String xmlContent = Files.getFileContents(xmlPath);
-		Collection<String> declaredClasses  = AndroidUtils.extractAndroidUIs(xmlContent);
+	    Utils.removeRedundant(uiClasses);
+	    
+	    Iterable<Entrypoint> uiEntries = CGEntryManager.getAllPublicMethods(builder, uiClasses);
 		
-		//declaredClasses.add("android.view.ViewRoot");
+		Collection<String> declaredClasses = AndroidUtils.extractAllUIs(cha, new File(getDirPath()));
+		
+		System.out.println("Number of declared UI: " + declaredClasses.size());
+		System.out.println("     " + declaredClasses);
 		
 	    Iterable<Entrypoint> widgetConstructors = //new LinkedList<Entrypoint>(); 
 	    	CGEntryManager.getConstructors(builder, declaredClasses);
@@ -67,7 +87,7 @@ public class AbstractAndroidTest extends TestCase {
 //		WALAUtils.logCallGraph(graph);
 		
 		//set up the anomaly detection
-		UIAnomalyDetector detector = new UIAnomalyDetector(appPath);
+		UIAnomalyDetector detector = new UIAnomalyDetector(getAppPath());
 		detector.configureCheckingMethods("./tests/edu/washington/cs/detector/checkingmethods_for_android.txt");
 		detector.setThreadStartGuider(new CGTraverseNoSystemCalls());
 		detector.setUIAnomalyGuider(new CGTraverseOnlyClientRunnableStrategy());
