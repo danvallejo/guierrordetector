@@ -211,6 +211,43 @@ public class AndroidUtils {
 		return widgetSet;
 	}
 	
+	public static Collection<IClass> getAppActivityClasses(ClassHierarchy cha) {
+		Collection<IClass> colls = new LinkedHashSet<IClass>();
+		for(IClass c : cha) {
+			if(isAppActivity(cha, c)) {
+				colls.add(c);
+			}
+		}
+		return colls;
+	}
+	
+	/**
+	 * Is the class an instance of activity
+	 * */
+	public static boolean isAppActivity(ClassHierarchy cha, IClass c) {
+		String packageName = WALAUtils.getJavaPackageName(c);
+		if(packageName.startsWith("android.")) {
+			return false;
+		}
+		IClass activity = getActivity(cha);
+		return cha.isAssignableFrom(activity, c);
+	}
+	
+	private static String ACTIVITY_CLASS = "android.app.Activity";
+	
+	private static IClass ACTIVITY = null;
+	
+	public static IClass getActivity(ClassHierarchy cha) {
+		if(ACTIVITY != null) {
+			return ACTIVITY;
+		}
+		ACTIVITY = WALAUtils.lookupClass(cha, ACTIVITY_CLASS);
+		if(ACTIVITY == null) {
+			throw new RuntimeException("Can not load: " + ACTIVITY_CLASS);
+		}
+		return ACTIVITY;
+	}
+	
 	private static String WIDGET_PACKAGE = "android.widget";
 	
 	private static IClass VIEW = null;
