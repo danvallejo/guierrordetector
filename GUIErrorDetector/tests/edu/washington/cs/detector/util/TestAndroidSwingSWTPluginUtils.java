@@ -43,6 +43,18 @@ public class TestAndroidSwingSWTPluginUtils extends TestCase {
 		assertEquals(63, num);
 	}
 	
+	public void testFindAppActivity() throws IOException, ClassHierarchyException {
+		String appPath = "D:\\research\\guierror\\eclipsews\\TestAndroid\\bin\\classes\\test\\android"
+			+ Globals.pathSep +
+			"D:\\Java\\android-sdk-windows\\platforms\\android-8\\android.jar";
+		CGBuilder builder = new CGBuilder(appPath);
+		builder.makeScopeAndClassHierarchy();
+		
+		Collection<IClass> colls = AndroidUtils.getAppActivityClasses(builder.getClassHierarchy());
+		System.out.println(colls);
+		assertEquals(1, colls.size());
+	}
+	
 	public void testLoadAllListener() throws IOException, ClassHierarchyException {
 		String appPath = "D:\\research\\guierror\\eclipsews\\TestAndroid\\bin\\classes\\test\\android"
 			+ Globals.pathSep +
