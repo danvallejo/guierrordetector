@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.ibm.wala.classLoader.IClass;
+import com.ibm.wala.core.tests.callGraph.CallGraphTestUtil;
 import com.ibm.wala.ipa.callgraph.Entrypoint;
 import com.ibm.wala.ipa.cha.ClassHierarchy;
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
@@ -37,7 +38,7 @@ public abstract class AbstractAndroidTest extends TestCase {
 	
 	public void findErrorsInAndroidApp(CG type, CGTraverseGuider ui2startGuider, CGTraverseGuider start2checkGuider)
 	    throws IOException, ClassHierarchyException {
-		CGBuilder builder = new CGBuilder(getAppPath(),UIAnomalyDetector.EXCLUSION_FILE_SWING);
+		CGBuilder builder = new CGBuilder(getAppPath(),CallGraphTestUtil.REGRESSION_EXCLUSIONS);
 	    builder.makeScopeAndClassHierarchy();
 	    
 	    //find all UI classes
