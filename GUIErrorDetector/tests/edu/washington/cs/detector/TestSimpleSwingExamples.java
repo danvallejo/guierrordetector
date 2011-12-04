@@ -1,7 +1,8 @@
 package edu.washington.cs.detector;
 
 import java.io.IOException;
-import edu.washington.cs.detector.experiments.AbstractSwingTest;
+
+import edu.washington.cs.detector.experiments.swing.AbstractSwingTest;
 import edu.washington.cs.detector.util.Log;
 
 import junit.framework.Test;

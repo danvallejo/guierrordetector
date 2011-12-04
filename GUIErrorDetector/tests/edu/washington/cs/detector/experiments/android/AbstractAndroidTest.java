@@ -1,4 +1,4 @@
-package edu.washington.cs.detector.experiments;
+package edu.washington.cs.detector.experiments.android;
 
 import java.io.File;
 import java.io.IOException;

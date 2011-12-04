@@ -1,4 +1,4 @@
-package edu.washington.cs.detector.experiments;
+package edu.washington.cs.detector.experiments.swt;
 
 import java.io.IOException;
 import java.util.List;
@@ -9,28 +9,25 @@ import edu.washington.cs.detector.CallChainFilter;
 import edu.washington.cs.detector.TestCommons;
 import edu.washington.cs.detector.UIAnomalyDetector;
 import edu.washington.cs.detector.CGBuilder.CG;
+import edu.washington.cs.detector.experiments.filters.MergeSameTailStrategy;
 import edu.washington.cs.detector.experiments.filters.RemoveSystemCallStrategy;
 import edu.washington.cs.detector.util.Globals;
 import edu.washington.cs.detector.util.Utils;
 import edu.washington.cs.detector.util.WALAUtils;
 import junit.framework.TestCase;
 
-public class TestJavaNativeCompiler extends TestCase {
+public class TestVirgoFtp extends TestCase {
 	
-	/**
-	 * Get a false positive:
-	 * Application, Lorg/eclipse/swt/widgets/Display, getDefault()
-	 * This method may access incorrect thread, however, it is highly unlikely. since
-	 * the display will be initialized as soon as the GUI pops up.
-	 * */
-	public String appPath = "D:\\research\\guierror\\subjects\\javanativecompiler.jar";
+	//it generates 3 false positive:, all on methods:
+	//AbstractFileTransferThread#prepareForTransfer:
+	// ftp = ttt.ftpEngine.clones(new LoggerHandle(null,taskLog));
 	
-	public String libJar =
-		"D:\\research\\guierror\\eclipsews\\JavaNativeCompiler\\win\\swt.jar" +
-		Globals.pathSep + "D:\\research\\guierror\\eclipsews\\JavaNativeCompiler\\data.jar" +
-		Globals.pathSep + "D:\\research\\guierror\\eclipsews\\JavaNativeCompiler\\bcel-5.2.jar";
+    public String appPath = "D:\\research\\guierror\\subjects\\virgoftp-1.3.5.jar";
 	
-	public void testRunningJavaNativeCompiler() throws IOException {
+	public String libJar = "D:\\research\\guierror\\eclipsews\\virgoftp-1.3.5\\swt.jar" +
+	    Globals.pathSep + "D:\\research\\guierror\\eclipsews\\virgoftp-1.3.5\\xerces.jar";
+	
+	public void testRunVirgoFtp() throws IOException {
 		String path = appPath + Globals.pathSep + libJar;
         UIAnomalyDetector detector = new UIAnomalyDetector(path);
 		
@@ -49,7 +46,11 @@ public class TestJavaNativeCompiler extends TestCase {
 		chains = filter.apply(new RemoveSystemCallStrategy());
 		System.out.println("No of chains after filtering system classes: " + chains.size());
 		
-		Utils.dumpAnomalyCallChains(chains, "./logs/javanativecompiler-anomalies.txt");
+		filter = new CallChainFilter(chains);
+		chains = filter.apply(new MergeSameTailStrategy());
+		System.out.println("No of chains after removing common tails: " + chains.size());
+		
+		Utils.dumpAnomalyCallChains(chains, "./logs/virgo-ftp-anomalies.txt");
+		
 	}
-	
 }

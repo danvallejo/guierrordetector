@@ -1,4 +1,4 @@
-package edu.washington.cs.detector.experiments;
+package edu.washington.cs.detector.experiments.eclipseplugin;
 
 import java.io.IOException;
 import java.util.Collection;

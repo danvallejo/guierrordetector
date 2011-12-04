@@ -1,6 +1,7 @@
-package edu.washington.cs.detector.experiments;
+package edu.washington.cs.detector.experiments.android;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Collection;
@@ -9,6 +10,7 @@ import java.util.List;
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
 
 import edu.washington.cs.detector.CGBuilder.CG;
+import edu.washington.cs.detector.guider.CGTraverseAndroidGuider;
 import edu.washington.cs.detector.guider.CGTraverseGuider;
 import edu.washington.cs.detector.guider.CGTraverseNoSystemCalls;
 import edu.washington.cs.detector.guider.CGTraverseOnlyClientRunnableStrategy;
@@ -16,13 +18,13 @@ import edu.washington.cs.detector.util.AndroidUtils;
 import edu.washington.cs.detector.util.ApkUtils;
 import edu.washington.cs.detector.util.Globals;
 
-public class TestK9MailAndroid extends AbstractAndroidTest {
+public class TestBarcodeScannerAndroid extends AbstractAndroidTest {
 
 	@Override
 	protected String getAppPath() {
-		String appPath = "D:\\research\\guierror\\subjects\\android-programs\\extracted\\k9-3.992-release.apk\\com"
-			+ Globals.pathSep + 
-			"D:\\research\\guierror\\subjects\\android-programs\\extracted\\k9-3.992-release.apk\\org"
+		String appPath = "D:\\research\\guierror\\subjects\\android-programs\\extracted\\zxingcore.jar"
+			+ Globals.pathSep +
+			"D:\\research\\guierror\\subjects\\android-programs\\extracted\\zxingandroid.jar"
 			+ Globals.pathSep +
 			"D:\\research\\guierror\\eclipsews\\GUIErrorDetector\\exp-subjects\\original-android.jar";
 		
@@ -31,7 +33,7 @@ public class TestK9MailAndroid extends AbstractAndroidTest {
 
 	@Override
 	protected String getDirPath() {
-		return "D:\\research\\guierror\\subjects\\android-programs\\extracted\\k9-3.992-release.apk";
+		return "D:\\research\\guierror\\subjects\\android-programs\\extracted\\BarcodeScanner3.72.apk";
 	}
 	
 	public void testFindErrors() throws ClassHierarchyException, IOException {
@@ -47,8 +49,8 @@ public class TestK9MailAndroid extends AbstractAndroidTest {
 	public void testUnzip() throws IOException {
         ApkUtils.setApkToolDir("D:\\develop-tools\\apktool");
 		
-		String apkFile = "D:\\research\\guierror\\subjects\\android-programs\\k9-3.992-release.apk";
-		String extractDir = "D:\\research\\guierror\\subjects\\android-programs\\extracted\\k9-3.992-release.apk";
+		String apkFile = "D:\\research\\guierror\\subjects\\android-programs\\BarcodeScanner3.72.apk";
+		String extractDir = "D:\\research\\guierror\\subjects\\android-programs\\extracted\\BarcodeScanner3.72.apk";
 		
 		String resultDir = ApkUtils.decryptXMFiles(apkFile, extractDir);
 		assertEquals(resultDir, extractDir);
