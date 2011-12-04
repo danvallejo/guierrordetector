@@ -1,4 +1,4 @@
-package edu.washington.cs.detector.experiments;
+package edu.washington.cs.detector.experiments.swt;
 
 import java.io.IOException;
 import java.util.List;
