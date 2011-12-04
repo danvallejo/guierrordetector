@@ -200,4 +200,16 @@ public class TestAndroidSwingSWTPluginUtils extends TestCase {
 			System.out.println(m);
 		}
 	}
+	
+	public void testAllAndroid_2_2_Classes() throws IOException, ClassHierarchyException {
+		String appPath = "D:\\research\\guierror\\eclipsews\\GUIErrorDetector\\exp-subjects\\original-android.jar";
+		CGBuilder builder = new CGBuilder(appPath, UIAnomalyDetector.EXCLUSION_FILE_SWING);
+		builder.makeScopeAndClassHierarchy();
+		StringBuilder sb = new StringBuilder();
+		for(IClass c : builder.getClassHierarchy()) {
+			sb.append(WALAUtils.getJavaFullClassName(c));
+			sb.append(Globals.lineSep);
+		}
+		Files.writeToFile(sb.toString(), "./tests/edu/washington/cs/detector/util/androidclasses.txt");
+	}
 }
