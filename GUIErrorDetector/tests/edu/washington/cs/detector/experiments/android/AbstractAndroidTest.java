@@ -1,7 +1,9 @@
 package edu.washington.cs.detector.experiments.android;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.Reader;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -24,6 +26,7 @@ import edu.washington.cs.detector.guider.CGTraverseGuider;
 import edu.washington.cs.detector.guider.CGTraverseNoSystemCalls;
 import edu.washington.cs.detector.guider.CGTraverseOnlyClientRunnableStrategy;
 import edu.washington.cs.detector.util.AndroidUtils;
+import edu.washington.cs.detector.util.ApkUtils;
 import edu.washington.cs.detector.util.Files;
 import edu.washington.cs.detector.util.Log;
 import edu.washington.cs.detector.util.Utils;
@@ -111,4 +114,17 @@ public abstract class AbstractAndroidTest extends TestCase {
 		UIAnomalyDetector.DEBUG = false;
 	}
 
+	public void decryptXML(String apkToolDir, String apkFile, String extractDir) throws IOException {
+        ApkUtils.setApkToolDir(apkToolDir);
+        
+		String resultDir = ApkUtils.decryptXMFiles(apkFile, extractDir);
+		assertEquals(resultDir, extractDir);
+		
+		List<Reader> readers = AndroidUtils.getAllLayoutXMLFromDir(new File(extractDir));
+		Collection<String> uis = AndroidUtils.extractAndroidUIs(readers);
+		
+		System.out.println(uis);
+		
+		ApkUtils.restoreToDefault();
+	}
 }

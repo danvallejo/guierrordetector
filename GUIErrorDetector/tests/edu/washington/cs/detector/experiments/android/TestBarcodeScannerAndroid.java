@@ -47,20 +47,10 @@ public class TestBarcodeScannerAndroid extends AbstractAndroidTest {
 	}
 	
 	public void testUnzip() throws IOException {
-        ApkUtils.setApkToolDir("D:\\develop-tools\\apktool");
-		
+		String apkToolDir = "D:\\develop-tools\\apktool";
 		String apkFile = "D:\\research\\guierror\\subjects\\android-programs\\BarcodeScanner3.72.apk";
 		String extractDir = "D:\\research\\guierror\\subjects\\android-programs\\extracted\\BarcodeScanner3.72.apk";
-		
-		String resultDir = ApkUtils.decryptXMFiles(apkFile, extractDir);
-		assertEquals(resultDir, extractDir);
-		
-		List<Reader> readers = AndroidUtils.getAllLayoutXMLFromDir(new File(extractDir));
-		Collection<String> uis = AndroidUtils.extractAndroidUIs(readers);
-		
-		System.out.println(uis);
-		
-		ApkUtils.restoreToDefault();
+		super.decryptXML(apkToolDir, apkFile, extractDir);
 	}
 
 }
