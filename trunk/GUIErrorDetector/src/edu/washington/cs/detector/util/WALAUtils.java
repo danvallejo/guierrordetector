@@ -226,4 +226,32 @@ public class WALAUtils {
 	    	}
 	    	return sb.toString();
 	    }
+	    
+	    /**
+	     * check if a given class is a Runnable
+	     * */
+	    private static IClass RUNNABLE = null;
+	    public static IClass getRunnable(ClassHierarchy cha) {
+	    	if(RUNNABLE == null) {
+	    		RUNNABLE = WALAUtils.lookupClass(cha, "java.lang.Runnable");
+	    	}
+	    	if(RUNNABLE == null) {
+	    		throw new Error("No runnable loaded.");
+	    	}
+	    	return RUNNABLE;
+	    }
+	    public static boolean isRunnable(ClassHierarchy cha, IClass c) {
+	    	IClass runnable = getRunnable(cha);
+	    	return cha.isAssignableFrom(runnable, c);
+	    }
+	    public static Collection<IClass> getRunnablesInApp(ClassHierarchy cha) {
+	    	Collection<IClass> cs = new LinkedHashSet<IClass>();
+	    	//only count client code
+	    	for(IClass c : cha) {
+	    		if(c.getClassLoader().getReference().equals(ClassLoaderReference.Application)) {
+	    			cs.add(c);
+	    		}
+	    	}
+	    	return cs;
+	    }
 }
