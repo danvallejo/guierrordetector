@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -44,8 +45,31 @@ public abstract class AbstractAndroidTest extends TestCase {
 		CGBuilder builder = new CGBuilder(getAppPath(),CallGraphTestUtil.REGRESSION_EXCLUSIONS);
 	    builder.makeScopeAndClassHierarchy();
 	    
-	    //find all UI classes
 	    ClassHierarchy cha = builder.getClassHierarchy();
+
+		Log.logConfig("./log.txt");
+	    
+	    Collection<IClass> runnableInApp = WALAUtils.getRunnablesInApp(cha);
+	    Collection<IClass> runnableInClient = new LinkedHashSet<IClass>();
+	    List<String> allAndroidClasses = Files.readWhole("./tests/edu/washington/cs/detector/util/androidclasses.txt");
+	    for(IClass c : runnableInApp) {
+	    	String fullNameC = WALAUtils.getJavaFullClassName(c);
+	    	if(allAndroidClasses.contains(fullNameC)) {
+	    		continue;
+	    	}
+	    	runnableInClient.add(c);
+	    }
+	    
+	    System.out.println("Number of runnable in App: " + runnableInApp.size());
+	    System.out.println(runnableInApp);
+	    System.out.println();
+	    
+	    Log.logln("Number of runnable loaded in app: " + runnableInApp.size());
+	    Log.logln("Number of runnable in client code: " + runnableInClient.size());
+	    for(IClass c : runnableInClient) {
+	    	Log.logln("   " + c.toString());
+	    }
+	    
 	    List<String> uiClasses = new LinkedList<String>();
 	    //get all activity classes
 	    Collection<IClass> activities = AndroidUtils.getAppActivityClasses(cha);
@@ -88,7 +112,6 @@ public abstract class AbstractAndroidTest extends TestCase {
 		System.out.println("CG node num: " + builder.getCallGraph().getNumberOfNodes());
 		System.out.println("App CG node num: " + builder.getAppCallGraph().getNumberOfNodes());
 		
-		Log.logConfig("./log.txt");
 		
 		//set up the anomaly detection
 		UIAnomalyDetector detector = new UIAnomalyDetector(getAppPath());
