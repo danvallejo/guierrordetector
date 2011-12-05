@@ -2,13 +2,19 @@ package edu.washington.cs.detector.guider;
 
 import com.ibm.wala.ipa.callgraph.CGNode;
 
-public class CGTraverseAndroidSafeMethodGuider implements CGTraverseGuider {
+import edu.washington.cs.detector.util.Utils;
 
-	private String runOnUIThread = "android.app.Activity.runOnUiThread(Ljava/lang/Runnable;)V";
+public class CGTraverseAndroidSafeMethodGuider implements CGTraverseGuider {
+	
+	String[] safeMethods = new String[] {
+			"android.app.Activity.runOnUiThread(Ljava/lang/Runnable;)V",
+			"android.widget.ProgressBar.refreshProgress(IIZ)V",
+		};
 	
 	@Override
 	public boolean traverse(CGNode src, CGNode dest) {
-		if(dest.getMethod().getSignature().equals(runOnUIThread)) {
+		String destSig = dest.getMethod().getSignature();
+		if(Utils.includedIn(destSig, safeMethods)) {
 			return false;
 		}
 		return true;
