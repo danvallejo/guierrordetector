@@ -209,6 +209,14 @@ public class TestAndroidSwingSWTPluginUtils extends TestCase {
 		for(IClass c : builder.getClassHierarchy()) {
 			sb.append(WALAUtils.getJavaFullClassName(c));
 			sb.append(Globals.lineSep);
+//			if(c.toString().indexOf("ProgressBar")!=-1) {
+//				for(IMethod m : c.getDeclaredMethods()) {
+//					String sig = m.getSignature();
+//					if(sig.indexOf("refresh") != -1) {
+//						System.out.println(sig);
+//					}
+//				}
+//			}
 		}
 		Files.writeToFile(sb.toString(), "./tests/edu/washington/cs/detector/util/androidclasses.txt");
 	}

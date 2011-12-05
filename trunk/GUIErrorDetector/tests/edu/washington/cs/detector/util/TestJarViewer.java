@@ -32,4 +32,15 @@ public class TestJarViewer extends TestCase {
 		}
 		Files.writeToFile(sb.toString(), "original-android-jar-diff.txt");
 	}
+	
+	public void testAndroidJarWithSrc() throws ZipException, IOException {
+		File jar1 = new File("D:\\research\\guierror\\eclipsews\\GUIErrorDetector\\exp-subjects\\original-android-src.jar");
+		File jar2 = new File("D:\\research\\guierror\\eclipsews\\GUIErrorDetector\\exp-subjects\\original-android.jar");
+		
+		Collection<String> jar1Content = JarViewer.getContentsAsStr(jar1);
+		Collection<String> jar2Content = JarViewer.getContentsAsStr(jar2);
+		
+		System.out.println("Jar1 content: " + jar1Content.size());
+		System.out.println("Jar2 content: " + jar2Content.size());
+	}
 }
