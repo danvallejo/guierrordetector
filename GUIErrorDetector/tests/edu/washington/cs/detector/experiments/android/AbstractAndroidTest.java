@@ -40,7 +40,7 @@ public abstract class AbstractAndroidTest extends TestCase {
 	
 	abstract protected String getDirPath();
 	
-	public void findErrorsInAndroidApp(CG type, CGTraverseGuider ui2startGuider, CGTraverseGuider start2checkGuider)
+	public List<AnomalyCallChain> findErrorsInAndroidApp(CG type, CGTraverseGuider ui2startGuider, CGTraverseGuider start2checkGuider)
 	    throws IOException, ClassHierarchyException {
 		CGBuilder builder = new CGBuilder(getAppPath(),CallGraphTestUtil.REGRESSION_EXCLUSIONS);
 	    builder.makeScopeAndClassHierarchy();
@@ -128,13 +128,12 @@ public abstract class AbstractAndroidTest extends TestCase {
 		chains = CallChainFilter.filter(chains, new RemoveSubsumedChainStrategy());
 		System.out.println("Number of chains after removing subsumption: " + chains.size());
 		
-		for(AnomalyCallChain c : chains) {
-			System.out.println(c.getFullCallChainAsString());
-		}
 		
 		//set it back
 		UIAnomalyMethodFinder.setCheckingMethods("./src/checking_methods.txt");
 		UIAnomalyDetector.DEBUG = false;
+		
+		return chains;
 	}
 
 	public void decryptXML(String apkToolDir, String apkFile, String extractDir) throws IOException {
