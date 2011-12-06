@@ -9,8 +9,14 @@ import java.util.List;
 
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
 
+import edu.washington.cs.detector.AnomalyCallChain;
 import edu.washington.cs.detector.CGBuilder.CG;
+import edu.washington.cs.detector.CallChainFilter;
+import edu.washington.cs.detector.experiments.filters.RemoveContainingNodeAfterStartStrategy;
+import edu.washington.cs.detector.experiments.filters.RemoveContainingNodeBeforeStartStrategy;
+import edu.washington.cs.detector.experiments.filters.RemoveContainingNodeStrategy;
 import edu.washington.cs.detector.guider.CGTraverseAndroidGuider;
+import edu.washington.cs.detector.guider.CGTraverseAndroidSafeMethodGuider;
 import edu.washington.cs.detector.guider.CGTraverseGuider;
 import edu.washington.cs.detector.guider.CGTraverseNoSystemCalls;
 import edu.washington.cs.detector.guider.CGTraverseOnlyClientRunnableStrategy;
@@ -37,10 +43,20 @@ public class TestBarcodeScannerAndroid extends AbstractAndroidTest {
 	}
 	
 	public void testFindErrors() throws ClassHierarchyException, IOException {
-		CGTraverseGuider ui2startGuider = new CGTraverseNoSystemCalls();
-		CGTraverseGuider start2checkGuider = new CGTraverseOnlyClientRunnableStrategy();
+		CGTraverseGuider ui2startGuider = new CGTraverseAndroidGuider();
+		CGTraverseGuider start2checkGuider = new CGTraverseAndroidSafeMethodGuider();
+//		    new CGTraverseOnlyClientRunnableStrategy();
 		try {
-		super.findErrorsInAndroidApp(CG.RTA, ui2startGuider, start2checkGuider);
+		  List<AnomalyCallChain> chains = super.findErrorsInAndroidApp(CG.RTA, ui2startGuider, start2checkGuider);
+		  int count = 0;
+		  for(AnomalyCallChain chain : chains) {
+			 System.out.println("The " + count++ + "-th call chain:");
+			 System.out.println(chain.getFullCallChainAsString());
+		  }
+		  chains = CallChainFilter.filter(chains, new RemoveContainingNodeStrategy("Lcom/google/zxing/client/android/DecodeThread, run()V"));
+		  chains = CallChainFilter.filter(chains, new RemoveContainingNodeBeforeStartStrategy("Lcom/google/zxing/client/android/book/SearchBookContentsActivity, launchSearch()V"));
+		  
+		  System.out.println("size after removing DecodeThread.run() / SearchBookContentsActivity, launchSearch: " + chains.size());
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}

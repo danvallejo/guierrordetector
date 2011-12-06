@@ -8,7 +8,11 @@ import java.util.List;
 
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
 
+import edu.washington.cs.detector.AnomalyCallChain;
 import edu.washington.cs.detector.CGBuilder.CG;
+import edu.washington.cs.detector.CallChainFilter;
+import edu.washington.cs.detector.experiments.filters.MergeSameEntryToStartPathStrategy;
+import edu.washington.cs.detector.guider.CGTraverseAndroidGuider;
 import edu.washington.cs.detector.guider.CGTraverseGuider;
 import edu.washington.cs.detector.guider.CGTraverseNoSystemCalls;
 import edu.washington.cs.detector.guider.CGTraverseOnlyClientRunnableStrategy;
@@ -35,10 +39,18 @@ public class TestK9MailAndroid extends AbstractAndroidTest {
 	}
 	
 	public void testFindErrors() throws ClassHierarchyException, IOException {
-		CGTraverseGuider ui2startGuider = new CGTraverseNoSystemCalls();
+		CGTraverseGuider ui2startGuider = new CGTraverseAndroidGuider();
 		CGTraverseGuider start2checkGuider = new CGTraverseOnlyClientRunnableStrategy();
 		try {
-		super.findErrorsInAndroidApp(CG.RTA, ui2startGuider, start2checkGuider);
+		    List<AnomalyCallChain> chains = super.findErrorsInAndroidApp(CG.RTA, ui2startGuider, start2checkGuider);
+		    System.out.println("Before merging: " + chains.size());
+		    chains = CallChainFilter.filter(chains, new MergeSameEntryToStartPathStrategy());
+		    System.out.println("After merging: " + chains.size());
+		    int i = 0;
+		    for(AnomalyCallChain c : chains) {
+		    	System.out.println("The " + i++ + "-th chain:");
+			    System.out.println(c.getFullCallChainAsString());
+		    }
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
