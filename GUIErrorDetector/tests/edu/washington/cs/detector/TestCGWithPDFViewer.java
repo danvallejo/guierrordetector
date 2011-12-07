@@ -84,6 +84,16 @@ public class TestCGWithPDFViewer extends TestCase {
 		PDFViewer.viewCG("imprecisecg.pdf", builder.getAppCallGraph());
 	}
 	
+	public void testCallNativeMethod() throws IOException {
+		String appPath =  TestCommons.testfolder + "nativemethod";
+		CGBuilder builder = new CGBuilder(appPath, FileProvider.getFile(CallGraphTestUtil.REGRESSION_EXCLUSIONS));
+		builder.setCGType(CG.ZeroCFA);
+		builder.buildCG();
+		
+		assertEquals(5, builder.getAppCallGraph().getNumberOfNodes());
+		PDFViewer.viewCG("nativecall.pdf", builder.getAppCallGraph());
+	}
+	
 	public void testImpactOfControlFlow() throws IOException {
 		String appPath =  TestCommons.testfolder + "controlflow";
 		CGBuilder builder = new CGBuilder(appPath, FileProvider.getFile(CallGraphTestUtil.REGRESSION_EXCLUSIONS));
