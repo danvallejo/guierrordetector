@@ -27,7 +27,7 @@ public class RemoveSubsumedChainStrategy extends FilterStrategy {
 					shouldRemoveList.add(c); 
 				}
 				//the new one subsume an existing one
-				if(chainStr.indexOf(existStr) != -1) {
+				if(chainStr.indexOf(existStr) != -1 && !chainStr.equals(existStr)) {
 					shouldAdd = false;
 				}
 			}
@@ -44,6 +44,7 @@ public class RemoveSubsumedChainStrategy extends FilterStrategy {
 			if(!shouldAdd && !shouldRemoveList.isEmpty()) {
 				throw new RuntimeException("Impossible that a longer chain exists, " +
 						"but still need to remove chain been subsumed by the new chain.");
+				
 			}
 			
 		}
