@@ -10,10 +10,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.ibm.wala.classLoader.IClass;
+import com.ibm.wala.classLoader.IMethod;
+import com.ibm.wala.classLoader.ShrikeCTMethod;
 import com.ibm.wala.core.tests.callGraph.CallGraphTestUtil;
 import com.ibm.wala.ipa.callgraph.Entrypoint;
 import com.ibm.wala.ipa.cha.ClassHierarchy;
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
+import com.ibm.wala.shrikeCT.InvalidClassFileException;
 
 import edu.washington.cs.detector.AnomalyCallChain;
 import edu.washington.cs.detector.CGBuilder;
@@ -44,7 +47,6 @@ public abstract class AbstractAndroidTest extends TestCase {
 	    throws IOException, ClassHierarchyException {
 		CGBuilder builder = new CGBuilder(getAppPath(),CallGraphTestUtil.REGRESSION_EXCLUSIONS);
 	    builder.makeScopeAndClassHierarchy();
-	    
 	    ClassHierarchy cha = builder.getClassHierarchy();
 
 		Log.logConfig("./log.txt");
@@ -60,21 +62,36 @@ public abstract class AbstractAndroidTest extends TestCase {
 	    	runnableInClient.add(c);
 	    }
 	    
-	    System.out.println("Number of runnable in App: " + runnableInApp.size());
-	    System.out.println(runnableInApp);
-	    System.out.println();
-	    
 	    Log.logln("Number of runnable loaded in app: " + runnableInApp.size());
 	    Log.logln("Number of runnable in client code: " + runnableInClient.size());
-	    for(IClass c : runnableInClient) {
-	    	Log.logln("   " + c.toString());
+	    for(IClass runnableC : runnableInClient) {
+	    	Log.logln("   runnable in client: " + runnableC.toString());
 	    }
 	    
-	    List<String> uiClasses = new LinkedList<String>();
+//	    for(IClass c : runnableInClient) {
+//	    	Log.logln("   " + c.toString());
+//	    	for(IMethod m : c.getDeclaredMethods()) {
+//	    		Log.logln("   - " + m + ", type: " + m.getClass());
+//	    		if(m instanceof ShrikeCTMethod) {
+//	    			try {
+//						Log.logln("    -  call sites: " + ((ShrikeCTMethod)m).getCallSites());
+//					} catch (InvalidClassFileException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					}
+//	    		}
+//	    	}
+//	    }
+	    
+	    List<String> entryClasses = new LinkedList<String>();
+	    
+	    List<String> activityClasses = new LinkedList<String>();
 	    //get all activity classes
 	    Collection<IClass> activities = AndroidUtils.getAppActivityClasses(cha);
 	    for(IClass activity : activities) {
-	    	uiClasses.add(WALAUtils.getJavaFullClassName(activity));
+	    	entryClasses.add(WALAUtils.getJavaFullClassName(activity));
+	    	activityClasses.add(WALAUtils.getJavaFullClassName(activity));
+	    	Log.logln("Activity class: " + activity);
 	    	System.out.println("activity class: " + activity);
 	    }
 	    //get all listener classess
@@ -84,13 +101,20 @@ public abstract class AbstractAndroidTest extends TestCase {
 	    		continue;
 	    	}
 	    	if(AndroidUtils.isCustomizedListener(cha, fullClassName)) {
-	    	    uiClasses.add(fullClassName);
+	    	    entryClasses.add(fullClassName);
+	    	    Log.logln("Listener class: " + fullClassName);
 	    	    System.out.println("listener class: " + fullClassName);
 	    	}
 	    }
 	    //remove all redundance
-	    Utils.removeRedundant(uiClasses);
-	    Iterable<Entrypoint> uiEntries = CGEntryManager.getAllPublicMethods(builder, uiClasses);
+	    Utils.removeRedundant(activityClasses);
+	    Utils.removeRedundant(entryClasses);
+	    //the entryPoint here is for querying
+	    Iterable<Entrypoint> queryPoints = CGEntryManager.getAllPublicMethods(builder, entryClasses);
+	    //get all activity call back methods
+	    Iterable<Entrypoint> activityCallbacks = CGEntryManager.getAndroidActivityCallBackMethods(builder, activityClasses);
+	    //merge these two as the query points
+	    queryPoints = CGEntryManager.mergeEntrypoints(queryPoints, activityCallbacks);
 		
 	    //get all declared UI classes
 		Collection<String> declaredClasses = AndroidUtils.extractAllUIs(cha, new File(getDirPath()));
@@ -101,10 +125,21 @@ public abstract class AbstractAndroidTest extends TestCase {
 	    Iterable<Entrypoint> widgetConstructors = //new LinkedList<Entrypoint>(); 
 	    	CGEntryManager.getConstructors(builder, declaredClasses);
 	    
-	    //Merge2 entries
-	    Iterable<Entrypoint> entries = CGEntryManager.mergeEntrypoints(uiEntries, widgetConstructors);
+	    Iterable<Entrypoint> activityConstructors =
+	    	CGEntryManager.getConstructors(builder, activityClasses);
+	    
+	    //Merge 2 entries
+	    Iterable<Entrypoint> entries = CGEntryManager.mergeEntrypoints(queryPoints, widgetConstructors);
+	    
+	    //merge with activity constructors
+	    entries = CGEntryManager.mergeEntrypoints(entries, activityConstructors);
 	    
 		System.out.println("Number of entries for building CG: " + Utils.countIterable(entries));
+		Log.logln("The number of entries for building cg: " + Utils.countIterable(entries));
+		for(Entrypoint ep : entries) {
+			Log.logln("    - entry point: " + ep);
+		}
+		
 		builder.setCGType(type);
 		builder.buildCG(entries);
 		
@@ -122,7 +157,7 @@ public abstract class AbstractAndroidTest extends TestCase {
 		//UIAnomalyMethodFinder.DEBUG = true;
 		
 		//detect the anomaly chain
-		List<AnomalyCallChain> chains = detector.detectUIAnomaly(builder, builder.getCallGraphEntryNodes(uiEntries));
+		List<AnomalyCallChain> chains = detector.detectUIAnomaly(builder, builder.getCallGraphEntryNodes(queryPoints));
 		
 		System.out.println("Number of chains: " + chains.size());
 		chains = CallChainFilter.filter(chains, new RemoveSubsumedChainStrategy());

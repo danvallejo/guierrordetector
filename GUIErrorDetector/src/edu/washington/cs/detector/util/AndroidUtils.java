@@ -782,4 +782,35 @@ public class AndroidUtils {
 		"disable",
 		"swipeLeft"
 	};
+	
+	private static String[] activityMethods = new String[] {
+		"onCreate",
+		"onStart",
+		"onRestart",
+		"onResume",
+		"onPause",
+		"onStop",
+		"onDestroy",
+		"onUserLeaveHint",
+		"onTitleChanged",
+		"onSaveInstanceState",
+		"onRestoreInstanceState",
+		"onPrepareDialog",
+		"onPostResume",
+		"onPostCreate",
+		"onNewIntent",
+		"onCreateDialog",
+		"onChildTitleChanged",
+		"onApplyThemeResource",
+		"onActivityResult"
+	};
+	
+	public static boolean isActivityCallbackMethod(ClassHierarchy cha, IMethod method) {
+		IClass declaringClass = method.getDeclaringClass();
+		if(!AndroidUtils.isAppActivity(cha, declaringClass)) {
+			throw new RuntimeException("method: " + method + ", in class: " + declaringClass + " is not an activity class.");
+		}
+		String methodName = method.getName().toString();
+		return Utils.includedIn(methodName, activityMethods);
+	}
 }
