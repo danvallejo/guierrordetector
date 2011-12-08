@@ -19,6 +19,7 @@ import edu.washington.cs.detector.guider.CGTraverseOnlyClientRunnableStrategy;
 import edu.washington.cs.detector.util.AndroidUtils;
 import edu.washington.cs.detector.util.ApkUtils;
 import edu.washington.cs.detector.util.Globals;
+import edu.washington.cs.detector.util.Utils;
 
 public class TestK9MailAndroid extends AbstractAndroidTest {
 
@@ -51,6 +52,7 @@ public class TestK9MailAndroid extends AbstractAndroidTest {
 		    	System.out.println("The " + i++ + "-th chain:");
 			    System.out.println(c.getFullCallChainAsString());
 		    }
+		    Utils.dumpAnomalyCallChains(chains, "./output_chains.txt");
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
