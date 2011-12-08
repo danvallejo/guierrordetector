@@ -19,6 +19,7 @@ import com.ibm.wala.types.TypeName;
 import com.ibm.wala.types.TypeReference;
 import com.ibm.wala.util.collections.HashSetFactory;
 
+import edu.washington.cs.detector.util.AndroidUtils;
 import edu.washington.cs.detector.util.Utils;
 import edu.washington.cs.detector.util.WALAUtils;
 
@@ -168,6 +169,32 @@ public class CGEntryManager {
 				return result.iterator();
 			}
 		}; 
+	}
+	
+	public static Iterable<Entrypoint> getAndroidActivityCallBackMethods(CGBuilder builder, Collection<String> activityClasses) {
+		AnalysisScope scope = builder.getAnalysisScope();
+		ClassHierarchy cha = builder.getClassHierarchy();
+		
+		ClassLoaderReference clr = scope.getApplicationLoader();
+		final HashSet<Entrypoint> result = HashSetFactory.make();
+		for (String activityClass: activityClasses) {
+			IClass klass = WALAUtils.lookupClass(cha, activityClass);
+			if (klass.getClassLoader().getReference().equals(clr)) {
+				Collection<IMethod> allMethods = klass.getDeclaredMethods();
+				for(IMethod m : allMethods) {
+					if(AndroidUtils.isActivityCallbackMethod(cha, m)) {
+						result.add(new DefaultEntrypoint(m, cha));
+					}
+				}
+			}
+		}
+		
+		return new Iterable<Entrypoint>() {
+			public Iterator<Entrypoint> iterator() {
+				return result.iterator();
+			}
+		}; 
+		
 	}
 	
 	//methodClass: a.b.c.d
