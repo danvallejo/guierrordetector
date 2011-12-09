@@ -14,6 +14,8 @@ public abstract class AbstractMethodFinder implements AnomalyFinder {
 	
 	protected CGTraverseGuider guider = new CGTraverseDefaultGuider();
 	
+	protected NativeMethodConnector connector = NativeMethodConnector.createEmptyConnector();
+	
 	public AbstractMethodFinder(Graph<CGNode> cg, CGNode startNode) {
 		assert cg.containsNode(startNode);
 		this.cg = cg;
@@ -25,5 +27,12 @@ public abstract class AbstractMethodFinder implements AnomalyFinder {
 			throw new RuntimeException("The guider can not be null.");
 		}
 		this.guider = guider;
+	}
+	
+	public void setNativeMethodConnector(NativeMethodConnector connector) {
+		if(connector == null) {
+			throw new RuntimeException("The native connector can not be null.");
+		}
+		this.connector = connector;
 	}
 }

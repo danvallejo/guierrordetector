@@ -1,5 +1,6 @@
 package edu.washington.cs.detector;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -66,12 +67,20 @@ public class UIAnomalyMethodFinder extends AbstractMethodFinder {
 	}
 	
 	public static UIAnomalyMethodFinder createInstance(ClassHierarchy cha, Graph<CGNode> cg, CGNode startNode, CGTraverseGuider guider) {
+		return createInstance(cha, cg, startNode, guider, null);
+	}
+	
+	public static UIAnomalyMethodFinder createInstance(ClassHierarchy cha, Graph<CGNode> cg, CGNode startNode, CGTraverseGuider guider,
+			NativeMethodConnector connector) {
 		UIAnomalyMethodFinder finder = new UIAnomalyMethodFinder(cg, startNode);
 		if(guider != null) {
 		    finder.setCGTraverseGuider(guider);
 		}
 		if(cha!= null) {
 			finder.setClassHierarchy(cha);
+		}
+		if(connector != null) {
+			finder.setNativeMethodConnector(connector);
 		}
 		return finder;
 	}
@@ -147,8 +156,30 @@ public class UIAnomalyMethodFinder extends AbstractMethodFinder {
 			} else {
 			    visitedNodes.add(node);
 			}
+			
 			//add the succ nodes to the queue and continue to traverse
 			Iterator<CGNode> succIt = this.cg.getSuccNodes(node);
+			
+			//check if it is a native method
+			if(node.getMethod().isNative()) {
+				Log.logln("See a native: " + node);
+				Log.logln(" --  connector empty? : " + this.connector.isEmpty());
+				if(succIt.hasNext()) {
+					throw new RuntimeException("A native method should never call others in Java");
+				}
+				if(!this.connector.isEmpty()) {
+					Collection<CGNode> succNodes = this.connector.getSucc(cg, node);
+					Log.logln("Get native callees from connector for method: " + node);
+					for(CGNode succNode : succNodes) {
+						queue.add(succNode);
+						Log.logln(" -  add native callee: " + succNode);
+						if(!cgNodeMap.containsKey(succNode)) {
+					        cgNodeMap.put(succNode, new CallChainNode(succNode, chainNode));
+				       }
+					}
+				}
+			}
+			
 			while(succIt.hasNext()) {
 				CGNode succNode = succIt.next();
 				
