@@ -13,15 +13,18 @@ import com.ibm.wala.classLoader.IClass;
 import com.ibm.wala.classLoader.IMethod;
 import com.ibm.wala.classLoader.ShrikeCTMethod;
 import com.ibm.wala.core.tests.callGraph.CallGraphTestUtil;
+import com.ibm.wala.ipa.callgraph.CGNode;
 import com.ibm.wala.ipa.callgraph.Entrypoint;
 import com.ibm.wala.ipa.cha.ClassHierarchy;
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
 import com.ibm.wala.shrikeCT.InvalidClassFileException;
+import com.ibm.wala.util.graph.Graph;
 
 import edu.washington.cs.detector.AnomalyCallChain;
 import edu.washington.cs.detector.CGBuilder;
 import edu.washington.cs.detector.CGEntryManager;
 import edu.washington.cs.detector.CallChainFilter;
+import edu.washington.cs.detector.NativeMethodConnector;
 import edu.washington.cs.detector.UIAnomalyDetector;
 import edu.washington.cs.detector.UIAnomalyMethodFinder;
 import edu.washington.cs.detector.CGBuilder.CG;
@@ -43,7 +46,17 @@ public abstract class AbstractAndroidTest extends TestCase {
 	
 	abstract protected String getDirPath();
 	
+	static Graph<CGNode> appCallGraph = null;
+	
+	static ClassHierarchy builtCHA = null;
+	
 	public List<AnomalyCallChain> findErrorsInAndroidApp(CG type, CGTraverseGuider ui2startGuider, CGTraverseGuider start2checkGuider)
+	    throws ClassHierarchyException, IOException {
+		return findErrorsInAndroidApp(type, ui2startGuider, start2checkGuider, null);
+	}
+	
+	public List<AnomalyCallChain> findErrorsInAndroidApp(CG type, CGTraverseGuider ui2startGuider, CGTraverseGuider start2checkGuider,
+			NativeMethodConnector connector)
 	    throws IOException, ClassHierarchyException {
 		CGBuilder builder = new CGBuilder(getAppPath(),CallGraphTestUtil.REGRESSION_EXCLUSIONS);
 	    builder.makeScopeAndClassHierarchy();
@@ -106,15 +119,30 @@ public abstract class AbstractAndroidTest extends TestCase {
 	    	    System.out.println("listener class: " + fullClassName);
 	    	}
 	    }
+	    //get all user defined view (that is potentially been reflectively called by UI)
+	    Collection<IClass> appViewClasses = AndroidUtils.getAppViewClasses(cha);
+	    List<String> appViews = new LinkedList<String>();
+	    for(IClass c : appViewClasses) {
+	    	String fullClassName = WALAUtils.getJavaFullClassName(c);
+	    	Log.logln("User defined view class: " + fullClassName);
+	    	System.out.println("User defined view class: " + fullClassName);
+	    	appViews.add(fullClassName);
+	    }
+	    
 	    //remove all redundance
 	    Utils.removeRedundant(activityClasses);
 	    Utils.removeRedundant(entryClasses);
+	    Utils.removeRedundant(appViews);
 	    //the entryPoint here is for querying
 	    Iterable<Entrypoint> queryPoints = CGEntryManager.getAllPublicMethods(builder, entryClasses);
 	    //get all activity call back methods
 	    Iterable<Entrypoint> activityCallbacks = CGEntryManager.getAndroidActivityCallBackMethods(builder, activityClasses);
 	    //merge these two as the query points
 	    queryPoints = CGEntryManager.mergeEntrypoints(queryPoints, activityCallbacks);
+	    
+	    //get all user defined 
+	    Iterable<Entrypoint> appViewEntries = CGEntryManager.getAllPublicMethods(builder, appViews);
+	    queryPoints = CGEntryManager.mergeEntrypoints(queryPoints, appViewEntries);
 		
 	    //get all declared UI classes
 		Collection<String> declaredClasses = AndroidUtils.extractAllUIs(cha, new File(getDirPath()));
@@ -147,12 +175,16 @@ public abstract class AbstractAndroidTest extends TestCase {
 		System.out.println("CG node num: " + builder.getCallGraph().getNumberOfNodes());
 		System.out.println("App CG node num: " + builder.getAppCallGraph().getNumberOfNodes());
 		
+		appCallGraph = builder.getAppCallGraph();
+		builtCHA = builder.getClassHierarchy();
+		
 		
 		//set up the anomaly detection
 		UIAnomalyDetector detector = new UIAnomalyDetector(getAppPath());
 		detector.configureCheckingMethods("./tests/edu/washington/cs/detector/checkingmethods_for_android.txt");
 		detector.setThreadStartGuider(ui2startGuider);
 		detector.setUIAnomalyGuider(start2checkGuider);
+		detector.setNativeMethodConnector(connector);
 		UIAnomalyDetector.DEBUG = true;
 		//UIAnomalyMethodFinder.DEBUG = true;
 		
