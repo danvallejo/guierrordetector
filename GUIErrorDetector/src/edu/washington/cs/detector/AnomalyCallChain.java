@@ -1,14 +1,20 @@
 package edu.washington.cs.detector;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import com.ibm.wala.ipa.callgraph.CGNode;
 import com.ibm.wala.util.graph.Graph;
 
 import edu.washington.cs.detector.util.Globals;
+import edu.washington.cs.detector.util.Log;
+import edu.washington.cs.detector.util.WALAUtils;
 
 public class AnomalyCallChain {
 	
@@ -81,6 +87,73 @@ public class AnomalyCallChain {
 			sb.append(Globals.lineSep);
 		}
 		return sb.toString();
+	}
+	
+	/**
+	 * A utility method to check whether there is a valid call chain from the
+	 * startNode to the endNode. return the path, else return an empty list.
+	 * */
+	public static List<CGNode> extractPathByStartEnd(Graph<CGNode> cg, CGNode startNode,
+			CGNode endNode, String excludedPackageName) {
+		if(startNode.equals(endNode)) {
+			throw new RuntimeException("Start node: " + startNode + " should not equal to endNode.");
+		}
+		if(startNode == null || endNode == null) {
+			throw new RuntimeException("Start or end node can not be null.");
+		}
+		
+		//the path to return
+		List<CGNode> nodesInPath = new LinkedList<CGNode>();
+		
+		Map<CGNode, CallChainNode> cgNodeMap = new LinkedHashMap<CGNode, CallChainNode>();
+		List<CGNode> queue = new LinkedList<CGNode>();
+		Set<CGNode> visitedNodes = new HashSet<CGNode>();
+		
+		Iterator<CGNode> nodeIt = cg.getSuccNodes(startNode);
+		while(nodeIt.hasNext()) {
+			CGNode node = nodeIt.next();
+			queue.add(node);
+			if(!cgNodeMap.containsKey(node)) {
+			    cgNodeMap.put(node, new CallChainNode(node, startNode));
+			}
+		}
+		//perform BFS search here
+		while(!queue.isEmpty()) {
+			CGNode node = queue.remove(0);
+			assert cgNodeMap.containsKey(node);
+			CallChainNode chainNode = cgNodeMap.get(node);
+			
+			if(node.equals(endNode)) {
+				CallChainNode backTrackNode = chainNode;
+				nodesInPath.add(0, backTrackNode.getNode());
+				while(backTrackNode.getParent() != null) {
+					backTrackNode = backTrackNode.getParent();
+					nodesInPath.add(0, backTrackNode.getNode());
+				}
+				break;
+			}
+			
+			//skip if already visited, otherwise, add to the visited set
+			if(visitedNodes.contains(node)) {
+				continue;
+			} else {
+				if(excludedPackageName != null && WALAUtils.getJavaPackageName(node.getMethod().getDeclaringClass()).startsWith(excludedPackageName)) {
+					continue;
+				}
+			    visitedNodes.add(node);
+			}
+			//add the succ nodes to the queue and continue to traverse
+			Iterator<CGNode> succIt = cg.getSuccNodes(node);
+			while(succIt.hasNext()) {
+				CGNode succNode = succIt.next();
+				queue.add(succNode);
+				if(!cgNodeMap.containsKey(succNode)) {
+					cgNodeMap.put(succNode, new CallChainNode(succNode, chainNode));
+				}
+			}
+		}
+		
+		return nodesInPath;
 	}
 	
 	/**

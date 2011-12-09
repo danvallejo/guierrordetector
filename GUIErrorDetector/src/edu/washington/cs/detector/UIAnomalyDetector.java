@@ -31,6 +31,7 @@ public class UIAnomalyDetector {
 	private List<FilterStrategy> filters = new LinkedList<FilterStrategy>();
 	private CGTraverseGuider threadStartGuider = null;
 	private CGTraverseGuider uiAnomalyGuider = null;
+	private NativeMethodConnector nativeConnector = null;
 	private CG cgOpt = null;
 	
 	public UIAnomalyDetector(String appPath) {
@@ -73,6 +74,11 @@ public class UIAnomalyDetector {
 	//it can be null
 	public void setUIAnomalyGuider(CGTraverseGuider uiAnomalyGuider) {
 		this.uiAnomalyGuider = uiAnomalyGuider;
+	}
+	
+	//it can be null
+	public void setNativeMethodConnector(NativeMethodConnector connector) {
+		this.nativeConnector = connector;
 	}
 	
 	//set the evaluator
@@ -153,7 +159,9 @@ public class UIAnomalyDetector {
 	        
 	        for(CallChainNode threadStartNode : reachableStarts) {
 	        	//TODO this needs
-	        	AnomalyFinder anomalyFinder = UIAnomalyMethodFinder.createInstance(builder.getClassHierarchy(), g /*change from cg*/, threadStartNode.getNode(), this.uiAnomalyGuider); 
+	        	AnomalyFinder anomalyFinder
+	        	    = UIAnomalyMethodFinder.createInstance(builder.getClassHierarchy(), g /*change from cg*/,
+	        	    		threadStartNode.getNode(), this.uiAnomalyGuider, this.nativeConnector); 
 	        	
 	        	List<CallChainNode> resultNodes = anomalyFinder.findThreadUnsafeUINodes();
 	        	resultNodes = Utils.removeRedundantCallChains(resultNodes);

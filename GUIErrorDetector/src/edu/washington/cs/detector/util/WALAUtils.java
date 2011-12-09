@@ -13,6 +13,7 @@ import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
 import com.ibm.wala.classLoader.IClass;
+import com.ibm.wala.classLoader.IMethod;
 import com.ibm.wala.core.tests.callGraph.CallGraphTestUtil;
 import com.ibm.wala.ipa.callgraph.AnalysisCache;
 import com.ibm.wala.ipa.callgraph.AnalysisOptions;
@@ -124,6 +125,20 @@ public class WALAUtils {
 	    }
 	  }
 	  
+	  //give method full name like a.b.c.ClassName.method, return the CGNode
+	  public static Collection<CGNode> lookupCGNode(Graph<CGNode> cg, String fullName) {
+		  Collection<CGNode> nodes = new LinkedHashSet<CGNode>();
+		  
+		  for(CGNode node : cg) {
+			  String fullMethodName = WALAUtils.getFullMethodName(node.getMethod());
+			  if(fullName.equals(fullMethodName)) {
+				  nodes.add(node);
+			  }
+		  }
+		  
+		  return nodes;
+	  }
+	  
 	  //given class name like a.b.c.d
 	  public static IClass lookupClass(ClassHierarchy cha, String classFullName) {
 		  for(IClass c : cha) {
@@ -133,6 +148,12 @@ public class WALAUtils {
 				}
 			}
 			return null;
+	  }
+	  
+	  //return a.b.c.d.MethodName
+	  public static String getFullMethodName(IMethod method) {
+		  String className = getJavaFullClassName(method.getDeclaringClass());
+		  return className + "." + method.getName().toString();
 	  }
 		
 		//return like a.b.c.d

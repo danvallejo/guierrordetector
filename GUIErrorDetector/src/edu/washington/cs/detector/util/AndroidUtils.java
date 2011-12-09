@@ -182,8 +182,8 @@ public class AndroidUtils {
 						    	} else {
 						    		if(clazzValue.startsWith(WIDGET_PACKAGE)) {
 										//double check
-										if(!androidWidgetShortName.contains(clazzValue.substring(WIDGET_PACKAGE.length()))) {
-											throw new RuntimeException("The widget list is not complete, it miss: " + clazzValue);
+										if(!androidWidgetShortName.contains(clazzValue.substring(WIDGET_PACKAGE.length() + 1))) {
+											throw new RuntimeException("The widget list is not complete, it miss: " + clazzValue.substring(WIDGET_PACKAGE.length()));
 										}
 										declaredUIComponents.add(clazzValue);
 									}
@@ -208,7 +208,23 @@ public class AndroidUtils {
 		for(String widgetName : widgetShortNames) {
 			widgetSet.add(widgetName);
 		}
+		
 		return widgetSet;
+	}
+	
+	public static Collection<IClass> getAppViewClasses(ClassHierarchy cha) {
+		Collection<IClass> colls = new LinkedHashSet<IClass>();
+		IClass view = getWidgetView(cha);
+		for(IClass c : cha) {
+			String fullName = WALAUtils.getJavaFullClassName(c);
+			if(AndroidUtils.isInAndroidLib(fullName)) {
+				continue;
+			}
+			if(cha.isAssignableFrom(view, c)) {
+				colls.add(c);
+			}
+		}
+		return colls;
 	}
 	
 	public static Collection<IClass> getAppActivityClasses(ClassHierarchy cha) {
