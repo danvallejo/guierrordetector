@@ -1,0 +1,319 @@
+\section{Technique}
+
+\subsection{Problem Formulation}
+
+formulate it as a graph reachability
+
+\subsection{Error Detection Algorithm}
+
+
+\begin{figure}[t]
+\textbf{Input}: a Java program $P$\\
+\textbf{Output}: a set of potential $errors$\\
+\vspace{-5mm}
+\begin{algorithmic}[1]
+\STATE errors $\leftarrow$ $\emptyset$
+\STATE cg $\leftarrow$ $constructCallGraph$($P$)
+\STATE entryNodes $\leftarrow$ $getEntryNodes$(cg)
+\STATE uiAccessNodes $\leftarrow$ $getUIAccessNodes$(cg)
+\STATE safeNodes $\leftarrow$ $getSafeNodes$(cg)
+\FOR{each entryNode in entryNodes}
+\STATE threadStartNodes $\leftarrow$ $getReachableStartsByBFS$(cg)
+\FOR{each threadStart in threadStartNodes}
+\STATE queue $\leftarrow$ an empty queue
+\STATE queue.enqueueAll(threadStart.$getAllSuccNodes$())
+\WHILE{queue.isNotEmpty()}
+\STATE nextNode $\leftarrow$ queue.dequeue()
+\FOR{each succNode in cg.$getSuccNodes$(nextNode)}
+\IF{succNode $\in$ uiAccessNodes}
+\STATE errors $\leftarrow$ errors $\cup$ $createErrorReport$(succNode)
+\ELSIF{succNode $\in$ safeNodes}
+\STATE continue
+\ELSE
+\STATE queue.enqueue(succNode)
+\ENDIF 
+\ENDFOR
+\ENDWHILE
+\ENDFOR
+\ENDFOR
+\RETURN $errors$
+%\ENDWHILE
+\vspace{-2mm}
+\end{algorithmic}
+\caption{Algorithm for detecting errors in multithreaded GUI programs. 
+Four utility methods in lines 2 -- 4 are customized for each GUI platforms
+(not each program) as described in Section~\ref{sec:platforms}.
+} \label{fig:detectalgorithm}
+\end{figure}
+
+
+\subsubsection{Call Graph Construction}
+
+For desktop applications which have main method, it is straigtforward to apply
+the above algorithm. However, for applications on platforms like eclipse plugin
+and Android. presents new challenges. Two technical challenges must be solve.
+First, use reflection extensively, Second, it is possible to interact with
+native code.
+
+Android features an extended event-based library and dynamic inflation of
+graphical views from declarative XML layout files.
+A static analyzer for Android programs must consider such features, for
+correctness and precision.
+
+\begin{figure}[t]
+%\centering
+\begin{CodeOut}
+\begin{alltt}
+
+<LinearLayout>
+    <Button android:id="@+id/\textbf{button\_id}" android:text="A Button" />
+</LinearLayout>
+
+1. public class MyActivity extends Activity \{
+2.    final List<View> cachedViews = new LinkedList<View>();
+3.    @Override
+4.    public void onCreate(Bundle savedInstanceState) \{
+5.        super.onCreate(savedInstanceState);
+6.        setContentView(R.layout.main);
+7.        Button button = (Button) findViewById(R.id.\textbf{button\_id});
+8.        button.setOnClickListener(new Button.OnClickListener() \{
+9.            @Override
+10.           public void onClick(View v) \{
+11.               button.setText("Button Clicked.");
+12.               cachedViews.add(v);
+13.           \}
+14.       \});
+15.   \}
+16. \}
+\end{alltt}
+\end{CodeOut}
+\label{fig:sampleandroid}
+\caption{A Sample Android Code ..}
+\end{figure}
+
+
+Give an example of how reflection affect call graph precision.
+
+The Android button example.
+
+Using RTA is not enough, since that maintains a global
+
+So, we present a new call graph construction algorithm
+
+reflected classes are known, use RTA.
+
+reflection code
+
+native code
+
+\begin{figure}[t]
+\textbf{Input}: a Java program $P$, a list of classes $cls$\\
+\textbf{Output}: a call graph $cg$\\
+\vspace{-5mm}
+\begin{algorithmic}[1]
+\STATE callSiteMap $\leftarrow$ new Map$\langle$CallSite, List$\langle$Type$\rangle$$\rangle$
+\STATE rta\_cg $\leftarrow$ $constructCallGraphByRTA$($P$)
+\FOR{each $method$ in $P$}
+\FOR{each  $callSite$ in $method$}
+\STATE type $\leftarrow$ $staticType$(callSite)
+\IF{type $\in$ $cls$}
+\FOR{each subType of $subType$(type)}
+\IF{$hasObjectCreated$(subType, rta\_cg)}
+\STATE callSiteMap[callSite].add(subType)
+\ENDIF
+\ENDFOR
+\ENDIF
+\ENDFOR
+\ENDFOR
+\STATE $cg$ $\leftarrow$ $constructCallGraphByKCFA$($P$, callSiteMap)
+\RETURN $cg$
+%\ENDWHILE
+\vspace{-2mm}
+\end{algorithmic}
+\caption{Algorithm for constructing a call graph using a combination of the RTA~\cite{rta} and k-CFA~\cite{kcfa} algorithms.
+$cls$ is a list of class XXXX, whose invocatioon is treated using RTA; while the remaining call graph
+part is constructed using k-CFA.
+} \label{fig:cgalgorithm}
+\end{figure}
+
+
+
+
+\subsubsection{Heuristic Filters and Annotations}
+(XXX)
+
+Static analysis exhaustively check possible error path; it may report
+paths that indicate the same bug. The potentially huge volume of
+reported warnings impose great burden for programmers to check
+its validity. 
+
+a few useful static heuristic filtering rules.
+
+\begin{itemize}
+\item \textbf{Method call chain sumbsumption}. Remove redundant
+results
+
+\item \textbf{Remove system calls}. Method call chain involves typical
+system methods like \CodeIn{toString} are unlikely to reveal a real bug.
+
+\item \textbf{Method call chain with the same entry}. such
+call chains may reveal the same bug
+
+\item \textbf{Method call chain with the same tail}.  different ways
+to reach the same bug
+
+\item \textbf{User-defined rules}.  to overcome the limitation
+
+\end{itemize}
+
+The above filtering rules are not sound, it may filter real bugs but works
+well in practice.
+
+We also provide annotations for native methods which are beyond the ability
+of most static analyses
+
+\subsection{Instantiation for Different Frameworks}
+\label{sec:platforms}
+
+We instantiate our error detection techniques for 4 popular GUI frameworks,
+namely SWT, Eclipse plugin environment, Swing, and Android.
+For each GUI platform, we customize the \textit{call graph entry nodes},
+\textit{UI accessing nodes}, and \textit{safe methods} on lines 3 -- 5 of the
+algorithm in Figure~\ref{fig:detectalgorithm}.
+
+%For the sake of efficiency, they are all using the single thread model.
+
+%Why these platforms? popularity? account for xxx\% of the GUI. 
+
+%customizing for: entry points, starting points, error checking, thread
+%safe methods, what is the event dispatching thread?
+
+\subsubsection{SWT}
+
+SWT is an open source widget toolkit for Java designed to provide efficient,
+portable access to the GUI facilities of the operating systems on which it is implemented.
+
+Like normal Java applications, a SWT desktop application starts from its main method.
+By default, the thread that the main method executes is the UI thread. Thus, we instantiate
+our technique as follows:
+
+\begin{itemize}
+
+\item \textbf{Call graph entry points: } the single main method
+
+\item \textbf{UI accessing nodes: } any methods that calls \CodeIn{org.eclipse.swt.widgets.Display.checkWidget}
+or \CodeIn{org.eclipse.swt.widgets.Display.checkDevice} methods, since these two methods are the
+only place where the SWT framework checks whether the current thread is the UI thread or not. Thus, any
+methods that calls the checking method must be invoked in the UI thread.
+
+\item \textbf{Safe methods: } SWT provides two utility methods (\CodeIn{Display.asyncExec}
+and \CodeIn{Display.syncExec}) that pass messages to the UI thread.
+ Invoking these two methods are generally considered to be safe, and would not
+cause an invalid thread access error.
+
+\end{itemize}
+
+\subsubsection{Eclipse plugin}
+
+Unlike a SWT desktop application, an eclipse plugin, though is developed in SWT,
+has no single main method. Instead, (XXX) it extends certain extension points
+exposed by the eclipse framework, and eclipse will XXX. To instantiate our
+technique for the Eclipse plugin environment, we need to redefine the
+call graph entry points.
+
+\begin{itemize}
+
+\item \textbf{Call graph entry points: } all overriden methods of the classes inside
+ a plugin's \CodeIn{ui} package.  Such methods are normally called by the eclipse framework
+by the UI thread. XXX This rule, though quite heuristical, works quite well in practice.
+
+\item \textbf{UI accessing nodes} and \textbf{Safe methods} are the same as SWT desktop applications.
+
+\end{itemize}
+
+\subsubsection{Swing}
+
+%The collections classes from the original JDK (\CodeIn{Vector}
+%and \CodeIn{Hashtable}) and the AWT library are designed as
+%thread-safe. That is, two separate threads of execution can
+%access the UI element at the same time without the developer having
+%to worry about the threads interfering with one another. However, the
+%safety comes at a cost. Because there is a great deal of overhead
+%necessary to build thread-safe artifacts, the tend to be much slower
+%than nonthread-safe alternatives. 
+
+%The design decisions for Swing changed. This does not mean the controls
+%can never be accessed from multiple threads, but the developer is now
+%responsible for adding code to ensure that no ill effects occur.
+
+A Swing application often contains three kinds of threads: \textit{initial thread}
+that executes initial application code, the \textit{event dispatch thread},
+where all GUI manipulation code is executed, and the \textit{worker thread} where
+time-consuming background tasks are executed. After Swing UIs are launched,
+the initial thread exits and the event dispatch thread starts to execute all
+event-handling code or spawns new worker threads. XXXX Therefore, we can not directly
+use the main method as the call graph entry point, since it is not invoked
+by the UI thread. We customize our technique for Swing as follows:
+
+\begin{itemize}
+
+\item \textbf{Call graph entry points: } all overriden callback methods of the listerner classes.
+Specifically, for each class, we check whether it is a Swing listerner class. If so,
+we extract all its overriden callback methods as the call graph entry points.
+ %Such methods are normally called by the eclipse framework
+%by the UI thread. XXX This rule, though quite heuristical, works quite well in practice.
+
+\item \textbf{UI accessing nodes:} unlike SWT, Swing does not explicitly check
+whether the current thread is the UI thread or not, when a GUI object is accessed. Except
+for three documented thread-safe method (\CodeIn{repaint}, XXXX), our technique
+treat all methods defined in each GUI object as UI accessing nodes.
+
+\item \textbf{Safe methods: } similar to SWT, Swing provides two utility methods
+(\CodeIn{SwingUtilities.invokeLater} and \CodeIn{SwingUtilities.invokeDelay}) to pass messages to the UI thread. These two methods are regarded as safe methods.
+
+\end{itemize}
+
+%A key tasks in instantiating
+%our technique to the Swing framework is to identify its event dispatch thread.
+%We use
+
+\subsubsection{Android}
+
+Android is a Java-based platform for embedded or mobile devices. 
+Android features an extended event-based library and dynamic inflation of
+graphical views from declarative XML layout files. Android applications are
+written in Java, running in their own process within their own virtual machine.
+Unlike desktop applications, they do not have a single entry point but can
+rather use parts of other Android applications on-demand and can require their
+services by calling corresponding event handlers, directly or through the
+operating system. In particular, Android applications use \textit{activities}
+as code interacting with the user through a visual interface. Event handlers
+are scheduled in no particular ordering, with some notable exceptions such as the
+lifecycle of activities.
+
+An XML \textit{manifest file} registers the components of an application. Other XML
+fies describe the visual layout of the activities. Activities \textit{inflate}
+layout files into
+visual objects (a hierarchy of views), through an \textit{inflater} provided by the An-
+droid library. This means that library or user-defined views are not explicitly
+created by new statements but rather inflated through \textit{reflection}. Library meth-
+ods such as \CodeIn{findViewById} access the inflated views.
+
+We instantiate the technique for Android programs as follows.
+
+\begin{itemize}
+
+\item \textbf{Call graph entry points: } all overriden callback methods of the event
+listerner classes, and all overriden callback methods of an Activity. 
+
+\item \textbf{UI accessing nodes: } any methods that calls the \CodeIn{ViewRoot.checkThread}
+method. This method is the only place where Android checks
+whether the current thread is the UI thread or not. Thus, any
+methods that calls the checking method must be invoked in the UI thread.
+
+\item \textbf{Safe methods: } Android provides two utility methods (\CodeIn{View.post}
+and \CodeIn{View.XXX}) that pass messages to the UI thread.
+ Invoking these two methods are generally considered to be safe, and would not
+cause an invalid thread access error.
+
+\end{itemize}

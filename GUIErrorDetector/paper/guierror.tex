@@ -1,0 +1,83 @@
+
+
+%\documentclass{acm_proc_article-sp}
+\documentclass{sig-alternate}
+\usepackage{multirow}
+\usepackage{fancyheadings}
+\usepackage{algorithmic}
+\usepackage{amssymb}
+\usepackage{xspace}
+\usepackage{pslatex}
+\usepackage{microtype}
+\usepackage{subfigure}
+%\usepackage{todonotes}
+\input{macros}
+
+% % Add line between figure and text
+ \makeatletter
+ \def\topfigrule{\kern3\p@ \hrule \kern -3.4\p@} % the \hrule is .4pt high
+ \def\botfigrule{\kern-3\p@ \hrule \kern 2.6\p@} % the \hrule is .4pt high
+ \def\dblfigrule{\kern3\p@ \hrule \kern -3.4\p@} % the \hrule is .4pt high
+ \makeatother
+ % If there is a line, you can get away with reducing the separation between
+ % figures and text.  Don't do this without the line, though.
+ \addtolength{\textfloatsep}{-.5\textfloatsep}
+ \addtolength{\dbltextfloatsep}{-.5\dbltextfloatsep}
+ \addtolength{\floatsep}{-.5\floatsep}
+ \addtolength{\dblfloatsep}{-.5\dblfloatsep}
+
+
+\begin{document}
+
+\title{Finding Errors in Multithreaded Graphical User Interfaces}
+%\subtitle{[Extended Abstract]
+%\titlenote{This work is sponsored by}
+
+
+\author{
+\alignauthor Sai Zhang \quad Hao Lu \quad Michael D. Ernst\\
+       \affaddr{Department of Computer Science \& Engineering}\\
+       %\affaddr{1932 Wallamaloo Lane}\\
+       \affaddr{University of Washington}\\
+       \email{\{szhang, hlv, mernst\}@cs.washington.edu}
+}
+
+%Generating fault-revealing tests for object-oriented programs
+
+\maketitle
+
+
+\input{abstract}
+
+\input{introduction}
+
+\input{technique}
+
+\input{implementation}
+
+\input{evaluation}
+
+\input{related}
+
+\input{conclusion}
+
+The source code of our tool implementation is available at:
+
+\vspace{1mm}
+
+\noindent \url{http://guierrordetector.googlecode.com}
+
+
+\vspace{2mm}
+
+%\noindent \textbf{Acknowledgement.} We thank XXX, and the %anonymous
+%reviewers for their feedback. This work was supported in
+%part by ABB Corporation and NSF under grant CCF-0963757.
+
+%\vspace{-2mm}
+
+\bibliographystyle{abbrv}
+\footnotesize{
+\bibliography{issta2012}
+}
+\end{document}
