@@ -1,0 +1,194 @@
+\section{Empirical Evaluation}
+
+Our experiment objective is three-fold: to demonstrate the effectiveness
+of our approach in detecting real bugs in multithreaded GUI applications, to 
+compare the combined RTA and k-CFA call graph construction algorithms
+with existing ones , and to evaluate the usefulness of the proposed 
+ heuristics. First, we describe our subject programs, our computing
+environment and the experimental procedural. We then show that our technique
+detects bugs in real-world GUI applications on
+4 supported frameworks. We compare the combined RTA and k-CFA call graph
+construction algorithms with existing algorithms, showing it improves
+both precision and completeness of the constructed call graph.
+ Finally, we show that the set of proposed heuristics are useful
+in removing redundant warnings and eliminate false positivies. 
+
+
+
+\subsection{Subjects}
+
+\begin{table}[t]
+\begin{center}
+ \fontsize{9pt}{\baselineskip}\selectfont
+\hspace*{-0.2cm}
+\begin{tabular}{|l||c|c|c|c|}
+\hline
+ Program (version) & LOC & Classes & Methods & Threads \\
+\hline \hline
+\multicolumn{5}{|l|}{SWT desktop applications}   \\
+ \hline
+ xxx &  xxxx &  xx &  xxx & xx \\
+ \hline
+ xxx &  xxxx &  xx &  xxx & xx \\
+ \hline
+ xxx &  xxxx &  xx &  xxx & xx \\
+ \hline
+ \hline
+\multicolumn{5}{|l|}{Eclipse plugins}   \\
+ \hline
+ xxx &  xxxx &  xx &  xxx & xx \\
+ \hline
+ xxx &  xxxx &  xx &  xxx & xx \\
+ \hline
+ xxx &  xxxx &  xx &  xxx & xx \\
+ \hline
+ \hline
+\multicolumn{5}{|l|}{Swing desktop applications}   \\
+ \hline
+ xxx &  xxxx &  xx &  xxx & xx \\
+ \hline
+ xxx &  xxxx &  xx &  xxx & xx \\
+ \hline
+ xxx &  xxxx &  xx &  xxx & xx \\
+ \hline
+ \hline
+\multicolumn{5}{|l|}{Android mobile applications}   \\
+ \hline
+ xxx &  xxxx &  xx &  xxx & xx \\
+ \hline
+ xxx &  xxxx &  xx &  xxx & xx \\
+ \hline
+ xxx &  xxxx &  xx &  xxx & xx \\
+\hline
+\end{tabular}
+\end{center}
+\vspace{-15pt}
+\Caption{{\label{table:subjects}Subject Programs.} }
+\end{table}
+
+
+\subsection{Procedural}
+
+\subsection{Results}
+
+
+\begin{table*}[t]
+\begin{center}
+ \fontsize{9pt}{\baselineskip}\selectfont
+\hspace*{-0.2cm}
+\begin{tabular}{|l||c|c|c||c|c|c||c|c|c|}
+\hline
+ Program  &  \multicolumn{3}{|c|}{RTA}& \multicolumn{3}{|c|}{0-CFA / Combined RTA and 0-CFA} & \multicolumn{3}{|c|}{1-CFA / Combined RTA and 1-CFA}  \\
+\cline{2-10}
+ (version) & CG Size & \#Warning & \#Bug & CG Size & \#Warning & \#Bug & CG Size & \#Warning & \#Bug\\
+\hline \hline
+\multicolumn{10}{|l|}{SWT desktop applications}   \\
+ \hline
+ xxx &  xxxx &  xx &  xxx & xx & xx & xx& xx & xx & xx \\
+ \hline
+ xxx &  xxxx &  xx &  xxx & xx & xx & xx& xx & xx & xx \\
+ \hline
+ xxx &  xxxx &  xx &  xxx & xx & xx & xx& xx & xx & xx \\
+ \hline
+ \hline
+\multicolumn{10}{|l|}{Eclipse plugins}   \\
+ \hline
+ xxx &  xxxx &  xx &  xxx & xx & xx & xx& xx & xx & xx \\
+ \hline
+ xxx &  xxxx &  xx &  xxx & xx & xx & xx& xx & xx & xx \\
+ \hline
+ xxx &  xxxx &  xx &  xxx & xx & xx & xx& xx & xx & xx \\
+ \hline
+ \hline
+\multicolumn{10}{|l|}{Swing desktop applications}   \\
+ \hline
+ xxx &  xxxx &  xx &  xxx & xx & xx & xx& xx & xx & xx \\
+ \hline
+ xxx &  xxxx &  xx &  xxx & xx & xx & xx& xx & xx & xx \\
+ \hline
+ xxx &  xxxx &  xx &  xxx & xx & xx & xx& xx & xx & xx \\
+ \hline
+ \hline
+\multicolumn{10}{|l|}{Android mobile applications}   \\
+ \hline
+ xxx &  xxxx &  xx &  xxx & xx & xx & xx& xx & xx & xx \\
+ \hline
+ xxx &  xxxx &  xx &  xxx & xx & xx & xx& xx & xx & xx \\
+ \hline
+ xxx &  xxxx &  xx &  xxx & xx & xx & xx& xx & xx & xx \\
+\hline
+\end{tabular}
+\end{center}
+\vspace{-15pt}
+\Caption{{\label{table:results}Experimental results.} }
+\end{table*}
+
+
+\subsubsection{Errors in Multithreaded GUI}
+
+\subsubsection{Call Graph Construction Algorithms}
+
+\subsubsection{Heuristic Filters}
+
+Heuristic filter, effective.
+
+\begin{table}[t]
+\begin{center}
+ \fontsize{9pt}{\baselineskip}\selectfont
+\hspace*{-0.2cm}
+\begin{tabular}{|l||c|c|c|c|}
+\hline
+ Program  & \#Warning & \#Warning & \#Warning & \#Warning \\
+ (version) & $F_1$ & $F_2$ & $F_3$&$F_4$ \\
+\hline \hline
+\multicolumn{5}{|l|}{SWT desktop applications}   \\
+ \hline
+ xxx &  xxxx &  xx &  xxx & xx \\
+ \hline
+ xxx &  xxxx &  xx &  xxx & xx \\
+ \hline
+ xxx &  xxxx &  xx &  xxx & xx \\
+ \hline
+ \hline
+\multicolumn{5}{|l|}{Eclipse plugins}   \\
+ \hline
+ xxx &  xxxx &  xx &  xxx & xx \\
+ \hline
+ xxx &  xxxx &  xx &  xxx & xx \\
+ \hline
+ xxx &  xxxx &  xx &  xxx & xx \\
+ \hline
+ \hline
+\multicolumn{5}{|l|}{Swing desktop applications}   \\
+ \hline
+ xxx &  xxxx &  xx &  xxx & xx \\
+ \hline
+ xxx &  xxxx &  xx &  xxx & xx \\
+ \hline
+ xxx &  xxxx &  xx &  xxx & xx \\
+ \hline
+ \hline
+\multicolumn{5}{|l|}{Android mobile applications}   \\
+ \hline
+ xxx &  xxxx &  xx &  xxx & xx \\
+ \hline
+ xxx &  xxxx &  xx &  xxx & xx \\
+ \hline
+ xxx &  xxxx &  xx &  xxx & xx \\
+\hline
+\end{tabular}
+\end{center}
+\vspace{-15pt}
+\Caption{{\label{table:filters}Experimental results after applying heuristic filters.} }
+\end{table}
+
+
+\subsubsection{Performance and Scalability}
+
+Runs in practical time, mention the largest time cost in the program.
+
+The average analysis time per / bug
+
+\subsection{Discussion}
+
+\subsubsection{Threats to Validity}

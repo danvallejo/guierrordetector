@@ -1,0 +1,23 @@
+\section{Implementation}
+
+We implemented our technique using the WALA framework~\cite{walatutorial}.
+Our prototype tool takes Java bytecode as inputs, works in a fully
+automatic and push-button way to detect potential invalid thread access
+errors, and scales to realistic programs.  
+Optionally, the user may specify additional heuristics to guide call graph
+traverse, and annotate calling relations for native methods (Section~\ref{}).
+
+Our current implementation supports four widely-used GUI frameworks, namely
+SWT, Eclipse plugin development environment, Java Swing, and Android.
+Our implementation handles all of the Java language, and also takes
+all dependent libraries (e.g., \CodeIn{rt.jar} and \CodeIn{android.jar})
+into analysis. Since Android applications are often fully encrypted and shipped in Dalvik
+bytecode as a single apk file, our implementation first uses
+android-apktool\footnote{\url{http://code.google.com/p/android-apktool/}} to
+decrypt the apk file, and then uses the 
+ded translator~\cite{Enck:2011:SAA:2028067.2028088} to convert
+Dalvik bytecode to Java bytecode before feeding to WALA.  The Android system
+library (i.e., \CodeIn{android.jar}) uses many ``stub'' classes as
+placeholder for the sake of efficiency. We manually re-compiled the whole
+\CodeIn{android.jar} from its source code by replacing all ``stub'' classes
+with real class files.

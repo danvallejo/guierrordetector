@@ -1,0 +1,131 @@
+\section{Related Work}
+
+Work related to this paper falls into two main categories; (1)
+techniques and tools to analyze and test GUI programs; and (2)
+bug finding techniques for general multithreaded programs.
+
+\subsection{Analysis and Testing for GUI Applications}
+
+Automated GUI testing is a challenging tasks~\cite{Bertolino:2007:STR:1253532.1254712,
+Harrold:2000:TR:336512.336532}.
+ Many GUI analysis and testing techniques have been proposed in the past decade; some have been
+implemented as tools and adopted by practitioners. Existing techniques automate
+some aspect(s) of GUI testing including model creation
+(for model-based testing)~\cite{androidtesting, Xie:2006:MTC:1172962.1172990},
+test-case generation~\cite{YuanCohenMemonTSE2011, YuanMemonICSE2007},
+test oracle creation~\cite{MemonFSE2000}, test execution~\cite{MemonFSE2001},
+and test script repairing~\cite{Huang:2010:RGT:1828417.1828465, Daniel:2011:AGR:2002931.2002937}.
+For example,
+Kervinen et al.~\cite{Kervinen06model-basedtesting} present a formal model and architecture for testing
+concurrently running applications. The behavior of the system under test
+needs to be specified manually as a labeled transition system. 
+Guitar~\cite{YuanCohenMemonTSE2011, YuanMemonICSE2007, Xie:2006:MTC:1172962.1172990}
+is a GUI testing framework for Java and Microsoft Windows applications. 
+Yuan and Memon~\cite{YuanMemonICSE2007} generate event-sequence based test cases for GUI
+programs. They proposed a model-based approach for testing GUI-based applications.
+Their technique can generate test cases automatically using a structural event
+generation graph. 
+
+%Their approach targets Java desktop applications, which
+%are quite different from the Android mobile environment (XXXX).
+
+However, testing is often insufficient to ensure the correctness of a GUI program, for
+a number of reasons. First of all, the space of possible interactions
+with a GUI is enormous, in that each sequence of GUI
+events can result in a different state, and each GUI event
+may need to be evaluated in all of these states~\cite{YuanMemonICSE2007}.
+The large number of possible states result in a large number of
+test inputs requiring substantile human effort. The second
+problem is to determine the coverage of a set of test
+cases~\cite{MemonFSE2001}. For conventional software, coverage is measured
+using the amount and type of underlying code exercised.
+These measures do not work well for GUI testing, because
+what matters is not only how much of the code is tested,
+but in how many different possible states of the software
+each piece of code is tested. This makes it hard to determine
+the effectiveness of a test suite. %All of the (XXXXX, so that GUI is often not well tested)
+In constrast, as advocated in this paper, the primary advantage of
+using a static analysis is that it can potentially explore
+all paths to find possible bugs without actually executing the tested code. % (XXX use heuristic filtering)
+Compared with software testing, a static analysis tool may
+report false positives due to its conservative nature. Netherless,
+as we demonstrated in our experiments, using a few simple heuristics
+can dramatically reduce the number of false positives  to
+an acceptable level.
+
+
+Michail and Xie~\cite{michail05:helping} proposed a tool-based approach to help users avoid bugs
+in GUI applications. Their approach monitors user's action in the background,
+and gives a user a warning as well as the opportunity to abort the action, when
+a user attempts an action that has led to problems in the past. 
+As a comparison, our work aims to find unknown errors in a multithreaded
+GUI applications, while their work aims to prevent an existing bug
+from happening again.
+%is significantly different than their
+
+
+Recently, Payet and Spoto~\cite{Payet:2011:SAA:2032266.2032299} presented a static
+analysis framework for Android programs based on  abstract
+interpretation. Their framework focuses on the Android platform, and
+ consists of 7 existing static analyses such as
+nullness analysis, class analysis, and termination analysis.  However,
+their framework does not support detecting the invalid thread access
+errors, and uses a quite different abstraction than ours.
+To the best of our knowledge, we are the first to identify the invalid
+thread access problem on multithreaded GUI applications, and
+our technique is a general one that is specifically designed to detect
+the invalid thread access errors.
+
+%To the best of our knowledge, there is no prior work to tackle this invalid thread access problem
+% on multithreaded GUI applications.
+
+\subsection{Finding Bugs in Multithreaded Programs}
+
+
+
+A rich body of techniques have been developed to detect bugs in multithreaded programs~\cite{Huang:2011:PPC:2001420.2001438, Weeratunge:2010, Huang:2011:EST}.
+Active testing frameworks like AssertFuzzer~\cite{Sen:2008} uses the trace information to detect
+and create atomicity schedule violations. Static analysis tools such as Chord~\cite{Naik:2006}
+ explore multithreaded bugs by statically analyzing the program. On the
+other hand, runtime analysis tools such as Eraser~\cite{Savage:1997}  dynamically detect concurrency bugs using the lockset
+algorithms or some criteria based automata. Bodden and Havelund~\cite{Bodden:2008} uses AOP for
+race detection by providing three novel pointcuts to the AspectJ language. More recently,
+Goldilock~\cite{Elmas:2007} uses the hybrid model that combines the happens-before and lock-based
+approaches to identify data races based on an execution. By exploiting the insight
+that a full generality of the happens-before is unnecessary in most data accesses,
+FastTrack~\cite{Flanagan:2009} proposes an adaptive representation for the happen-before
+relation to efficiently and precisely detect races at runtime. However, finding
+invalid thread errors is quite different than detecting data races in
+a multithreaded program. A data race occurs when two concurrent threads access
+a shared variable and when at least one access is a write and the threads
+use no explicit mechanism to prevent the accesses from being simultaneous. In contrast,
+an invalid thread access error occurs when a non-UI thread accesses (reads or writes) a GUI object.
+Detecting invalid thread access error does not require monitoring every shared-memory
+reference and verify that consistent locking behavior is observed among different threads. Instead,
+our technique only needs to track whether a non-UI thread can reach a GUI object or not.
+How to adapt existing data race detection technique to find potential
+GUI errors is one of our future work.
+
+%Significantly different from the concurrency bug finding work....
+
+%They are often limited to detect errors manifested in a specific concrete execution.
+
+An alternative way to find bugs in multithreaded programs is using model checking~\cite{Nori:2010:ESO, Inverardi:2000, Siegel:2008}.
+By exhaustively exploring the thread scheduling space, a model checker can
+report counter examples for the potential bugs with a counter example. For example,
+CHESS~\cite{chess} dynamically explores the thread scheduling decisions to expose
+concurrency bugs using a context-bounded approach. Shacham et al~\cite{Shacham:2007} uses
+a model checker to construct the witness for data races reported by the lockset algorithm.
+%(XXXX problem for applying to GUI).
+Unfortunately, due to the exponential size of the search space,
+ it is hard for model checking approaches to scale to a realistic multithreaded GUI application
+ without compromising the detection capability. To our best knowledge,
+we are not aware of any software model checking approach can scale to the subjects
+as large as those used in our experiments. Compared with model checking, the static analysis
+algorithm presented in this paper chooses call graph as the
+abstraction level with a set of heuristics, and is much lightweighted. It is highly tailored to find the invalid thread
+access errors instead of being a general property checking tool. For this reason,
+our technique achieves good scalability and reasonable precision.
+
+
+
