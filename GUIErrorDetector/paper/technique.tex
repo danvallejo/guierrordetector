@@ -1,10 +1,77 @@
 \section{Technique}
 
-\subsection{Problem Formulation}
+We first gives our high-level approach formulation, then present
+an error detection algorithm. Finally, we show how to instantiate
+the error detection to different GUI frameworks.
 
-formulate it as a graph reachability
+
+\subsection{Approach Formulation}
+
+This section formulates our high-level approach. We define the
+notations of \textit{UI thread}, \textit{non-UI threads},
+\textit{UI accessing methods},
+ \textit{Safe methods}, and \textit{invalid thread access error}, and
+two assumptions we make with regard to error detection.
+
+\noindent {\textsc{\textbf{Definition 1 (UI Thread).}}} {UI thread
+is a special thread created by the GUI framework during
+GUI initialization. After the GUI becomes visible, the UI thread
+takes charge of the application, handle events from the GUIs,
+or spawn new threads to process lengthy operations in the background. }\vspace{1mm}
+
+\noindent {\textsc{\textbf{Assumption 1.}}} {We assume that each multithreaded
+GUI application has a single global UI thread. This is true for applications
+built on top of GUI frameworks that adapt the single-thread rule. It is
+possible that an application launches another application with its own UI thread
+by initializing a different process. In that case, we require the new
+launched application to be analyzed separately.}\vspace{1mm}
+
+\noindent {\textsc{\textbf{Definition 2 (non-UI Thread).}}} {Any other
+threads except for the UI thread is called non-UI threads.}\vspace{1mm}
+
+\noindent {\textsc{\textbf{Assumption 2.}}} { We assume that each non-UI
+thread can only be spawned by the UI thread. Under this assumption, all post-initialization
+GUI work naturally occurs in the UI-thread. Once the GUI is visible, the
+application is driven by events, which are always handled in the UI thread. We
+believe this assumption is reasonable, since if a non-UI
+thread is spawned during pre-initialization GUI work and that thread accesses
+a GUI object, an exception becomes apparent and the whole application may abort. This
+is unlikely for most of the realistic GUI applications.
+}\vspace{1mm}
+
+\noindent {\textsc{\textbf{Definition 3 (UI Accessing Methods).}}} { A method
+whose execution may read or write a UI object is called a UI Accessing Method.}\vspace{1mm}
+
+\noindent  {\textsc{\textbf{Definition 4 (Safe Methods).}}} {GUI frameworks that
+adapt the single-thread rule must provide methods to permit non-UI threads
+to run code in the UI thread. We can such methods \textit{safe methods}, since
+they can be invoked safely by any threads.}\vspace{1mm}
+
+\noindent  {\textsc{\textbf{Definition 5 (Invalid Thread Access).}}} {An invalid
+thread access error occurs if the UI thread spawns a non-UI thread, and there
+exists a path from the non-UI thread's \CodeIn{start} method to any UI accessing methods
+without going through any safe methods. }\vspace{2mm}
+
+At a high level, to detect an invalid thread access error, an analysis only needs to track all
+non-UI threads spawned by the UI thread, and check whether those non-UI threads
+may invoke a UI accessing method.
 
 \subsection{Error Detection Algorithm}
+
+We cast the problem of finding invalid thread
+
+Choose a right abstraction, why call graph is good?
+
+a call graph is a good approximation
+
+Given a sound call graph, our algorithm is sound in that it does not
+miss true positives. We note, however, that coomputing a sound
+call graph for partial programs such as an eclipse plugin,
+or in the presence of reflection, is non-trivial. Existing
+call graph construction algorithms either suffer from incompleteness
+or imprecision.  XX We describe our combined xxx in Section XXX.
+
+We also note that static analysis may report redundant
 
 
 \begin{figure}[t]
