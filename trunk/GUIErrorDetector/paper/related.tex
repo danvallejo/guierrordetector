@@ -25,10 +25,8 @@ Yuan and Memon~\cite{YuanMemonICSE2007} generate event-sequence based test cases
 programs. They proposed a model-based approach for testing GUI-based applications.
 Their technique can generate test cases automatically using a structural event
 generation graph. 
-
 %Their approach targets Java desktop applications, which
 %are quite different from the Android mobile environment (XXXX).
-
 However, testing is often insufficient to ensure the correctness of a GUI program, for
 a number of reasons. First of all, the space of possible interactions
 with a GUI is enormous, in that each sequence of GUI
@@ -44,7 +42,7 @@ what matters is not only how much of the code is tested,
 but in how many different possible states of the software
 each piece of code is tested. This makes it hard to determine
 the effectiveness of a test suite. %All of the (XXXXX, so that GUI is often not well tested)
-In constrast, as advocated in this paper, the primary advantage of
+In contrast, as advocated in this paper, the primary advantage of
 using a static analysis is that it can potentially explore
 all paths to find possible bugs without actually executing the tested code. % (XXX use heuristic filtering)
 Compared with software testing, a static analysis tool may
@@ -123,9 +121,9 @@ Unfortunately, due to the exponential size of the search space,
 we are not aware of any software model checking approach can scale to the subjects
 as large as those used in our experiments. Compared with model checking, the static analysis
 algorithm presented in this paper chooses call graph as the
-abstraction level with a set of heuristics, and is much lightweighted. It is highly tailored to find the invalid thread
+abstraction level with a set of heuristics, and thus is much lightweighted. It is highly tailored to find the invalid thread
 access errors instead of being a general property checking tool. For this reason,
-our technique achieves good scalability and reasonable precision.
+our technique achieves good scalability with reasonable precision.
 
 
 
