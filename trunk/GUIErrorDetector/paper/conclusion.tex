@@ -3,7 +3,7 @@
 In this paper, we presented a general technique to find invalid
 thread access errors in multithreaded GUI applications. 
 Our technique statically explores paths in a call graph to check
-whether a non-UI thread can access any GUI object.
+whether a non-UI thread can access a GUI object.
 It uses a combined RTA and k-CFA algorithm to construct
 a good call graph, and employs a set of heuristics to
 filter likely false positives and redundant reports.
@@ -47,12 +47,12 @@ to the context of multithreaded GUI applications.
 
 
 \item \textbf{Fixing potential GUI errors.} After a potential error is revealed, fixing
-it has often been another important and time-consuming process. Fixing concurrency
+it and verifing the patch has often been another important and time-consuming process. Fixing concurrency
 bugs has become especially critical in the multicore era.
 Recently, a few work has been done
 on automatically repairing test script for GUI applications~\cite{Daniel:2011:AGR:2002931.2002937, Huang:2010:RGT:1828417.1828465}. However, none of them focuses on repairing
-the GUI program to fix a revealed bug. Thus, we are interested in further exploring 
-along that line to investigate techniques to fix potential errors in
+the GUI program to fix a revealed bug. Thus, we are interested in 
+developing automated error fixing techniques for
 multithreaded GUI applications.
 
 \end{itemize}

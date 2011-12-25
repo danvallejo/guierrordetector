@@ -2,7 +2,7 @@
 
 Graphical User Interfaces (GUIs) are one of the most important parts of
 software. Most software developed in recent years has a GUI, and the only
-way for the end-user to interact with the software application is through
+way for the most end-users to interact with the software application is through
 the GUI. Hence, end-user satisfaction and retention of a software application
  are largely determined by the usability and correctness of
 its GUIs.
@@ -34,18 +34,17 @@ All GUI objects, including visual components and data models, must be
 The \textit{event dispatching thread}, or called \textit{UI thread}, is a global special
 thread initialized by the GUI framework, where all event-handling code
 is executed. All code that interacts with GUI objects must also
-execute on this thread.  There are several advantages to adapt the single-thread rule:
+execute on that thread.  There are several advantages to adapt the single-thread rule:
 
 \begin{itemize}
 
 \item GUI developers do not have to have an in-depth
-understanding of concurrency programming. A GUI framework in which all components
-must fully support multithreaded access can be difficult to extend, particularly
+understanding of concurrency programming. A GUI framework in which all GUI objects
+fully support multithreaded access can be difficult to extend, particularly
 for developers who are not expert at threads programming.
 
-\item Events are dispatched in a predictable order. Mouse and keyboard events, timer events, 
-paint requests, and other user-defined events are dispatched from the same event queue.
-In contrast, in a GUI framework without adapting the single-thread rule where components
+\item GUI events are dispatched in a predictable order from the same event queue.
+In contrast, in a GUI framework without adapting the single-thread rule where GUI objects 
 support multithreaded access, any component changes can be interleaved with event
 processing at the whim of the thread scheduler. This makes program behavior comprehension hard,
  and comprehensive testing difficult or impossible. 
@@ -72,18 +71,19 @@ who must make sure all GUI objects are accessed by the UI thread.
 
 In a multithreaded GUI application, the single-thread rule can be
 easily violated since a spawned non-UI thread often needs to update
-the GUI to display results after its computation task is finished.
+the GUI  after its  task is finished.
 For example, a server program can get requests from other programs
 that might be running on different machines. These requests can come at any time,
 and they result in one of the server's methods being invoked in some thread.
-After handling the request, the GUI-update code must be executed on the UI-thread.
+After handling the request, the GUI-update code that displays the response must be executed on the UI-thread.
 If not, an \textit{invalid thread access} will error occur. In practice, such
 invalid thread access error is \textit{frequent}, \textit{pervasive}, \textit{severe}.
 and \textit{difficult to avoid}.
 
 Take the popular Standard Widget Toolkit (SWT)~\cite{swt} GUI framework as an example. 
 In a recent survey~\footnote{\url{http://www.slideshare.net/lakshmip/top-3-swt-exceptions-3951224}}, the invalid thread access error
-has been listed as the top 3 bugs in developing a SWT application. Searching
+has been listed as the top 3 bugs in developing a SWT application, and treated
+as the source of many relevant concurrency bugs. Searching
 ``SWTException:Invalid thread access'' in Google returns over 11,800 entries,
 consisting of numerous bug reports, forum posts, and mailing list threads on
 this problem. Eclipse~\cite{eclipse}, the de-facto standard IDE for Java development,
@@ -95,13 +95,13 @@ We further manually studied all 156 \textit{confirmed} distinct bug reports, and
 found this error has been reported in at least 20 distinct eclipse projects
 and 40 distinct eclipse components. Even after over 10-year's active development,
 a recent release of eclipse still contains this error (bug id: 333533, reported in 01/2011).
- Furthermore, many reported invalid thread access errors are non-trivial. It is unintuitive
+ Furthermore, many reported  errors are non-trivial. It is unintuitive
 to fix them. Developers usually
 need non-local reasoning to find the specific UI interactions that can trigger the bug; and
-some reported bugs (e.g., bug id: 51757) even took developers 2 years to fix and verify the
+some reported errors (e.g., bug id: 51757) even took developers 2 years to fix it and verify the
 patch. In addition, such invalid thread access error is UI-relevant and also user-perceivable;
-it cannot be recovered by eclipse itself and often terminates the whole program.
-In many circumstances (as described in the bug reports),
+it cannot be recovered by the program itself and often terminates the whole application.
+In many circumstances as described in the bug reports,
 what users can only do is to restart the application to resort to an inconsistent status.
 
 
@@ -137,24 +137,27 @@ what users can only do is to restart the application to resort to an inconsisten
 \end{CodeOut}
 \vspace*{-2.0ex} \Caption{{\label{fig:androiderror} A real
 bug reported in 11/17/2011 in Mozilla firefox release 10.0.a.rc3
-for the Android platform (bugzilla ID: 703256). The \CodeIn{setRender}
-method called inside \CodeIn{LayerView}'s constructor
-spawns a new thread that violates the single-thread rule to inappropriately
-access the GUI objects in line 222. Our tool
-can find this bug and generate a warning as shown in
+for the Android platform (bugzilla ID: 703256). \CodeIn{LayerView}'s constructor
+calls method \CodeIn{setRender} that
+spawns a new thread at line 283. The new thread calls back method
+\CodeIn{onSurfaceChanged} that access GUI objects at line 222, and
+causes an invalid thread access error.
+Our tool
+can find this error and generate a warning as shown in
 Figure~\ref{fig:report}.
 }} %\vspace{-5mm}
 \end{figure}
 
-The invalid thread access error is not unique to the SWT framework. Other GUI frameworks
-such as Android~\cite{android} also suffer from similar problems. For example, 
+The invalid thread access error is not unique to the SWT framework. Other recent GUI frameworks
+like Android~\cite{android} also suffer from similar problems. For example, 
 Figure~\ref{fig:androiderror} shows a recently reported bug on the Mozilla Firefox Android version.
 In Figure~\ref{fig:androiderror}, \CodeIn{LayViewer}'s constructor calls the
 \CodeIn{setRender} method (line 74), which spawns a new thread (line 283).
-This newly created (non-UI) thread calls back the \CodeIn{onSurfaceChanged} method that
-accesses the GUI objects at line 222, thus results in an invalid thread access error.
-Compared to other reported errors, this bug is even more difficult to note, since the \CodeIn{setRender} method is in Android's
-library whose source code is often not available to developers.
+This newly created, non-UI thread calls back the \CodeIn{onSurfaceChanged} method that
+accesses the GUI objects at line 222, causing an invalid thread access error.
+Compared to other reported errors, this bug is even more difficult to note, 
+since the code that spawns a new thread inside the \CodeIn{setRender} method is
+in Android's library whose source code is often not available to developers.
 
 %It may work during development, but like most concurrent bugs, you'll start to see weird exceptions come up that seem completely unrelated, and occur non-deterministly - usually spotted AFTER you've shipped by real users. Not good.
 
@@ -167,29 +170,28 @@ The invalid thread access errors have significantly affect the
 usability of GUIs, but have not been thoroughly studied in
 the context of multithreaded GUI applications . To ensure GUIs
 to behave correctly, effective
-techniques must be devised to alleviate this problem.
+techniques must be developed to alleviate this problem.
 
 %Effective techniques must be developed to
 %find such errors.
 
 Software testing, the most widely used method to ensure program correctness,
-is often insufficient to detect such errors. That is because the space of possible interactions
+is insufficient to detect such errors. That is because the space of possible interactions
 with a GUI is enormous, in that each sequence of GUI events can result in
 a difficult state, and each GUI event may need to be evaluated in all of
 these states. It is almost impossible for testing to cover every possible
-states in practice. In fact, for most reported bugs in eclipse, only very specific
-UI interaction sequences can trigger the error. A large software system like eclipse
-has a well-designed test suite that achieves fairly high coverage; but many
+states. In fact, for a widely-used software system like eclipse
+often has a well-designed test suite that achieves fairly high coverage; but many
  bug-triggering UI sequences are still not covered.
 
 Program refactoring~\cite{Mens:2004}, another popular way to improve software quality,
 is also inadequate to eliminate this error.  A standard way to fix such
-invalid thread access error is to replace direct GUI object accessing operations
+invalid thread access error is to replace direct GUI object accessing code 
 with asynchronized message passing, to ensure GUI object are accessed in
 the UI thread. For example, fixing the bug in Figure~\ref{fig:androiderror}
 needs to wrap line 222 inside a \CodeIn{post} message passing method\footnote{The
-\CodeIn{post} method is in class \CodeIn{android.widget.View}, providing
-a standard utility to send messages to the UI-thread}, as follows:
+\CodeIn{post} method in class \CodeIn{android.widget.View} is a
+a standard way to send messages to the UI-thread}, as follows:
 
 
 \begin{CodeOut}
@@ -219,7 +221,8 @@ with extreme caution.
 %Furthermore, asyncExec has no timing guarantee, and programmers can not use it everywhere
 
 In this paper, we choose to use static analysis to find such potential errors.
-Static analysis has several advantages while comparing to dynamic approaches like testing for this problem.
+Static analysis has two attractive advantages while comparing to dynamic approaches such as
+ testing.
 First, a static analysis can explore every path of the program without executing the code, and
 thus there is no need to construct non-trivial tests and harnesses.
 Second, a static analysis can soundly find potentially errors: if it
@@ -242,23 +245,24 @@ reports no warnings, the code is guaranteed to be bug-free.
 \end{alltt}
 \end{CodeOut}
 \vspace*{-2.0ex} \Caption{{\label{fig:report} A report
-generated by our tool to reveal the pontential bug in
-Figure~\ref{fig:androiderror}. $\rightarrow$ represents the calling relations
-between methods, and \CodeIn{checkThread} is an internal utility
-method in Android's library that checks whether the current thread is the
+generated by our tool to reveal the pontential error in
+Figure~\ref{fig:androiderror}. This report indicates a 
+full method call chain that causes the error. $\rightarrow$ represents
+the call relationship
+between methods, and \CodeIn{checkThread} is an Android library
+method  that checks whether the current thread is the
 event dispatching thread before accessing a GUI object.
 }} %\vspace{-5mm}
 \end{figure}
 
 We formulate finding invalid thread access as a call graph reachability
-problem. Our static analysis soundly constructs a call graph and starts
-to traverse every possible paths from the entry points, checking whether
+problem. Given a call graph, our technique traverses
+every possible paths from its entry nodes, checking whether
 there exists a path to access a GUI object from a non-UI thread. If 
 a suspicious path is found,
 the static analysis issues a potential warning in the form of a method
 call chain from the starting point, serving as the contextual information
 for developers to understand the error.
-
 As an example, Figure~\ref{fig:report} shows a report produced
 by our static analysis for the buggy code in Figure~\ref{fig:androiderror}.
 This report clearly indicates how a new, non-UI thread is spawned and
@@ -268,20 +272,36 @@ inspect the method call chain, understand how the error
 is triggered, and then determine if it is a real bug.
 
 Our static analysis is independent of the call graph construction algorithms.
-However, we find existing call graph construction algorithms~\cite{} are
-insufficient to build a good call graph for GUI applications in the presence
-of the heavy use of reflection. To alleviate this problem,
-we present a combined RTA and k-CFA call graph analysis to balance the call
-graph completeness and precision. (XXXX)
+Given a sound call graph, our analysis is sound in that it does
+not miss true positives. We note, however, that computing a sound
+call graph for GUI applications in the presence of reflection,
+is non-trivial.
+Existing call graph construction algorithms such as RTA~\cite{} and k-CFA~\cite{}
+either suffer from the problem of imprecision or incompleteness .
+To alleviate this problem,
+we present a combined RTA and k-CFA call graph construction algorithm, and
+also compare its usefulness with other algorithms in  our experiments.
 
 \subsection{Technique Instantiation and Evaluation}
 
-(XXX)
 
-We instantiate our technique on four popular GUI frameworks namely SWT,
-eclipse plugin, Java Swing, and Android. Instantiating the general technique
-for each framework only requires few human effort. The key issue to address
-is to identify UI-thread
+We instantiate our technique for four popular GUI frameworks namely SWT,
+eclipse plugin environment, Java Swing, and Android. Swing and SWT are
+two dominating GUI frameworks in developing desktop Java applications.
+Eclipse and its plugin development envrionment is the de-facto standard
+IDE for Java. Android market share reaches 56\% in the mobile computing
+world as of Sep 2011, and becomes the No. 1 platform for mobile applications.
+Instantiating the general technique for each framework only requires few
+human effort. The primary framework-specific part is to specify
+the \textit{UI thread} and \textit{call graph entry nodes}.
+
+We further implement a prototype tool that supports detecting invalid
+thread access errors in the above four GUI frameworks, and evaluate
+it on XXX subjects over XXX LOC. The experiment results demonstrate
+the effectiveness of the proposed technique. Our tool found XXX
+from XXX subjects on all supported GUI frameworks with an acceptable
+false positives.
+
 
 
 
@@ -291,22 +311,26 @@ This paper makes the following contributions:
 
 \begin{itemize}
 \item \textbf{Problem.} We explicitly identify the invalid thread
-access error on multithreaded GUI programs, and formulate it
-as a call graph reachability problem.
+access error on multithreaded GUI programs.
+%, and formulate it
+%as a call graph reachability problem.
 
-\item \textbf{Technique.} We present a general technique to find
-such errors. In particular, to deal with the unique features in
+\item \textbf{Technique.} We formulate finding
+the invalid thread access error as a call graph reachability problem,
+and present a general technique to find such errors. 
+In particular, to deal with the unique features in
 multithreaded GUI programs, we propose a combined RTA and k-CFA
-call graph construction algorithm
+call graph construction algorithm (Section~\ref{sec:technique}).
 
-\item \textbf{Implementation.} We instantiate our technique for four
-popular GUI platforms: SWT, eclipse plugin, Swing, and Android. Our
+\item \textbf{Implementation.} We implement our technique, and
+instantiate it for four
+popular GUI platforms: SWT, eclipse plugin, Swing, and Android (Section~\ref{sec:implementation}). Our
 tool implementation is publicly available at:
 \url{http://guierrordetector.googlecode.com}
 
 \item \textbf{Evaluation.} We performed an experiment on XXX subjects
 from 4 different platforms over XXX LOC. As a result, our technique
-found XXX bugs 
+found XXX bugs (Section~\ref{sec:evaluation}).
 
 \end{itemize}
 

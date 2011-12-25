@@ -1,8 +1,9 @@
 \section{Technique}
+\label{sec:technique}
 
 We first gives our high-level approach formulation, then present
 an error detection algorithm. Finally, we show how to instantiate
-the error detection to different GUI frameworks.
+the error algorithm to different GUI frameworks.
 
 
 \subsection{Approach Formulation}
@@ -16,31 +17,35 @@ two assumptions we make with regard to error detection.
 \noindent {\textsc{\textbf{Definition 1 (UI Thread).}}} {UI thread
 is a special thread created by the GUI framework during
 GUI initialization. After the GUI becomes visible, the UI thread
-takes charge of the application, handle events from the GUIs,
+takes charge of the application to handle events from the GUIs,
 or spawn new threads to process lengthy operations in the background. }\vspace{1mm}
 
 \noindent {\textsc{\textbf{Assumption 1.}}} {We assume that each multithreaded
 GUI application has a single global UI thread. This is true for applications
-built on top of GUI frameworks that adapt the single-thread rule. It is
-possible that an application launches another application with its own UI thread
-by initializing a different process. In that case, we require the new
+built on top of GUI frameworks adapting the single-thread rule. The
+only exception is that 
+ an application may folk a new process to launch another
+application with its own UI thread. In that case, we require the new
 launched application to be analyzed separately.}\vspace{1mm}
 
 \noindent {\textsc{\textbf{Definition 2 (non-UI Thread).}}} {Any other
-threads except for the UI thread is called non-UI threads.}\vspace{1mm}
+threads except for the UI thread in a multithreaded GUI application
+ are called non-UI threads.}\vspace{1mm}
 
 \noindent {\textsc{\textbf{Assumption 2.}}} { We assume that each non-UI
-thread can only be spawned by the UI thread. Under this assumption, all post-initialization
+thread can only be spawned by the UI thread. Under this assumption,
+ all post-initialization
 GUI work naturally occurs in the UI-thread. Once the GUI is visible, the
-application is driven by events, which are always handled in the UI thread. We
-believe this assumption is reasonable, since if a non-UI
-thread is spawned during pre-initialization GUI work and that thread accesses
-a GUI object, an exception becomes apparent and the whole application may abort. This
-is unlikely for most of the realistic GUI applications.
+application is driven by events, which are always handled in the UI thread.
+We can safely ignore non-UI threads that are spawned during pre-initilaizaiton
+GUI work, since if such threads access a GUI object, an exception becomes
+immediately apparent and the whole application may abort even before the
+GUI is visible. This is highly unlikely for most of the realistic GUI
+applications.
 }\vspace{1mm}
 
 \noindent {\textsc{\textbf{Definition 3 (UI Accessing Methods).}}} { A method
-whose execution may read or write a UI object is called a UI Accessing Method.}\vspace{1mm}
+whose execution may read or write a UI object is called a UI accessing method.}\vspace{1mm}
 
 \noindent  {\textsc{\textbf{Definition 4 (Safe Methods).}}} {GUI frameworks that
 adapt the single-thread rule must provide methods to permit non-UI threads
@@ -48,7 +53,7 @@ to run code in the UI thread. We can such methods \textit{safe methods}, since
 they can be invoked safely by any threads.}\vspace{1mm}
 
 \noindent  {\textsc{\textbf{Definition 5 (Invalid Thread Access).}}} {An invalid
-thread access error occurs if the UI thread spawns a non-UI thread, and there
+thread access error occurs when the UI thread spawns a non-UI thread, and there
 exists a path from the non-UI thread's \CodeIn{start} method to any UI accessing methods
 without going through any safe methods. }\vspace{2mm}
 
@@ -58,20 +63,69 @@ may invoke a UI accessing method.
 
 \subsection{Error Detection Algorithm}
 
-We cast the problem of finding invalid thread
+The algorithm for detecting potential invalid thread access errors
+is shown in Figure~\ref{fig:detectalgorithm}. Our algorithm uses a
+static call graph as the program representation for a multithreaded
+GUI application. A Java call graph represents calling relationships
+between methods. Specially, each node represents a method and each
+edge ($f$, $g$) indicates that method $f$ may call method $g$.
+A theoretical ideal call graph can be defined as the union of the
+dynamic call graphs over all possible executions of the program. 
+A conservative static call graph is a superset of the ideal call graph;
+it over-approximates the
+dynamic call graph of every possible execution. 
+We believe call graph has a suitable granularity for this problem while
+Compared with other
+program representations like control flow graph or program dependence
+graph. That is because, in an object-oriented programming language like
+Java, a method is the basic unit of a program. Thus, reporting errors
+at the method level can be sufficient in most cases.
 
-Choose a right abstraction, why call graph is good?
 
-a call graph is a good approximation
+Our algorithm in Figure~\ref{fig:detectalgorithm} works as follows. It
+constructs a static call graph for the tested program (line 2),
+and specifies entry nodes for it. The algorithm starts to perform
+call graph traverse from every entry node (line 6). For every entry node,
+it first uses Breadth First Search (BFS) to find all reachable
+\CodeIn{Thread.start()} method (line 7). Each \CodeIn{Thread.start()} method
+indicates a new, non-UI thread is spawned.  Then, from each
+\CodeIn{Thread.start()} node, the algorithm uses a slightly modified 
+BFS algorithm to find reachable UI accessing methods (lines 9 -- 23).
+Specifially, it uses a queue to keep track of all visited nodes, and
+the algorithm checks every successive node to be visited;
+it reports an error if that node
+is a UI accessing method (line 15), or skips it if it is
+a safe method (line 17), or simply keeps traversing (line 19).
+
+If the algorithm determines that a UI accessing method may be invoked
+by a non-UI thread, it creates an error report containing the full
+method call chain from the entry node (line 15, the \CodeIn{createErrorReport}
+method). An example call chain for
+the motivating example in Figure~\ref{fig:androiderror} is shown
+in Figure~\ref{fig:report}.
 
 Given a sound call graph, our algorithm is sound in that it does not
-miss true positives. We note, however, that coomputing a sound
+miss true positives. We note, however, that computing a sound
 call graph for partial programs such as an eclipse plugin,
 or in the presence of reflection, is non-trivial. Existing
 call graph construction algorithms either suffer from incompleteness
-or imprecision.  XX We describe our combined xxx in Section XXX.
+or imprecision. GUI applications built on some popular frameworks
+often use configuration files and reflection to specify GUI layout
+or extension points, therefore, reflection must be properly handled.
+We developed a combined RTA
+and k-CFA call graph construction algorithm in Section~\ref{sec:cg}
+to alleviate this problem.
 
-We also note that static analysis may report redundant
+
+We also note that static analysis may report false positives due
+to its conservative nature, and multiple warnings that acutally corrspond to
+the same error. In addition, some GUI applications may even use
+Java native methods to interact with the underlying operating system.
+Native methods are often beyond the ability of a static analysis, but
+must be considered to make the call graph sound. To address the
+above two limitations, we present a set of heuristics to filter
+highly likely false positives and remove redundant reports, and annotation
+support for programmers to specify call relationship for native methods.
 
 
 \begin{figure}[t]
@@ -107,25 +161,17 @@ We also note that static analysis may report redundant
 %\ENDWHILE
 \vspace{-2mm}
 \end{algorithmic}
-\caption{Algorithm for detecting errors in multithreaded GUI programs. 
-Four utility methods in lines 2 -- 4 are customized for each GUI platforms
-(not each program) as described in Section~\ref{sec:platforms}.
+\caption{Algorithm for detecting invalid thread access errors in multithreaded GUI programs. 
+Any call graph construction algorithm can be used (line 2).
+Three utility methods in lines 3 -- 5 are specific for each GUI framework
+ as described in Section~\ref{sec:platforms}.
 } \label{fig:detectalgorithm}
 \end{figure}
 
 
 \subsubsection{Call Graph Construction}
+\label{sec:cg}
 
-For desktop applications which have main method, it is straigtforward to apply
-the above algorithm. However, for applications on platforms like eclipse plugin
-and Android. presents new challenges. Two technical challenges must be solve.
-First, use reflection extensively, Second, it is possible to interact with
-native code.
-
-Android features an extended event-based library and dynamic inflation of
-graphical views from declarative XML layout files.
-A static analyzer for Android programs must consider such features, for
-correctness and precision.
 
 \begin{figure}[t]
 %\centering
@@ -155,9 +201,42 @@ correctness and precision.
 \end{alltt}
 \end{CodeOut}
 \label{fig:sampleandroid}
-\caption{A Sample Android Code ..}
+\caption{Sample GUI application code on the Android platform. The layout
+XML file (the top) specifies a Button object declaratively, 
+and the Java code (the bottom)
+first loads the XML file (line 6) and then uses reflection to create
+a Button object by its ID (line 7, the \CodeIn{findViewByd} method).}
 \end{figure}
 
+In the context of object-oriened languages wth dynamic dispatch, the
+crucial step in constructing a call graph is to compute a conservative
+approximation of the set of methods that can be invoked by a given
+virtual method call. Call graph construction algorithms have been
+studied intensively in the 1990s. While their original formulations
+use a variety of formalisms, most of them can be recast as set-based
+analyses. Various algorithms differ primarily in the number of sets
+that are used to approximate run-time values of expressions. 
+In practice, algorithms such as RTA that use a single set for the whole
+program scale well but achieves relatively lower precision. The
+k-CFA algorithms maintains one set per expression achieves better
+precision than RTA.
+
+Unfortunately, for GUI applications that use reflection, we found both
+RTA and k-CFA is insufficient to build a satisfactory call graph. Here
+is an example in Figure~\ref{fig:sampleandroid} to illustrate their limitations.
+
+(XXX)
+
+For desktop applications which have main method, it is straigtforward to apply
+the above algorithm. However, for applications on platforms like eclipse plugin
+and Android. presents new challenges. Two technical challenges must be solve.
+First, use reflection extensively, Second, it is possible to interact with
+native code.
+
+Android features an extended event-based library and dynamic inflation of
+graphical views from declarative XML layout files.
+A static analyzer for Android programs must consider such features, for
+correctness and precision.
 
 Give an example of how reflection affect call graph precision.
 
@@ -197,9 +276,10 @@ native code
 %\ENDWHILE
 \vspace{-2mm}
 \end{algorithmic}
-\caption{Algorithm for constructing a call graph using a combination of the RTA~\cite{rta} and k-CFA~\cite{kcfa} algorithms.
-$cls$ is a list of class XXXX, whose invocatioon is treated using RTA; while the remaining call graph
-part is constructed using k-CFA.
+\caption{A combined  RTA~\cite{rta} and k-CFA~\cite{kcfa} call graph construction algorithm.
+$cls$ is a list of classes whose method invocations are added to the
+call graph using the RTA algorithm; while method invocations from other classes
+are added to the call graph using the k-CFA algorithm.
 } \label{fig:cgalgorithm}
 \end{figure}
 
@@ -207,7 +287,7 @@ part is constructed using k-CFA.
 
 
 \subsubsection{Heuristic Filters and Annotations}
-(XXX)
+\label{sec:heuristic}
 
 Static analysis exhaustively check possible error path; it may report
 paths that indicate the same bug. The potentially huge volume of

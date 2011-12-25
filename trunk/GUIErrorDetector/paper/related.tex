@@ -27,13 +27,12 @@ Their technique can generate test cases automatically using a structural event
 generation graph. 
 %Their approach targets Java desktop applications, which
 %are quite different from the Android mobile environment (XXXX).
-However, testing is often insufficient to ensure the correctness of a GUI program, for
-a number of reasons. First of all, the space of possible interactions
-with a GUI is enormous, in that each sequence of GUI
-events can result in a different state, and each GUI event
-may need to be evaluated in all of these states~\cite{YuanMemonICSE2007}.
-The large number of possible states result in a large number of
-test inputs requiring substantile human effort. The second
+However, testing is often insufficient to ensure the correctness of a GUI program
+due to the huge space of possible interactions
+with a GUI. The large number of possible interactions
+result in a large number of
+test inputs requiring substantile human effort.
+The second
 problem is to determine the coverage of a set of test
 cases~\cite{MemonFSE2001}. For conventional software, coverage is measured
 using the amount and type of underlying code exercised.
@@ -41,13 +40,13 @@ These measures do not work well for GUI testing, because
 what matters is not only how much of the code is tested,
 but in how many different possible states of the software
 each piece of code is tested. This makes it hard to determine
-the effectiveness of a test suite. %All of the (XXXXX, so that GUI is often not well tested)
+the completeness of a test suite. %All of the (XXXXX, so that GUI is often not well tested)
 In contrast, as advocated in this paper, the primary advantage of
 using a static analysis is that it can potentially explore
 all paths to find possible bugs without actually executing the tested code. % (XXX use heuristic filtering)
 Compared with software testing, a static analysis tool may
-report false positives due to its conservative nature. Netherless,
-as we demonstrated in our experiments, using a few simple heuristics
+report false positives due to its conservative nature.
+Nevertheless, as we demonstrated in our experiments, using a few simple heuristics
 can dramatically reduce the number of false positives  to
 an acceptable level.
 
@@ -98,11 +97,11 @@ a multithreaded program. A data race occurs when two concurrent threads access
 a shared variable and when at least one access is a write and the threads
 use no explicit mechanism to prevent the accesses from being simultaneous. In contrast,
 an invalid thread access error occurs when a non-UI thread accesses (reads or writes) a GUI object.
-Detecting invalid thread access error does not require monitoring every shared-memory
+Unlike detecting potential data races, finding invalid thread access error does not require monitoring every shared-memory
 reference and verify that consistent locking behavior is observed among different threads. Instead,
 our technique only needs to track whether a non-UI thread can reach a GUI object or not.
-How to adapt existing data race detection technique to find potential
-GUI errors is one of our future work.
+How to adapt existing data race detection approaches to 
+improve our technique is one of our future work.
 
 %Significantly different from the concurrency bug finding work....
 
