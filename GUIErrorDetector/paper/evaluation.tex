@@ -1,4 +1,5 @@
 \section{Empirical Evaluation}
+\label{sec:evaluation}
 
 Our experiment objective is three-fold: to demonstrate the effectiveness
 of our approach in detecting real bugs in multithreaded GUI applications, to 
@@ -192,3 +193,9 @@ The average analysis time per / bug
 \subsection{Discussion}
 
 \subsubsection{Threats to Validity}
+
+Our evaluation was limited in several ways. First, the studied
+subjects were selected with a bias towards popularity. Second,
+the program analysis tool cannot compute call relationships
+for inter-process communication between components. Missing
+call relationship may lead to false negatives.

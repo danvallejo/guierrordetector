@@ -13,12 +13,13 @@ occurs and the whole application may abort consequently.
 In this paper, we present a general technique to find such \textit{invalid thread access}
 errors in multithreaded GUI applications. We formulate finding invalid
 thread access errors as a call graph
-reachability problem. Our technique starts from call graph entry nodes and statically explores
-all possible paths that may cause a non-UI thread to access a GUI object.
+reachability problem. Our technique starts from call graph entry nodes to
+statically explore all possible paths that may cause a non-UI thread
+to access a GUI object.
 However, the heavy use of reflection in modern GUI frameworks makes existing
 call graph construction algorithms insufficient to build a both complete and precise
-call graph. To overcome such limitations, we present a combined RTA and k-CFA
-call graph analysis (that XXX). % to overcome such limitations.% of analyzing GUI applications.
+call graph. Thus, we present a combined RTA and k-CFA
+call graph construction algorithm to overcome the limitations.% of analyzing GUI applications.
 
 
 We implemented our technique and instantiated it on four popular GUI
