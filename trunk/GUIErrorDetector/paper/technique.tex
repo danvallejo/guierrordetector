@@ -57,7 +57,7 @@ thread access error occurs when the UI thread spawns a non-UI thread, and there
 exists a path from the non-UI thread's \CodeIn{start} method to any UI accessing methods
 without going through any safe methods. }\vspace{2mm}
 
-At a high level, to detect an invalid thread access error, an analysis only needs to track all
+At a high level, to detect an invalid thread access error, an analysis needs to track all
 non-UI threads spawned by the UI thread, and check whether those non-UI threads
 may invoke a UI accessing method.
 
@@ -71,31 +71,33 @@ between methods. Specially, each node represents a method and each
 edge ($f$, $g$) indicates that method $f$ may call method $g$.
 A theoretical ideal call graph can be defined as the union of the
 dynamic call graphs over all possible executions of the program. 
-A conservative static call graph is a superset of the ideal call graph;
-it over-approximates the
+A conservative static call graph used in practice is a superset of
+the ideal call graph; it over-approximates the
 dynamic call graph of every possible execution. 
-We believe call graph has a suitable granularity for this problem while
-Compared with other
+In an object-oriented programming language like
+Java, a method is the basic logic unit in a program. Reporting
+potential errors at the method level can be sufficient in most cases.
+Thus, we believe using call graph is well suited for this problem while
+compared with other
 program representations like control flow graph or program dependence
-graph. That is because, in an object-oriented programming language like
-Java, a method is the basic unit of a program. Thus, reporting errors
-at the method level can be sufficient in most cases.
+graph. 
 
 
 Our algorithm in Figure~\ref{fig:detectalgorithm} works as follows. It
-constructs a static call graph for the tested program (line 2),
-and specifies entry nodes for it. The algorithm starts to perform
-call graph traverse from every entry node (line 6). For every entry node,
+first constructs a static call graph for the tested program (line 2),
+then specifies entry nodes for it (line 3). The algorithm starts to traverse
+the call graph from every entry node (line 6). For every entry node,
 it first uses Breadth First Search (BFS) to find all reachable
 \CodeIn{Thread.start()} method (line 7). Each \CodeIn{Thread.start()} method
-indicates a new, non-UI thread is spawned.  Then, from each
-\CodeIn{Thread.start()} node, the algorithm uses a slightly modified 
-BFS algorithm to find reachable UI accessing methods (lines 9 -- 23).
+indicates that a new, non-UI thread is spawned.  After that, 
+the algorithm uses a slightly modified 
+BFS algorithm to find reachable UI accessing methods (lines 9 -- 23)
+from each \CodeIn{Thread.start()} node.
 Specifially, it uses a queue to keep track of all visited nodes, and
-the algorithm checks every successive node to be visited;
+then checks every successive node to be visited (line 12);
 it reports an error if that node
 is a UI accessing method (line 15), or skips it if it is
-a safe method (line 17), or simply keeps traversing (line 19).
+a safe method (line 17), or simply keeps traversing otherwise (line 19).
 
 If the algorithm determines that a UI accessing method may be invoked
 by a non-UI thread, it creates an error report containing the full
@@ -107,25 +109,26 @@ in Figure~\ref{fig:report}.
 Given a sound call graph, our algorithm is sound in that it does not
 miss true positives. We note, however, that computing a sound
 call graph for partial programs such as an eclipse plugin,
-or in the presence of reflection, is non-trivial. Existing
-call graph construction algorithms either suffer from incompleteness
-or imprecision. GUI applications built on some popular frameworks
+or in the presence of reflection, is non-trivial. 
+In particular, GUI applications built on some popular frameworks
 often use configuration files and reflection to specify GUI layout
-or extension points, therefore, reflection must be properly handled.
-We developed a combined RTA
-and k-CFA call graph construction algorithm in Section~\ref{sec:cg}
-to alleviate this problem.
+or extension points.
+Existing call graph construction algorithms either suffer from incompleteness
+or imprecision.  To alleviate this problem, 
+We proposed a combined RTA
+and k-CFA call graph construction algorithm in Section~\ref{sec:cg}.
 
 
-We also note that static analysis may report false positives due
-to its conservative nature, and multiple warnings that acutally corrspond to
-the same error. In addition, some GUI applications may even use
+We also note that a static analysis may report false positives due
+to its conservative nature, or multiple warnings that acutally corrspond to
+the same error. In addition, some GUI applications may use
 Java native methods to interact with the underlying operating system.
 Native methods are often beyond the ability of a static analysis, but
-must be considered to make the call graph sound. To address the
+should be considered to construct a good call graph. To address the
 above two limitations, we present a set of heuristics to filter
-highly likely false positives and remove redundant reports, and annotation
-support for programmers to specify call relationship for native methods.
+highly likely false positives and remove redundant reports, and provide
+annotation support for programmers to specify call relationship for
+ native methods.
 
 
 \begin{figure}[t]
@@ -219,38 +222,9 @@ that are used to approximate run-time values of expressions.
 In practice, algorithms such as RTA that use a single set for the whole
 program scale well but achieves relatively lower precision. The
 k-CFA algorithms maintains one set per expression achieves better
-precision than RTA.
+precision than RTA (\textit{k} is the context length, which is
+orthogonal to the number of maintained sets).
 
-Unfortunately, for GUI applications that use reflection, we found both
-RTA and k-CFA is insufficient to build a satisfactory call graph. Here
-is an example in Figure~\ref{fig:sampleandroid} to illustrate their limitations.
-
-(XXX)
-
-For desktop applications which have main method, it is straigtforward to apply
-the above algorithm. However, for applications on platforms like eclipse plugin
-and Android. presents new challenges. Two technical challenges must be solve.
-First, use reflection extensively, Second, it is possible to interact with
-native code.
-
-Android features an extended event-based library and dynamic inflation of
-graphical views from declarative XML layout files.
-A static analyzer for Android programs must consider such features, for
-correctness and precision.
-
-Give an example of how reflection affect call graph precision.
-
-The Android button example.
-
-Using RTA is not enough, since that maintains a global
-
-So, we present a new call graph construction algorithm
-
-reflected classes are known, use RTA.
-
-reflection code
-
-native code
 
 \begin{figure}[t]
 \textbf{Input}: a Java program $P$, a list of classes $cls$\\
@@ -276,14 +250,71 @@ native code
 %\ENDWHILE
 \vspace{-2mm}
 \end{algorithmic}
+\label{fig:cgalgorithm}
 \caption{A combined  RTA~\cite{rta} and k-CFA~\cite{kcfa} call graph construction algorithm.
 $cls$ is a list of classes whose method invocations are added to the
 call graph using the RTA algorithm; while method invocations from other classes
 are added to the call graph using the k-CFA algorithm.
-} \label{fig:cgalgorithm}
+} 
 \end{figure}
 
 
+Unfortunately, GUI applications often use reflection, which makes either
+RTA or k-CFA insufficient to build a satisfactory call graph. 
+The example code in Figure~\ref{fig:sampleandroid}  illustrates their limitations.
+In Figure~\ref{fig:sampleandroid}, line 7 uses reflection to create a \CodeIn{Button}
+object by looking up its id declared in the XML file. Due to
+its limitation in handling reflection, the k-CFA algorithm
+will conclude that variable \CodeIn{button} at line 7 does not point to any
+concrete \CodeIn{Button} object. Thus, it will miss the call edge \CodeIn{setText}
+while processing line 11. On the other hand, a less precise algorithm like RTA~\cite{}
+can not solve this problem. By explicitly specifying that GUI objects
+like \CodeIn{Button} as declared in the XML file will be created, RTA maintains
+a global value set for those GUI object type, and concludes that the \CodeIn{button} variable
+at line 7 points to a concrete Button object. So the algorithm  adds a
+call edge \CodeIn{setText} to the call graph. However, using RTA for
+the whole program results in unnecessary precision loss. Note that,
+RTA may conclude that the \CodeIn{cachedViews} variable at line 2
+may point to any created \CodeIn{List} objects, despite the
+fact that \CodeIn{cachedViews} can only be a \CodeIn{LinkedList} object at line 12.
+
+
+To alleviate the above problems, we present a combined RTA and k-CFA
+call graph construction algorithm as shown in Figure~\ref{fig:cgalgorithm}.
+This algorithm uses the RTA algorithm to construct call graph for part of the program that
+uses reflection to creating GUI objects (to ensure call graph completeness), while still uses
+the k-CFA algorithm for the remaining part of the program (to avoid precision loss). Specifically,
+users provide a list of classes, which can either be encoded manually or
+automatically extracted from the XML configuration file, whose method invocations should be
+constructed in a RTA way. The algorithm maintains a global set for
+each  provided class, but a separate set for expressions of other
+types.  For the example in Figure~\ref{fig:sampleandroid}, this
+combined algorithm concludes that a \CodeIn{Button} object has been
+created at line 7 and then adds the call edge \CodeIn{setText} to the
+graph. It also concludes that the \CodeIn{cachedViews} variable can only
+point to a \CodeIn{LinkedList} object, avoiding unnecessary precision loss.
+
+%For desktop applications which have main method, it is straigtforward to apply
+%the above algorithm. However, for applications on platforms like eclipse plugin
+%and Android. presents new challenges. Two technical challenges must be solve.
+%First, use reflection extensively, Second, it is possible to interact with
+%native code.
+
+%Android features an extended event-based library and dynamic inflation of
+%graphical views from declarative XML layout files.
+%A static analyzer for Android programs must consider such features, for
+%correctness and precision.
+
+%Give an example of how reflection affect call graph precision.
+
+
+%So, we present a new call graph construction algorithm
+
+%reflected classes are known, use RTA.
+
+%reflection code
+
+%native code
 
 
 \subsubsection{Heuristic Filters and Annotations}

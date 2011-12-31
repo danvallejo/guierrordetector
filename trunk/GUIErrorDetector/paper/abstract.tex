@@ -16,7 +16,7 @@ thread access errors as a call graph
 reachability problem. Our technique starts from call graph entry nodes to
 statically explore all possible paths that may cause a non-UI thread
 to access a GUI object.
-However, the heavy use of reflection in modern GUI frameworks makes existing
+However, the heavy use of reflection in modern GUI applications makes existing
 call graph construction algorithms insufficient to build a both complete and precise
 call graph. Thus, we present a combined RTA and k-CFA
 call graph construction algorithm to overcome the limitations.% of analyzing GUI applications.
@@ -24,7 +24,7 @@ call graph construction algorithm to overcome the limitations.% of analyzing GUI
 
 We implemented our technique and instantiated it on four popular GUI
 platforms, namely SWT, Eclipse plugin development framework, Java Swing, and Android. In an evaluation
-on XX subjects over XXX LOC, our technique found a number of errors,
+on XX subjects over XXX LOC, our technique found a number of real-world errors,
 suggesting its effectiveness and showing good scalability.
 
 \end{abstract}
