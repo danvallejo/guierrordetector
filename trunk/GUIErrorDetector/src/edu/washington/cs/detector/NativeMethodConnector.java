@@ -27,6 +27,10 @@ public class NativeMethodConnector {
 		methodMappings.get(nativeMethod).add(callbackMethod);
 	}
 	
+	public void addNativeMethodMapping(Map<String, Collection<String>> mappings) {
+		this.methodMappings.putAll(mappings);
+	}
+	
 	public Collection<String> getCallBacks(String nativeMethod) {
 		return methodMappings.get(nativeMethod);
 	}
