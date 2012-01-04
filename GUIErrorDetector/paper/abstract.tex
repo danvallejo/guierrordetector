@@ -1,31 +1,28 @@
 \begin{abstract}
-Graphical User Interface (GUI) is a critical component of today's software.
- It provides user-friendly access to the functionality provided by the application.
-To keep GUIs responsive and active, a GUI application often spawns
- separate threads to handle lengthy operations in the background,
-such as expensive computations, I/O tasks, and network requests.
-However, many modern GUI frameworks require all GUI objects
-must be accessed exclusively by the \textit{event dispatching thread}
-(or called \textit{UI thread}). If a GUI object
-is accessed through a non-UI thread, an \textit{invalid thread access} error
-occurs and the whole application may abort consequently. 
+To keep a Graphical User Interface (GUI) responsive and active, a GUI
+application often has a main \textit{UI thread} (or \textit{event dispatching thread})
+and spawns separate threads to handle lengthy operations in the background,
+such as expensive computation, I/O tasks, and network requests.
+Many GUI frameworks require all GUI objects to be accessed exclusively by the
+UI thread. If a GUI object is accessed through a non-UI thread,
+an \textit{invalid thread access} error occurs and the whole
+application may abort. 
 
-In this paper, we present a general technique to find such \textit{invalid thread access}
+This paper presents a general technique to find such \textit{invalid thread access}
 errors in multithreaded GUI applications. We formulate finding invalid
-thread access errors as a call graph
-reachability problem. Our technique starts from call graph entry nodes to
-statically explore all possible paths that may cause a non-UI thread
-to access a GUI object.
-However, the heavy use of reflection in modern GUI applications makes existing
-call graph construction algorithms insufficient to build a both complete and precise
-call graph. Thus, we present a combined RTA and k-CFA
+thread access errors as a call graph reachability problem with
+thread spawning as the sources and GUI object accessing as the sinks. 
+Heavy use of reflection in modern GUI applications makes existing
+call graph construction algorithms fail to build a sufficiently complete
+and precise call graph. Thus, we present a combined RTA and k-CFA
 call graph construction algorithm to overcome the limitations.% of analyzing GUI applications.
 
 
 We implemented our technique and instantiated it on four popular GUI
-platforms, namely SWT, Eclipse plugin development framework, Java Swing, and Android. In an evaluation
-on XX subjects over XXX LOC, our technique found a number of real-world errors,
-suggesting its effectiveness and showing good scalability.
+platforms: SWT, Eclipse plugin development framework, Java Swing, and
+Android. In an evaluation on XX subjects over XXX LOC, our technique
+found a number of real-world errors, suggesting its effectiveness
+and showing good scalability.
 
 \end{abstract}
 
