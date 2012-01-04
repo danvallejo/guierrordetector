@@ -1,7 +1,7 @@
 \section{Technique}
 \label{sec:technique}
 
-We first gives our high-level approach formulation, then present
+We first give our high-level approach formulation, then present
 an error detection algorithm. Finally, we show how to instantiate
 the error algorithm to different GUI frameworks.
 
@@ -11,20 +11,20 @@ the error algorithm to different GUI frameworks.
 This section formulates our high-level approach. We define the
 notations of \textit{UI thread}, \textit{non-UI threads},
 \textit{UI accessing methods},
- \textit{Safe methods}, and \textit{invalid thread access error}, and
+ \textit{safe methods}, and \textit{invalid thread access error}, and
 two assumptions we make with regard to error detection.
 
-\noindent {\textsc{\textbf{Definition 1 (UI Thread).}}} {UI thread
+\noindent {\textsc{\textbf{Definition 1 (UI Thread).}}} {The UI thread
 is a special thread created by the GUI framework during
 GUI initialization. After the GUI becomes visible, the UI thread
-takes charge of the application to handle events from the GUIs,
-or spawn new threads to process lengthy operations in the background. }\vspace{1mm}
+takes charge of the application to handle events from the GUI,
+and spawns new threads to process lengthy operations in the background. }\vspace{1mm}
 
 \noindent {\textsc{\textbf{Assumption 1.}}} {We assume that each multithreaded
 GUI application has a single global UI thread. This is true for applications
 built on top of GUI frameworks adapting the single-thread rule. The
 only exception is that 
- an application may folk a new process to launch another
+ an application may fork a new process to launch another
 application with its own UI thread. In that case, we require the new
 launched application to be analyzed separately.}\vspace{1mm}
 
@@ -33,29 +33,30 @@ threads except for the UI thread in a multithreaded GUI application
  are called non-UI threads.}\vspace{1mm}
 
 \noindent {\textsc{\textbf{Assumption 2.}}} { We assume that each non-UI
-thread can only be spawned by the UI thread. Under this assumption,
- all post-initialization
-GUI work naturally occurs in the UI-thread. Once the GUI is visible, the
+thread is spawned by the UI thread. Under this assumption,
+we ignore all non-UI threads created by the GUI framework
+before the UI thread has been initialized. That is, all post-initialization
+GUI work naturally occurs in the UI thread. Once the GUI is visible, the
 application is driven by events, which are always handled in the UI thread.
-We can safely ignore non-UI threads that are spawned during pre-initilaizaiton
-GUI work, since if such threads access a GUI object, an exception becomes
+We believe this assumption is reasonable, since if a non-UI thread 
+spawned during pre-initialization GUI work accesses a GUI object, an exception becomes
 immediately apparent and the whole application may abort even before the
-GUI is visible. This is highly unlikely for most of the realistic GUI
+GUI is visible. This is highly unlikely for realistic GUI
 applications.
 }\vspace{1mm}
 
-\noindent {\textsc{\textbf{Definition 3 (UI Accessing Methods).}}} { A method
+\noindent {\textsc{\textbf{Definition 3 (UI-Accessing Methods).}}} { A method
 whose execution may read or write a UI object is called a UI accessing method.}\vspace{1mm}
 
 \noindent  {\textsc{\textbf{Definition 4 (Safe Methods).}}} {GUI frameworks that
-adapt the single-thread rule must provide methods to permit non-UI threads
+adopt the single-thread rule must provide methods to permit non-UI threads
 to run code in the UI thread. We can such methods \textit{safe methods}, since
-they can be invoked safely by any threads.}\vspace{1mm}
+they can be invoked safely by any thread.}\vspace{1mm}
 
 \noindent  {\textsc{\textbf{Definition 5 (Invalid Thread Access).}}} {An invalid
 thread access error occurs when the UI thread spawns a non-UI thread, and there
-exists a path from the non-UI thread's \CodeIn{start} method to any UI accessing methods
-without going through any safe methods. }\vspace{2mm}
+exists a path from the non-UI thread's \CodeIn{start} method to any UI-accessing method
+without going through any safe method. }\vspace{2mm}
 
 At a high level, to detect an invalid thread access error, an analysis needs to track all
 non-UI threads spawned by the UI thread, and check whether those non-UI threads
@@ -69,7 +70,7 @@ static call graph as the program representation for a multithreaded
 GUI application. A Java call graph represents calling relationships
 between methods. Specially, each node represents a method and each
 edge ($f$, $g$) indicates that method $f$ may call method $g$.
-A theoretical ideal call graph can be defined as the union of the
+A theoretically ideal call graph can be defined as the union of the
 dynamic call graphs over all possible executions of the program. 
 A conservative static call graph used in practice is a superset of
 the ideal call graph; it over-approximates the
@@ -77,10 +78,9 @@ dynamic call graph of every possible execution.
 In an object-oriented programming language like
 Java, a method is the basic logic unit in a program. Reporting
 potential errors at the method level can be sufficient in most cases.
-Thus, we believe using call graph is well suited for this problem while
-compared with other
-program representations like control flow graph or program dependence
-graph. 
+Thus, we believe using the call graph is well suited for this problem while
+compared with other program representations like control flow graph or
+program dependence graph. 
 
 
 Our algorithm in Figure~\ref{fig:detectalgorithm} works as follows. It
@@ -88,10 +88,9 @@ first constructs a static call graph for the tested program (line 2),
 then specifies entry nodes for it (line 3). The algorithm starts to traverse
 the call graph from every entry node (line 6). For every entry node,
 it first uses Breadth First Search (BFS) to find all reachable
-\CodeIn{Thread.start()} method (line 7). Each \CodeIn{Thread.start()} method
+\CodeIn{Thread.start()} calls (line 7). Each \CodeIn{Thread.start()} call
 indicates that a new, non-UI thread is spawned.  After that, 
-the algorithm uses a slightly modified 
-BFS algorithm to find reachable UI accessing methods (lines 9 -- 23)
+the algorithm uses a BFS to find reachable UI accessing methods (lines 9 -- 23)
 from each \CodeIn{Thread.start()} node.
 Specifially, it uses a queue to keep track of all visited nodes, and
 then checks every successive node to be visited (line 12);
@@ -108,26 +107,26 @@ in Figure~\ref{fig:report}.
 
 Given a sound call graph, our algorithm is sound in that it does not
 miss true positives. We note, however, that computing a sound
-call graph for partial programs such as an eclipse plugin,
+call graph for partial programs such as an Eclipse plugin,
 or in the presence of reflection, is non-trivial. 
 In particular, GUI applications built on some popular frameworks
 often use configuration files and reflection to specify GUI layout
 or extension points.
-Existing call graph construction algorithms either suffer from incompleteness
-or imprecision.  To alleviate this problem, 
-We proposed a combined RTA
+Existing call graph construction algorithms suffer from incompleteness
+, imprecision, or both.  To alleviate this problem, 
+we proposed a combined RTA
 and k-CFA call graph construction algorithm in Section~\ref{sec:cg}.
 
 
 We also note that a static analysis may report false positives due
-to its conservative nature, or multiple warnings that acutally corrspond to
+to its conservative nature, or multiple warnings that actually correspond to
 the same error. In addition, some GUI applications may use
 Java native methods to interact with the underlying operating system.
 Native methods are often beyond the ability of a static analysis, but
 should be considered to construct a good call graph. To address the
 above two limitations, we present a set of heuristics to filter
 highly likely false positives and remove redundant reports, and provide
-annotation support for programmers to specify call relationship for
+annotation support for programmers to specify call relationships for
  native methods.
 
 
@@ -208,7 +207,7 @@ Three utility methods in lines 3 -- 5 are specific for each GUI framework
 XML file (the top) specifies a Button object declaratively, 
 and the Java code (the bottom)
 first loads the XML file (line 6) and then uses reflection to create
-a Button object by its ID (line 7, the \CodeIn{findViewByd} method).}
+a Button object by its ID (line 7, the \CodeIn{findViewById} method).}
 \end{figure}
 
 In the context of object-oriened languages wth dynamic dispatch, the
@@ -264,7 +263,7 @@ RTA or k-CFA insufficient to build a satisfactory call graph.
 The example code in Figure~\ref{fig:sampleandroid}  illustrates their limitations.
 In Figure~\ref{fig:sampleandroid}, line 7 uses reflection to create a \CodeIn{Button}
 object by looking up its id declared in the XML file. When this button
-is clicked, its event handling code (line 10 -- 13) updates the text and cached
+is clicked, its event handling code (line 10 -- 13) updates the text and caches
 the current view to a list declared at line 2.
 
 Existing call graph algorithms either suffer from the problem of incompleteness
