@@ -242,6 +242,14 @@ public class Utils {
 		coll.addAll(set);
 	}
 	
+	public static <T> Iterable<T> returnUniqueIterable(Iterable<T> coll) {
+		Set<T> set = new LinkedHashSet<T>();
+		for(T t : coll) {
+			set.add(t);
+		}
+		return set;
+	}
+	
 	//check if every element of its is included in all
 	public static <T> boolean includedIn(Iterable<T> its, Iterable<T> all) {
 		Collection<T> collection_its = iterableToCollection(its);
@@ -257,6 +265,11 @@ public class Utils {
 		}
 		return count;
 	}
+	
+	public static <T> void logCollection(Iterable<T> c) {
+		Log.logln(dumpCollection(c));
+	}
+	
 	public static <T> void dumpCollection(Iterable<T> c, PrintStream out) {
 		out.println(dumpCollection(c));
 	}

@@ -146,6 +146,14 @@ public class CGEntryManager {
 		return getAllPublicMethods(scope, cha, uiClasses);
 	}
 	
+	public static Iterable<Entrypoint> getAllPublicMethods(CGBuilder builder, List<String> uiClasses, boolean includeInherited) {
+		if(!includeInherited) {
+			return getAllPublicMethods(builder, uiClasses);
+		} else {
+			return getAllPublicMethods(builder.getAnalysisScope(), builder.getClassHierarchy(), uiClasses, true);
+		}
+	}
+	
 	public static Iterable<Entrypoint> getAllPublicMethods(AnalysisScope scope, ClassHierarchy cha, String... methodClasses) {
 		List<String> clazzList = new LinkedList<String>();
 		for(String uiClass : methodClasses) {
@@ -169,6 +177,27 @@ public class CGEntryManager {
 				return result.iterator();
 			}
 		}; 
+	}
+	
+	public static Iterable<Entrypoint> getAllPublicMethods(AnalysisScope scope, ClassHierarchy cha, List<String> methodClasses, boolean includeInherited) {
+		if(!includeInherited) {
+			return getAllPublicMethods(scope, cha, methodClasses);
+		} else {
+			final HashSet<Entrypoint> result = HashSetFactory.make();
+			for(String methodClass : methodClasses) {
+				//System.out.println("method class: " + methodClass);
+			    Iterable<Entrypoint> entries = getAppPublicMethodsByClass(scope, cha, methodClass, false, includeInherited /*include inherited*/);
+			    for(Entrypoint ep : entries) {
+			    	result.add(ep);
+			    }
+			}
+			
+			return new Iterable<Entrypoint>() {
+				public Iterator<Entrypoint> iterator() {
+					return result.iterator();
+				}
+			}; 
+		}
 	}
 	
 	public static Iterable<Entrypoint> getAndroidActivityCallBackMethods(CGBuilder builder, Collection<String> activityClasses) {
@@ -233,6 +262,46 @@ public class CGEntryManager {
 				}
 			}
 		}
+		
+		return new Iterable<Entrypoint>() {
+			public Iterator<Entrypoint> iterator() {
+				return result.iterator();
+			}
+		}; 
+	}
+	
+	//XXX largely duplicated with the above one, but it does not check class loader
+	public static Iterable<Entrypoint> getAppPublicMethodsByClass(AnalysisScope scope, ClassHierarchy cha, String methodClass, boolean useSubClass
+			, boolean includeInherited) {
+		if (cha == null) {
+			throw new IllegalArgumentException("cha is null");
+		}
+		final HashSet<Entrypoint> result = HashSetFactory.make();
+		ClassLoaderReference clr = scope.getApplicationLoader();
+		for (IClass klass : cha) {
+			if (!klass.getClassLoader().getReference().equals(clr)) {
+				continue;
+			}
+			String clazzStr = WALAUtils.iclassToClassName(klass);
+			if(!clazzStr.equals(methodClass)) {
+				continue;
+			}
+			/*the major difference*/
+				Collection<IMethod> allMethods = includeInherited ? klass.getAllMethods() : klass.getDeclaredMethods();
+				for(IMethod m : allMethods) {
+					if(!m.isPublic()) {
+						continue;
+					}
+					if(!m.getDeclaringClass().getClassLoader().getReference().equals(clr)) {
+						continue;
+					}
+					if(useSubClass) {
+						result.add(new SubtypesEntrypoint(m, cha));
+					} else {
+					    result.add(new DefaultEntrypoint(m, cha));
+					}
+				}
+			}
 		
 		return new Iterable<Entrypoint>() {
 			public Iterator<Entrypoint> iterator() {

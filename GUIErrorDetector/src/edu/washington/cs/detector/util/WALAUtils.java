@@ -188,6 +188,15 @@ public class WALAUtils {
 			}
 		}
 		
+		//also remove repetition
+		public static Collection<String> convertIClassToStrings(Collection<IClass> coll) {
+			Collection<String> strs = new LinkedHashSet<String>();
+			for(IClass ic : coll) {
+				strs.add(WALAUtils.getJavaFullClassName(ic));
+			}
+			return strs;
+		}
+		
 		public static Set<String> getUnloadedClasses(ClassHierarchy cha, Collection<String> jars) throws IOException {
 			Set<String> unloadedClasses = new LinkedHashSet<String>();
 			for(String jarFile : jars) {
