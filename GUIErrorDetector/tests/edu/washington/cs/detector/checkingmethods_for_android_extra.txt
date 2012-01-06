@@ -1,0 +1,17 @@
+android.view.ViewRoot.checkThread()V
+android.view.View.requestLayout()V
+android.view.View.onAttachedToWindow()V
+android.view.View.clearFocus()V
+android.view.View.setFlags(int flags, int mask)
+android.view.View.invalidate(Landroid/graphics/Rect;)V
+android.view.View.invalidate(IIII)V
+android.view.ViewGroup.invalidateChild(Landroid/view/View;Landroid/graphics/Rect;)V
+android.view.View.handleFocusGainInternal(ILandroid/graphics/Rect;)V
+android.view.View.focusSearch(I)Landroid/view/View;
+android.view.SurfaceView.onAttachedToWindow()V
+android.view.ViewGroup.clearChildFocus(Landroid/view/View;)V
+android.view.ViewGroup.focusableViewAvailable(Landroid/view/View;)V
+android.view.ViewGroup.focusSearch(Landroid/view/View;I)Landroid/view/View;
+android.view.ViewGroup.recomputeViewAttributes(Landroid/view/View;)V
+android.view.ViewGroup.requestChildFocus(Landroid/view/View;Landroid/view/View;)V
+android.view.ViewGroup.requestTransparentRegion(Landroid/view/View;)V
