@@ -63,6 +63,7 @@ public class UIAnomalyDetector {
 	//configure the UI anomaly detector for different purpose
 	//You can configure this detector for different UI models, e.g., swing
 	public void configureCheckingMethods(String configFilePath) {
+		System.err.println("Use : " + configFilePath + " as checking file.");
 		UIAnomalyMethodFinder.setCheckingMethods(configFilePath);
 	}
 	

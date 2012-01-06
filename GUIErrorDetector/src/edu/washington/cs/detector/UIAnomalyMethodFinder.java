@@ -44,6 +44,9 @@ public class UIAnomalyMethodFinder extends AbstractMethodFinder {
 	public static void setCheckingMethods(String fileName) {
 		assert fileName != null;
 		checking_methods = Files.readWholeNoExp(fileName).toArray(new String[0]);
+		for(String method : checking_methods) {
+			System.err.println("error checking method as sink: " + method);
+		}
 	}
 	public static Map<CGNode, List<CallChainNode>> getCachedResult() {
 		return cachedResult;
