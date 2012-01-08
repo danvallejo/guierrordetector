@@ -3,6 +3,7 @@ package edu.washington.cs.detector;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -42,13 +43,14 @@ public class TestSimpleAndroidExamples extends TestCase {
 	    
 	    //find all UI classes
 	    ClassHierarchy cha = builder.getClassHierarchy();
-	    List<String> uiClasses = new LinkedList<String>();
+	    List<String> entryClasses = new LinkedList<String>();
 	    
 	    Collection<IClass> activities = AndroidUtils.getAppActivityClasses(cha);
-	    for(IClass activity : activities) {
-	    	uiClasses.add(WALAUtils.getJavaFullClassName(activity));
-	    	System.out.println("activity class: " + activity);
-	    }
+	    Collection<String> activityClasses = WALAUtils.convertIClassToStrings(activities);
+//	    for(IClass activity : activities) {
+//	    	entryClasses.add(WALAUtils.getJavaFullClassName(activity));
+//	    	System.out.println("activity class: " + activity);
+//	    }
 	    
 	    for(IClass c : cha) {
 	    	String fullClassName = WALAUtils.getJavaFullClassName(c);
@@ -56,14 +58,25 @@ public class TestSimpleAndroidExamples extends TestCase {
 	    		continue;
 	    	}
 	    	if(AndroidUtils.isCustomizedListener(cha, fullClassName)) {
-	    	    uiClasses.add(fullClassName);
+	    	    entryClasses.add(fullClassName);
 	    	    System.out.println("listener class: " + fullClassName);
 	    	}
 	    }
 	    
-	    Utils.removeRedundant(uiClasses);
+	    Utils.removeRedundant(entryClasses);
 	    
-	    Iterable<Entrypoint> uiEntries = CGEntryManager.getAllPublicMethods(builder, uiClasses);
+	    entryClasses.removeAll(activityClasses);
+	    
+	    Iterable<Entrypoint> uiEntries = CGEntryManager.getAllPublicMethods(builder, entryClasses);
+	    
+	    List<String> activityClassList = new LinkedList<String>();
+	    activityClassList.addAll(activityClasses);
+	    Iterable<Entrypoint> allActivityMethods = CGEntryManager.getAllPublicMethods(builder, activityClassList, false); /*need to use inherit?*/
+	    
+	    List<String> otherClasses = new LinkedList<String>();
+	    otherClasses.add("android.view.ViewRoot");
+	    Iterable<Entrypoint> otherClassMethods = CGEntryManager.getAllPublicMethods(builder, otherClasses, false); 
+	                                             //CGEntryManager.getConstructors(builder, otherClasses);
 		
 		Collection<String> declaredClasses = AndroidUtils.extractAllUIs(cha, new File(dirPath));
 		
@@ -74,19 +87,32 @@ public class TestSimpleAndroidExamples extends TestCase {
 	    	CGEntryManager.getConstructors(builder, declaredClasses);
 	    
 	    //Merge2 entries
-	    Iterable<Entrypoint> entries = CGEntryManager.mergeEntrypoints(uiEntries, widgetConstructors);
+	    Iterable<Entrypoint> entries = uiEntries;
+	    entries = CGEntryManager.mergeEntrypoints(entries, widgetConstructors);
+	    entries = CGEntryManager.mergeEntrypoints(entries, allActivityMethods);
+	    entries = CGEntryManager.mergeEntrypoints(entries, otherClassMethods);
+	    
+	    entries = Utils.returnUniqueIterable(entries);
+	    /**
+	     * Build a call graph, and start to detect errors below.
+	     * */
+	    
+	    Log.logConfig("./log.txt");
+	    Log.logln("Entries in building CG: ");
+	    Utils.logCollection(entries);
 	    
 		System.out.println("Number of entries for building CG: " + Utils.countIterable(entries));
-		builder.setCGType(CG.RTA);
+//		builder.setCGType(CG.RTA);
+//		builder.setCGType(CG.ZeroCFA);
+		builder.setCGType(CG.OneCFA);
 		builder.buildCG(entries);
 		
 		System.out.println("number of entry node in the built CG: " + builder.getCallGraph().getEntrypointNodes().size());
 		System.out.println("CG node num: " + builder.getCallGraph().getNumberOfNodes());
 		System.out.println("App CG node num: " + builder.getAppCallGraph().getNumberOfNodes());
 		
-//		Graph<CGNode> graph = builder.getAppCallGraph();
-		Log.logConfig("./log.txt");
-//		WALAUtils.logCallGraph(graph);
+		Log.logln("Entries in the built CG: ");
+		Utils.logCollection(builder.getCallGraph().getEntrypointNodes());
 		
 		//set up the anomaly detection
 		UIAnomalyDetector detector = new UIAnomalyDetector(appPath);
