@@ -33,6 +33,7 @@ public class CGBuilder {
 	public final String appPath;
 	public final File exclusionFile;
 	
+	private String byPassFile = null;
 	private CG type = CG.ZeroCFA;
 	private int cfaprecision = -1;
 	
@@ -69,6 +70,10 @@ public class CGBuilder {
 		if(i < 2) {throw new RuntimeException("Please use setCGType instead.");}
 		if(type != CG.CFA) {throw new RuntimeException("Please set CG type as CFA first.");}
 		this.cfaprecision = i;
+	}
+	
+	public void setByPassFile(String fileName) {
+		this.byPassFile = fileName;
 	}
 	
 	//by default it uses all main methods are starting points
@@ -155,6 +160,13 @@ public class CGBuilder {
 			throw new RuntimeException("The CG type: " + type + " is unknonw");
 		}
 		assert builder != null;
+		
+		//add the bypass file
+		if(this.byPassFile != null) {
+			System.err.println("Use bypass file: " + this.byPassFile);
+			Util.addBypassLogic(options, scope, Utils.class.getClassLoader(), this.byPassFile, cha);
+		}
+		
 		return builder;
 	}
 	
