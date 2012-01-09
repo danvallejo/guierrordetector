@@ -1,6 +1,7 @@
 package edu.washington.cs.detector;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 import edu.washington.cs.detector.util.EclipsePluginCommons;
@@ -45,6 +46,14 @@ public class TestFileExistence extends TestCase {
 		for(String str : UIAnomalyMethodFinder.getCheckingMethods()) {
 			assertTrue("str: " + str + " not in: " + fPath, list.contains(str));
 		}
+	}
+	
+	public void testGetResource() {
+		String xmlFile = "samplereflection.xml";
+		ClassLoader cl = edu.washington.cs.detector.util.Utils.class.getClassLoader();
+		InputStream s = cl.getResourceAsStream(xmlFile);
+		System.out.println(s);
+		assertNotNull("The xmlfile: " + xmlFile + " does not exist.", s);
 	}
 
 }
