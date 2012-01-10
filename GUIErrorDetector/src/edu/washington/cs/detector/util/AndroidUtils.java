@@ -30,6 +30,7 @@ import com.ibm.wala.ipa.cha.ClassHierarchy;
 
 public class AndroidUtils {
 	
+	//return full class name
 	public static Collection<String> extractAllUIs(final ClassHierarchy cha, File dir) throws ZipException, IOException {
 		//need 2 copies, since a reader will be closed in extractAndroidUI / extractCustomizedUIs
 		List<Reader> xmlFileReaders1 = getAllLayoutXMLFromDir(dir);
