@@ -245,6 +245,10 @@ public class WALAUtils {
 	    	return packageName + className;
 	    }
 	    
+	    public static String javaClassToWalaClass(String javaFullClassName) {
+	    	return "L" + Utils.translateDotToSlash(javaFullClassName);
+	    }
+	    
 	    //utilities for ir
 	    public static String getAllIRAsString(CGNode node) {
 	    	StringBuilder sb = new StringBuilder();
