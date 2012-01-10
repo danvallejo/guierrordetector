@@ -67,9 +67,9 @@ public class AndroidLogicByPassFileCreator {
 		sb.append(Globals.lineSep);
 		sb.append("    <classloader name=\"Application\">");
 		sb.append(Globals.lineSep);
-		sb.append("        <package name=\"android/view\">");
+		sb.append("        <package name=\"android/app\">");
 		sb.append(Globals.lineSep);
-		sb.append("            <class name=\"View\">");
+		sb.append("            <class name=\"Activity\">");
 		sb.append(Globals.lineSep);
 		sb.append("                <method name=\"findViewById\" descriptor=\"(I)Landroid/view/View;\" static=\"false\">");
 		sb.append(Globals.lineSep);
@@ -88,7 +88,7 @@ public class AndroidLogicByPassFileCreator {
 		for(String walaClassName : fullWalaClassNames) {
 			String retValue = "x" + (index++);
 			sb.append("                    <new def=\"" + retValue
-					+ "\" class=\"" +  walaClassName + "\"/>");
+					+ "\" class=\"" +  walaClassName.trim() + "\"/>");
 			sb.append(Globals.lineSep);
 			sb.append("                    <return value=\"" + retValue + "\"/>");
 			sb.append(Globals.lineSep);
@@ -149,6 +149,6 @@ public class AndroidLogicByPassFileCreator {
 		Collection<String> javaClassNames = new LinkedList<String>();
 		javaClassNames.add("android.widget.Button");
 		javaClassNames.add("android.widget.TextView");
-		creator.createByPassLogicFile("androidsamplereflection.xml", javaClassNames);
+		creator.createByPassLogicFile("androidsamplereflection-test.xml", javaClassNames);
 	}
 }
