@@ -107,7 +107,7 @@ public class TestSimpleAndroidExamples extends TestCase {
 //		builder.setCGType(CG.OneCFA);
 
 		//set up the bypasslogic file
-		builder.setByPassFile("samplereflection.xml");
+		builder.setByPassFile("androidsamplereflection.xml");
 		
 		builder.buildCG(entries);
 		
