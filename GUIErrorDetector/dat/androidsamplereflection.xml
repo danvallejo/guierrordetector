@@ -1,0 +1,13 @@
+<summary-spec>
+    <classloader name="Application">
+	    <package name="android/app">
+            <class name="Activity">
+				<method name="findViewById"
+                    descriptor="(I)Landroid/view/View;" static="false">
+                       <new def="x" class="Landroid/widget/Button"/>
+					   <return value="x"/>
+                </method>
+			</class>
+	    </package>
+    </classloader>
+</summary-spec>
