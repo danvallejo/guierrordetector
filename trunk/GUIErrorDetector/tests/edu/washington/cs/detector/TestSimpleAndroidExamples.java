@@ -102,12 +102,13 @@ public class TestSimpleAndroidExamples extends TestCase {
 	    Utils.logCollection(entries);
 	    
 		System.out.println("Number of entries for building CG: " + Utils.countIterable(entries));
-		builder.setCGType(CG.RTA);
-//		builder.setCGType(CG.ZeroCFA);
+//		builder.setCGType(CG.RTA);
+		builder.setCGType(CG.ZeroCFA);
 //		builder.setCGType(CG.OneCFA);
 
 		//set up the bypasslogic file
-		builder.setByPassFile("androidsamplereflection.xml");
+//		builder.setByPassFile("androidsamplereflection.xml");
+		builder.setByPassFile("androidsamplereflection-test.xml");
 		
 		builder.buildCG(entries);
 		
