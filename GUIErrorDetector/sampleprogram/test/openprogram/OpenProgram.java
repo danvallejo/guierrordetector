@@ -10,9 +10,11 @@ public class OpenProgram {
 		f.foo();
 	}
 	
-	public void entryMethod(Foo f, Bar b) {
+	public void entryMethod(Foo f, Bar b, Moo m, Noo n) {
 		f.foo();
 		b.bar();
+		m.moo();
+		n.noo();
 	}
 }
 
@@ -34,4 +36,23 @@ abstract class Bar {
 class BarSub extends Bar {
 	public BarSub(Object obj) { super(obj); }
 	public void bar() {}
+}
+
+class Moo {
+	public Moo(Object obj) {}
+	public void moo() {}
+}
+
+class MooSub extends Moo {
+	public MooSub(Object obj) { super(obj); }
+	public void moo() {}
+}
+
+interface Noo {
+	public void noo();
+}
+
+class NooSub implements Noo {
+	public NooSub(Object obj) {}
+	public void noo() {};
 }
