@@ -75,6 +75,19 @@ public class SwingUtils {
 		}
 		return cha.isAssignableFrom(JCOMPONENT, clazz);
 	}
+	
+	private static String[] safeMethods = new String[]{
+		"java.awt.Component.repaint",
+		"java.awt.Container.invalidate",
+		"javax.swing.JComponent.revalidate"
+	};
+	//java.awt.Component.repaint
+	//java.awt.Container.invalidate
+	//javax.swing.revalidate
+	public static boolean isThreadSafeMethod(IMethod method) {
+		String fullMethodName = WALAUtils.getFullMethodName(method);
+		return Utils.includedIn(fullMethodName, safeMethods);
+	}
 
 	/**
 	 * This is potentially incomplete!
@@ -83,6 +96,12 @@ public class SwingUtils {
 		if (method.isAbstract()) {
 			return false;
 		}
+		
+		//the methods excluded by
+		if(isThreadSafeMethod(method)) {
+			return false;
+		}
+		
 		IClass clazz = method.getDeclaringClass();
 		if (!isInSwingPackage(clazz)) {
 			return false;
