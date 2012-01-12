@@ -86,8 +86,27 @@ public class SwingUtils {
 	//javax.swing.revalidate
 	public static boolean isThreadSafeMethod(IMethod method) {
 		String fullMethodName = WALAUtils.getFullMethodName(method);
-		return Utils.includedIn(fullMethodName, safeMethods);
+		if(Utils.includedIn(fullMethodName, safeMethods)) {
+			return true;
+		}
+		/*
+		 * Methods for adding, getting, and deleting listerners are all safe
+		 * getListeners(..)) ||
+         *  call(* add*Listener(..)) ||
+         *  call(* remove*Listener(..));
+		 * */
+		String methodName = method.getName().toString();
+		if(methodName.equals("getListeners")
+		 || (methodName.startsWith("add") && methodName.endsWith("Listener"))
+		 || (methodName.startsWith("remove") && methodName.endsWith("Listener"))) {
+			return true;
+		}
+		return false;
 	}
+	
+//	public static boolean isEmptyMethod(IMethod method) {
+//		method.
+//	}
 
 	/**
 	 * This is potentially incomplete!
