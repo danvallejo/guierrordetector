@@ -2,6 +2,8 @@ package edu.washington.cs.detector;
 
 import java.io.IOException;
 
+import com.ibm.wala.ipa.cha.ClassHierarchyException;
+
 import edu.washington.cs.detector.experiments.swing.AbstractSwingTest;
 import edu.washington.cs.detector.util.Log;
 
@@ -14,14 +16,14 @@ public class TestSimpleSwingExamples extends AbstractSwingTest {
 		return new TestSuite(TestSimpleSwingExamples.class);
 	}
 	
-	public void testSwingError() throws IOException {
+	public void testSwingError() throws IOException, ClassHierarchyException {
 		String appPath = TestCommons.testfolder + "swingerror";
 		Log.logConfig("./log.txt");
 		UIAnomalyMethodFinder.DEBUG = true;
 		this.checkCallChainNumber(2, appPath, new String[]{"test.swingerror"});
 	}
 	
-	public void testSwingNoError() throws IOException {
+	public void testSwingNoError() throws IOException, ClassHierarchyException {
 		String appPath = TestCommons.testfolder + "swingnoerror";
 //		Log.logConfig("./log.txt");
 //		UIAnomalyMethodFinder.DEBUG = true;
