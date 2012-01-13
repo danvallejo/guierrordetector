@@ -20,6 +20,19 @@ import edu.washington.cs.detector.util.WALAUtils;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+/**
+ * https://github.com/tomcz/s3dropbox
+ * 
+ * Use 1-CFA
+ * size of chains before removing redundancy: 45528
+size of chains after removing redundancy: 45528
+size of chains after removing system calls: 45528
+size of chains after removing subsumed calls: 31978
+size of chains after removing no client classes after start: 30975
+size of chains after removing the same entry but keeping the shortest chain: 9
+size of chains after removing same entry nodes to lib: 9
+size of chains after matching run with invoke: 1
+ * */
 public class TestS3Dropbox extends AbstractSwingTest {
 	
 	public static Test suite() {
