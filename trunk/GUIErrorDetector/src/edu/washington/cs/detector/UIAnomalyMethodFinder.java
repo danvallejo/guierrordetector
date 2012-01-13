@@ -58,6 +58,7 @@ public class UIAnomalyMethodFinder extends AbstractMethodFinder {
 	
 	/**Set the evaluator, evaluating whether a method is thread safe or not*/
 	public static void setMethodEvaluator(MethodEvaluator evl) {
+		System.err.println("Use method evaluator to identify UI-accessing method: " + evl);
 		evaluator = evl;
 	}
 	

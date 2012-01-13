@@ -9,11 +9,24 @@ import java.util.Set;
 import com.ibm.wala.classLoader.IClass;
 import com.ibm.wala.classLoader.IMethod;
 import com.ibm.wala.ipa.callgraph.CGNode;
+import com.ibm.wala.ipa.callgraph.Entrypoint;
+import com.ibm.wala.ipa.callgraph.impl.DefaultEntrypoint;
 import com.ibm.wala.ipa.cha.ClassHierarchy;
 import com.ibm.wala.types.ClassLoaderReference;
+import com.ibm.wala.util.collections.HashSetFactory;
 
 public class SwingUtils {
 
+	private static IClass RUNNABLE = null;
+	
+	public static IClass getRunnable(ClassHierarchy cha) {
+		if (RUNNABLE != null) {
+			return RUNNABLE;
+		}
+		RUNNABLE = WALAUtils.lookupClass(cha, "java.lang.Runnable");
+		return RUNNABLE;
+	}
+	
 	private static IClass JCOMPONENT = null;
 
 	// javax.swing.ListModel
@@ -176,6 +189,42 @@ public class SwingUtils {
 		return eventHandlingMethods;
 	}
 	
+	public static Collection<Entrypoint> getAllAppEventhandlingMethodsAsEntrypoints(ClassHierarchy cha) {
+		return getAllAppEventhandlingMethodsAsEntrypoints(cha, new String[]{});
+	}
+	
+	public static Collection<Entrypoint> getAllAppEventhandlingMethodsAsEntrypoints(ClassHierarchy cha, String[] packages) {
+		final HashSet<Entrypoint> result = HashSetFactory.make();
+		
+		for(IClass c : cha) {
+			if(c.getClassLoader().getReference().equals(ClassLoaderReference.Application)) {
+				
+				String packageName = WALAUtils.getJavaPackageName(c);
+				if(packages != null && packages.length > 0) {
+					boolean include = false;
+					for(String pName : packages) {
+						if(packageName.startsWith(pName)) {
+							include = true;
+							break;
+						}
+					}
+					if(!include) {
+						continue;
+					}
+				}
+				
+				for(IMethod m : c.getDeclaredMethods()) {
+					if(SwingUtils.isEventHandlingMethod(m, cha)) {
+						Entrypoint ep = new DefaultEntrypoint(m, cha);
+						result.add(ep);
+					}
+				}
+			}
+		}
+		
+		return result;
+	}
+	
 	public static Collection<CGNode> getAllEventhandlingMethods(Iterable<CGNode> nodes,
 			ClassHierarchy cha, String[] packageNames) {
 		Collection<CGNode> eventHandlingMethods = new LinkedList<CGNode>();
@@ -204,8 +253,26 @@ public class SwingUtils {
 	}
 	
 	public static boolean isEventHandlingMethod(CGNode node, ClassHierarchy cha) {
-		String methodName = node.getMethod().getName().toString();
-		IClass declaringClass = node.getMethod().getDeclaringClass();
+//		String methodName = node.getMethod().getName().toString();
+//		IClass declaringClass = node.getMethod().getDeclaringClass();
+//		
+//		Set<String> allHandlers = getHandlerNames();
+//		if(!allHandlers.contains(methodName)) {
+//			return false;
+//		}
+//		
+//		//check if it is the subclass of an event listerner
+//		IClass el = getEventListener(cha);
+//		if(cha.isAssignableFrom(el, declaringClass)) {
+//			return true;
+//		}
+//		return false;
+		return isEventHandlingMethod(node.getMethod(), cha);
+	}
+	
+	public static boolean isEventHandlingMethod(IMethod method, ClassHierarchy cha) {
+		String methodName = method.getName().toString();
+		IClass declaringClass = method.getDeclaringClass();
 		
 		Set<String> allHandlers = getHandlerNames();
 		if(!allHandlers.contains(methodName)) {

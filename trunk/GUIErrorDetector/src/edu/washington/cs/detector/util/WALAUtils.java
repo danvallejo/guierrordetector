@@ -288,4 +288,30 @@ public class WALAUtils {
 	    	}
 	    	return cs;
 	    }
+	    
+	    /**
+	     * filter a collection node by package names
+	     * */
+	    public static Collection<CGNode> filterCGNodeByPackages(Collection<CGNode> nodes, String[] packages) {
+	    	if(packages == null) {
+	    		throw new RuntimeException("The package name can not be null.");
+	    	}
+	    	Collection<CGNode> filteredNodes = new HashSet<CGNode>();
+	    	for(CGNode node : nodes) {
+	    		IMethod method = node.getMethod();
+	    		String packageName = getJavaPackageName(method.getDeclaringClass());
+	    		boolean retained = false;
+	    		for(String pName : packages) {
+	    			if(packageName.startsWith(pName)) {
+	    				retained = true;
+	    				break;
+	    			}
+	    		}
+	    		if(retained) {
+	    			filteredNodes.add(node);
+	    		}
+	    	}
+	    	
+	    	return filteredNodes;
+	    }
 }
