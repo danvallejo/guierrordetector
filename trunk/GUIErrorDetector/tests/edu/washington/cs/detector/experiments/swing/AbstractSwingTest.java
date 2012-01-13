@@ -2,41 +2,140 @@ package edu.washington.cs.detector.experiments.swing;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import com.ibm.wala.ipa.callgraph.CGNode;
+import com.ibm.wala.ipa.callgraph.Entrypoint;
+import com.ibm.wala.ipa.cha.ClassHierarchy;
+import com.ibm.wala.ipa.cha.ClassHierarchyException;
+import com.ibm.wala.util.io.FileProvider;
 
 import edu.washington.cs.detector.AnomalyCallChain;
 import edu.washington.cs.detector.CGBuilder;
+import edu.washington.cs.detector.CGBuilder.CG;
+import edu.washington.cs.detector.CGEntryManager;
 import edu.washington.cs.detector.CallChainFilter;
 import edu.washington.cs.detector.SwingUIMethodEvaluator;
 import edu.washington.cs.detector.UIAnomalyDetector;
 import edu.washington.cs.detector.UIAnomalyMethodFinder;
+import edu.washington.cs.detector.experiments.filters.MatchRunWithInvokeClassStrategy;
+import edu.washington.cs.detector.experiments.filters.MergeSamePrefixToLibCallStrategy;
 import edu.washington.cs.detector.experiments.filters.RemoveNoClientClassStrategy;
+import edu.washington.cs.detector.experiments.filters.RemoveSameEntryStrategy;
+import edu.washington.cs.detector.experiments.filters.RemoveSubsumedChainStrategy;
 import edu.washington.cs.detector.experiments.filters.RemoveSystemCallStrategy;
 import edu.washington.cs.detector.guider.CGTraverseSwingGuider;
+import edu.washington.cs.detector.guider.CGTraverseSwingUIAccessGuider;
+import edu.washington.cs.detector.util.Log;
 import edu.washington.cs.detector.util.SwingUtils;
 import edu.washington.cs.detector.util.Utils;
+import edu.washington.cs.detector.util.WALAUtils;
 import junit.framework.TestCase;
 
 public abstract class AbstractSwingTest extends TestCase {
 	
-	protected void checkCallChainNumber(int expectedNum, String appPath, String[] packages /*for filtering*/ ) throws IOException {
+	private boolean use_non_default_cg = false;
+	
+	private boolean add_handlers = false;
+	
+	private boolean add_extra_ep = false;
+	
+	private boolean match_run_with_invoke = false;
+	
+	private CG type = null;
+	
+	protected void setCGType(CG t) {
+		type = t;
+	}
+	
+	public void setNondefaultCG(boolean nonDefault) {
+		this.use_non_default_cg = nonDefault;
+	}
+	
+	protected void setAddHandlers(boolean add) {
+		this.add_handlers = add;
+	}
+	
+	protected void setAddExtraEntrypoints(boolean addEP) {
+		this.add_extra_ep = addEP;
+	}
+	
+	protected void setMatchRunWithInvoke(boolean match) {
+		this.match_run_with_invoke = match;
+	}
+	
+	protected Iterable<Entrypoint> getAdditonalEntrypoints(ClassHierarchy cha) {
+		return Collections.emptySet();
+	}
+	
+	protected void checkCallChainNumber(int expectedNum, String appPath, String[] packages /*for filtering*/ ) throws IOException,
+	    ClassHierarchyException {
+		
 		UIAnomalyDetector detector = new UIAnomalyDetector(appPath);
 		
 		/** a few configurations to configure the tool for swing*/
-//		detector.setDefaultCGType(CG.OneCFA);
+		if(type != null) {
+			detector.setDefaultCGType(type);
+		}
 		detector.setExclusionFile(UIAnomalyDetector.EXCLUSION_FILE_SWING);
 		detector.configureCheckingMethods("./tests/edu/washington/cs/detector/checkingmethods_for_swing.txt");
 		detector.setAnomalyMethodEvaluator(new SwingUIMethodEvaluator());
 		detector.setThreadStartGuider(new CGTraverseSwingGuider());
+		detector.setUIAnomalyGuider(new CGTraverseSwingUIAccessGuider());
 		
-		CGBuilder builder = detector.getDefaultCGBuilder();
+		CGBuilder builder = null;
+		if(!use_non_default_cg) {
+			//already build the call graph when the default cg builder is returned
+		    builder = detector.getDefaultCGBuilder();
+		} else {
+			//extract all event handling method
+			builder = new CGBuilder(detector.getAppPath(), FileProvider.getFile(detector.getExclusionFile()));
+			if(type != null) {
+				builder.setCGType(type);
+			}
+			builder.makeScopeAndClassHierarchy();
+			Iterable<Entrypoint> eps = com.ibm.wala.ipa.callgraph.impl.Util.makeMainEntrypoints(builder.getAnalysisScope(),
+					builder.getClassHierarchy());
+			//add handlers
+			if(this.add_handlers) {
+			    Iterable<Entrypoint> eventHandlers = SwingUtils.getAllAppEventhandlingMethodsAsEntrypoints(builder.getClassHierarchy(), packages);
+			    eps = CGEntryManager.mergeEntrypoints(eps, eventHandlers);
+			}
+			//also add some additional entry points here
+			if(this.add_extra_ep) {
+			    eps = CGEntryManager.mergeEntrypoints(eps, this.getAdditonalEntrypoints(builder.getClassHierarchy()));
+			}
+			//start build call graph
+			builder.buildCG(eps);
+		}
+		
+		//entry nodes in CG
+		Iterable<Entrypoint> entries = builder.getEntrypoints();
+		Log.logln("The entry point for CG: " + Utils.countIterable(entries));
+		for(Entrypoint entry : entries) {
+			Log.logln("   " + entry);
+		}
+		
 		//get all entries
 		List<AnomalyCallChain> chains = null;
 		
 		Collection<CGNode> nodes = SwingUtils.getAllAppEventhandlingMethods(builder.getAppCallGraph(),
 				builder.getClassHierarchy());
+		//filter CGNodes within the given packages
+		if(packages != null && packages.length > 0) {
+			Log.logln("CGNode before filtering: " + nodes.size());
+			nodes = WALAUtils.filterCGNodeByPackages(nodes, packages);
+			Log.logln("CGNode after filtering: " + nodes.size());
+		}
+		
+		Log.logln("Number of CG nodes: " + builder.getAppCallGraph().getNumberOfNodes());
+		Log.logln("The CG nodes to start traversing: " + nodes.size());
+		for(CGNode node : nodes) {
+			Log.logln("   " + node);
+		}
+
+		//start to detect errors
 		chains = detector.detectUIAnomaly(builder, nodes);
 		
 		System.out.println("size of chains before removing redundancy: " + chains.size());
@@ -44,13 +143,32 @@ public abstract class AbstractSwingTest extends TestCase {
 		System.out.println("size of chains after removing redundancy: " + chains.size());
 		chains = CallChainFilter.filter(chains, new RemoveSystemCallStrategy());
 		System.out.println("size of chains after removing system calls: " + chains.size());
-		chains = CallChainFilter.filter(chains, new RemoveNoClientClassStrategy(packages, true /*only look after*/));
-		System.out.println("size of chains after removing non client class chains: " + chains.size());
+		
+		chains = CallChainFilter.filter(chains, new RemoveSubsumedChainStrategy(nodes));
+		System.out.println("size of chains after removing subsumed calls: " + chains.size());
+		
+		if(packages != null) {
+		    chains = CallChainFilter.filter(chains, new RemoveNoClientClassStrategy(packages, true));
+		    System.out.println("size of chains after removing no client classes after start: " + chains.size());
+		}
+		
+		chains = CallChainFilter.filter(chains, new RemoveSameEntryStrategy());
+		System.out.println("size of chains after removing the same entry but keeping the shortest chain: " + chains.size());
+		
+		if(packages != null) {
+		  chains = CallChainFilter.filter(chains, new MergeSamePrefixToLibCallStrategy(packages));
+		  System.out.println("size of chains after removing same entry nodes to lib: " + chains.size());
+		}
+		
+		if(this.match_run_with_invoke) {
+			chains = CallChainFilter.filter(chains, new MatchRunWithInvokeClassStrategy(builder.getClassHierarchy()));
+			  System.out.println("size of chains after matching run with invoke: " + chains.size());
+		}
 		
 		int count = 0;
 		for(AnomalyCallChain chain : chains) {
-			System.out.println("The " + (count++) + "-th chain");
-			System.out.println(chain.getFullCallChainAsString());
+			Log.logln("The " + (count++) + "-th chain");
+			Log.logln(chain.getFullCallChainAsString());
 		}
 		if(expectedNum != -1) {
 		    assertEquals("The number of expected call chain is wrong", expectedNum, chains.size());
