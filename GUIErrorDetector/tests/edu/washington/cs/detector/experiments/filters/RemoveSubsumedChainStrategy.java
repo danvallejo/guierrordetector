@@ -1,17 +1,33 @@
 package edu.washington.cs.detector.experiments.filters;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import com.ibm.wala.ipa.callgraph.CGNode;
 
 import edu.washington.cs.detector.AnomalyCallChain;
 import edu.washington.cs.detector.FilterStrategy;
 
 public class RemoveSubsumedChainStrategy extends FilterStrategy {
+	
+	private Collection<CGNode> startingNodes = new HashSet<CGNode>();
+	
+	public RemoveSubsumedChainStrategy() {}
+	
+	public RemoveSubsumedChainStrategy(Collection<CGNode> startingNodes) {this.startingNodes.addAll(startingNodes);}
 
 	@Override
 	public List<AnomalyCallChain> filter(List<AnomalyCallChain> chains) {
+		
+		if(!this.startingNodes.isEmpty()) {
+			return filterByStartingPoint(chains);
+		}
+		
 		Map<AnomalyCallChain, String> map = new LinkedHashMap<AnomalyCallChain, String>();
 		
 		for(AnomalyCallChain chain : chains) {
@@ -57,5 +73,35 @@ public class RemoveSubsumedChainStrategy extends FilterStrategy {
 		map.clear();
 		
 		return result;
+	}
+	
+	public List<AnomalyCallChain> filterByStartingPoint(List<AnomalyCallChain> chains) {
+		Set<String> startingMethodsSigs = new HashSet<String>();
+		for(CGNode node : this.startingNodes) {
+			startingMethodsSigs.add(node.getMethod().getSignature());
+		}
+		List<AnomalyCallChain> result = new LinkedList<AnomalyCallChain>();
+		
+		for(AnomalyCallChain chain : chains) {
+			boolean shouldKeep = true;
+			List<CGNode> nodes = chain.getUI2Start();
+			if(nodes.size() < 3) {
+				shouldKeep = true;
+			} else {
+			    for(int i = 1 /*note it is not 0*/; i < nodes.size() - 1; i++) {
+				    CGNode node = nodes.get(i);
+				    if(startingMethodsSigs.contains(node.getMethod().getSignature())) {
+				    	shouldKeep = false;
+				    	break;
+				    }
+			    }
+			}
+			if(shouldKeep) {
+				result.add(chain);
+			}
+		}
+		
+		return result;
+		
 	}
 }
