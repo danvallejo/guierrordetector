@@ -25,6 +25,7 @@ import edu.washington.cs.detector.experiments.filters.RemoveNoClientClassStrateg
 import edu.washington.cs.detector.experiments.filters.RemoveSameEntryStrategy;
 import edu.washington.cs.detector.experiments.filters.RemoveSubsumedChainStrategy;
 import edu.washington.cs.detector.experiments.filters.RemoveSystemCallStrategy;
+import edu.washington.cs.detector.guider.CGTraverseGuider;
 import edu.washington.cs.detector.guider.CGTraverseSwingGuider;
 import edu.washington.cs.detector.guider.CGTraverseSwingUIAccessGuider;
 import edu.washington.cs.detector.util.Log;
@@ -43,7 +44,15 @@ public abstract class AbstractSwingTest extends TestCase {
 	
 	private boolean match_run_with_invoke = false;
 	
+	private boolean prune_entrypoint = false;
+	
+	private boolean tweak_startnode = false;
+	
 	private CG type = null;
+	
+	private CGTraverseGuider threadStartGuider = null;
+	
+	private CGTraverseGuider uiAnomalyGuider = null;
 	
 	protected void setCGType(CG t) {
 		type = t;
@@ -65,8 +74,32 @@ public abstract class AbstractSwingTest extends TestCase {
 		this.match_run_with_invoke = match;
 	}
 	
+	protected void setPruneEntrypoint(boolean prune) {
+		this.prune_entrypoint = prune;
+	}
+	
+	protected void setTweakStartnode(boolean tweak) {
+		this.tweak_startnode = tweak;
+	}
+	
 	protected Iterable<Entrypoint> getAdditonalEntrypoints(ClassHierarchy cha) {
 		return Collections.emptySet();
+	}
+	
+	protected Iterable<Entrypoint> pruneEntrypoints(Iterable<Entrypoint> eps) {
+		return eps;
+	}
+	
+	protected void setThreadStartGuider(CGTraverseGuider guider) {
+		this.threadStartGuider = guider;
+	}
+	
+	protected void setUIAnomalyGuider(CGTraverseGuider guider) {
+		this.uiAnomalyGuider = guider;
+	}
+	
+	protected Collection<CGNode> tweakStartNode(Collection<CGNode> nodes, ClassHierarchy cha) {
+		return nodes;
 	}
 	
 	protected void checkCallChainNumber(int expectedNum, String appPath, String[] packages /*for filtering*/ ) throws IOException,
@@ -83,6 +116,14 @@ public abstract class AbstractSwingTest extends TestCase {
 		detector.setAnomalyMethodEvaluator(new SwingUIMethodEvaluator());
 		detector.setThreadStartGuider(new CGTraverseSwingGuider());
 		detector.setUIAnomalyGuider(new CGTraverseSwingUIAccessGuider());
+		
+		//reset
+		if(this.threadStartGuider != null) {
+			detector.setThreadStartGuider(this.threadStartGuider);
+		}
+		if(this.uiAnomalyGuider != null) {
+			detector.setUIAnomalyGuider(this.uiAnomalyGuider);
+		}
 		
 		CGBuilder builder = null;
 		if(!use_non_default_cg) {
@@ -106,6 +147,11 @@ public abstract class AbstractSwingTest extends TestCase {
 			if(this.add_extra_ep) {
 			    eps = CGEntryManager.mergeEntrypoints(eps, this.getAdditonalEntrypoints(builder.getClassHierarchy()));
 			}
+			//need to do final prune?
+			if(this.prune_entrypoint) {
+				eps = this.pruneEntrypoints(eps);
+			}
+			
 			//start build call graph
 			builder.buildCG(eps);
 		}
@@ -133,6 +179,10 @@ public abstract class AbstractSwingTest extends TestCase {
 		Log.logln("The CG nodes to start traversing: " + nodes.size());
 		for(CGNode node : nodes) {
 			Log.logln("   " + node);
+		}
+		
+		if(this.tweak_startnode) {
+			nodes = this.tweakStartNode(nodes, builder.getClassHierarchy()); 
 		}
 
 		//start to detect errors
