@@ -7,6 +7,7 @@ import com.ibm.wala.ipa.cha.ClassHierarchyException;
 import edu.washington.cs.detector.UIAnomalyDetector;
 import edu.washington.cs.detector.util.Log;
 
+//do not waste time, there is no thread
 public class TestJavaClassFileEditor extends AbstractSwingTest {
 
 	//when searching the code, there is no Runnable, but there is a suspicious
