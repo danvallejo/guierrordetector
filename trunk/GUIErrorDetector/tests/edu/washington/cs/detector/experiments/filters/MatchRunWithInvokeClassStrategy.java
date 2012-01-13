@@ -39,7 +39,8 @@ public class MatchRunWithInvokeClassStrategy extends FilterStrategy {
 		List<CGNode> start2error = chain.getStart2Check();
 		
 		String runClass = null;
-		for(CGNode node : start2error) {
+		for(int i = start2error.size() - 1; i >= 0; i--) {
+			CGNode node = start2error.get(i);
 			IMethod m = node.getMethod();
 			if(m.getName().toString().equals("run") && this.cha.isAssignableFrom(SwingUtils.getRunnable(this.cha), m.getDeclaringClass())) { //maybe imprecise
 				runClass = WALAUtils.getJavaFullClassName(m.getDeclaringClass());
@@ -49,6 +50,11 @@ public class MatchRunWithInvokeClassStrategy extends FilterStrategy {
 		
 		if(runClass == null) {
 			throw new Error("Null: " + chain.getFullCallChainAsString());
+		}
+		
+		if(runClass.indexOf("$") != -1) {
+			//System.out.println("runClass: " + runClass);
+			runClass = runClass.substring(0, runClass.indexOf("$"));
 		}
 		
 		//in the reverse order
