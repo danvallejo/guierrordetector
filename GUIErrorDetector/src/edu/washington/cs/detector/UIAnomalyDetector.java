@@ -23,6 +23,8 @@ public class UIAnomalyDetector {
 	
 	public static boolean DEBUG = false;
 	
+	public static boolean LOG_RESULT = false;
+	
 	public static final String EXCLUSION_FILE_SWING = "Java60RegressionExclusionsWithoutGUI.txt";
 	public static final String EMPTY_FILE = "EmptyExclusion.txt";
 	
@@ -90,6 +92,10 @@ public class UIAnomalyDetector {
 	//set precision of default cg builder
 	public void setDefaultCGType(CG type) {
 		this.cgOpt = type;
+	}
+	
+	public CG getDefaultCGType() {
+		return this.cgOpt;
 	}
 	
 	/**
@@ -196,7 +202,9 @@ public class UIAnomalyDetector {
 	    anomalyCallChains = CallChainFilter.filter(anomalyCallChains, this.filters);
 	    
 	    //for logging
-	    this.logresult(anomalyCallChains);
+	    if(LOG_RESULT) {
+	        this.logresult(anomalyCallChains);
+	    }
 	    
 	    //clear the cache
 	    UIAnomalyMethodFinder.clearCachedResult();
