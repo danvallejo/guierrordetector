@@ -2,12 +2,14 @@ package edu.washington.cs.detector.guider;
 
 import com.ibm.wala.ipa.callgraph.CGNode;
 
+
 public class CGTraverseSwingGuider implements CGTraverseGuider {
     CGTraverseGuider systemGuider = new CGTraverseNoSystemCalls();
 	
 	//Excluding the following method calls:
 	String[] swingCalls = new String[] {
-		"Ljavax/swing/SwingUtilities, isEventDispatchThread()Z"
+		"Ljavax/swing/SwingUtilities, isEventDispatchThread()Z",
+		"Ljava/awt/Window, dispose()V"
 	};
 	
 	@Override
@@ -16,15 +18,16 @@ public class CGTraverseSwingGuider implements CGTraverseGuider {
 			return false;
 		}
 		//check specific SWT rules 
-		if(this.matchExcludedSWTCalls(dest)) {
+		if(this.matchCalls(dest, swingCalls)) {
 			return false;
 		}
+		
 		return true;
 	}
 	
-	private boolean matchExcludedSWTCalls(CGNode dest) {
+	private boolean matchCalls(CGNode dest, String[] calls) {
 		String destStr = dest.toString();
-		for(String str : swingCalls) {
+		for(String str : calls) {
 			if(destStr.indexOf(str) != -1) {
 				return true;
 			}
