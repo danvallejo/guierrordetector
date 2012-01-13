@@ -20,7 +20,8 @@ public class CGTraverseNoSystemCalls implements CGTraverseGuider {
 		"Ljava/util/HashMap",
 		"Ljava/lang/Throwable",
 		"Ljava/util/Hashtable",
-		"Ljava/lang/ClassLoader"};
+		"Ljava/lang/ClassLoader",
+		"Ljava/lang/ApplicationShutdownHooks"};
 	
 	public static String[] excep_classes = new String[] {
 		"Ljava/util/Timer",
