@@ -1,4 +1,4 @@
-package edu.washington.cs.detector;
+package edu.washington.cs.detector.experiments.eclipseplugin;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -16,6 +16,17 @@ import com.ibm.wala.ipa.cha.ClassHierarchy;
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
 import com.ibm.wala.util.graph.Graph;
 
+import edu.washington.cs.detector.AnomalyCallChain;
+import edu.washington.cs.detector.AnomalyFinder;
+import edu.washington.cs.detector.CGBuilder;
+import edu.washington.cs.detector.CGEntryManager;
+import edu.washington.cs.detector.CallChainNode;
+import edu.washington.cs.detector.FilterStrategy;
+import edu.washington.cs.detector.TestCommons;
+import edu.washington.cs.detector.ThreadStartFinder;
+import edu.washington.cs.detector.UIAnomalyDetector;
+import edu.washington.cs.detector.UIAnomalyMethodFinder;
+import edu.washington.cs.detector.CGBuilder.CG;
 import edu.washington.cs.detector.guider.CGTraverseGuider;
 import edu.washington.cs.detector.util.Files;
 import edu.washington.cs.detector.util.Globals;
@@ -25,7 +36,7 @@ import edu.washington.cs.detector.util.WALAUtils;
 
 import junit.framework.TestCase;
 
-public abstract class AbstractEclipsePluginTest extends TestCase {
+public abstract class AbstractEclipsePluginOldTest extends TestCase {
 	
 	public static boolean DEBUG = false;
 	
