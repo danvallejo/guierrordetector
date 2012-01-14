@@ -12,7 +12,7 @@ import com.ibm.wala.classLoader.IClass;
 import com.ibm.wala.ipa.cha.ClassHierarchy;
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
 
-import edu.washington.cs.detector.AbstractUITest;
+import edu.washington.cs.detector.AbstractEclipsePluginTest;
 import edu.washington.cs.detector.AnomalyCallChain;
 import edu.washington.cs.detector.CGBuilder;
 import edu.washington.cs.detector.CallChainFilter;
@@ -22,7 +22,7 @@ import edu.washington.cs.detector.experiments.filters.RemoveContainingNodeStrate
 import edu.washington.cs.detector.util.EclipsePluginCommons;
 import edu.washington.cs.detector.util.Globals;
 
-public class TestCDTUI extends AbstractUITest {
+public class TestCDTUI extends AbstractEclipsePluginTest {
 	
 	public static String PLUGIN_DIR = TestCommons.cdt_60_dir + Globals.fileSep + "plugins";
 

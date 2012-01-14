@@ -6,14 +6,14 @@ import java.util.List;
 import com.ibm.wala.classLoader.IClass;
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
 
-import edu.washington.cs.detector.AbstractUITest;
+import edu.washington.cs.detector.AbstractEclipsePluginTest;
 import edu.washington.cs.detector.AnomalyCallChain;
 import edu.washington.cs.detector.SWTAppUIErrorMain;
 import edu.washington.cs.detector.TestCommons;
 import edu.washington.cs.detector.util.EclipsePluginCommons;
 import edu.washington.cs.detector.util.Globals;
 
-public class TestMylynUI extends AbstractUITest {
+public class TestMylynUI extends AbstractEclipsePluginTest {
 
 	public static String PLUGIN_DIR = TestCommons.mylyn_362_dir + Globals.fileSep + "plugins";
 

@@ -28,7 +28,7 @@ import com.ibm.wala.util.collections.HashSetFactory;
 import com.ibm.wala.util.config.AnalysisScopeReader;
 import com.ibm.wala.util.io.FileProvider;
 
-import edu.washington.cs.detector.AbstractUITest;
+import edu.washington.cs.detector.AbstractEclipsePluginTest;
 import edu.washington.cs.detector.AnomalyCallChain;
 import edu.washington.cs.detector.CGEntryManager;
 import edu.washington.cs.detector.CallChainFilter;
@@ -51,7 +51,7 @@ import edu.washington.cs.detector.util.Globals;
 import edu.washington.cs.detector.util.Utils;
 import edu.washington.cs.detector.util.WALAUtils;
 
-public class TestRSESDKUI extends AbstractUITest {
+public class TestRSESDKUI extends AbstractEclipsePluginTest {
 	public static String PLUGIN_DIR = TestCommons.rse_303_dir + Globals.fileSep
 			+ "plugins";
 	
@@ -86,7 +86,7 @@ public class TestRSESDKUI extends AbstractUITest {
 	 * No errors can be found, since the entry methods must be correctly specified.
 	 * */
 	public void testKnownBug267478() throws ClassHierarchyException, IOException {
-		AbstractUITest test = new AbstractUITest(){
+		AbstractEclipsePluginTest test = new AbstractEclipsePluginTest(){
 			@Override
 			protected boolean isUIClass(IClass kclass) {
 				return kclass.toString().indexOf("org/eclipse/dstore/internal/core/client/ClientUpdateHandler") != -1;
@@ -100,14 +100,14 @@ public class TestRSESDKUI extends AbstractUITest {
 				return EclipsePluginCommons.DEPENDENT_JARS;
 			}
 		};
-		AbstractUITest.DEBUG = true;
+		AbstractEclipsePluginTest.DEBUG = true;
 		List<AnomalyCallChain> chains  = test.reportUIErrors(SWTAppUIErrorMain.default_log, CG.ZeroCFA);
 		assertEquals(0, chains.size());
 	}
 	
 	public void testKnownBug267478ByAllEntries() throws ClassHierarchyException, IOException {
 		//org.eclipse.rse.services.dstore.util.DownloadListener
-		AbstractUITest test = new AbstractUITest(){
+		AbstractEclipsePluginTest test = new AbstractEclipsePluginTest(){
 			final Collection<String> exposedClasses = TestCommons.getPluginExposedClasses(getAppPath(), "./logs/plugin_xml_classes.txt");
 			
 			@Override
@@ -148,7 +148,7 @@ public class TestRSESDKUI extends AbstractUITest {
 		filters.add(new RemoveDoubleThreadStartStrategy());
 		filters.add(new MergeSamePrefixStrategy(6));
 		
-		AbstractUITest.DEBUG = true;
+		AbstractEclipsePluginTest.DEBUG = true;
 		List<AnomalyCallChain> chains 
 		    = test.reportUIErrorsWithEntries(SWTAppUIErrorMain.default_log, CG.OneCFA, filters); //can change the CG type here
 		
@@ -156,7 +156,7 @@ public class TestRSESDKUI extends AbstractUITest {
 	}
 	
 	public void testCheckKnownBug26747() throws IOException, ClassHierarchyException {
-		AbstractUITest test = new AbstractUITest(){
+		AbstractEclipsePluginTest test = new AbstractEclipsePluginTest(){
 			final Collection<String> exposedClasses = TestCommons.getPluginExposedClasses(getAppPath(), "./logs/plugin_xml_classes.txt");
 			@Override
 			protected boolean isUIClass(IClass kclass) {
