@@ -36,6 +36,9 @@ import edu.washington.cs.detector.util.WALAUtils;
 
 import junit.framework.TestCase;
 
+/**
+ * Please ignore this class
+ * */
 public abstract class AbstractEclipsePluginOldTest extends TestCase {
 	
 	public static boolean DEBUG = false;

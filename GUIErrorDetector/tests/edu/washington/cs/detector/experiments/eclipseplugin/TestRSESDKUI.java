@@ -65,15 +65,28 @@ public class TestRSESDKUI extends AbstractEclipsePluginTest {
 	}
 
 	@Override
-	protected boolean isUIClass(IClass kclass) {
-		return TestCommons.isConcreteAccessibleClass(kclass)
-				&& kclass.toString().indexOf("/ui") != -1
-				&& kclass.toString().indexOf("/rse/") != -1;
+	protected Iterable<Entrypoint> getEntrypoints(ClassHierarchy cha) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
-	public void testGetAppJars() {
-		super.checkAppJarNumber(46);
+	@Override
+	protected Collection<CGNode> getStartNodes(Iterable<CGNode> allNodes,
+			ClassHierarchy cha) {
+		// TODO Auto-generated method stub
+		return null;
 	}
+	
+//	@Override
+//	protected boolean isUIClass(IClass kclass) {
+//		return TestCommons.isConcreteAccessibleClass(kclass)
+//				&& kclass.toString().indexOf("/ui") != -1
+//				&& kclass.toString().indexOf("/rse/") != -1;
+//	}
+//
+//	public void testGetAppJars() {
+//		super.checkAppJarNumber(46);
+//	}
 
 	public void testDetectUIErrors() throws IOException,
 			ClassHierarchyException {
