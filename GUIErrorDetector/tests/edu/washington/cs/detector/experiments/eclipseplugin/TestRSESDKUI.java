@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import com.ibm.wala.classLoader.IClass;
 import com.ibm.wala.classLoader.IMethod;
@@ -34,6 +35,7 @@ import edu.washington.cs.detector.CallChainFilter;
 import edu.washington.cs.detector.FilterStrategy;
 import edu.washington.cs.detector.SWTAppUIErrorMain;
 import edu.washington.cs.detector.TestCommons;
+import edu.washington.cs.detector.UIAnomalyDetector;
 import edu.washington.cs.detector.CGBuilder.CG;
 import edu.washington.cs.detector.experiments.filters.MergeSamePrefixStrategy;
 import edu.washington.cs.detector.experiments.filters.MergeSameTailStrategy;
@@ -47,12 +49,16 @@ import edu.washington.cs.detector.guider.CGTraverseSWTGuider;
 import edu.washington.cs.detector.util.EclipsePluginCommons;
 import edu.washington.cs.detector.util.Files;
 import edu.washington.cs.detector.util.Globals;
+import edu.washington.cs.detector.util.Log;
 import edu.washington.cs.detector.util.Utils;
 import edu.washington.cs.detector.util.WALAUtils;
+import edu.washington.cs.detector.walaextension.ParamTypeCustomizedEntrypoint;
 
 public class TestRSESDKUI extends AbstractEclipsePluginTest {
 	public static String PLUGIN_DIR = "D:\\research\\guierror\\subjects\\RSE-SDK-3.0.3\\eclipse" + Globals.fileSep
 			+ "plugins";
+	
+	private boolean init_all_arg_objs = false;
 	
 	@Override
 	protected String getAppPath() {
@@ -66,15 +72,106 @@ public class TestRSESDKUI extends AbstractEclipsePluginTest {
 
 	@Override
 	protected Iterable<Entrypoint> getEntrypoints(ClassHierarchy cha) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		//initialize classes to be created
+		if(this.init_all_arg_objs) {
+			Set<String> appClasses = WALAUtils.getAllAppClassNames(cha);
+			ParamTypeCustomizedEntrypoint.setUserClasses(appClasses);
+		}
+		
+
+//		return kclass.toString().indexOf("org/eclipse/dstore/internal/core/client/ClientUpdateHandler") != -1
+//	    || kclass.toString().indexOf("org/eclipse/dstore/core/client/ClientConnection") != -1;
+		String className1 = "org.eclipse.dstore.internal.core.client.ClientUpdateHandler";
+		String className2 = "org.eclipse.dstore.core.client.ClientConnection";
+		String className3 = "org.eclipse.rse.internal.services.dstore.files.DStoreFileService";
+		
+		final HashSet<Entrypoint> result = HashSetFactory.make();
+		
+		String package1 = "org.eclipse.rse.ui";
+		String package2 = "org.eclipse.rse.internal.ui";
+		for(IClass c : cha) {
+			if(c.isAbstract() || c.isInterface()) {
+				continue;
+			}
+			String packageName = WALAUtils.getJavaPackageName(c);
+//			if(packageName.startsWith(package1) || packageName.startsWith(package2)) 
+			{
+				for(IMethod m : c.getDeclaredMethods()) {
+					String methodFullName = WALAUtils.getFullMethodName(m);
+					
+					if(m.isAbstract() || m.isClinit() || m.isNative()) {
+						continue;
+					}
+//					if(m.isProtected() || m.isPublic()) {
+//						Entrypoint ep = new ParamTypeCustomizedEntrypoint(m, cha);
+//						result.add(ep);
+//					}
+//					if(m.isInit()) {
+//						Entrypoint ep = new ParamTypeCustomizedEntrypoint(m, cha);
+//						result.add(ep);
+//					}
+					
+					if(methodFullName.startsWith(className1) || methodFullName.startsWith(className2)
+							|| methodFullName.startsWith(className3)) {
+						Entrypoint ep = new DefaultEntrypoint(m, cha);
+						result.add(ep);
+					}
+					
+				}
+			}
+		}
+		
+		return result;
 	}
 
 	@Override
 	protected Collection<CGNode> getStartNodes(Iterable<CGNode> allNodes,
 			ClassHierarchy cha) {
-		// TODO Auto-generated method stub
-		return null;
+		String package1 = "org.eclipse.rse.ui";
+		String package2 = "org.eclipse.rse.internal.ui";
+		
+		String name = "org.eclipse.dstore.internal.core.client.ClientUpdateHandler";
+		
+		
+		Collection<CGNode> nodes = new HashSet<CGNode>();
+		
+		for(CGNode node : allNodes) {
+			IMethod m = node.getMethod();
+			String str = WALAUtils.getFullMethodName(m);
+			if(str.startsWith(package1) || str.startsWith(package2)) {
+				nodes.add(node);
+			}
+			
+			if(nodes.size() > 100) {
+				break;
+			}
+			
+//			if(str.startsWith(name)) {
+//				nodes.add(node);
+//			}
+		}
+			
+		return nodes;
+	} 
+	
+	public void testRSEDKUI() throws ClassHierarchyException, IOException {
+		Log.logConfig("./log.txt");
+		UIAnomalyDetector.DEBUG = true;
+		
+		this.init_all_arg_objs = true;
+		
+		super.setCGType(CG.RTA);
+		super.setThreadStartGuider(new CGTraverseSWTGuider());
+		super.setUIAnomalyGuider(new CGTraverseSWTGuider());
+		
+		List<AnomalyCallChain> chains = super.reportUIErrors();
+		
+		int count = 0;
+		for(AnomalyCallChain chain : chains) {
+			Log.logln("The " + (count++) + "-th chain");
+			Log.logln(chain.getFullCallChainAsString());
+		}
 	}
 	
 //	@Override
@@ -88,11 +185,11 @@ public class TestRSESDKUI extends AbstractEclipsePluginTest {
 //		super.checkAppJarNumber(46);
 //	}
 
-	public void testDetectUIErrors() throws IOException,
-			ClassHierarchyException {
-		List<AnomalyCallChain> chains = super.reportUIErrors(SWTAppUIErrorMain.default_log, CG.ZeroOneContainerCFA);
-		assertEquals(308, chains.size());
-	}
+//	public void testDetectUIErrors() throws IOException,
+//			ClassHierarchyException {
+//		List<AnomalyCallChain> chains = super.reportUIErrors(SWTAppUIErrorMain.default_log, CG.ZeroOneContainerCFA);
+//		assertEquals(308, chains.size());
+//	}
 	
 	/**
 	 * No errors can be found, since the entry methods must be correctly specified.

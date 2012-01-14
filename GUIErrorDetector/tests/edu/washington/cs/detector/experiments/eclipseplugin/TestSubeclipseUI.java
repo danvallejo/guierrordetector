@@ -56,13 +56,13 @@ public class TestSubeclipseUI extends AbstractEclipsePluginTest {
 
 	public void testDetectUIErrors() throws IOException,
 	    ClassHierarchyException {
-        List<AnomalyCallChain> chains = super.reportUIErrors(SWTAppUIErrorMain.default_log, CG.ZeroOneContainerCFA);
-        System.out.println("No of chains before filtering system classes: " + chains.size());
-        
-        CallChainFilter filter = new CallChainFilter(chains);
-		chains = filter.apply(new RemoveSystemCallStrategy());
-		System.out.println("No of chains after filtering system classes: " + chains.size());
-		
-		Utils.dumpAnomalyCallChains(chains, "./logs/subclipse-1.6.txt");
+//        List<AnomalyCallChain> chains = super.reportUIErrors(SWTAppUIErrorMain.default_log, CG.ZeroOneContainerCFA);
+//        System.out.println("No of chains before filtering system classes: " + chains.size());
+//        
+//        CallChainFilter filter = new CallChainFilter(chains);
+//		chains = filter.apply(new RemoveSystemCallStrategy());
+//		System.out.println("No of chains after filtering system classes: " + chains.size());
+//		
+//		Utils.dumpAnomalyCallChains(chains, "./logs/subclipse-1.6.txt");
     }
 }
