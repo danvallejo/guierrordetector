@@ -25,6 +25,7 @@ public class ParamTypeCustomizedEntrypoint extends DefaultEntrypoint {
 	// in terms of full class name
 	public static final Set<String> usr_classes = new HashSet<String>();
 	public static void setUserClasses(Collection<String> classFullNames) {
+		System.err.println("User class num: " + classFullNames.size() + " for param type customized entrypoint.");
 		usr_classes.addAll(classFullNames);
 	}
 	public static void setUserClasses(String fileName) {
@@ -51,6 +52,10 @@ public class ParamTypeCustomizedEntrypoint extends DefaultEntrypoint {
 		}
 		return converted;
 	}
+	
+	/**
+	 * All instance method
+	 * */
 
 	public ParamTypeCustomizedEntrypoint(IMethod method, IClassHierarchy cha) {
 		super(method, cha);
@@ -74,12 +79,20 @@ public class ParamTypeCustomizedEntrypoint extends DefaultEntrypoint {
 			return super.makeParameterTypes(method, i);
 		}
 		
+		//debugging
+		//System.err.println("processing: " + method);
+		
 		//add corresponding usr defined classes
 		TypeReference nominal = method.getParameterType(i);
 		if (nominal.isPrimitiveType() || nominal.isArrayType())
 			return new TypeReference[] { nominal };
 		else {
 			IClass nc = getCha().lookupClass(nominal);
+			if(nc == null) { //like a class which WALA pretends to not see, like java.net.URL
+				//System.err.println("   " + nominal);
+				return new TypeReference[] { nominal };
+			}
+			
 			Collection<IClass> subcs = nc.isInterface()
 			    ? getCha().getImplementors(nominal)
 				: getCha().computeSubClasses(nominal);

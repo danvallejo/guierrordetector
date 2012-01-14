@@ -13,7 +13,8 @@ public class CGTraverseSWTGuider implements CGTraverseGuider {
 		"Lorg/eclipse/swt/graphics/Device, getDevice()",
 		"Lorg/eclipse/swt/graphics/Display, getDefault()",
 		"Lorg/eclipse/swt/widgets/Display, getActiveShell()",
-		"Lorg/eclipse/swt/widgets/Widget, toString()"
+		"Lorg/eclipse/swt/widgets/Widget, toString()",
+		"Lorg/eclipse/swt/widgets/Widget, dispose()V"
 	};
 	
 	@Override
