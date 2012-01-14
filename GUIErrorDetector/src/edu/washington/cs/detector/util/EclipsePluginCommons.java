@@ -4,8 +4,8 @@ import java.util.List;
 
 public class EclipsePluginCommons {
 	
-	public static String PLUGIN_DIR = PropertyReader.createInstance("./src/detector.properties").getProperty("eclipse.plugin.dir"); 
-		//"D:\\develop-tools\\eclipse\\eclipse\\plugins\\";
+	public static String PLUGIN_DIR = //PropertyReader.createInstance("./src/detector.properties").getProperty("eclipse.plugin.dir"); 
+		"D:\\develop-tools\\eclipse\\eclipse\\plugins\\";
 
 	public static String DEPENDENT_JARS = getAllDependentJars("./src/eclipse_jars.txt");
 	
