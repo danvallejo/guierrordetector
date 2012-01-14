@@ -37,112 +37,76 @@ import edu.washington.cs.detector.util.WALAUtils;
 import junit.framework.TestCase;
 
 public abstract class AbstractEclipsePluginTest extends TestCase {
+//	
+//	public static boolean DEBUG = false;
+//	
+	private CGTraverseGuider threadStartGuider = null;
+	private CGTraverseGuider uiAnomalyGuider = null;
+	private CG type = null;
+	private String completePath = null;
 	
-	public static boolean DEBUG = false;
-	
-	protected abstract boolean isUIClass(IClass kclass);
-	
-	protected boolean isEntryClass(IClass kclass) {return isUIClass(kclass); }
-	
+	//these four methods must be overriden
+	protected abstract Iterable<Entrypoint> getEntrypoints(ClassHierarchy cha);
+	protected abstract Collection<CGNode> getStartNodes(Iterable<CGNode> allNodes, ClassHierarchy cha);
 	protected abstract String getAppPath();
-	
 	protected abstract String getDependentJars();
-	
-	protected CGTraverseGuider getThreadStartGuider() {return null; }
-	
-	protected CGTraverseGuider getUIAnomalyGuider() {return null; }
-	
-	public void reportAppJars() {
-		TestCommons.getNonSourceNonTestsJars(getAppPath());
+
+	//a few configuration options
+	protected void setThreadStartGuider(CGTraverseGuider guider) {
+		this.threadStartGuider = guider;
+	}
+	protected void setUIAnomalyGuider(CGTraverseGuider guider) {
+		this.uiAnomalyGuider = guider;
+	}
+	protected void setCGType(CG type) {
+		this.type = type;
+	}
+	protected void setCompletePath(String path) {
+		this.completePath = path;
 	}
 	
-	public void checkAppJarNumber(int expectedNumber) {
-		assertEquals(expectedNumber, TestCommons.getNonSourceNonTestsJars(getAppPath()).size());
-	}
-	
-	//use the default precision: 0-CFA for call graph
-	//treat as every public methods of every UI class as call graph entries
-	public List<AnomalyCallChain> reportUIErrors(String outputFilePath) throws IOException, ClassHierarchyException {
-		return reportUIErrors(outputFilePath, null);
-	}
-	
-	//permit user to set call graph precision options. but still treat every public
-	//methods of every UI class as call graph entries
 	public List<AnomalyCallChain> reportUIErrors(String outputFilePath, CGBuilder.CG opt) throws IOException, ClassHierarchyException {
-		String appPath =  TestCommons.assemblyAppPath(getAppPath(), getDependentJars());
+		String appPath = null;
+		if(this.completePath != null) {
+			appPath = this.completePath;
+		} else {
+		    appPath =  TestCommons.assemblyAppPath(getAppPath() /*just a path*/, getDependentJars() /*all jars*/);
+		}
 	    CGBuilder builder = new CGBuilder(appPath);
 	    builder.makeScopeAndClassHierarchy();
 	    
-	    //find all UI classes
+	    //see all loaded classes, it is possible some classes are not loaded due to dependence
 	    ClassHierarchy cha = builder.getClassHierarchy();
-	    List<String> uiClasses = new LinkedList<String>();
-	    for(IClass kclass : cha) {
-	    	if(this.isUIClass(kclass)) {
-	    		 uiClasses.add(WALAUtils.getJavaFullClassName(kclass));
-	    	}
-		}
+	    System.out.println("Total class loaded: " + cha.getNumberOfClasses());
 	    
+	    //for debugging
 	    WALAUtils.dumpClasses(cha, "./logs/loaded_classes.txt");
 	    Utils.dumpCollection(WALAUtils.getUnloadedClasses(cha, TestCommons.getNonSourceNonTestsJars(getAppPath())),
 	    		"./logs/unloaded_classes.txt");
 	    
-	    //report UI errors
-	    return reportUIErrors(outputFilePath, appPath, uiClasses, builder, opt);
-	}
-	
-	
-	//permit user to set call graph precision options, and treat every public methods of the given
-	//ui class list as entries
-	public List<AnomalyCallChain> reportUIErrors(String outputFilePath, List<String> uiClasses, CGBuilder.CG opt) throws IOException, ClassHierarchyException {
-		String appPath =  TestCommons.assemblyAppPath(getAppPath(), getDependentJars());
-	    CGBuilder builder = new CGBuilder(appPath);
-	    builder.makeScopeAndClassHierarchy();
-	    
-	    //report UI errors
-	    return reportUIErrors(outputFilePath, appPath, uiClasses, builder, opt);
-	}
-	
-	//treat every public method in the uiClass list as call graph entry, permit user
-	//to set call graph precision
-	private List<AnomalyCallChain> reportUIErrors(String outputFilePath, String appPath, List<String> uiClasses, CGBuilder builder, CGBuilder.CG opt)
-	    throws IOException, ClassHierarchyException {
-		if(builder.getClassHierarchy() == null || builder.getAnalysisScope() == null) {
-			throw new RuntimeException("Please call builder.makeScopeAndClassHierarchy first.");
+	    Iterable<Entrypoint> entries = this.getEntrypoints(cha);
+		System.out.println("Number of entries for building CG: " + Utils.countIterable(entries));
+		Log.logln("Number of entries for building CG: " + Utils.countIterable(entries));
+		for(Entrypoint  entry : entries) {
+			Log.logln("  " + entry);
 		}
-		//dump info
-		System.out.println("Total class num: " + builder.getClassHierarchy().getNumberOfClasses());
-	    System.out.println("Number of UI classes: " + uiClasses.size());
-	    Utils.dumpCollection(uiClasses, "./logs/ui_classes.txt");
-	    
-	    Iterable<Entrypoint> entries = CGEntryManager.getAllPublicMethods(builder, uiClasses);
-		int size = 0;
-		for(Entrypoint entry : entries) {
-			assertTrue(entry != null);
-			size++;
-		}
-		System.out.println("Number of entries for building CG: " + size);
 		
-		if(opt != null) {
+		//if user specified CG built types
+		if(this.type != null) {
 			builder.setCGType(opt);
 		}
 		builder.buildCG(entries);
-		System.out.println("number of entry node in the built CG: " + builder.getCallGraph().getEntrypointNodes().size());
-		System.out.println("CG node num: " + builder.getCallGraph().getNumberOfNodes());
-		System.out.println("App CG node num: " + builder.getAppCallGraph().getNumberOfNodes());
 		
-//		Utils.dumpCollection(builder.getCallGraph().getEntrypointNodes(), "./logs/entries.txt");
-		Utils.dumpCollection(entries, "./logs/entries.txt");
+		Collection<CGNode> startNodes = this.getStartNodes(builder.getAppCallGraph(), cha);
+		System.out.println("Number of starting nodes in the built callg graph: " + startNodes.size());
+		Log.logln("Number of starting nodes in the built callg graph: " + startNodes.size());
+		for(CGNode node : startNodes) {
+			Log.logln("    " + node);
+		}
 		
-		if(DEBUG) {
-		    WALAUtils.logCallGraph(builder.getAppCallGraph());
-		    Files.writeToFile(builder.getAppCallGraph().toString(), "./logs/callgraph.txt");
-		}
-		if(outputFilePath != null) {
-		    Log.logConfig(outputFilePath);
-		}
-		//try to detect errors from all public methods
 		UIAnomalyDetector detector = new UIAnomalyDetector(appPath);
-		List<AnomalyCallChain> chains = detector.detectUIAnomaly(builder);
+		List<AnomalyCallChain> chains = detector.detectUIAnomaly(builder, startNodes);
+		
 		System.out.println("Number of anomaly call chains: " + chains.size());
 		
 		return chains;

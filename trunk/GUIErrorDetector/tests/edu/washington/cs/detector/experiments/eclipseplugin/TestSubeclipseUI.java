@@ -1,9 +1,13 @@
 package edu.washington.cs.detector.experiments.eclipseplugin;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 import com.ibm.wala.classLoader.IClass;
+import com.ibm.wala.ipa.callgraph.CGNode;
+import com.ibm.wala.ipa.callgraph.Entrypoint;
+import com.ibm.wala.ipa.cha.ClassHierarchy;
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
 
 import edu.washington.cs.detector.AnomalyCallChain;
@@ -20,12 +24,12 @@ public class TestSubeclipseUI extends AbstractEclipsePluginTest {
 
 	public static String PLUGIN_DIR = TestCommons.subeclipse_1_6 + Globals.fileSep 	+ "plugins";
 	
-	@Override
-	protected boolean isUIClass(IClass kclass) {
-		return //TestCommons.isConcreteAccessibleClass(kclass) &&
-		    kclass.toString().indexOf("/ui/operations/CheckoutAsProjectOperation") != -1;
-//		    && kclass.toString().indexOf("/subclipse/") != -1;
-	}
+//	@Override
+//	protected boolean isUIClass(IClass kclass) {
+//		return //TestCommons.isConcreteAccessibleClass(kclass) &&
+//		    kclass.toString().indexOf("/ui/operations/CheckoutAsProjectOperation") != -1;
+////		    && kclass.toString().indexOf("/subclipse/") != -1;
+//	}
 
 	@Override
 	protected String getAppPath() {
@@ -36,9 +40,18 @@ public class TestSubeclipseUI extends AbstractEclipsePluginTest {
 	protected String getDependentJars() {
 		return EclipsePluginCommons.DEPENDENT_JARS;
 	}
-	
-	public void testGetAppJars() {
-		super.checkAppJarNumber(13);
+
+	@Override
+	protected Iterable<Entrypoint> getEntrypoints(ClassHierarchy cha) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected Collection<CGNode> getStartNodes(Iterable<CGNode> allNodes,
+			ClassHierarchy cha) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	public void testDetectUIErrors() throws IOException,
