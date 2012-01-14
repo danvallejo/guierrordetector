@@ -139,6 +139,25 @@ public class WALAUtils {
 		  return nodes;
 	  }
 	  
+	  public static Set<IClass> getAllAppClasses(ClassHierarchy cha) {
+		  Set<IClass> set = new HashSet<IClass>();
+		  for(IClass c : cha) {
+			  if(c.getClassLoader().getReference().equals(ClassLoaderReference.Application)) {
+	    			set.add(c);
+	    		}
+		  }
+		  return set;
+	  }
+	  
+	  public static Set<String> getAllAppClassNames(ClassHierarchy cha) {
+		  Set<IClass> set = getAllAppClasses(cha);
+		  Set<String> names = new HashSet<String>();
+		  for(IClass c : set) {
+			  names.add(WALAUtils.getJavaFullClassName(c));
+		  }
+		  return names;
+	  }
+	  
 	  //given class name like a.b.c.d
 	  public static IClass lookupClass(ClassHierarchy cha, String classFullName) {
 		  for(IClass c : cha) {
