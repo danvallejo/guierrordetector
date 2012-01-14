@@ -6,7 +6,7 @@ import java.util.List;
 import com.ibm.wala.classLoader.IClass;
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
 
-import edu.washington.cs.detector.AbstractUITest;
+import edu.washington.cs.detector.AbstractEclipsePluginTest;
 import edu.washington.cs.detector.AnomalyCallChain;
 import edu.washington.cs.detector.CallChainFilter;
 import edu.washington.cs.detector.SWTAppUIErrorMain;
@@ -17,7 +17,7 @@ import edu.washington.cs.detector.util.EclipsePluginCommons;
 import edu.washington.cs.detector.util.Globals;
 import edu.washington.cs.detector.util.Utils;
 
-public class TestSubeclipseUI extends AbstractUITest {
+public class TestSubeclipseUI extends AbstractEclipsePluginTest {
 
 	public static String PLUGIN_DIR = TestCommons.subeclipse_1_6 + Globals.fileSep 	+ "plugins";
 	
