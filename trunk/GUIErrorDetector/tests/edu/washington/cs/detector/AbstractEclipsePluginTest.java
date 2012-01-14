@@ -25,7 +25,7 @@ import edu.washington.cs.detector.util.WALAUtils;
 
 import junit.framework.TestCase;
 
-public abstract class AbstractUITest extends TestCase {
+public abstract class AbstractEclipsePluginTest extends TestCase {
 	
 	public static boolean DEBUG = false;
 	
