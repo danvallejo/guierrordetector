@@ -14,7 +14,12 @@ public class CGTraverseSWTGuider implements CGTraverseGuider {
 		"Lorg/eclipse/swt/graphics/Display, getDefault()",
 		"Lorg/eclipse/swt/widgets/Display, getActiveShell()",
 		"Lorg/eclipse/swt/widgets/Widget, toString()",
-		"Lorg/eclipse/swt/widgets/Widget, dispose()V"
+		"Lorg/eclipse/swt/widgets/Widget, dispose()V",
+		"Lorg/eclipse/swt/widgets/Synchronizer, syncExec(Ljava/lang/Runnable;)V",
+		//safe methods
+		"Lorg/eclipse/swt/widgets/Display, syncExec(Ljava/lang/Runnable;)V",
+		"Lorg/eclipse/swt/widgets/Display, asyncExec(Ljava/lang/Runnable;)V",
+		"Lorg/eclipse/swt/widgets/Display, runAsyncMessages(Z)Z"
 	};
 	
 	@Override
