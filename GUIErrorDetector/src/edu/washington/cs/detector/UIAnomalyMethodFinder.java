@@ -35,6 +35,7 @@ public class UIAnomalyMethodFinder extends AbstractMethodFinder {
 	//bad design here
 	private static MethodEvaluator evaluator = null;
 	
+	//only used when the method evaluator is set up
 	private ClassHierarchy cha = null;
 	
 	/** reload all checking method for customization */
