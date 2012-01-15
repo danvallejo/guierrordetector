@@ -90,7 +90,10 @@ public class TestRSESDKUI extends AbstractEclipsePluginTest {
 		
 		String package1 = "org.eclipse.rse.ui";
 		String package2 = "org.eclipse.rse.internal.ui";
-		for(IClass c : cha) {
+		
+		Set<IClass> allAppClasses = WALAUtils.getAllAppClasses(cha);
+		
+		for(IClass c : allAppClasses) {
 			if(c.isAbstract() || c.isInterface()) {
 				continue;
 			}
@@ -113,9 +116,20 @@ public class TestRSESDKUI extends AbstractEclipsePluginTest {
 //					}
 					
 					if(methodFullName.startsWith(className1) || methodFullName.startsWith(className2)
-							|| methodFullName.startsWith(className3)) {
-						Entrypoint ep = new DefaultEntrypoint(m, cha);
-						result.add(ep);
+							|| methodFullName.startsWith(className3)) 
+					{
+						if (m.isInit()) {
+							Entrypoint ep = new ParamTypeCustomizedEntrypoint(m, cha);
+						    result.add(ep);
+						} else {
+						    Entrypoint ep = new DefaultEntrypoint(m, cha);
+						    result.add(ep);
+						}
+					} else {
+						if (m.isInit()) {
+							Entrypoint ep = new ParamTypeCustomizedEntrypoint(m, cha);
+						    result.add(ep);
+						}
 					}
 					
 				}
