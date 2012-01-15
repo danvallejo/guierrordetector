@@ -149,6 +149,10 @@ public class WALAUtils {
 		  return set;
 	  }
 	  
+	  public static boolean isAppClass(IClass c) {
+		  return c.getClassLoader().getReference().equals(ClassLoaderReference.Application);
+	  }
+	  
 	  public static Set<String> getAllAppClassNames(ClassHierarchy cha) {
 		  Set<IClass> set = getAllAppClasses(cha);
 		  Set<String> names = new HashSet<String>();
@@ -188,6 +192,18 @@ public class WALAUtils {
 			TypeName tn = clazz.getName();
 			String packageName = tn.getPackage() == null ? "" : tn.getPackage().toString();
 			return Utils.translateSlashToDot(packageName);
+		}
+		
+		public static boolean isClassInPackages(IClass clazz, String[] packages) {
+			String packageName = getJavaPackageName(clazz);
+			boolean isIn = false;
+			for(String p : packages) {
+				if(packageName.startsWith(p)) {
+					isIn = true;
+					break;
+				}
+			}
+			return isIn;
 		}
 		
 		//dump all classes
