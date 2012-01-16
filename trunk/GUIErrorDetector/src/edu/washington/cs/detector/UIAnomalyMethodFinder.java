@@ -167,17 +167,17 @@ public class UIAnomalyMethodFinder extends AbstractMethodFinder {
 			
 			//check if it is a native method
 			if(node.getMethod().isNative()) {
-				Log.logln("See a native: " + node);
-				Log.logln(" --  connector empty? : " + this.connector.isEmpty());
+				//Log.logln("See a native: " + node);
+				//Log.logln(" --  connector empty? : " + this.connector.isEmpty());
 				if(succIt.hasNext()) {
 					throw new RuntimeException("A native method should never call others in Java");
 				}
 				if(!this.connector.isEmpty()) {
 					Collection<CGNode> succNodes = this.connector.getSucc(cg, node);
-					Log.logln("Get native callees from connector for method: " + node);
+					//Log.logln("Get native callees from connector for method: " + node);
 					for(CGNode succNode : succNodes) {
 						queue.add(succNode);
-						Log.logln(" -  add native callee: " + succNode);
+						//Log.logln(" -  add native callee: " + succNode);
 						if(!cgNodeMap.containsKey(succNode)) {
 					        cgNodeMap.put(succNode, new CallChainNode(succNode, chainNode));
 				       }
@@ -189,11 +189,11 @@ public class UIAnomalyMethodFinder extends AbstractMethodFinder {
 				CGNode succNode = succIt.next();
 				
 				if(!super.guider.traverse(node, succNode)) {
-					Log.logln("  skip by guider: " + succNode, DEBUG);
+					//Log.logln("  skip by guider: " + succNode, DEBUG);
 					continue;
 				}
 				
-				Log.logln("  next node: " + succNode, DEBUG);
+				//Log.logln("  next node: " + succNode, DEBUG);
 				queue.add(succNode);
 				if(!cgNodeMap.containsKey(succNode) //|| this.isCheckingMethod(succNode) 
 						) {
