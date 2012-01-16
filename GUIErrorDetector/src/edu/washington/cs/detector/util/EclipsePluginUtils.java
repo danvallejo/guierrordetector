@@ -8,15 +8,53 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+
 import com.ibm.wala.classLoader.IClass;
 import com.ibm.wala.classLoader.IMethod;
+import com.ibm.wala.ipa.callgraph.CGNode;
 import com.ibm.wala.ipa.callgraph.Entrypoint;
 import com.ibm.wala.ipa.callgraph.impl.DefaultEntrypoint;
 import com.ibm.wala.ipa.cha.ClassHierarchy;
+import com.ibm.wala.util.graph.Graph;
 
 import edu.washington.cs.detector.walaextension.ParamTypeCustomizedEntrypoint;
 
 public class EclipsePluginUtils {
+	
+	private static IClass UI_PLUGIN = null;
+	private static String uiPlugin = "org.eclipse.ui.plugin.AbstractUIPlugin";
+	public static IClass getUIPlugin(ClassHierarchy cha) {
+		if(UI_PLUGIN == null) {
+			UI_PLUGIN = WALAUtils.lookupClass(cha, uiPlugin);
+		}
+		if(UI_PLUGIN == null) {
+			throw new RuntimeException("The class can not be loaded: " + uiPlugin);
+		}
+		return UI_PLUGIN;
+	}
+	public static Collection<Entrypoint> getAllPluginMethodsAsEntrypoint(ClassHierarchy cha, String[] packages) {
+		IClass plugin = getUIPlugin(cha);
+		Collection<IClass> allPluginClasses = getAllAppSubClasses(cha, plugin, packages);
+		
+		Collection<Entrypoint> colls = new HashSet<Entrypoint>();
+		
+		for(IClass c : allPluginClasses) {
+			for(IMethod m : c.getDeclaredMethods()) {
+				IClass decl = m.getDeclaringClass();
+				String declPackage = WALAUtils.getJavaPackageName(decl);
+				if(declPackage.startsWith("java.")) {
+					continue;
+				}
+				if(m.isPublic() || m.isProtected()) {
+				    colls.add(new DefaultEntrypoint(m, cha));
+				}
+			}
+		}
+		
+		return colls;
+	}
 	
 	public static Collection<String> getAllDeclaredClasses(String jarFile) {
 		try {
@@ -74,6 +112,81 @@ public class EclipsePluginUtils {
 		
 		return entries;
 	}
+	/**
+	 * The UI parts in eclipse
+	 * */
+	private static IClass WORKBENCH_PART =  null;
+	private static String workbenchPart = "org.eclipse.ui.part.WorkbenchPart"; //include viewpart and editor part
+	private static IClass WINDOW = null;
+	private static String windowPart = "org.eclipse.jface.window.Window"; //window part
+	private static IClass PAGE_VIEW = null;
+	private static String pageView = "org.eclipse.ui.part.IPageBookViewPage"; //page part
+	private static IClass DIALOG_PAGE = null;
+	private static String dialogView = "org.eclipse.jface.dialogs.IDialogPage";
+	private static IClass IWIZARD = null;
+	private static String iwizard = "org.eclipse.jface.wizard.IWizard";
+	private static IClass VIEWER = null;
+	private static String viewer = "org.eclipse.jface.viewers.Viewer";
+	
+	public static IClass getWorkbenchPart(ClassHierarchy cha) {
+		if(WORKBENCH_PART == null) {
+			WORKBENCH_PART = WALAUtils.lookupClass(cha, workbenchPart);
+		}
+		if(WORKBENCH_PART == null) {
+			throw new RuntimeException("The class can not be loaded: " + workbenchPart);
+		}
+		return WORKBENCH_PART;
+	}
+	
+	public static IClass getWindowPart(ClassHierarchy cha) {
+		if(WINDOW == null) {
+			WINDOW = WALAUtils.lookupClass(cha, windowPart);
+		}
+		if(WINDOW == null) {
+			throw new RuntimeException("The class can not be loaded: " + windowPart);
+		}
+		return WINDOW;
+	}
+	
+	public static IClass getPagePart(ClassHierarchy cha) {
+		if(PAGE_VIEW == null) {
+			PAGE_VIEW = WALAUtils.lookupClass(cha, pageView);
+		}
+		if(PAGE_VIEW == null) {
+			throw new RuntimeException("The class can not be loaded: " + pageView);
+		}
+		return PAGE_VIEW;
+	}
+	
+	public static IClass getDialog(ClassHierarchy cha) {
+		if(DIALOG_PAGE == null) {
+			DIALOG_PAGE = WALAUtils.lookupClass(cha, dialogView);
+		}
+		if(DIALOG_PAGE == null) {
+			throw new RuntimeException("The class can not be loaded: " + dialogView);
+		}
+		return DIALOG_PAGE;
+	}
+	
+	public static IClass getWizard(ClassHierarchy cha) {
+		if(IWIZARD == null) {
+			IWIZARD = WALAUtils.lookupClass(cha, iwizard);
+		}
+		if(IWIZARD == null) {
+			throw new RuntimeException("The class can not be loaded: " + iwizard);
+		}
+		return IWIZARD;
+	}
+	
+	public static IClass getViewer(ClassHierarchy cha) {
+		if(VIEWER == null) {
+			VIEWER = WALAUtils.lookupClass(cha, viewer);
+		}
+		if(VIEWER == null) {
+			throw new RuntimeException("The class can not be loaded: " + viewer);
+		}
+		return VIEWER;
+	}
 	
 	/**
 	 * All SWT Listeners, and all methods that extend eclipse Actions
@@ -91,6 +204,8 @@ public class EclipsePluginUtils {
 	 * */
 	private static IClass ACTION_DELEGATION = null;
 	private static String actionDelegation = "org.eclipse.ui.actions.ActionDelegate";
+	private static IClass EVENT_LISTENER = null;
+	private static String eventListener = "java.util.EventListener";
 	private static IClass SWT_EVENT_LISTENER = null;
 	private static String swtEventListener = "org.eclipse.swt.internal.SWTEventListener";
 	private static IClass I_ACTION_DELEGATE = null;
@@ -136,6 +251,16 @@ public class EclipsePluginUtils {
 			throw new RuntimeException("The class is not found: " + jobChangeListener);
 		}
 		return JOB_CHANGE_LISTENER;
+	}
+	
+	public static IClass getEventListener(ClassHierarchy cha) {
+		if(EVENT_LISTENER == null) {
+			EVENT_LISTENER = WALAUtils.lookupClass(cha, eventListener);
+		}
+		if(EVENT_LISTENER == null) {
+			throw new RuntimeException("The class is not found: " + eventListener);
+		}
+		return EVENT_LISTENER;
 	}
 	
 	/**
@@ -393,4 +518,82 @@ public class EclipsePluginUtils {
 		}
 		return entries;
 	}
+	
+	//eclipse Job, UIJob
+	private static IClass UI_JOB = null;
+	private static String uiJobStr = "org.eclipse.ui.progress.UIJob";
+	public static IClass getUIJob(ClassHierarchy cha) {
+		if(UI_JOB == null) {
+			UI_JOB = WALAUtils.lookupClass(cha, uiJobStr);
+		}
+		if(UI_JOB == null) {
+			throw new RuntimeException("The class is not found: " + uiJobStr);
+		}
+		return UI_JOB;
+	}
+	
+	public static boolean isRunInUIThreadMethod(IMethod method) {
+		return method.getName().toString().equals("runInUIThread"); //FIXME, not complete
+	}
+	
+	private static IClass JOB = null;
+	private static String jobStr = "org.eclipse.core.runtime.jobs.Job";
+	public static IClass getJob(ClassHierarchy cha) {
+		if(JOB == null) {
+			JOB = WALAUtils.lookupClass(cha, jobStr);
+		}
+		if(JOB == null) {
+			throw new RuntimeException("The class is not found: " + jobStr);
+		}
+		return JOB;
+	}
+	
+	public static Collection<IClass> getAllJobClasses(ClassHierarchy cha, String[] packages) {
+		IClass job = getJob(cha);
+		Collection<IClass> retClasses = new HashSet<IClass>();
+		
+		for(IClass c : cha) {
+			if(packages != null) {
+				if(!WALAUtils.isClassInPackages(c, packages)) {
+					continue;
+				}
+			}
+			if(cha.isAssignableFrom(job, c)) {
+				retClasses.add(c);
+			}
+		}
+		
+		return retClasses;
+	}
+	
+	//get all Job run nodes
+	public static Collection<CGNode> getAllJobRunMethods(Graph<CGNode> cg, ClassHierarchy cha, String[] packages) {
+		IClass job = getJob(cha);
+		Collection<CGNode> retNodes = new HashSet<CGNode>();
+		
+		for(CGNode node : cg) {
+			IMethod m = node.getMethod();
+			IClass c = m.getDeclaringClass();
+			if(packages != null) {
+				if(!WALAUtils.isClassInPackages(c, packages)) {
+					continue;
+				}
+			}
+			if(cha.isAssignableFrom(job, c)) {
+				//IStatus run(IProgressMonitor monitor)
+				//run(Lorg/eclipse/core/runtime/IProgressMonitor;)V
+				if(m.getName().toString().equals("run") && m.getNumberOfParameters() == 2
+						//&& m.getParameterType(1).toString().equals("Lorg/eclipse/core/runtime/IProgressMonitor;")
+						) { //FIXME
+					System.out.println("-- " + node);
+					retNodes.add(node);
+				}
+			}
+		}
+		
+		return retNodes;
+	}
+	
+	//find all declared pages? views?
+	
 }
