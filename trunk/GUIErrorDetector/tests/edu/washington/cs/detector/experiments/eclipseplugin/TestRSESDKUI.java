@@ -179,7 +179,7 @@ public class TestRSESDKUI extends AbstractEclipsePluginTest {
 		super.setThreadStartGuider(new CGTraverseSWTGuider());
 		super.setUIAnomalyGuider(new CGTraverseSWTGuider());
 		
-		List<AnomalyCallChain> chains = super.reportUIErrors();
+		Collection<AnomalyCallChain> chains = super.reportUIErrors();
 		
 		int count = 0;
 		for(AnomalyCallChain chain : chains) {
