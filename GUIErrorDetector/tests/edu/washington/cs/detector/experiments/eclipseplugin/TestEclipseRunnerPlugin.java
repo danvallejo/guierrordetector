@@ -20,6 +20,7 @@ import edu.washington.cs.detector.util.Globals;
 import edu.washington.cs.detector.util.Log;
 import edu.washington.cs.detector.util.Utils;
 
+//found bugs: http://code.google.com/p/eclipserunnerplugin/issues/detail?id=7
 public class TestEclipseRunnerPlugin extends AbstractEclipsePluginTest {
 	
 	@Override

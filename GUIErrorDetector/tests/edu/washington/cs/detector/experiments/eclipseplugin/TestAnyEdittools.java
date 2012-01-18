@@ -22,6 +22,7 @@ import edu.washington.cs.detector.util.Utils;
 
 //no errors
 //has potential bugs
+//http://code.google.com/a/eclipselabs.org/p/anyedittools/
 public class TestAnyEdittools extends AbstractEclipsePluginTest {
 	
 	@Override
