@@ -212,6 +212,12 @@ public class EclipsePluginUtils {
 	private static String iActionDelegate = "org.eclipse.ui.IActionDelegate";
 	private static IClass JOB_CHANGE_LISTENER = null;
 	private static String jobChangeListener = "org.eclipse.core.runtime.jobs.IJobChangeListener";
+	private static IClass RESOURCE_CHANGE_LISTENER = null;
+	private static String resourceChangeListener = "org.eclipse.core.resources.IResourceChangeListener";
+	//public void resourceChanged(IResourceChangeEvent event); invoked by non-UI
+	private static IClass ACTION = null;
+	private static String action = "org.eclipse.jface.action.Action";  //run() invoked by non-UI
+	//all public methods in a Job Change Listener
 	
 	public static IClass getActionDelegation(ClassHierarchy cha) {
 		if(ACTION_DELEGATION == null) {
@@ -261,6 +267,26 @@ public class EclipsePluginUtils {
 			throw new RuntimeException("The class is not found: " + eventListener);
 		}
 		return EVENT_LISTENER;
+	}
+	
+	public static IClass getResourceChangeListener(ClassHierarchy cha) {
+		if(RESOURCE_CHANGE_LISTENER == null) {
+			RESOURCE_CHANGE_LISTENER = WALAUtils.lookupClass(cha, resourceChangeListener);
+		}
+		if(RESOURCE_CHANGE_LISTENER == null) {
+			throw new RuntimeException("The class is not found: " + resourceChangeListener);
+		}
+		return RESOURCE_CHANGE_LISTENER;
+	}
+	
+	public static IClass getAction(ClassHierarchy cha) {
+		if(ACTION == null) {
+			ACTION = WALAUtils.lookupClass(cha, action);
+		}
+		if(ACTION == null) {
+			throw new RuntimeException("The class is not found: " + action);
+		}
+		return ACTION;
 	}
 	
 	/**
@@ -483,6 +509,7 @@ public class EclipsePluginUtils {
 	}
 
     //the job change listener
+	//The JobListener is not running at EDT
 	private static Set<String> jobListenerMethods = null;
 	public static Set<String> getJobListenerMethods() {
 		if(jobListenerMethods != null) {
@@ -498,11 +525,13 @@ public class EclipsePluginUtils {
 			return jobListenerMethods;
 		}
 	}
+	
+	//all job change listener methods
 	public static Collection<Entrypoint> getAllJobChangeListenerMethods(ClassHierarchy cha, String[] packages, boolean considerSubType) {
 		Collection<IClass> allJobChangedListeners =
 		    EclipsePluginUtils.getAllAppSubClasses(cha, getJobChangeListener(cha), packages);
 		
-		Set<String> jobListenerMethods = getJobListenerMethods();
+//		Set<String> jobListenerMethods = getJobListenerMethods();
 		Collection<Entrypoint> entries = new HashSet<Entrypoint>();
 		for(IClass c : allJobChangedListeners) {
 			for(IMethod m : c.getDeclaredMethods()) {
@@ -522,6 +551,7 @@ public class EclipsePluginUtils {
 	//eclipse Job, UIJob
 	private static IClass UI_JOB = null;
 	private static String uiJobStr = "org.eclipse.ui.progress.UIJob";
+	
 	public static IClass getUIJob(ClassHierarchy cha) {
 		if(UI_JOB == null) {
 			UI_JOB = WALAUtils.lookupClass(cha, uiJobStr);
@@ -530,6 +560,11 @@ public class EclipsePluginUtils {
 			throw new RuntimeException("The class is not found: " + uiJobStr);
 		}
 		return UI_JOB;
+	}
+	
+    public static boolean isUIJob(IClass c, ClassHierarchy cha) {
+    	IClass uiJob = getUIJob(cha);
+    	return cha.isAssignableFrom(uiJob, c);
 	}
 	
 	public static boolean isRunInUIThreadMethod(IMethod method) {
@@ -567,6 +602,7 @@ public class EclipsePluginUtils {
 	}
 	
 	//get all Job run nodes
+	//the job runnable methods may not be called in a UI thread
 	public static Collection<CGNode> getAllJobRunMethods(Graph<CGNode> cg, ClassHierarchy cha, String[] packages) {
 		IClass job = getJob(cha);
 		Collection<CGNode> retNodes = new HashSet<CGNode>();
@@ -585,7 +621,7 @@ public class EclipsePluginUtils {
 				if(m.getName().toString().equals("run") && m.getNumberOfParameters() == 2
 						//&& m.getParameterType(1).toString().equals("Lorg/eclipse/core/runtime/IProgressMonitor;")
 						) { //FIXME
-					System.out.println("-- " + node);
+					//System.out.println("-- " + node);
 					retNodes.add(node);
 				}
 			}
@@ -594,6 +630,123 @@ public class EclipsePluginUtils {
 		return retNodes;
 	}
 	
-	//find all declared pages? views?
+	public static Collection<CGNode> getAllJobPublicProtectMethods(Graph<CGNode> cg, ClassHierarchy cha, String[] packages) {
+		IClass job = getJob(cha);
+		Collection<CGNode> retNodes = new HashSet<CGNode>();
+		for(CGNode node : cg) {
+			IMethod m = node.getMethod();
+			IClass c = m.getDeclaringClass();
+			if(packages != null) {
+				if(!WALAUtils.isClassInPackages(c, packages)) {
+					continue;
+				}
+			}
+			if(cha.isAssignableFrom(job, c)) {
+				if(m.isPublic() || m.isProtected()) {
+					retNodes.add(node);
+				}
+			}
+		}
+		return retNodes;
+	}
 	
+	/**
+	 * 
+	 * //public void resourceChanged(IResourceChangeEvent event); invoked by non-UI
+	private static IClass ACTION = null;
+	private static String action = "org.eclipse.jface.action.Action";  //run() invoked by non-UI
+	//all public methods in a Job Change Listener
+	 * */
+	
+	public static Collection<CGNode> getAllResourceChangeMethods(Graph<CGNode> graph, ClassHierarchy cha, String[] packages) {
+		Collection<CGNode> resourceChangeMethods = new HashSet<CGNode>();
+		
+		IClass resourceListener = getResourceChangeListener(cha);
+		for(CGNode node : graph) {
+			IMethod m = node.getMethod();
+			IClass c = m.getDeclaringClass();
+			if(packages != null) {
+				if(!WALAUtils.isClassInPackages(c, packages)) {
+					continue;
+				}
+			}
+			if(cha.isAssignableFrom(resourceListener, c)) {
+				if(m.getName().toString().equals("resourceChanged")) { //XXX may not complete
+					resourceChangeMethods.add(node);
+				}
+			}
+		}
+		
+		return resourceChangeMethods;
+	}
+	
+	public static Collection<CGNode> getAllActionRunMethods(Graph<CGNode> graph, ClassHierarchy cha, String[] packages) {
+		Collection<CGNode>  actionRuns = new HashSet<CGNode>();
+		IClass action = getAction(cha);
+		for(CGNode node : graph) {
+			IMethod m = node.getMethod();
+			IClass c = m.getDeclaringClass();
+			if(packages != null) {
+				if(!WALAUtils.isClassInPackages(c, packages)) {
+					continue;
+				}
+			}
+			if(cha.isAssignableFrom(action, c)) {
+				if(m.getName().toString().equals("run")) {
+					actionRuns.add(node);
+				}
+			}
+		}
+		return actionRuns;
+	}
+	
+	private static IClass IPROGRESS_MONITOR = null;
+	private static String progressMonitor = "org.eclipse.core.runtime.IProgressMonitor";
+	public static IClass getProgressMonitor(ClassHierarchy cha) {
+		if(IPROGRESS_MONITOR == null) {
+			IPROGRESS_MONITOR = WALAUtils.lookupClass(cha, progressMonitor);
+		}
+		if(IPROGRESS_MONITOR == null) {
+			throw new RuntimeException("The class is not loaded: " + progressMonitor);
+		}
+		return IPROGRESS_MONITOR;
+	}
+	private static Set<String> monitorMethods = null;
+	public static Set<String> getMonitorMethods() {
+		if(monitorMethods == null) {
+			monitorMethods = new HashSet<String>();
+			monitorMethods.add("beginTask");
+			monitorMethods.add("done");
+			monitorMethods.add("internalWorked");
+			monitorMethods.add("isCanceled");
+			monitorMethods.add("setCanceled");
+			monitorMethods.add("setTaskName");
+			monitorMethods.add("subTask");
+			monitorMethods.add("worked");
+		}
+		return monitorMethods;
+	}
+	//the progress monitor methods are not supposed to be executed
+	//in the UI thread
+	public static Collection<CGNode> getAllMonitorMethods(Graph<CGNode> cg, ClassHierarchy cha, String[] packages) {
+		IClass monitor = getProgressMonitor(cha);
+		Set<String> methods = getMonitorMethods();
+		Collection<CGNode> retNodes = new HashSet<CGNode>();
+		for(CGNode node : cg) {
+			IMethod m = node.getMethod();
+			IClass c = m.getDeclaringClass();
+			if(packages != null) {
+				if(!WALAUtils.isClassInPackages(c, packages)) {
+					continue;
+				}
+			}
+			if(cha.isAssignableFrom(monitor, c)) {
+				//check the name here
+				if(methods.contains(m.getName().toString())) {
+					retNodes.add(node);
+				}
+			}
+		}
+		return retNodes;
+	}
 }
