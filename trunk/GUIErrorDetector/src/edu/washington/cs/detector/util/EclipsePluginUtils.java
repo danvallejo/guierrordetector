@@ -680,6 +680,29 @@ public class EclipsePluginUtils {
 		return resourceChangeMethods;
 	}
 	
+	public static Collection<CGNode> getAllJobChangeMethods(Graph<CGNode> graph, ClassHierarchy cha, String[] packages) {
+		Collection<CGNode> jobChangeMethods = new HashSet<CGNode>();
+		Set<String> definedMethods = getJobListenerMethods(); 
+		
+		IClass jobChangeListener = getJobChangeListener(cha);
+		for(CGNode node : graph) {
+			IMethod m = node.getMethod();
+			IClass c = m.getDeclaringClass();
+			if(packages != null) {
+				if(!WALAUtils.isClassInPackages(c, packages)) {
+					continue;
+				}
+				if(cha.isAssignableFrom(jobChangeListener, c)) {
+					if(definedMethods.contains(m.getName().toString())) {
+						jobChangeMethods.add(node);
+					}
+				}
+			}
+		}
+		
+		return jobChangeMethods;
+	}
+	
 	public static Collection<CGNode> getAllActionRunMethods(Graph<CGNode> graph, ClassHierarchy cha, String[] packages) {
 		Collection<CGNode>  actionRuns = new HashSet<CGNode>();
 		IClass action = getAction(cha);
