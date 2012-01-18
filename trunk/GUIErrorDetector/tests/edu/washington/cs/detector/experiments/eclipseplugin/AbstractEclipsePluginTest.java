@@ -55,6 +55,10 @@ public abstract class AbstractEclipsePluginTest extends TestCase {
 	protected abstract Collection<CGNode> getStartNodes(Iterable<CGNode> allNodes, ClassHierarchy cha);
 	protected abstract String getAppPath();
 	protected abstract String getDependentJars();
+	
+	protected String getExtraJars() {
+		return null;
+	}
 
 	//a few configuration options
 	protected void setThreadStartGuider(CGTraverseGuider guider) {
@@ -85,6 +89,10 @@ public abstract class AbstractEclipsePluginTest extends TestCase {
 			appPath = this.completePath;
 		} else {
 		    appPath =  TestCommons.assemblyAppPath(getAppPath() /*just a path*/, getDependentJars() /*all jars*/);
+		    if(this.getExtraJars() != null) {
+		    	System.err.println("Extra path: " + this.getExtraJars());
+		    	appPath = appPath + Globals.pathSep + this.getExtraJars();
+		    }
 		}
 		System.out.println("App path:\n  " + appPath);
 		
@@ -132,7 +140,10 @@ public abstract class AbstractEclipsePluginTest extends TestCase {
 		}
 		
 		//note that, the execution will return from here
+		List<AnomalyCallChain> chains  = new LinkedList<AnomalyCallChain>();
+		
 		if(this.see_ui_access_runnable) {
+			Log.logln("-----All thread runnable ------");
 			UIAccessRunnableFinder finder = new UIAccessRunnableFinder(builder.getAppCallGraph(), cha, this.uiAnomalyGuider,
 					null, this.getPackages());
 			Collection<CGNode> runnables = UIAccessRunnableFinder.getAllAppRunMethods(builder.getAppCallGraph(), cha,
@@ -140,20 +151,39 @@ public abstract class AbstractEclipsePluginTest extends TestCase {
 			Collection<AnomalyCallChain> chains1 = finder.findAllUIAccessingRunnables(runnables);
 			
 			Log.logln("--------- job runs -----------");
-			
 			Collection<CGNode> jobRuns = EclipsePluginUtils.getAllJobRunMethods(builder.getAppCallGraph(), cha,
 					this.getPackages());
 			Collection<AnomalyCallChain> chains2 = finder.findAllUIAccessingRunnables(jobRuns);
 			
-			Collection<AnomalyCallChain> chains = new LinkedList<AnomalyCallChain>();
+			Log.logln("--------- job public methods -----");
+			Collection<CGNode> jobMethods = EclipsePluginUtils.getAllJobPublicProtectMethods(builder.getAppCallGraph(), cha,
+					this.getPackages());
+			Collection<AnomalyCallChain> chains3 = finder.findAllUIAccessingRunnables(jobMethods);
+			
+			Log.logln("--------- progress monitor -------");
+			Collection<CGNode> monitorMethods = EclipsePluginUtils.getAllMonitorMethods(builder.getAppCallGraph(), cha,
+					this.getPackages());
+			Collection<AnomalyCallChain> chains4 = finder.findAllUIAccessingRunnables(monitorMethods);
+			
+			Collection<CGNode> resourceChangeMethods = EclipsePluginUtils.getAllResourceChangeMethods(builder.getAppCallGraph(),
+					cha, this.getPackages());
+			Collection<AnomalyCallChain> chains5 = finder.findAllUIAccessingRunnables(resourceChangeMethods);
+			
+			System.out.println("Action run number");
+			Collection<CGNode> actionMethods = EclipsePluginUtils.getAllActionRunMethods(builder.getAppCallGraph(), cha,
+					this.getPackages());
+			Collection<AnomalyCallChain> chains6 = finder.findAllUIAccessingRunnables(actionMethods);
+			
+			
 			//chains.addAll(chains1);
 			chains.addAll(chains2);
-			
-			return chains;
+			chains.addAll(chains3);
+			chains.addAll(chains4);
+			chains.addAll(chains5);
+			chains.addAll(chains6);
+		} else {
+		    chains = detector.detectUIAnomaly(builder, startNodes);
 		}
-		
-		//detect the full chain here
-		List<AnomalyCallChain> chains = detector.detectUIAnomaly(builder, startNodes);
 		
 		System.out.println("Number of anomaly call chains: " + chains.size());
 		
@@ -162,8 +192,8 @@ public abstract class AbstractEclipsePluginTest extends TestCase {
 		chains = CallChainFilter.filter(chains, new RemoveSystemCallStrategy());
 		System.out.println("size of chains after removing system calls: " + chains.size());
 		
-		chains = CallChainFilter.filter(chains, new RemoveSubsumedChainStrategy(startNodes));
-		System.out.println("size of chains after removing subsumed calls: " + chains.size());
+//		chains = CallChainFilter.filter(chains, new RemoveSubsumedChainStrategy(startNodes));
+//		System.out.println("size of chains after removing subsumed calls: " + chains.size());
 		
 		if(packages != null) {
 		    chains = CallChainFilter.filter(chains, new RemoveNoClientClassStrategy(packages, true));
