@@ -17,7 +17,8 @@ public class RemoveSameEntryStrategy extends FilterStrategy {
 		
 		List<AnomalyCallChain> result = new LinkedList<AnomalyCallChain>();
 		for(AnomalyCallChain chain : chains) {
-			String entry = chain.getUI2Start().get(0).getMethod().toString();
+//			String entry = chain.getUI2Start().get(0).getMethod().toString();
+			String entry = chain.getFullCallChain().get(0).getMethod().toString();
 			if(!entryMap.containsKey(entry)) {
 				entryMap.put(entry, chain);
 			} else {
