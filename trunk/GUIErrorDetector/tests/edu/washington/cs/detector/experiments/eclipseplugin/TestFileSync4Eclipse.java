@@ -21,6 +21,7 @@ import edu.washington.cs.detector.util.Log;
 import edu.washington.cs.detector.util.Utils;
 
 //no errors
+//http://code.google.com/a/eclipselabs.org/p/filesync4eclipse/downloads/list
 public class TestFileSync4Eclipse extends AbstractEclipsePluginTest {
 	@Override
 	protected String getAppPath() {
