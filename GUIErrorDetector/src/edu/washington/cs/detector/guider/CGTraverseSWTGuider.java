@@ -19,7 +19,8 @@ public class CGTraverseSWTGuider implements CGTraverseGuider {
 		//safe methods
 		"Lorg/eclipse/swt/widgets/Display, syncExec(Ljava/lang/Runnable;)V",
 		"Lorg/eclipse/swt/widgets/Display, asyncExec(Ljava/lang/Runnable;)V",
-		"Lorg/eclipse/swt/widgets/Display, runAsyncMessages(Z)Z"
+		"Lorg/eclipse/swt/widgets/Display, runAsyncMessages(Z)Z",
+		"Lorg/eclipse/core/internal/runtime/Log, log(Lorg/eclipse/core/runtime/IStatus;)V" //add Log, it is highly unlikely
 	};
 	
 	@Override
