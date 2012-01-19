@@ -118,6 +118,21 @@ public class Utils {
 		return fullPaths;
 	}
 	
+	public static Collection<String> extractClassFromPlugXMLFiles(String...fileNames) {
+		Collection<String> classNames = new HashSet<String>();
+		
+		for(String fileName : fileNames) {
+			if(!fileName.endsWith(".xml")) {
+				throw new RuntimeException("The file is not an XML file: " + fileName);
+			}
+			String content = Files.readWholeAsString(fileName);
+			Collection<String> classes = extractClasses(content);
+			classNames.addAll(classes);
+		}
+		
+		return classNames;
+	}
+	
 	public static Collection<String> extractClassFromPluginXML(String pluginJarFile) throws IOException {
 		if(!pluginJarFile.endsWith(".jar")) {
 			throw new RuntimeException("The input file: " + pluginJarFile + " is not a jar file.");

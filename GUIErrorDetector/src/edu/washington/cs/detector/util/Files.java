@@ -196,6 +196,19 @@ public final class Files {
 		  throw new RuntimeException(e);
 	  }
   }
+  
+  /**
+   * Reads the whole file. Returns the file content as a flat String
+   * */
+  public static String readWholeAsString(String fileName) {
+	  List<String> content = readWholeNoExp(fileName);
+	  StringBuilder sb = new StringBuilder();
+	  for(String str : content) {
+		  sb.append(str);
+		  sb.append(Globals.lineSep);
+	  }
+	  return sb.toString();
+  }
 
   /**
    * Reads the whole file. Returns the list of lines.  
