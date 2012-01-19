@@ -148,39 +148,58 @@ public abstract class AbstractEclipsePluginTest extends TestCase {
 					null, this.getPackages());
 			Collection<CGNode> runnables = UIAccessRunnableFinder.getAllAppRunMethods(builder.getAppCallGraph(), cha,
 					this.getPackages());
+			Utils.logCollection(runnables);
 			Collection<AnomalyCallChain> chains1 = finder.findAllUIAccessingRunnables(runnables);
+			Log.logln("Number of chains: " + chains1.size());
 			
 			Log.logln("--------- job runs -----------");
 			Collection<CGNode> jobRuns = EclipsePluginUtils.getAllJobRunMethods(builder.getAppCallGraph(), cha,
 					this.getPackages());
+			Utils.logCollection(jobRuns);
 			Collection<AnomalyCallChain> chains2 = finder.findAllUIAccessingRunnables(jobRuns);
+			Log.logln("Number of chains: " + chains2.size());
 			
 			Log.logln("--------- job public methods -----");
 			Collection<CGNode> jobMethods = EclipsePluginUtils.getAllJobPublicProtectMethods(builder.getAppCallGraph(), cha,
 					this.getPackages());
+			Utils.logCollection(jobMethods);
 			Collection<AnomalyCallChain> chains3 = finder.findAllUIAccessingRunnables(jobMethods);
+			Log.logln("Number of chains: " + chains3.size());
 			
 			Log.logln("--------- progress monitor -------");
 			Collection<CGNode> monitorMethods = EclipsePluginUtils.getAllMonitorMethods(builder.getAppCallGraph(), cha,
 					this.getPackages());
+			Utils.logCollection(monitorMethods);
 			Collection<AnomalyCallChain> chains4 = finder.findAllUIAccessingRunnables(monitorMethods);
+			Log.logln("Number of chains: " + chains4.size());
 			
+			Log.logln("--------- Resource change methods -------");
 			Collection<CGNode> resourceChangeMethods = EclipsePluginUtils.getAllResourceChangeMethods(builder.getAppCallGraph(),
 					cha, this.getPackages());
+			Utils.logCollection(resourceChangeMethods);
 			Collection<AnomalyCallChain> chains5 = finder.findAllUIAccessingRunnables(resourceChangeMethods);
+			Log.logln("Number of chains: " + chains5.size());
 			
+			Log.logln("--------- Action run number -------");
 			System.out.println("Action run number");
 			Collection<CGNode> actionMethods = EclipsePluginUtils.getAllActionRunMethods(builder.getAppCallGraph(), cha,
 					this.getPackages());
+			Utils.logCollection(actionMethods);
 			Collection<AnomalyCallChain> chains6 = finder.findAllUIAccessingRunnables(actionMethods);
 			
+			Log.logln("--------- Job change methods --------");
+			Collection<CGNode> jobChangeMethods = EclipsePluginUtils.getAllJobChangeMethods(builder.getAppCallGraph(), cha,
+					this.getPackages());
+			Utils.logCollection(jobChangeMethods);
+			Collection<AnomalyCallChain> chains7 = finder.findAllUIAccessingRunnables(jobChangeMethods);
 			
-			//chains.addAll(chains1);
+			chains.addAll(chains1);
 			chains.addAll(chains2);
 			chains.addAll(chains3);
 			chains.addAll(chains4);
 			chains.addAll(chains5);
 			chains.addAll(chains6);
+			chains.addAll(chains7);
 		} else {
 		    chains = detector.detectUIAnomaly(builder, startNodes);
 		}
