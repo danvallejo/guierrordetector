@@ -117,6 +117,8 @@ Existing call graph construction algorithms suffer from incompleteness
 we proposed a combined RTA
 and k-CFA call graph construction algorithm in Section~\ref{sec:cg}.
 
+%we augument k-CFA with value set
+
 
 We also note that a static analysis may report false positives due
 to its conservative nature, or multiple warnings that actually correspond to
@@ -174,6 +176,11 @@ Three utility methods in lines 3 -- 5 are specific for each GUI framework
 \subsubsection{Call Graph Construction}
 \label{sec:cg}
 
+%In OO program, translate k-CFA as:
+%k-call-site sensitive interprocedural pointer
+%analysis with a k-context-sensitive heap and onthe-
+%fly call-graph construction
+% 
 
 \begin{figure}[t]
 %\centering
@@ -223,6 +230,13 @@ program scale well but achieves relatively lower precision. The
 k-CFA algorithms maintains one set per expression achieves better
 precision than RTA (\textit{k} is the context length, which is
 orthogonal to the number of maintained sets).
+
+%this is wrong for k-CFA, k-CFA maintains several sets per expression, which k > 0
+%should cite Ben Livshit's paper on "Reflection analysis for Java"
+%Donot overclaim "say propose a new technique", instead, say "refine the technique"
+%also need to cite Yannis's paper on solving k-CFA paradox
+
+\textbf{need to describe why need to traverse from the UI entry, not just from the thread entry}
 
 
 \begin{figure}[t]
@@ -556,7 +570,7 @@ in Swing GUI classes are not thread safe with three exceptions (\CodeIn{repaint(
 treat all methods as defined in each GUI class as UI accessing nodes.
 
 \item \textbf{Safe methods: }  Swing provides two helper methods
-(\CodeIn{SwingUti-\\lities.invokeLater} and \CodeIn{SwingUtilities.invokeDelay}) to pass messages to the UI thread.
+(\CodeIn{SwingUti-\\lities.invokeLater} and \CodeIn{SwingUtilities.invokeAndWait}) to pass messages to the UI thread.
 We treat these two methods as safe methods.
 
 \end{itemize}
