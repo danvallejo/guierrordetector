@@ -21,6 +21,7 @@ import edu.washington.cs.detector.util.Log;
 import edu.washington.cs.detector.util.Utils;
 
 //project page: http://marketplace.eclipse.org/content/pydev-python-ide-eclipse
+//too large to analyze
 public class TestPyDev extends AbstractEclipsePluginTest {
 	
 	private String[] allPluginFiles = new String[] {
@@ -132,7 +133,7 @@ public class TestPyDev extends AbstractEclipsePluginTest {
 //		super.setCGType(CG.ZeroCFA);
 		super.setCGType(CG.OneCFA);
 		super.setCGType(CG.RTA);
-		super.setCGType(CG.ZeroCFA);
+//		super.setCGType(CG.ZeroCFA);
 		super.setThreadStartGuider(new CGTraverseSWTGuider());
 		super.setUIAnomalyGuider(new CGTraverseSWTGuider());
 		super.setPackages(new String[]{"com.python.pydev", "org.python.pydev"});
