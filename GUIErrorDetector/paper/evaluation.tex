@@ -1,136 +1,358 @@
 \section{Empirical Evaluation}
 \label{sec:evaluation}
 
+%Our experiment investigate the followinig four research questions:
+
+%\begin{itemize}
+%\Item can our approach detect real bugs in multithreaded GUI applications?
+
+%\Item is the reflection-aware call graph construction algorithm useful?
+
+%\Item how effective is the proposed heuristic? is the reflection-aware call graph construction algorithm useful?
+%\end{itemize}
+
 Our experiment objective is three-fold: to demonstrate the effectiveness
 of our approach in detecting real bugs in multithreaded GUI applications, to 
-compare the combined RTA and k-CFA call graph construction algorithms
+compare the reflection-aware call graph construction algorithms
 with existing ones , and to evaluate the usefulness of the proposed 
- heuristics. First, we describe our subject programs, our computing
-environment and the experimental procedural. We then show that our technique
-detects bugs in real-world GUI applications on
-4 supported frameworks. We compare the combined RTA and k-CFA call graph
-construction algorithms with existing algorithms, showing it improves
-both precision and completeness of the constructed call graph.
- Finally, we show that the set of proposed heuristics are useful
-in removing redundant warnings and eliminate false positivies. 
+ heuristics.  
+
+First, we describe our subject programs (Section~\ref{sec:subjects}) and the experimental procedural (Section~\ref{sec:procedural}).
+We then show that our technique detects bugs in real-world GUI applications on
+four supported frameworks (Section~\ref{sec:errors}). We also compare our technique with
+a straightfoward approach in Section~\ref{sec:straightforward}. We further compare the reflection-aware call graph
+construction algorithms with existing algorithms, showing its usefulness (Section~\ref{sec:reflectionaware}).
+ Finally, we show that the set of proposed heuristics are effective
+in removing redundant warnings and eliminate false positivies (Section~\ref{sec:filters}). 
 
 
 
-\subsection{Subjects}
+\subsection{Subject Programs}
+\label{sec:subjects}
+
+We use a set of open-source projects from Sourceforge, Google code and Eclipse plugin
+market as evaluation subjects. We choose subjects for each supported GUI framework
+as follows. We search the framework keywords (e.g., ``Java Swing'' or ``Java SWT'')
+in the above three source repositories, and select subjects based on the following
+criterias: first, the subject must be a multithread GUI application, not
+an open library. Second, the subject must undergone at least two years of active development,
+and is listed in the first 3 results pages based on popularity. This permits us
+to exclude all pre-mature subjects, which may contain obvious errors.
+
+The subjects used in our experiment are shown in Table~\ref{table:subjects}. Our
+subjects range from end-user applications, programming tools, to games. Specifically:
+
+\begin{itemize}
+\Item CelarFTP\footnote{\url{http://celerftp.sourceforge.net/}}
+and FileBunker\footnote{\url{http://filebunker.sourceforge.net/}} are two SWT desktop applications.
+CelarFTP implements a simple FTP client based on Java and SWT UI library, and
+FileBunker is a file backup application which uses one or more GMail accounts as its backup repository.
+
+\Item  AnyEdit\footnote{\url{http://andrei.gmxhome.de/anyedit/}}, FileSync4Eclipse\footnote{\url{andrei.gmxhome.de/filesync/}}, and
+EclipseRunner\footnote{\url{http://eclipserunnerplugin.googlecode.com/}} are three popular eclipse plugins.
+AnyEdit adds several new tools to  Eclipse editors, output consoles, and main menu. 
+FileSync4Eclipse is a file synchronisation tool to keep files outside of Eclipse projects in synchronized
+with Eclipse project files. EclipseRunner extends capability of running launch configurations in Eclipse IDE.
+
+\Item  S3dropbox\footnote{\url{http://s3dropbox.googlecode.com}} and SudokuPuzzleSolver\footnote{\url{http://sudokupuzzlesol.sourceforge.net/}}
+are two Swing desktop applications. S3dropbox implements a client that allows users
+to drag and drop files, which are then uploaded to their Amazon S3 accounts. SodokuPuzzleSolver
+computes Sodoku solutions efficiently using mutlithreading execution. 
+
+\Item  MyTracks\footnote{\url{http://code.google.com/p/mytracks/}}, Fennec\footnote{\url{http://www.mozilla.org/en-US/mobile/}},
+and SGTPuzzles\footnote{\url{http://chris.boyle.name/projects/android-puzzles}} are three Android applications.
+MyTracks, developed by Google, records users' GPS tracks in outdoor activities, and provides
+interfaces to visualize them on Google Maps. Fennec, developed by Mozilla, is the Mozilla
+Firefox web browser for mobile devices. SGTPuzzles is a small logic single-player game.
+
+\end{itemize}
+
 
 \begin{table}[t]
 \begin{center}
  \fontsize{9pt}{\baselineskip}\selectfont
 \hspace*{-0.2cm}
-\begin{tabular}{|l||c|c|c|c|}
+\begin{tabular}{|p{4.4cm}||c|c|c|c|}
 \hline
- Program (version) & LOC & Classes & Methods & Threads \\
+ Program (version) & LOC & Classes & Methods \\
 \hline \hline
-\multicolumn{5}{|l|}{SWT desktop applications}   \\
+\multicolumn{4}{|l|}{SWT desktop applications}   \\
  \hline
- xxx &  xxxx &  xx &  xxx & xx \\
+ CelarFTP (3.0 alpha) &  2293 &  20 &  165  \\
  \hline
- xxx &  xxxx &  xx &  xxx & xx \\
- \hline
- xxx &  xxxx &  xx &  xxx & xx \\
+ FileBunker (1.1.2)&  14237 &  150 &  1106  \\
  \hline
  \hline
-\multicolumn{5}{|l|}{Eclipse plugins}   \\
+\multicolumn{4}{|l|}{Eclipse plugins}   \\
  \hline
- xxx &  xxxx &  xx &  xxx & xx \\
+ EclipseRunner (1.1.0) &  3101 &  48 &  354\\
  \hline
- xxx &  xxxx &  xx &  xxx & xx \\
+ FileSync (1.4.0)&  7374 &  36 &  510 \\
  \hline
- xxx &  xxxx &  xx &  xxx & xx \\
- \hline
- \hline
-\multicolumn{5}{|l|}{Swing desktop applications}   \\
- \hline
- xxx &  xxxx &  xx &  xxx & xx \\
- \hline
- xxx &  xxxx &  xx &  xxx & xx \\
- \hline
- xxx &  xxxx &  xx &  xxx & xx \\
+ AnyEdit (2.4.0)&  11077 &  74 &  649 \\
  \hline
  \hline
-\multicolumn{5}{|l|}{Android mobile applications}   \\
+\multicolumn{4}{|l|}{Swing desktop applications}   \\
  \hline
- xxx &  xxxx &  xx &  xxx & xx \\
+ S3dropbox (1.7) &  2353 &  42  &  224 \\
  \hline
- xxx &  xxxx &  xx &  xxx & xx \\
+ Sudoku Solver (1.06)&  3555 &  10 &  62 \\
  \hline
- xxx &  xxxx &  xx &  xxx & xx \\
+ \hline
+\multicolumn{4}{|l|}{Android mobile applications}   \\
+ \hline
+ SGTPuzzler (v9306.11)&  2220 &  16 &  148 \\
+ \hline
+ Fennec (10.0.a.rc3)&  8577 &  51 &  620 \\
+ \hline
+ MyTracks (1.1.13.rc4)&  20297 &  143 &  1374 \\
+\hline
+\multicolumn{4}{l}{}   \\
+\hline
+ GUI framework (version) & LOC & Classes & Methods  \\
+\hline \hline
+ SWT (3.6.2)&  20297 &  143 &  1374  \\
+\hline
+ Eclipse plugin development (3.6.2)&  20297 &  143 &  1374  \\
+\hline
+Swing (1.6)&  20297 &  143 &  1374  \\
+\hline
+ Android (3.6)&  20297 &  143 &  1374  \\
 \hline
 \end{tabular}
+
 \end{center}
 \vspace{-15pt}
-\Caption{{\label{table:subjects}Subject Programs.} }
+\Caption{{\label{table:subjects} Open source programs
+used in our evaluation. Column ``LOC'' is the number of lines
+of code, as counted by LOCC~\cite{}.  Each program is analyzed
+together with its dependent GUI framework, as listed in
+the bottom table.} }
 \end{table}
 
 
 \subsection{Procedural}
+\label{sec:procedural}
 
-\subsection{Results}
+We run our tool on each subject with three call graph construction
+algorithms: RTA~\cite{}, 0-CFA, and 1-CFA~\cite{}.  When running
+each call graph construction algorithm on Android applications, we
+use two configurations: with and without taming reflection (Section~\ref{}).
+$k$-CFA ($k >$ 1) algorithm
+does not scale to large programs, and thus is not used in this experiment
+
+SGTPuzzler is the only subject that uses native methods to interact with
+underlying operating systems. Thus, we manually added XXX \CodeIn{@CalledByNative}
+annotations after inspecting its source code. In addition, two subjects XXXX and XXX use a self-defined
+way to interact with the GUI framework. In this experiment, none of the paper
+authors was faimilar with the subjects; but we found it is quite easy
+to add extra those annotations and heuristic filters and finished these
+manual parts in less than 20 minutes.
+
+After provided with necessary annotations and heuristic filters,
+our tool works in a fully-automatic, push-bottom manner. For each output
+warning, we manually determine its validity by either searching the
+bug repository to check whether the same bug has been reported before,
+or submitting a new bug report, or writing a test driver to reproduce
+the error.
 
 
-\begin{table*}[t]
+
+\begin{table*}[ht]
 \begin{center}
  \fontsize{9pt}{\baselineskip}\selectfont
 \hspace*{-0.2cm}
-\begin{tabular}{|l||c|c|c||c|c|c||c|c|c|}
+\setlength{\tabcolsep}{.75\tabcolsep}
+\begin{tabular}{|l||c|c|c||c|c|c||c|c|c||c|c|}
 \hline
- Program  &  \multicolumn{3}{|c|}{RTA}& \multicolumn{3}{|c|}{0-CFA / Combined RTA and 0-CFA} & \multicolumn{3}{|c|}{1-CFA / Combined RTA and 1-CFA}  \\
+ Subject&  \multicolumn{9}{|c||}{Our Technique} & \multicolumn{2}{|c|}{The Approach in}  \\
 \cline{2-10}
- (version) & CG Size & \#Warning & \#Bug & CG Size & \#Warning & \#Bug & CG Size & \#Warning & \#Bug\\
+ Program  &  \multicolumn{3}{|c|}{RTA / reflection aware}& \multicolumn{3}{|c|}{0-CFA / reflection aware} & \multicolumn{3}{|c||}{1-CFA / reflection aware} & \multicolumn{2}{|c|}{Section~\ref{sec:straightforward}}  \\
+\cline{2-12}
+ & CG Size & \#Warning & \#Bug & CG Size & \#Warning & \#Bug & CG Size & \#Warning & \#Bug & \#Warning & \#Bug\\
 \hline \hline
-\multicolumn{10}{|l|}{SWT desktop applications}   \\
+\multicolumn{12}{|l|}{SWT desktop applications}   \\
  \hline
- xxx &  xxxx &  xx &  xxx & xx & xx & xx& xx & xx & xx \\
+ xxx &  xxxx &  xx &  xxx & xx & xx & xx& xx & xx & xx& xx & xx \\
  \hline
- xxx &  xxxx &  xx &  xxx & xx & xx & xx& xx & xx & xx \\
+ xxx &  xxxx &  xx &  xxx & xx & xx & xx& xx & xx & xx& xx & xx \\
  \hline
- xxx &  xxxx &  xx &  xxx & xx & xx & xx& xx & xx & xx \\
- \hline
- \hline
-\multicolumn{10}{|l|}{Eclipse plugins}   \\
- \hline
- xxx &  xxxx &  xx &  xxx & xx & xx & xx& xx & xx & xx \\
- \hline
- xxx &  xxxx &  xx &  xxx & xx & xx & xx& xx & xx & xx \\
- \hline
- xxx &  xxxx &  xx &  xxx & xx & xx & xx& xx & xx & xx \\
+ xxx &  xxxx &  xx &  xxx & xx & xx & xx& xx & xx & xx& xx & xx \\
  \hline
  \hline
-\multicolumn{10}{|l|}{Swing desktop applications}   \\
+\multicolumn{12}{|l|}{Eclipse plugins}   \\
  \hline
- xxx &  xxxx &  xx &  xxx & xx & xx & xx& xx & xx & xx \\
+ xxx &  xxxx &  xx &  xxx & xx & xx & xx& xx & xx & xx& xx & xx \\
  \hline
- xxx &  xxxx &  xx &  xxx & xx & xx & xx& xx & xx & xx \\
+ xxx &  xxxx &  xx &  xxx & xx & xx & xx& xx & xx & xx& xx & xx \\
  \hline
- xxx &  xxxx &  xx &  xxx & xx & xx & xx& xx & xx & xx \\
+ xxx &  xxxx &  xx &  xxx & xx & xx & xx& xx & xx & xx& xx & xx \\
  \hline
  \hline
-\multicolumn{10}{|l|}{Android mobile applications}   \\
+\multicolumn{12}{|l|}{Swing desktop applications}   \\
  \hline
- xxx &  xxxx &  xx &  xxx & xx & xx & xx& xx & xx & xx \\
+ xxx &  xxxx &  xx &  xxx & xx & xx & xx& xx & xx & xx& xx & xx \\
  \hline
- xxx &  xxxx &  xx &  xxx & xx & xx & xx& xx & xx & xx \\
+ xxx &  xxxx &  xx &  xxx & xx & xx & xx& xx & xx & xx& xx & xx \\
  \hline
- xxx &  xxxx &  xx &  xxx & xx & xx & xx& xx & xx & xx \\
+ xxx &  xxxx &  xx &  xxx & xx & xx & xx& xx & xx & xx& xx & xx \\
+ \hline
+ \hline
+\multicolumn{12}{|l|}{Android mobile applications}   \\
+ \hline
+ xxx &  xxxx / xxxx &  xx / xxxx &  xxx / xxxx & xx /xxx & xx / xxxx  & xx / xxxx& xx / xxx & xxxx / xxx  & xxxx / xxx& xx & xx \\
+ \hline
+ xxx &  xxxx &  xx &  xxx & xx & xx & xx& xx & xx & xx& xx & xx \\
+ \hline
+ xxx &  xxxx &  xx &  xxx & xx & xx & xx& xx & xx & xx& xx & xx \\
 \hline
 \end{tabular}
 \end{center}
 \vspace{-15pt}
-\Caption{{\label{table:results}Experimental results.} }
+\Caption{{\label{table:results}Experimental results in finding errors
+in multithreaded GUI programs. Column ``CG Size'' shows the
+call graph size in terms of node number. Column ``\#Warning''
+shows the number of warnings issued by our tool. Column ``\#Bug'' shows
+the actual bugs found. Columns ``RTA / reflection aware '', ``0-CFA / reflection aware'',
+and ``1-CFA / reflection aware'' show the results of using different
+call graph construction algorithms with (before ``/'') or without (after ``/'')
+taming the reflection on Android applications. In each cell of the table
+for Android applications, a slash ``/'' separates the result of
+using normal call graph construction algorithm and the reflection-aware
+call graph construction algorithm. As a comparison, the
+results of a straightforward approach (Section~\ref{sec:straightforward}) are show at the far right.} }
 \end{table*}
 
+\subsection{Results}
+\label{sec:results}
+
+Table~\ref{table:results} show our results in finding errors in
+multithreaded GUI applications, and Table~\ref{table:filters} show
+the results of applying each heuristic filter.
 
 \subsubsection{Errors in Multithreaded GUI}
+\label{sec:errors}
+
+Swing is a single-threaded GUI toolkit, and is not thread-safe. 
+As the official documentation states, all Swing code must be executed in the UI-thread and
+invoking Swing code from multiple threads risks thread interference or memory-consistency errors. 
+
+Since Swing does not provide any run-time checks for invalid thread access and, most of the time,
+programmers can get away with an apparently ``well behaved'' Swing GUI that actually breaks the
+single-thread rule.
+
+Example in Swing
+\begin{figure}[t]
+\begin{CodeOut}
+\begin{alltt}
+/* In class: com.tomczarniecki.s3.gui.DeleteBucketAction */
+59.private void deleteBucket() \{
+60.    executor.execute(new Runnable() \{
+61.        public void run() \{
+62.            try \{
+63.                controller.deleteCurrentBucket();
+64.            \} catch (Exception e) \{
+65.                logger.info("Delete failed", e);
+66.                deleteError(); 
+67.            \}
+68.       \}
+69.    \});
+70.\}
+
+77.private void deleteError() \{
+78.    String text = "Cannot delete folder .....";
+79.    display.showErrorMessage("Delete failed", 
+        String.format(text, controller.getSelectedBucketName())); 
+80.\}
+\end{alltt}
+\end{CodeOut}
+\vspace*{-2.0ex} \Caption{{\label{fig:swingerror} A
+potential invalid thread error reported by our tool
+in the S3dropbox Swing application. The error occurs when
+the invocation of \CodeIn{deleteCurrentBucket} at line 63 throws
+an exception, which lead to the \CodeIn{deleteError} method
+access a Swing GUI object \CodeIn{display} at line 79 from
+a non-UI thread. This error has been confirmed by S3dropbox developers.
+}} %\vspace{-5mm}
+\end{figure}
+
+
+Example in  Eclipse plugin
+\begin{figure}[t]
+\begin{CodeOut}
+\begin{alltt}
+179.private void initializeResourceChangeListener() \{
+180.  ResourcesPlugin.getWorkspace().addResourceChangeListener(
+        new IResourceChangeListener() \{
+181.      public void resourceChanged(IResourceChangeEvent event) \{
+182.        refresh();
+183.      \}
+184.  \}, IResourceChangeEvent.POST\_CHANGE);
+185.\}
+
+414.public void refresh() \{
+415.  getViewer().refresh();
+416.\}
+\end{alltt}
+\end{CodeOut}
+\vspace*{-2.0ex} \Caption{{\label{fig:pluginerror} A
+potential invalid thread error reported by our tool
+in the EclipseRunner plugin. The \CodeIn{IResourceChangeListener} object
+added at line 180 is invoked by a non-UI thread, and the
+callback method \CodeIn{resourceChanged} calls the \CodeIn{refresh}
+method at line 414. However, the \CodeIn{refresh} method
+directly accesses the GUI objects (at line 415) and triggers the error.
+This error has been reported by other users 13 months after the
+buggy code was checked in, and fixed by developers.
+}} %\vspace{-5mm}
+\end{figure}
+
+
+\vspace{1mm}
+
+\noindent \textbf{\textit{Summary.}}
+
+\subsubsection{Comparison with a Straightforward Approach}
+\label{sec:straightforward}
+
+As we mentioned in Section~\ref{sec:finding}, a standard way to avoid
+invalid thread access errors is to wrap every GUI access code
+with message passing methods (i.e., the safe methods). Thus, a
+straightforward way to detect potential invalid error
+is to check every method to determine whether all GUI-accessing
+are probably wrapping by safe methods. If not, this
+approach issues warnings.
+
+We implemented this naive approach and experimentally compared its
+results with the technique presented in Section~\ref{}.
+
+Algorithm:
+
+1. find all UI direct accessing methods 
+
+2. to see is this methods called by non-safe
+
+The primary difference
+
+
+
+\vspace{1mm}
+
+\noindent \textbf{\textit{Summary.}}
 
 \subsubsection{Call Graph Construction Algorithms}
+\label{sec:reflectionaware}
+
+\vspace{1mm}
+
+\noindent \textbf{\textit{Summary.}}
 
 \subsubsection{Heuristic Filters}
+\label{sec:filters}
 
+\vspace{1mm}
+
+\noindent \textbf{\textit{Summary.}}
 Heuristic filter, effective.
 
 \begin{table}[t]
@@ -180,22 +402,45 @@ Heuristic filter, effective.
 \end{tabular}
 \end{center}
 \vspace{-15pt}
-\Caption{{\label{table:filters}Experimental results after applying heuristic filters.} }
+\Caption{{\label{table:filters}Number of warnings after applying a set of
+heuristic filters (Section~\ref{}). Column ``\#Warning $F_i$''
+represents the number of remaining warnings after applying
+filters 1 -- $i$, and the number of last column is taken
+from Table~\ref{} (Subcolumn ``\#Warning'' under column ``1-CFA / with taming reflection'').} }
 \end{table}
 
 
 \subsubsection{Performance and Scalability}
 
-Runs in practical time, mention the largest time cost in the program.
+Our tool runs in a practical amount of time. Our evaluations
+were conducted on a 2.67GHz Intel Core PC with 4GB
+physical memory (1GB is allocated for JVM), running Fedora 16.
+For the largest subject, xxx, our tool finished the whole analysis
+within 286 seconds using the most expensive call graph construction
+algorithm (the reflection-aware 1-CFA analysis). Analyzing
+other subjects using different algorithms took less time.
+The performance has not been tuned, and we believe
+that it could be improved further.
 
-The average analysis time per / bug
+Our experiments also demonstrate that our approach has good scalability.
+Our tool has analyzed xxx LOC in total, and together with all dependent libraries,
+the largest subject our approach can analyze and detect errors has
+over XXX LOC, xx classes, and xxx methods.
 
-\subsection{Discussion}
+
+\subsection{Discussions}
+
 
 \subsubsection{Threats to Validity}
 
 Our evaluation was limited in several ways. First, the studied
 subjects were selected with a bias towards popularity. Second,
-the program analysis tool cannot compute call relationships
+our tool cannot compute call relationships
 for inter-process communication between components. Missing
-call relationship may lead to false negatives.
+Future work could evaluate our technique on more subjects, and
+investigate the false negative rate.
+
+\subsubsection{Experimental Conclusions}
+Findings: programmers have noted this problem, but often overlook special cases like error handle, subtype
+
+ Reporting on violations is fine but what is more important are the pracitces and patterns that need to be adopted to make it easier to avoid the issue in the first place. That is why there is a Worker interface in this project
