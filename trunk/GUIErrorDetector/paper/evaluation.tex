@@ -162,7 +162,7 @@ the error.
 \begin{center}
  \fontsize{9pt}{\baselineskip}\selectfont
 \hspace*{-0.2cm}
-\setlength{\tabcolsep}{.75\tabcolsep}
+\setlength{\tabcolsep}{.65\tabcolsep}
 \begin{tabular}{|l||c|c|c||c|c|c||c|c|c||c|c|}
 \hline
  Subject&  \multicolumn{9}{|c||}{Our Technique} & \multicolumn{2}{|c|}{The Approach in}  \\
@@ -191,11 +191,9 @@ the error.
  \hline
 \multicolumn{12}{|l|}{Swing desktop applications}   \\
  \hline
- xxx &  xxxx &  xx &  xxx & xx & xx & xx& xx & xx & xx& xx & xx \\
+ S3dropbox &  xxxx &  xx &  xxx & xx & xx & xx& xx & 1 & 1 & 210 & xx \\
  \hline
- xxx &  xxxx &  xx &  xxx & xx & xx & xx& xx & xx & xx& xx & xx \\
- \hline
- xxx &  xxxx &  xx &  xxx & xx & xx & xx& xx & xx & xx& xx & xx \\
+  Sudoku Solver&  xxxx &  xx &  xxx & xx & xx & xx& xx & xx & xx& 356 & xx \\
  \hline
  \hline
 \multicolumn{12}{|l|}{Android mobile applications}   \\
@@ -226,12 +224,23 @@ results of a straightforward approach (Section~\ref{sec:straightforward}) are sh
 \subsection{Results}
 \label{sec:results}
 
-Table~\ref{table:results} show our results in finding errors in
-multithreaded GUI applications, and Table~\ref{table:filters} show
-the results of applying each heuristic filter.
+Table~\ref{table:results} show the errors in
+our subject programs, and Table~\ref{table:filters} show
+the effect of applying each heuristic filter.
 
 \subsubsection{Errors in Multithreaded GUI}
 \label{sec:errors}
+
+
+characteristic of errors in various subjects
+
+False positive rate, and why?
+
+redundant rate
+
+response
+
+Swing
 
 Swing is a single-threaded GUI toolkit, and is not thread-safe. 
 As the official documentation states, all Swing code must be executed in the UI-thread and
@@ -310,7 +319,9 @@ buggy code was checked in, and fixed by developers.
 
 \vspace{1mm}
 
-\noindent \textbf{\textit{Summary.}}
+\noindent \textbf{\textit{Summary.}}Our technique finds real errors
+in multithreaded GUI applications on four different frameworks with
+an acceptable false positive rate.
 
 \subsubsection{Comparison with a Straightforward Approach}
 \label{sec:straightforward}
@@ -319,40 +330,79 @@ As we mentioned in Section~\ref{sec:finding}, a standard way to avoid
 invalid thread access errors is to wrap every GUI access code
 with message passing methods (i.e., the safe methods). Thus, a
 straightforward way to detect potential invalid error
-is to check every method to determine whether all GUI-accessing
-are probably wrapping by safe methods. If not, this
-approach issues warnings.
+is to check every method to determine whether all GUI-accessing code
+is probably wrapping by safe methods. This approach
+issues a warning for every violation. 
+%If not, this approach issues warnings.
 
-We implemented this naive approach and experimentally compared its
-results with the technique presented in Section~\ref{}.
-
-Algorithm:
-
-1. find all UI direct accessing methods 
-
-2. to see is this methods called by non-safe
-
-The primary difference
-
+We implemented this straightforward approach and experimentally compared its
+effectiveness with the technique presented in Section~\ref{}.
+The far right column in Table~\ref{table:results} shows its result.
+The results show that this straightforward approach can identified every
+error as our technique does, but issues a tremendous number of false
+positives. The primary reason is that this simple approach
+does not globally reason about calling relationship between
+threads, UI-accessing methods, and safe methods, thus it often incorrectly
+classifies GUI accessing code which will never be executed
+in a non-UI thread as errenous. Furthermore, our technique
+outputs a method call chain in the error report, which can help
+developers understand how an invalid thread access error is triggered.
 
 
 \vspace{1mm}
 
-\noindent \textbf{\textit{Summary.}}
+\noindent \textbf{\textit{Summary.}} Our technique provides
+richer contextually information for a potential error, and 
+is significantly more precise than the straightforward approach.
 
 \subsubsection{Call Graph Construction Algorithms}
 \label{sec:reflectionaware}
 
+We compare three call graph construction algorithms, RTA, 0-CFA, and 1-CFA,
+in our experiments. As shown in Table~\ref{table:results},  XXX found
+more errors with less warnings than the XXX and XXXX algorithms. This
+is because RTA and 0-CFA do not consider the context XXX, and it may
+mix the same methods called by different callers. Although the call graphs
+built by 1-CFA are significantly larger, XXX, the algorithm still runs
+in a practical amouont of time as presented in Section~\ref{}. For example,
+our tool finished building the call graph for the largest subject (xxx)
+within xxx minutes.
+
+The results in Table~\ref{table:results} also shown that using a reflection-aware
+call graph construction algorithm is critical in finding errors in Android
+applications. None of the errors in the studied Android applications
+can be found by using normal call graph construction algorithms, because their 
+limitation in handling reflection.
+
 \vspace{1mm}
 
-\noindent \textbf{\textit{Summary.}}
+\noindent \textbf{\textit{Summary.}} XX The 1-CFA call graph construction
+algorithm is more effective in finding errors. XXX. Our reflection-aware call
+graph construction algorithm is useful to find errors in
+Android applications.
 
 \subsubsection{Heuristic Filters}
 \label{sec:filters}
 
+We measure the effectiveness of the proposed heuristic filters of
+Section~\ref{} via the number of removed warnings.
+
+Table~\ref{table:filters} tabulates the results. The results show that
+our technique outputs thousnads of warnings for each subject, due to
+the conservative nature of static analysis.  However, the
+set of proposed heuristic filters are highly effectively. They
+ reduce the false positive numbers and redundant warnings by up to a factor of
+XXX. Specifically, filters $XX_i$ and $XX_j$  identified xx\% of
+the warnings as likely false positives, and filters $YY_i$
+and $YY_j$ identified YY\% of the warnings as redundant warnings.
+We further manually check each filtered warning, and found no
+real errors have been removed.
+
 \vspace{1mm}
 
-\noindent \textbf{\textit{Summary.}}
+\noindent \textbf{\textit{Summary.}} Although a static analysis may
+issue false postivies or redundant reports, a set of well-designed
+heuristics can still remove most of them.
 Heuristic filter, effective.
 
 \begin{table}[t]
@@ -410,6 +460,10 @@ from Table~\ref{} (Subcolumn ``\#Warning'' under column ``1-CFA / with taming re
 \end{table}
 
 
+\subsection{Discussions}
+
+We next discuss several important issues in our evaluation.
+
 \subsubsection{Performance and Scalability}
 
 Our tool runs in a practical amount of time. Our evaluations
@@ -428,17 +482,41 @@ the largest subject our approach can analyze and detect errors has
 over XXX LOC, xx classes, and xxx methods.
 
 
-\subsection{Discussions}
-
 
 \subsubsection{Threats to Validity}
 
-Our evaluation was limited in several ways. First, the studied
-subjects were selected with a bias towards popularity. Second,
-our tool cannot compute call relationships
-for inter-process communication between components. Missing
-Future work could evaluate our technique on more subjects, and
-investigate the false negative rate.
+There are two major threats to validity in our evaluation. 
+The major threat is the degree to which the subject programs
+used in our experiment are representative of true practice.
+In our evaluation, the studied subjects were selected with a bias towards popularity from
+three open-source repositories. Another threat is that we only employed three
+well-known call graph construction algorithms (i.e., RTA, 0-CFA, and 1-CFA) 
+in our implementation. It is still unknown whether using other 
+call graph construction algorithms such XFA~\cite{} may achieve better results.
+
+\subsubsection{Limitations}
+
+Our technique is limited in two aspects. First, it only considers
+non-UI threads that are spawned by the UI-thread after the GUI
+is initialized, and ignores other possible non-UI threads
+that are created during the pre-initialization GUI work. One way
+to remedy this limitation is to design an analysis to identify
+such threads. Second, our tool cannot compute call relationships
+for inter-process communication between components. It also
+requires users to manually add annotations to characterize
+call relationships that involve native methods. This limitation
+may lead to false negatives. Investigating the false positive
+rate is ongoing work.
+
+%Future work could evaluate our technique on more subjects, and
+%investigate the false negative rate.
+
+%our technique requires developers to manually
+%add annotations to provide call relationships
+%Second, 
+
+%Third, for subject program
+%that uses native methods, 
 
 \subsubsection{Experimental Conclusions}
 Findings: programmers have noted this problem, but often overlook special cases like error handle, subtype
