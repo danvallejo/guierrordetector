@@ -21,7 +21,10 @@ public class CGTraverseAndroidGuider implements CGTraverseGuider {
 		"android.widget.Filter.filter(Ljava/lang/CharSequence;Landroid/widget/Filter$FilterListener;)V",
 		"android.net.http.IdleCache.cacheConnection(Lorg/apache/http/HttpHost;Landroid/net/http/Connection;)Z",
 		"android.net.http.RequestQueue$ActivePool.startup()V",
-		"android.webkit.CookieManager.removeExpiredCookie()V"
+		"android.webkit.CookieManager.removeExpiredCookie()V",
+		//two safe methods
+		"android.view.View.post(Ljava/lang/Runnable;)Z",
+		"android.view.View.postDelayed(Ljava/lang/Runnable;J)Z"
 	};
 	
 	@Override
