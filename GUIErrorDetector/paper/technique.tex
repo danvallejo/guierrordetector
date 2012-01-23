@@ -92,7 +92,7 @@ it first uses Breadth First Search (BFS) to find all reachable
 indicates that a new, non-UI thread is spawned.  After that, 
 the algorithm uses a BFS to find reachable UI-accessing methods (lines 9 -- 23)
 from each \CodeIn{Thread.start()} node.
-Specifially, it uses a queue to keep track of all visited nodes, and
+Specifically, it uses a queue to keep track of all visited nodes, and
 then checks every successive node to be visited (line 12);
 it reports an error if that node
 is a UI-accessing method (line 15), or skips it if it is
@@ -302,7 +302,7 @@ call \CodeIn{setText} at line 10.
 To alleviate this limitation, we present an algorithm to construct
 a reflection-aware call graph based on simple program transformation.
 The basic idea to replace reflection calls with explicit object
-creation instructions, pretending the corresponding concreate object
+creation instructions, pretending the corresponding concrete object
 has been created.  The algorithm is shown in Figure~\ref{fig:cgalgorithm}.
 It consists of two steps. The first step is a simple program
 transformation to replace reflection calls with object creations, and
@@ -314,7 +314,7 @@ the \CodeIn{findViewById} method), the algorithm analyzes the
 program to determine a set of possible classes that may be created.
 After that, the algorithm creates a new instruction which non-deterministically
 returns a new object of the class set. The reflection-aware call graph
-construction algorithm is indepdent of the underlying call graph algorithm;
+construction algorithm is independent of the underlying call graph algorithm;
 any existing algorithm can be used to construct the resulting graph at line 8.
 
 For the example in Figure~\ref{fig:sampleandroid}, the algorithm
@@ -528,7 +528,7 @@ Unlike a SWT desktop application, an Eclipse plugin does not
 have a main method as a single program entry point. Instead, it extends
 extension points provided by the Eclispe framework to implement
 functionalities. When a plugin starts, Eclipse
-calls back the overrided extension points to handle the
+calls back the overridden extension points to handle the
 upcoming events. We customize our technique for Eclipse plugin as follows:
 
 %Unlike a SWT desktop application, an eclipse plugin, though is developed in SWT,
@@ -539,7 +539,7 @@ upcoming events. We customize our technique for Eclipse plugin as follows:
 
 \begin{itemize}
 
-\item \textbf{Call graph entry nodes: } all overriden SWT
+\item \textbf{Call graph entry nodes: } all overridden SWT
 GUI event handling methods\footnote{Eclipse plugin is built
 on top of the SWT framework} are called from the UI thread.
 We treat these callback methods as the entry nodes.
@@ -554,7 +554,7 @@ We treat these callback methods as the entry nodes.
 
 %entry nodesall overriden methods of the classes inside
 % a plugin's \CodeIn{ui} package.  Such methods are normally called by the eclipse framework
-%by the UI thread. XXX This rule, though quite heuristical, works quite well in practice.
+%by the UI thread. XXX This rule, though quite , works quite well in practice.
 
 \item \textbf{UI-accessing nodes} and \textbf{Safe methods} are the same as SWT.
 
@@ -588,12 +588,12 @@ We customized our technique for Swing as follows:
 
 \begin{itemize}
 
-\item \textbf{Call graph entry nodes: } all overriden callback methods in 
-Swing's UI listerner classes are called from the UI thread. We treat those callback
+\item \textbf{Call graph entry nodes: } all overridden callback methods in 
+Swing's UI listener classes are called from the UI thread. We treat those callback
 methods as the entry nodes.
 
 %Specifically, for each class, we check whether
-%it is a Swing listerner class. If so, we extract all its overriden callback methods as the call graph entry points.
+%it is a Swing listener class. If so, we extract all its overridden callback methods as the call graph entry points.
  %Such methods are normally called by the eclipse framework
 %by the UI thread. XXX This rule, though quite heuristical, works quite well in practice.
 
@@ -642,7 +642,7 @@ We instantiate our technique for Android programs as follows:
 \item \textbf{Call graph entry nodes: } in an Android application,
 an \CodeIn{Activity} object is created and manipulated by the UI thread. We treat
 all public methods from an \CodeIn{Activity} class as call graph entry nodes. Additionally,
-we also add all overriden callback methods in event listener classes as entry nodes.
+we also add all overridden callback methods in event listener classes as entry nodes.
 
 \item \textbf{UI-accessing nodes: } like SWT, Android explicitly checks whether
 the current thread is a UI thread or not before accessing a GUI object via

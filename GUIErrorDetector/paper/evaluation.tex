@@ -1,7 +1,7 @@
 \section{Empirical Evaluation}
 \label{sec:evaluation}
 
-%Our experiment investigate the followinig four research questions:
+%Our experiment investigate the following four research questions:
 
 %\begin{itemize}
 %\Item can our approach detect real bugs in multithreaded GUI applications?
@@ -34,7 +34,7 @@ We use a set of open-source projects from Sourceforge, Google code and Eclipse p
 market as evaluation subjects. To choose subjects for each supported GUI framework,
 we first search the framework keywords (e.g., ``Java Swing'' or ``Java SWT'')
 in the above three source repositories, and then select subjects based on the following
-criterias. First, the subject must be a multithread GUI application, not
+criterias. First, the subject must be a multithreaded GUI application, not
 an open library. Second, the subject must undergone at least two years of active development,
 and is listed in the first 3 results pages based on popularity. This permits us
 to exclude many pre-mature subjects that may contain obvious errors.
@@ -151,7 +151,7 @@ method in the XXX subject first checks whether the current thread is the UI-thre
 then determines whether to direct access a GUI object or wrap the code with
 message passing. We add XX heuristic filtering rules for those methods, to indicate
 that they are safe to be invoked from any thread. In this experiment, none of the paper
-authors was faimilar with the subjects; but we found it is quite easy
+authors was familar with the subjects; but we found it is quite easy
 to add extra those annotations and heuristic filters and finished these
 manual parts in less than 20 minutes.
 
@@ -584,11 +584,11 @@ methods.
 The technique presented in this paper offers a promising solution.
 Compared with the straightforward approach to check every
 GUI accessing code isolatedly, our technique produces significantly
-less warniings. The reflection-aware call graph construction algorithm
+less warnings. The reflection-aware call graph construction algorithm
 is critical in detecting errors for Android programs, and our
 proposed heuristic filtering rules are useful in reducing programmers'
 burden to inspect the output result.
 
 %Findings: programmers have noted this problem, but often overlook special cases like error handle, subtype
 
-% Reporting on violations is fine but what is more important are the pracitces and patterns that need to be adopted to make it easier to avoid the issue in the first place. That is why there is a Worker interface in this project
+% Reporting on violations is fine but what is more important are the practices and patterns that need to be adopted to make it easier to avoid the issue in the first place. That is why there is a Worker interface in this project
