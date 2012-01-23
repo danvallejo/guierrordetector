@@ -13,9 +13,11 @@ errors in multithreaded GUI applications. We formulate finding invalid
 thread access errors as a call graph reachability problem with
 thread spawning as the sources and GUI object accessing as the sinks. 
 Heavy use of reflection in modern GUI applications makes existing
-call graph construction algorithms fail to build a sufficiently complete
-and precise call graph. Thus, we present a combined RTA and k-CFA
-call graph construction algorithm to overcome the limitations.% of analyzing GUI applications.
+call graph construction algorithms fail to build a good
+call graph. Thus, we present a method to overcome the limitations, and
+build reflection-aware call graphs.
+
+%call graph construction algorithm to overcome the limitations.% of analyzing GUI applications.
 
 
 We implemented our technique and instantiated it on four popular GUI
