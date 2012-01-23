@@ -9,16 +9,18 @@ Optionally, users may specify additional heuristics to guide call graph
 traverse, and annotate call relationships for native methods (Section~\ref{sec:heuristic}).
 
 Our current implementation supports four widely-used GUI frameworks, namely
-SWT, Eclipse plugin development environment, Java Swing, and Android.
-Our implementation handles all of the Java language, and also takes
+SWT, Eclipse plugin development, Java Swing, and Android.
+Our implementation %handles all of the Java language, and
+also takes
 all dependent libraries (e.g., \CodeIn{rt.jar} and \CodeIn{android.jar})
-into analysis. We implement the reflection taming algorithm (Section~\ref{})
+into analysis. We implemented the reflection-aware call graph construction
+ algorithm (Section~\ref{sec:cg})
 using WALA's \textit{bypass logic}. Our tool parses the configuration file
 in an Android application and modifies the bytecode to replace all
 reflection calls with object creation instructions.
 Since Android applications are often fully encrypted and shipped in Dalvik
 bytecode as a single apk file, our tool first uses
-android-apktool\footnote{\url{http://code.google.com/p/android-apktool/}} to
+android-apktool~\cite{apktool} to
 decrypt the apk file, and then uses the 
 ded translator~\cite{Enck:2011:SAA:2028067.2028088} to convert
 Dalvik bytecode to Java bytecode before feeding to WALA.  The Android system
