@@ -116,6 +116,11 @@ public class TestFileSync4Eclipse extends AbstractEclipsePluginTest {
 		
 //		super.setCGType(CG.ZeroCFA);
 		super.setCGType(CG.OneCFA);
+//		super.setCGType(CG.RTA);
+//		super.setCGType(CG.ZeroCFA);
+		
+//		super.setRunNaiveApproach(true);
+		
 		super.setThreadStartGuider(new CGTraverseSWTGuider());
 		super.setUIAnomalyGuider(new CGTraverseSWTGuider());
 		super.setPackages(new String[]{"de.loskutov.fs"});

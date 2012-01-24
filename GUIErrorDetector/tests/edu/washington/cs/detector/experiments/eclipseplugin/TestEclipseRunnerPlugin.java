@@ -36,6 +36,7 @@ public class TestEclipseRunnerPlugin extends AbstractEclipsePluginTest {
 	@Override
 	protected String getExtraJars() {
 		return "D:\\develop-tools\\eclipse\\eclipse\\plugins\\org.eclipse.core.resources_3.6.1.R36x_v20110131-1630.jar"
+		    + Globals.pathSep + "D:\\develop-tools\\eclipse\\eclipse\\plugins\\org.eclipse.debug.core_3.6.0.v20100519.jar"
 		    + Globals.pathSep + "D:\\research\\guierror\\subjects\\plugins-for-evaluate\\eclipse-runner\\depdent-libs\\mockito-all-1.8.2.jar";
 	}
 	
@@ -55,6 +56,12 @@ public class TestEclipseRunnerPlugin extends AbstractEclipsePluginTest {
 		
 		Collection<Entrypoint> actionEntrypoints = EclipsePluginUtils.getAllPublicProtectedActionEntrypoints(cha, super.getPackages(), false);
 		Collection<Entrypoint> listenerEventHandler = EclipsePluginUtils.getAllPublicProtectedEventHandlerMethods(cha, super.getPackages(), false);
+		
+		Collection<Entrypoint> resourceChangeListeners = EclipsePluginUtils.getAllPublicProtectedResourceChangeListenerMethods(cha, super.getPackages());
+		
+		Collection<Entrypoint> configListeners = EclipsePluginUtils.getAllConfigListenerMethods(cha, super.getPackages());
+		
+		//EclipsePluginUtils.getAllResourceChangeMethods(graph, cha, packages)
 		
 		//all UI element
 		Collection<IClass> workbenchClasses = EclipsePluginUtils.getAllAppSubClasses(cha, EclipsePluginUtils.getWorkbenchPart(cha),
@@ -89,6 +96,13 @@ public class TestEclipseRunnerPlugin extends AbstractEclipsePluginTest {
 		entries.addAll(wizardPoints);
 		entries.addAll(viewerPoints);
 		
+		entries.addAll(resourceChangeListeners);
+		entries.addAll(configListeners);
+		
+//		entries.addAll(jobMethods);
+//		entries.addAll(actionEntrypoints);
+//		entries.addAll(listenerEventHandler);
+		
 //		entries.addAll(jobMethods);
 		
 		return entries;
@@ -108,7 +122,11 @@ public class TestEclipseRunnerPlugin extends AbstractEclipsePluginTest {
 		super.setSeeUIAccessRunnable(true);
 		
 //		super.setCGType(CG.ZeroCFA);
-		super.setCGType(CG.OneCFA);
+//		super.setCGType(CG.OneCFA);
+//		super.setCGType(CG.RTA);
+		super.setCGType(CG.ZeroCFA);
+//		super.setRunNaiveApproach(true);
+		
 		super.setThreadStartGuider(new CGTraverseSWTGuider());
 		super.setUIAnomalyGuider(new CGTraverseSWTGuider());
 		super.setPackages(new String[]{"com.eclipserunner"});

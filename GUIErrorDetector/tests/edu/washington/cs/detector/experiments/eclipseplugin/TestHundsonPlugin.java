@@ -21,6 +21,7 @@ import edu.washington.cs.detector.util.Log;
 import edu.washington.cs.detector.util.Utils;
 
 //found bugs:http://code.google.com/p/hudson-eclipse/issues/detail?id=58
+//removing runnable from the entry nodes
 public class TestHundsonPlugin extends AbstractEclipsePluginTest {
 
 	@Override
@@ -36,6 +37,7 @@ public class TestHundsonPlugin extends AbstractEclipsePluginTest {
 	@Override
 	protected String getExtraJars() {
 		return "D:\\develop-tools\\eclipse\\eclipse\\plugins\\org.eclipse.core.resources_3.6.1.R36x_v20110131-1630.jar"
+		    + Globals.pathSep + "D:\\develop-tools\\eclipse\\eclipse\\plugins\\org.eclipse.debug.core_3.6.0.v20100519.jar"
 		    + Globals.pathSep + "D:\\research\\guierror\\subjects\\plugins-for-evaluate\\hundson-plugin\\dependent-jars\\apache-log4j.jar"
 		    + Globals.pathSep + "D:\\research\\guierror\\subjects\\plugins-for-evaluate\\hundson-plugin\\dependent-jars\\commons-codec-1.3.jar"
 		    + Globals.pathSep + "D:\\research\\guierror\\subjects\\plugins-for-evaluate\\hundson-plugin\\dependent-jars\\commons-httpclient-3.1.jar"
@@ -109,9 +111,15 @@ public class TestHundsonPlugin extends AbstractEclipsePluginTest {
 		UIAnomalyDetector.DEBUG = true;
 		
 		super.setSeeUIAccessRunnable(true);
+		super.setAddRunnable(false);
 		
 //		super.setCGType(CG.ZeroCFA);
-		super.setCGType(CG.OneCFA);
+//		super.setCGType(CG.OneCFA);
+//		super.setCGType(CG.RTA);
+		super.setCGType(CG.FakeZeroCFA);
+		
+//		super.setRunNaiveApproach(true);
+		
 		super.setThreadStartGuider(new CGTraverseSWTGuider());
 		super.setUIAnomalyGuider(new CGTraverseSWTGuider());
 		super.setPackages(new String[]{"dk.contix.eclipse"});

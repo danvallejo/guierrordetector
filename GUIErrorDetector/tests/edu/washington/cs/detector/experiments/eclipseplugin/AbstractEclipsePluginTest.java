@@ -26,6 +26,7 @@ import edu.washington.cs.detector.experiments.filters.RemoveNoClientClassStrateg
 import edu.washington.cs.detector.experiments.filters.RemoveSameEntryStrategy;
 import edu.washington.cs.detector.experiments.filters.RemoveSubsumedChainStrategy;
 import edu.washington.cs.detector.experiments.filters.RemoveSystemCallStrategy;
+import edu.washington.cs.detector.experiments.straightforward.TestEclipsePlugins;
 import edu.washington.cs.detector.guider.CGTraverseGuider;
 import edu.washington.cs.detector.guider.CGTraverseNoSystemCalls;
 import edu.washington.cs.detector.guider.CGTraverseSwingGuider;
@@ -49,6 +50,8 @@ public abstract class AbstractEclipsePluginTest extends TestCase {
 	private String completePath = null;
 	private String[] packages = null;
 	private boolean see_ui_access_runnable = false;
+	private boolean runnaiveapproach = false;
+	private boolean addrunnable = true;
 	
 	//these four methods must be overriden
 	protected abstract Iterable<Entrypoint> getEntrypoints(ClassHierarchy cha);
@@ -81,6 +84,14 @@ public abstract class AbstractEclipsePluginTest extends TestCase {
 	}
 	protected void setSeeUIAccessRunnable(boolean see) {
 		this.see_ui_access_runnable = see;
+	}
+	
+	protected void setRunNaiveApproach(boolean runapproach) {
+		this.runnaiveapproach = runapproach;
+	}
+	
+	protected void setAddRunnable(boolean runnable) {
+		this.addrunnable = runnable;
 	}
 	
 	public Collection<AnomalyCallChain> reportUIErrors() throws IOException, ClassHierarchyException {
@@ -121,6 +132,12 @@ public abstract class AbstractEclipsePluginTest extends TestCase {
 		}
 		builder.buildCG(entries);
 		
+		if(this.runnaiveapproach) {
+			TestEclipsePlugins.seeNaiveResult(builder.getAppCallGraph(), cha, this.getPackages());
+			System.err.println("Exit in running the naive approach");
+			System.exit(1);
+		}
+		
 		Collection<CGNode> startNodes = this.getStartNodes(builder.getAppCallGraph(), cha);
 		System.out.println("Number of starting nodes in the built callg graph: " + startNodes.size());
 		Log.logln("Number of starting nodes in the built callg graph: " + startNodes.size());
@@ -143,6 +160,10 @@ public abstract class AbstractEclipsePluginTest extends TestCase {
 		List<AnomalyCallChain> chains  = new LinkedList<AnomalyCallChain>();
 		
 		if(this.see_ui_access_runnable) {
+			
+			//log the call graph
+			WALAUtils.logCallGraph(builder.getAppCallGraph());
+			
 			Log.logln("-----All thread runnable ------");
 			UIAccessRunnableFinder finder = new UIAccessRunnableFinder(builder.getAppCallGraph(), cha, this.uiAnomalyGuider,
 					null, this.getPackages());
@@ -151,7 +172,7 @@ public abstract class AbstractEclipsePluginTest extends TestCase {
 			Utils.logCollection(runnables);
 			Collection<AnomalyCallChain> chains1 = finder.findAllUIAccessingRunnables(runnables);
 			Log.logln("Number of chains: " + chains1.size());
-			
+
 			Log.logln("--------- job runs -----------");
 			Collection<CGNode> jobRuns = EclipsePluginUtils.getAllJobRunMethods(builder.getAppCallGraph(), cha,
 					this.getPackages());
@@ -193,26 +214,36 @@ public abstract class AbstractEclipsePluginTest extends TestCase {
 			Utils.logCollection(jobChangeMethods);
 			Collection<AnomalyCallChain> chains7 = finder.findAllUIAccessingRunnables(jobChangeMethods);
 			
-			chains.addAll(chains1);
+			Log.logln("--------- Launch config listeners -----");
+			Collection<CGNode> configMethods = EclipsePluginUtils.getAllLaunchConfigMethods(builder.getAppCallGraph(), cha,
+					this.getPackages());
+			Collection<AnomalyCallChain> chains8 = finder.findAllUIAccessingRunnables(configMethods);
+			
+			if(this.addrunnable) {
+			    chains.addAll(chains1);
+			}
 			chains.addAll(chains2);
 			chains.addAll(chains3);
 			chains.addAll(chains4);
 			chains.addAll(chains5);
-			chains.addAll(chains6);
+			//chains.addAll(chains6);
 			chains.addAll(chains7);
+			chains.addAll(chains8);
 		} else {
 		    chains = detector.detectUIAnomaly(builder, startNodes);
 		}
 		
 		System.out.println("Number of anomaly call chains: " + chains.size());
 		
-		chains = Utils.removeRedundantAnomalyCallChains(chains);
-		System.out.println("size of chains after removing redundancy: " + chains.size());
+		
 		chains = CallChainFilter.filter(chains, new RemoveSystemCallStrategy());
 		System.out.println("size of chains after removing system calls: " + chains.size());
 		
-//		chains = CallChainFilter.filter(chains, new RemoveSubsumedChainStrategy(startNodes));
-//		System.out.println("size of chains after removing subsumed calls: " + chains.size());
+		chains = Utils.removeRedundantAnomalyCallChains(chains);
+		System.out.println("size of chains after removing redundancy: " + chains.size());
+		
+		chains = CallChainFilter.filter(chains, new RemoveSubsumedChainStrategy(startNodes));
+		System.out.println("size of chains after removing subsumed calls: " + chains.size());
 		
 		if(packages != null) {
 		    chains = CallChainFilter.filter(chains, new RemoveNoClientClassStrategy(packages, true));
