@@ -156,6 +156,8 @@ public abstract class AbstractSwingTest extends TestCase {
 			builder.buildCG(eps);
 		}
 		
+		//System.exit(1);
+		
 		//entry nodes in CG
 		Iterable<Entrypoint> entries = builder.getEntrypoints();
 		Log.logln("The entry point for CG: " + Utils.countIterable(entries));

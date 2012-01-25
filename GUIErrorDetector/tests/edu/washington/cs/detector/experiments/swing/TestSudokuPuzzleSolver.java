@@ -36,9 +36,12 @@ public class TestSudokuPuzzleSolver extends AbstractSwingTest {
 		String[] packages = new String[]{"sudoku"};
 		
 		UIAnomalyDetector.DEBUG = true;
-//		super.setCGType(CG.RTA);
-		super.setCGType(CG.ZeroCFA);
+		super.setCGType(CG.RTA);
+//		super.setCGType(CG.ZeroCFA);
 //		super.setCGType(CG.OneCFA);
+		super.setCGType(CG.FakeZeroCFA);
+		super.setCGType(CG.OneCFA);
+		
 		super.setNondefaultCG(true);
 		super.setAddExtraEntrypoints(true);
 		
@@ -66,6 +69,8 @@ public class TestSudokuPuzzleSolver extends AbstractSwingTest {
 		extraMethodSigs.add("sudoku.Aboutbox.<init>");
 		extraMethodSigs.add("sudoku.ObjectViewer.<init>");
 		extraMethodSigs.add("sudoku.Sudoku_Puzzle_Solver.<init>");
+		extraMethodSigs.add("sudoku.Aboutbox$3.actionPerformed");
+		extraMethodSigs.add("sudoku.Sudoku_Puzzle_Solver$165.actionPerformed");
 		
 		Collection<Entrypoint> extraEPs = new HashSet<Entrypoint>();
 		for(IClass c : cha) {
@@ -81,5 +86,34 @@ public class TestSudokuPuzzleSolver extends AbstractSwingTest {
 		
 		return extraEPs;
 	}
-		
 }
+
+//The 0-th chain
+//Node: < Application, Lsudoku/Aboutbox$3, actionPerformed(Ljava/awt/event/ActionEvent;)V > Context: Everywhere, line: 74
+// -> Node: < Application, Lsudoku/Aboutbox, access$2(Lsudoku/Aboutbox;Ljava/awt/event/ActionEvent;)V > Context: Everywhere, line: 147
+// -> Node: < Application, Lsudoku/Aboutbox, jButton2ActionPerformed(Ljava/awt/event/ActionEvent;)V > Context: Everywhere, line: 148
+// -> Node: < Application, Lsudoku/Aboutbox, performDesktop(I)V > Context: Everywhere, line: 156
+// -> Node: synthetic < Primordial, Ljava/lang/Thread, start()V > Context: Everywhere, line: -1
+// -> Node: < Application, Lsudoku/Implementor, run()V > Context: Everywhere, line: 12
+// -> Node: < Application, Lsudoku/Sudoku_Puzzle_Solver, solution([[I)V > Context: Everywhere, line: 2927
+// -> Node: < Primordial, Ljavax/swing/text/JTextComponent, setText(Ljava/lang/String;)V > Context: Everywhere, line: -1
+//
+//The 1-th chain
+//Node: < Application, Lsudoku/Sudoku_Puzzle_Solver$165, actionPerformed(Ljava/awt/event/ActionEvent;)V > Context: Everywhere, line: 2337
+// -> Node: < Application, Lsudoku/Sudoku_Puzzle_Solver, access$5(Lsudoku/Sudoku_Puzzle_Solver;Ljava/awt/event/ActionEvent;)V > Context: Everywhere, line: 2819
+// -> Node: < Application, Lsudoku/Sudoku_Puzzle_Solver, tbSolvebtnActionPerformed(Ljava/awt/event/ActionEvent;)V > Context: Everywhere, line: 2821
+// -> Node: < Application, Lsudoku/Implementor, execute([[I)V > Context: Everywhere, line: 22
+// -> Node: synthetic < Primordial, Ljava/lang/Thread, start()V > Context: Everywhere, line: -1
+// -> Node: < Application, Lsudoku/Implementor, run()V > Context: Everywhere, line: 12
+// -> Node: < Application, Lsudoku/Sudoku_Puzzle_Solver, solution([[I)V > Context: Everywhere, line: 2927
+// -> Node: < Primordial, Ljavax/swing/text/JTextComponent, setText(Ljava/lang/String;)V > Context: Everywhere, line: -1
+//
+//The 2-th chain
+//Node: < Application, Lsudoku/Aboutbox$1, actionPerformed(Ljava/awt/event/ActionEvent;)V > Context: Everywhere, line: 51
+// -> Node: < Application, Lsudoku/Aboutbox, access$0(Lsudoku/Aboutbox;Ljava/awt/event/ActionEvent;)V > Context: Everywhere, line: 151
+// -> Node: < Application, Lsudoku/Aboutbox, jButton3ActionPerformed(Ljava/awt/event/ActionEvent;)V > Context: Everywhere, line: 152
+// -> Node: < Application, Lsudoku/Aboutbox, performDesktop(I)V > Context: Everywhere, line: 156
+// -> Node: synthetic < Primordial, Ljava/lang/Thread, start()V > Context: Everywhere, line: -1
+// -> Node: < Application, Lsudoku/Implementor, run()V > Context: Everywhere, line: 12
+// -> Node: < Application, Lsudoku/Sudoku_Puzzle_Solver, solution([[I)V > Context: Everywhere, line: 2927
+// -> Node: < Primordial, Ljavax/swing/text/JTextComponent, setText(Ljava/lang/String;)V > Context: Everywhere, line: -1
