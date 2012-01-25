@@ -9,8 +9,10 @@ import edu.washington.cs.detector.CallChainFilter;
 import edu.washington.cs.detector.TestCommons;
 import edu.washington.cs.detector.UIAnomalyDetector;
 import edu.washington.cs.detector.CGBuilder.CG;
+import edu.washington.cs.detector.experiments.filters.MergeSamePrefixToLibCallStrategy;
 import edu.washington.cs.detector.experiments.filters.MergeSameTailStrategy;
 import edu.washington.cs.detector.experiments.filters.RemoveSystemCallStrategy;
+import edu.washington.cs.detector.guider.CGTraverseSWTGuider;
 import edu.washington.cs.detector.util.Globals;
 import edu.washington.cs.detector.util.Utils;
 import edu.washington.cs.detector.util.WALAUtils;
@@ -30,9 +32,14 @@ public class TestVirgoFtp extends TestCase {
 	public void testRunVirgoFtp() throws IOException {
 		String path = appPath + Globals.pathSep + libJar;
         UIAnomalyDetector detector = new UIAnomalyDetector(path);
+        
+        detector.setThreadStartGuider(new CGTraverseSWTGuider());
+        detector.setUIAnomalyGuider(new CGTraverseSWTGuider());
 		
 		CGBuilder builder = new CGBuilder(path);
-		builder.setCGType(CG.OneCFA);
+//		builder.setCGType(CG.OneCFA);
+		builder.setCGType(CG.RTA);
+		builder.setCGType(CG.FakeZeroCFA);
 		builder.buildCG();
 		
 		WALAUtils.dumpClasses(builder.getClassHierarchy(), "./logs/loaded_classes.txt");
@@ -49,6 +56,10 @@ public class TestVirgoFtp extends TestCase {
 		filter = new CallChainFilter(chains);
 		chains = filter.apply(new MergeSameTailStrategy());
 		System.out.println("No of chains after removing common tails: " + chains.size());
+		
+		filter = new CallChainFilter(chains);
+		chains = filter.apply(new MergeSamePrefixToLibCallStrategy(new String[]{"edu.sysu.virgoftp"}));
+		System.out.println("No of chains after removing common tails of lib calls: " + chains.size());
 		
 		Utils.dumpAnomalyCallChains(chains, "./logs/virgo-ftp-anomalies.txt");
 		

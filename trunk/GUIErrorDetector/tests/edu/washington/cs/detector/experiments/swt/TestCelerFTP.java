@@ -11,6 +11,7 @@ import edu.washington.cs.detector.UIAnomalyDetector;
 import edu.washington.cs.detector.CGBuilder.CG;
 import edu.washington.cs.detector.experiments.filters.MergeSameTailStrategy;
 import edu.washington.cs.detector.experiments.filters.RemoveSystemCallStrategy;
+import edu.washington.cs.detector.guider.CGTraverseSWTGuider;
 import edu.washington.cs.detector.util.Globals;
 import edu.washington.cs.detector.util.Utils;
 import edu.washington.cs.detector.util.WALAUtils;
@@ -24,9 +25,14 @@ public class TestCelerFTP extends TestCase {
 		
 		//initialize a UI anomaly detector
         UIAnomalyDetector detector = new UIAnomalyDetector(path);
+        
+        detector.setThreadStartGuider(new CGTraverseSWTGuider());
+        detector.setUIAnomalyGuider(new CGTraverseSWTGuider());
+        
 		//configure the call graph builder, use 1-CFA as default
 		CGBuilder builder = new CGBuilder(path);
 		builder.setCGType(CG.OneCFA);
+//		builder.setCGType(CG.ZeroCFA);
 		builder.buildCG();
 		//dump debugging information
 		WALAUtils.dumpClasses(builder.getClassHierarchy(), "./logs/loaded_classes.txt");
