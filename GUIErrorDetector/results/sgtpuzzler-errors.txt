@@ -1,0 +1,13 @@
+Node: < Application, Lname/boyle/chris/sgtpuzzles/SGTPuzzles, onNewIntent(Landroid/content/Intent;)V > Context: Everywhere, line: 257
+ -> Node: < Application, Lname/boyle/chris/sgtpuzzles/SGTPuzzles, startGame(ILjava/lang/String;)V > Context: Everywhere, line: 481
+ -> Node: synthetic < Primordial, Ljava/lang/Thread, start()V > Context: Everywhere, line: -1
+ -> Node: < Application, Lname/boyle/chris/sgtpuzzles/SGTPuzzles$9, run()V > Context: Everywhere, line: 501
+ -> Node: < Application, Lname/boyle/chris/sgtpuzzles/SGTPuzzles, init(Lname/boyle/chris/sgtpuzzles/GameView;ILjava/lang/String;)V > Context: Everywhere, line: -1
+ -> Node: < Application, Lname/boyle/chris/sgtpuzzles/SGTPuzzles, changedState(ZZ)V > Context: Everywhere, line: 894
+ -> Node: < Application, Lname/boyle/chris/sgtpuzzles/SmallKeyboard, setUndoRedoEnabled(ZZ)V > Context: Everywhere, line: 398
+ -> Node: < Application, Lname/boyle/chris/sgtpuzzles/SmallKeyboard$KeyboardModel, setUndoRedoEnabled(ZZ)V > Context: Everywhere, line: 295
+ -> Node: < Application, Landroid/inputmethodservice/KeyboardView, setShifted(Z)Z > Context: Everywhere, line: -1
+ -> Node: < Application, Landroid/inputmethodservice/KeyboardView, invalidateAllKeys()V > Context: Everywhere, line: -1
+ -> Node: < Application, Landroid/view/View, invalidate()V > Context: Everywhere, line: -1
+ -> Node: < Application, Landroid/view/ViewRoot, invalidateChild(Landroid/view/View;Landroid/graphics/Rect;)V > Context: Everywhere, line: -1
+ -> Node: < Application, Landroid/view/ViewRoot, checkThread()V > Context: Everywhere, line: -1
