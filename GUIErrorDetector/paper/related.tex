@@ -25,8 +25,6 @@ Yuan and Memon~\cite{YuanMemonICSE2007} generate event-sequence based test cases
 programs. They proposed a model-based approach for testing GUI-based applications.
 Their technique can generate test cases automatically using a structural event
 generation graph. 
-%Their approach targets Java desktop applications, which
-%are quite different from the Android mobile environment (XXXX).
 However, testing is often insufficient to ensure the correctness of a GUI program
 due to the huge space of possible interactions
 with a GUI. The large number of possible interactions
@@ -40,10 +38,10 @@ These measures do not work well for GUI testing, because
 what matters is not only how much of the code is tested,
 but in how many different possible states of the software
 each piece of code is tested. This makes it hard to determine
-the completeness of a test suite. %All of the (XXXXX, so that GUI is often not well tested)
+the completeness of a test suite. 
 In contrast, as advocated in this paper, the primary advantage of
 using a static analysis is that it can potentially explore
-all paths to find possible bugs without actually executing the tested code. % (XXX use heuristic filtering)
+all paths to find possible bugs without actually executing the tested code. 
 Compared with software testing, a static analysis tool may
 report false positives due to its conservative nature.
 Nevertheless, as we demonstrated in our experiments, using a few simple heuristics
@@ -113,7 +111,6 @@ report counter examples for the potential bugs with a counter example. For examp
 CHESS~\cite{chess} dynamically explores the thread scheduling decisions to expose
 concurrency bugs using a context-bounded approach. Shacham et al~\cite{Shacham:2007} uses
 a model checker to construct the witness for data races reported by the lockset algorithm.
-%(XXXX problem for applying to GUI).
 Unfortunately, due to the exponential size of the search space,
  it is hard for model checking approaches to scale to a realistic multithreaded GUI application
  without compromising the detection capability. To our best knowledge,
