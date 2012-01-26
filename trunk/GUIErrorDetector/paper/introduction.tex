@@ -323,15 +323,13 @@ parts in our prototype tool implementation.
 We implement an invalid thread error detection tool that supports
 the above four GUI frameworks. Our tool works in a fully-automatic,
 push-button manner, and scales to realistic programs.
-We evaluate our implementation on XXX subjects from four different
-frameworks over XXX LOC. The experiment results demonstrate
-that: our technique is effective (it found XXX real-world errors
+We evaluate our implementation on 10 subjects from four different
+frameworks over 75000 LOC. The experiment results demonstrate
+that: our technique is effective (it found 12 real-world errors
 on all supported frameworks, and produced significantly less
 false positives and redundant warnings than the simple analysis);
 our reflection-aware call graph construction algorithm is
 critical in finding errors in Android applications,
-%graph construction algorithm is useful (XXX it improves both completeness
-%and precision over the existing algorithms), 
 and our proposed
 heuristics are useful (it significantly reduces the number of
 false positives and redundant warnings).
@@ -362,8 +360,8 @@ popular GUI platforms: SWT, eclipse plugin, Swing, and Android (Section~\ref{sec
 tool implementation is publicly available at:
 \url{http://guierrordetector.googlecode.com}
 
-\item \textbf{Evaluation.} We performed an experiment on XXX subjects
-from 4 different platforms over XXX LOC to show the usefulness
+\item \textbf{Evaluation.} We performed an experiment on 10 subjects
+from 4 different platforms over 75000 LOC to show the usefulness
 of the proposed technique (Section~\ref{sec:evaluation}).
 
 \end{itemize}

@@ -43,20 +43,19 @@ The subjects used in our experiment are shown in Table~\ref{table:subjects}. Our
 subjects include end-user applications, programming tools, and games. Specifically:
 
 \begin{itemize}
-\Item CelerFTP~\cite{celer} and FileBunker~\cite{filebunker} are two useful
+\Item VirgoFTP~\cite{virgo} and FileBunker~\cite{filebunker} are two useful
 SWT desktop applications.
-CelerFTP implements a simple FTP client based on Java and SWT UI library, and
+VirgoFTP implements a simple FTP client based on Java and SWT UI library, and
 FileBunker is a file backup application which uses one or more GMail accounts as its backup repository.
 
-\Item  AnyEdit~\cite{anyedit}, FileSync~\cite{filesync}, and
-EclipseRunner~\cite{eclipserunner} are three popular eclipse plugins.
-AnyEdit adds several new tools to  Eclipse editors, output consoles, and main menu. 
-FileSync is a file synchronisation tool to keep files outside of Eclipse projects in synchronized
-with Eclipse project files. EclipseRunner extends capability of running launch configurations in Eclipse IDE.
+\Item  HudsonEclipse~\cite{hudson}, and
+EclipseRunner~\cite{eclipserunner} are two popular eclipse plugins.
+HudsonEclipse adds several new tools to  monitor Hudson build status from Eclipse.
+EclipseRunner extends capability of running launch configurations in Eclipse IDE.
 
-\Item  S3dropbox~\cite{s3dropbox} and SudokuPuzzleSolver~\cite{sudokusolver}
+\Item  S3dropbox~\cite{s3dropbox} and SudokuSolver~\cite{sudokusolver}
 are two Swing desktop applications. S3dropbox implements a client that allows users
-to drag and drop files, which are then uploaded to their Amazon S3 accounts. SodokuPuzzleSolver
+to drag and drop files, which are then uploaded to their Amazon S3 accounts. SodokuSolver
 computes Sodoku solutions efficiently using mutlithreading execution. 
 
 \Item  MyTracks~\cite{mytracks}, Fennec~\cite{fennec},
@@ -72,13 +71,14 @@ Firefox web browser for mobile devices. SGTPuzzles is a small logic single-playe
 \begin{center}
  \fontsize{9pt}{\baselineskip}\selectfont
 \hspace*{-0.2cm}
+\setlength{\tabcolsep}{.75\tabcolsep}
 \begin{tabular}{|p{4.4cm}||c|c|c|c|}
 \hline
  Program (version) & LOC & Classes & Methods \\
 \hline \hline
 \multicolumn{4}{|l|}{SWT desktop applications}   \\
  \hline
- CelerFTP (3.0 alpha) &  2293 &  20 &  165  \\
+ VirgoFTP (1.3.5) &  2293 &  20 &  165  \\
  \hline
  FileBunker (1.1.2)&  14237 &  150 &  1106  \\
  \hline
@@ -87,16 +87,14 @@ Firefox web browser for mobile devices. SGTPuzzles is a small logic single-playe
  \hline
  EclipseRunner (1.1.0) &  3101 &  48 &  354\\
  \hline
- FileSync (1.4.0)&  7374 &  36 &  510 \\
- \hline
- AnyEdit (2.4.0)&  11077 &  74 &  649 \\
+ HudsonEclipse(1.0.9)&  11077 &  74 &  649 \\
  \hline
  \hline
 \multicolumn{4}{|l|}{Swing desktop applications}   \\
  \hline
  S3dropbox (1.7) &  2353 &  42  &  224 \\
  \hline
- Sudoku Solver (1.06)&  3555 &  10 &  62 \\
+ SudokuSolver (1.06)&  3555 &  10 &  62 \\
  \hline
  \hline
 \multicolumn{4}{|l|}{Android mobile applications}   \\
@@ -111,20 +109,20 @@ Firefox web browser for mobile devices. SGTPuzzles is a small logic single-playe
 \hline
  GUI framework (version) & LOC & Classes & Methods  \\
 \hline \hline
- SWT (3.6.2)&  xxxxx &  xxx &  xxxx  \\
+ SWT (3.6)&  129942 &  999 &  9643 \\
 \hline
- Eclipse plugin development (3.6.2)&  xxxxx &  xxx &  xxxx  \\
+ Eclipse plugin development (3.6.2)&  460830 &  6630 &  37183 \\
 \hline
-Swing (1.6)&  xxxxx &  xxx &  xxxx  \\
+Swing (1.6)&  167961 &  878 &  13159 \\
 \hline
- Android (3.6)&  xxxxx &  xxx &  xxxx  \\
+ Android (3.2)&  683289 &  5085 &  10584 \\
 \hline
 \end{tabular}
 
 \end{center}
 \vspace{-15pt}
 \Caption{{\label{table:subjects} Open source programs
-used in our evaluation. Column ``LOC'' is the number of lines
+used in our evaluation. Column ``LOC'' is the number of non-blank, non-comment lines
 of code, as counted by LOCC~\cite{locc}.  Each program is analyzed
 together with its dependent GUI framework, as listed in
 the bottom table.} }
@@ -138,7 +136,7 @@ We run our tool on each subject with three call graph construction
 algorithms: RTA~\cite{rta}, 0-CFA, and 1-CFA~\cite{kcfa}.  When running
 each call graph construction algorithm on Android applications, we
 use two configurations: with and without the reflection-aware transformation
-(Section~\ref{sec:cg}).  We did not use more expensive algorithms like $k$-CFA ($k >$ 1),
+(Section~\ref{sec:cg}).  We did not use other more expensive algorithms like $k$-CFA ($k >$ 1),
 because they can not scale to large programs.
 
 We inspect the source code of each subject to determine whether any
@@ -168,7 +166,7 @@ the error.
 \begin{center}
  \fontsize{9pt}{\baselineskip}\selectfont
 \hspace*{-0.2cm}
-\setlength{\tabcolsep}{.65\tabcolsep}
+\setlength{\tabcolsep}{.45\tabcolsep}
 \begin{tabular}{|l||c|c|c||c|c|c||c|c|c||c|c|}
 \hline
  Subject&  \multicolumn{9}{|c||}{Our Technique} & \multicolumn{2}{|c|}{The Approach in}  \\
@@ -179,36 +177,34 @@ the error.
 \hline \hline
 \multicolumn{12}{|l|}{SWT desktop applications}   \\
  \hline
- xxx &  xxxx &  xx &  xxx & xx & xx & xx& xx & xx & xx& xx & xx \\
+ VirgoFTP&  12401 &  2 &  2 & 10858 & 2 & 2 & 43598 & 2 & 2& 149 & 2 \\
  \hline
- xxx &  xxxx &  xx &  xxx & xx & xx & xx& xx & xx & xx& xx & xx \\
- \hline
- xxx &  xxxx &  xx &  xxx & xx & xx & xx& xx & xx & xx& xx & xx \\
+ FileBunker &  18951 &  1 &  0 & 15743 & 0 & 0 & 76088 & 2 & 1& 693 & 1 \\
  \hline
  \hline
 \multicolumn{12}{|l|}{Eclipse plugins}   \\
  \hline
- xxx &  xxxx &  xx &  xxx & xx & xx & xx& xx & xx & xx& xx & xx \\
+ EclipseRunner&  11248&  6 &  1 & 7201 & 6 & 1 & 26911 & 6 & 1& 202 & 1 \\
+ %\hline
+ %FileSync&  12132 &  xx &  xxx &8235 & xx & xx& 32565 & 1 & 1 & 331 & 1 \\
  \hline
- xxx &  xxxx &  xx &  xxx & xx & xx & xx& xx & xx & xx& xx & xx \\
- \hline
- xxx &  xxxx &  xx &  xxx & xx & xx & xx& xx & xx & xx& xx & xx \\
+ HudsonEclipse& 18473 &  2 &  1 & 15814 & 2 & 1& 56645 & 3 & 1 & 182 & 1 \\
  \hline
  \hline
 \multicolumn{12}{|l|}{Swing desktop applications}   \\
  \hline
- S3dropbox &  xxxx &  xx &  xxx & xx & xx & xx& xx & 1 & 1 & 210 & xx \\
+ S3dropbox & 37751 &  0 &  0 & 30609 & 0 & 0 & 115324 & 1 & 1 & 210 & 1 \\
  \hline
-  Sudoku Solver&  xxxx &  xx &  xxx & xx & xx & xx& xx & xx & xx& 356 & xx \\
+  SudokuSolver&  27730&  3 &  2 & 20907 & 3 & 2 & 39299 & 2 & 2 & 356 & 2 \\
  \hline
  \hline
 \multicolumn{12}{|l|}{Android mobile applications}   \\
  \hline
- xxx &  xxxx / xxxx &  xx / xxxx &  xxx / xxxx & xx /xxx & xx / xxxx  & xx / xxxx& xx / xxx & xxxx / xxx  & xxxx / xxx& xx & xx \\
+ SGTPuzzler & 13631 / 13865&  12 / 16 &  0 / 0 & 9546 / 9682& 4 / 4& 1 / 1 & 35198 / 35756 & 1 / 1  & 1 / 1& 104 & 1 \\
  \hline
- xxx &  xxxx &  xx &  xxx & xx & xx & xx& xx & xx & xx& xx & xx \\
+ Fennec & 14058 / 14387 &  55 / 54 &  0 / 0 & 8263 / 8898 & 0 / 0 & 0 / 0& 29125/ 31759 & xx / xxx & 0 / xxx& 433 & 1 \\
  \hline
- xxx &  xxxx &  xx &  xxx & xx & xx & xx& xx & xx & xx& xx & xx \\
+ MyTracks & 24036 / 24036 &  161 / 220 & 0 / 0 & 10803 / 13645 & 119 / 119 & 0 / 0 & 39235 / 110977 & 61 / xxx & 0 / xxx& 1192 & 1 \\
 \hline
 \end{tabular}
 \end{center}
@@ -253,6 +249,12 @@ are false positives, xxx are redundant:
 they have the same causes as the rest xxx warnings. (XXX why there
 are FP and redundant warnings?)
 
+why finds a bug in SGTPuzzle, because the \CodeIn{SmallKeyBoard} has been
+explicitly created in this main class \CodeIn{SGTPuzzles} \CodeIn{setKeyboardVisibility},
+thus, even without reflection-aware
+
+Why RTA, 0-CFA finds few, because they do not distinguish different
+calling context.
 
 
 \begin{figure}[t]
@@ -459,7 +461,7 @@ heuristics can still remove most of them.
 \begin{table}[t]
 \begin{center}
  \fontsize{9pt}{\baselineskip}\selectfont
-\setlength{\tabcolsep}{.30\tabcolsep}
+\setlength{\tabcolsep}{.01\tabcolsep}
 \hspace*{-0.2cm}
 \begin{tabular}{|l||c|c|c|c|c|c|}
 \hline
@@ -468,47 +470,45 @@ heuristics can still remove most of them.
 \hline \hline
 \multicolumn{7}{|l|}{SWT desktop applications}   \\
  \hline
- xxx &  xxxx &  xx &  xxx & xx &  xxx & xx\\
+ VirgoFTP &  21 &  21 &  3 & 3 &  2 & 2\\
  \hline
- xxx &  xxxx &  xx &  xxx & xx &  xxx & xx\\
- \hline
- xxx &  xxxx &  xx &  xxx & xx &  xxx & xx\\
+ FileBunker &  4494 &  3210 &  3210 &  642 &  2 & 2\\
  \hline
  \hline
 \multicolumn{7}{|l|}{Eclipse plugins}   \\
+ %\hline
+ %EclipseRunner &  xxxx &  xx &  xxx & xx &  xxx & xx\\
  \hline
- xxx &  xxxx &  xx &  xxx & xx &  xxx & xx\\
+ EclipseRunner&  1621 &  1487 &  1487 & 1487 &  5 & 1\\
  \hline
- xxx &  xxxx &  xx &  xxx & xx &  xxx & xx\\
- \hline
- xxx &  xxxx &  xx &  xxx & xx &  xxx & xx\\
+ HundsonEclipse&  3192 &  2417 &  1696 & 9 &  3 & 3\\
  \hline
  \hline
 \multicolumn{7}{|l|}{Swing desktop applications}   \\
  \hline
- xxx &  xxxx &  xx &  xxx & xx &  xxx & xx\\
+ S3dropbox&  45528 &  31978 &  30975 & 9 &  1 & 1\\
  \hline
- xxx &  xxxx &  xx &  xxx & xx &  xxx & xx\\
- \hline
- xxx &  xxxx &  xx &  xxx & xx &  xxx & xx\\
+ SudokuSolver &  58 &  58 &  58 & 2 &  2 & 2\\
  \hline
  \hline
 \multicolumn{7}{|l|}{Android mobile applications}   \\
  \hline
- xxx &  xxxx &  xx &  xxx & xx &  xxx & xx\\
+ SGTPuzzler&  2 &  1 &  1 & 1 &  1 & 1\\
  \hline
- xxx &  xxxx &  xx &  xxx & xx &  xxx & xx\\
+ Fennec &  xxxx &  xx &  xxx & xx &  xxx & xx\\
  \hline
- xxx &  xxxx &  xx &  xxx & xx &  xxx & xx\\
+ MyTracks &  xxxx &  xx &  xxx & xx &  xxx & xx\\
 \hline
 \end{tabular}
 \end{center}
 \vspace{-15pt}
 \Caption{{\label{table:filters}Number of warnings after applying a set of
-heuristic filters (Section~\ref{sec:heuristic}). Column ``\#Warning $F_i$''
-represents the number of remaining warnings after applying
-filters 1 -- $i$, and the number of last column is taken
-from Table~\ref{table:results} (Subcolumn ``\#Warning'' under column ``1-CFA / with taming reflection'').} }
+heuristic filters (Section~\ref{sec:heuristic}). Column ``Before Filtering''
+shows the output warning number using the reflection-aware 1-CFA algorithm.
+Column ``\#Warning $F_i$'' represents the number of remaining warnings after applying
+filters 1 -- $i$, and the number in last column is taken
+from Table~\ref{table:results}.
+Results of using other algorithms show similar patterns, which are omitted for brevity.} }
 \end{table}
 
 
