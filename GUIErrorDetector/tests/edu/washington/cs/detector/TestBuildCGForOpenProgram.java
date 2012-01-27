@@ -22,6 +22,22 @@ public class TestBuildCGForOpenProgram extends TestCase {
 		return new TestSuite(TestBuildCGForOpenProgram.class);
 	}
 	
+	public void testBuildCGForOpenParam() throws IOException, ClassHierarchyException {
+		String appPath = TestCommons.testfolder + "openparameter";
+		CGBuilder builder = new CGBuilder(appPath);
+		
+		builder.makeScopeAndClassHierarchy();
+		Iterable<Entrypoint> entries = CGEntryManager.getAllPublicMethods(builder, "test.openparameter.Entry");
+		
+		System.out.println("Number of entries to build CG: " + Utils.countIterable(entries));
+		System.out.println("All iterables: " + Utils.iterableToCollection(entries));
+		
+		builder.setCGType(CG.OneCFA);
+		builder.buildCG(entries);
+		
+		PDFViewer.viewCG("openparam.pdf", builder.getAppCallGraph());
+	}
+	
 	public void testBuildCGWithoutObjCreation() throws IOException, ClassHierarchyException {
 		String appPath = TestCommons.testfolder + "openprogram";
 		CGBuilder builder = new CGBuilder(appPath);
