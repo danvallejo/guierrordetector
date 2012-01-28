@@ -189,7 +189,7 @@ public class UIAnomalyMethodFinder extends AbstractMethodFinder {
 				CGNode succNode = succIt.next();
 				
 				if(!super.guider.traverse(node, succNode)) {
-					//Log.logln("  skip by guider: " + succNode, DEBUG);
+					Log.logln("  skip by guider: " + succNode, DEBUG);
 					continue;
 				}
 				

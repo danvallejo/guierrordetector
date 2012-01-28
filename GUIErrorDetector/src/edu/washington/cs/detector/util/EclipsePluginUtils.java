@@ -214,6 +214,9 @@ public class EclipsePluginUtils {
 	private static String jobChangeListener = "org.eclipse.core.runtime.jobs.IJobChangeListener";
 	private static IClass RESOURCE_CHANGE_LISTENER = null;
 	private static String resourceChangeListener = "org.eclipse.core.resources.IResourceChangeListener";
+	private static IClass LAUNCH_CONFIG_LISTENER = null;
+	private static String launchConfigListener = "org.eclipse.debug.core.ILaunchConfigurationListener";
+	
 	//public void resourceChanged(IResourceChangeEvent event); invoked by non-UI
 	private static IClass ACTION = null;
 	private static String action = "org.eclipse.jface.action.Action";  //run() invoked by non-UI
@@ -277,6 +280,16 @@ public class EclipsePluginUtils {
 			throw new RuntimeException("The class is not found: " + resourceChangeListener);
 		}
 		return RESOURCE_CHANGE_LISTENER;
+	}
+	
+	public static IClass getLaunchConfigListener(ClassHierarchy cha) {
+		if(LAUNCH_CONFIG_LISTENER == null) {
+			LAUNCH_CONFIG_LISTENER = WALAUtils.lookupClass(cha, launchConfigListener);
+		}
+		if(LAUNCH_CONFIG_LISTENER == null) {
+			throw new RuntimeException("The class is not found: " + launchConfigListener);
+		}
+		return LAUNCH_CONFIG_LISTENER;
 	}
 	
 	public static IClass getAction(ClassHierarchy cha) {
@@ -507,6 +520,42 @@ public class EclipsePluginUtils {
 		}
 		return entries;
 	}
+	
+	public static Collection<Entrypoint> getAllPublicProtectedResourceChangeListenerMethods(ClassHierarchy cha, String[] packages) {
+		Collection<IClass> allResourceChanges = EclipsePluginUtils.getAllAppSubClasses(cha, getResourceChangeListener(cha), packages);
+		Set<IMethod> methodSet = new HashSet<IMethod>();
+		for(IClass c : allResourceChanges) {
+			for(IMethod m : c.getDeclaredMethods()) {
+				if(m.isProtected() || m.isPublic()) {
+					methodSet.add(m);
+				}
+			}
+		}
+		Collection<Entrypoint> entries = new HashSet<Entrypoint>();
+		for(IMethod m : methodSet) {
+		    entries.add(new DefaultEntrypoint(m, cha));
+		}
+		return entries;
+	}
+	
+	public static Collection<Entrypoint> getAllConfigListenerMethods(ClassHierarchy cha, String[] packages) {
+		Collection<IClass> allConfigListerners = EclipsePluginUtils.getAllAppSubClasses(cha, EclipsePluginUtils.getLaunchConfigListener(cha),
+				packages);
+		Set<String> configMethods = EclipsePluginUtils.getLaunchListenerMethods();
+		Set<IMethod> methodSet = new HashSet<IMethod>();
+		for(IClass c : allConfigListerners) {
+			for(IMethod m : c.getDeclaredMethods()) {
+				if(configMethods.contains(m.getName().toString())) {
+					methodSet.add(m);
+				}
+			}
+		}
+		Collection<Entrypoint> entries = new HashSet<Entrypoint>();
+		for(IMethod m : methodSet) {
+		    entries.add(new DefaultEntrypoint(m, cha));
+		}
+		return entries;
+	}
 
     //the job change listener
 	//The JobListener is not running at EDT
@@ -523,6 +572,19 @@ public class EclipsePluginUtils {
 			jobListenerMethods.add("scheduled");
 			jobListenerMethods.add("sleeping");
 			return jobListenerMethods;
+		}
+	}
+	
+	private static Set<String> lauchListenerMethods = null;
+	public static Set<String> getLaunchListenerMethods() {
+		if(lauchListenerMethods != null) {
+			return lauchListenerMethods;
+		} else {
+			lauchListenerMethods = new HashSet<String>();
+			lauchListenerMethods.add("launchConfigurationAdded");
+			lauchListenerMethods.add("launchConfigurationChanged");
+			lauchListenerMethods.add("launchConfigurationRemoved");
+			return lauchListenerMethods;
 		}
 	}
 	
@@ -615,6 +677,7 @@ public class EclipsePluginUtils {
 					continue;
 				}
 			}
+//			System.out.println("processing: " + node);
 			if(cha.isAssignableFrom(job, c)) {
 				//IStatus run(IProgressMonitor monitor)
 				//run(Lorg/eclipse/core/runtime/IProgressMonitor;)V
@@ -701,6 +764,27 @@ public class EclipsePluginUtils {
 		}
 		
 		return jobChangeMethods;
+	}
+	
+	public static Collection<CGNode> getAllLaunchConfigMethods(Graph<CGNode> graph, ClassHierarchy cha, String[] packages) {
+		Set<String> definedMethods = EclipsePluginUtils.getLaunchListenerMethods();
+		Collection<CGNode> configMethods = new HashSet<CGNode>();
+		IClass launchListener = EclipsePluginUtils.getLaunchConfigListener(cha);
+		for(CGNode node : graph) {
+			IMethod m = node.getMethod();
+			IClass c = m.getDeclaringClass();
+			if(packages != null) {
+				if(!WALAUtils.isClassInPackages(c, packages)) {
+					continue;
+				}
+			}
+			if(cha.isAssignableFrom(launchListener, c)) {
+				if(definedMethods.contains(m.getName().toString())) {
+					configMethods.add(node);
+				}
+			}
+		}
+		return configMethods;
 	}
 	
 	public static Collection<CGNode> getAllActionRunMethods(Graph<CGNode> graph, ClassHierarchy cha, String[] packages) {

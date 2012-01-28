@@ -28,7 +28,7 @@ import edu.washington.cs.detector.util.WALAUtils;
 
 public class CGBuilder {
 	
-	public enum CG {RTA, ZeroCFA, ZeroContainerCFA, ZeroOneCFA, ZeroOneContainerCFA, OneCFA, TwoCFA, CFA}
+	public enum CG {RTA, ZeroCFA, ZeroContainerCFA, ZeroOneCFA, ZeroOneContainerCFA, OneCFA, TwoCFA, CFA, FakeZeroCFA}
 	
 	public final String appPath;
 	public final File exclusionFile;
@@ -156,7 +156,10 @@ public class CGBuilder {
 			}
 			System.out.println("Use CFA with precision: " + this.cfaprecision);
 			builder = WALAUtils.makeCFABuilder(this.cfaprecision, options,  cache, cha, scope);
-		} else {
+		} else if (this.type == CG.FakeZeroCFA) {
+			System.out.println("Use Fake-0-CFA with precision: " + this.cfaprecision);
+			builder = WALAUtils.makeCFABuilder(0, options, cache, cha, scope);
+		}else {
 			throw new RuntimeException("The CG type: " + type + " is unknonw");
 		}
 		assert builder != null;
