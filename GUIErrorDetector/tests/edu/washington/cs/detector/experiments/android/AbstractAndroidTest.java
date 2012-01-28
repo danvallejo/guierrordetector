@@ -5,9 +5,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import com.ibm.wala.classLoader.IClass;
 import com.ibm.wala.classLoader.IMethod;
@@ -28,10 +31,16 @@ import edu.washington.cs.detector.NativeMethodConnector;
 import edu.washington.cs.detector.UIAnomalyDetector;
 import edu.washington.cs.detector.UIAnomalyMethodFinder;
 import edu.washington.cs.detector.CGBuilder.CG;
+import edu.washington.cs.detector.experiments.filters.MergeSameEntryToStartPathStrategy;
+import edu.washington.cs.detector.experiments.filters.MergeSamePrefixToLibCallStrategy;
+import edu.washington.cs.detector.experiments.filters.MergeSameTailStrategy;
 import edu.washington.cs.detector.experiments.filters.RemoveSubsumedChainStrategy;
+import edu.washington.cs.detector.experiments.filters.RemoveSystemCallStrategy;
+import edu.washington.cs.detector.experiments.straightforward.TestAndroids;
 import edu.washington.cs.detector.guider.CGTraverseGuider;
 import edu.washington.cs.detector.guider.CGTraverseNoSystemCalls;
 import edu.washington.cs.detector.guider.CGTraverseOnlyClientRunnableStrategy;
+import edu.washington.cs.detector.util.AndroidLogicByPassFileCreator;
 import edu.washington.cs.detector.util.AndroidUtils;
 import edu.washington.cs.detector.util.ApkUtils;
 import edu.washington.cs.detector.util.Files;
@@ -42,13 +51,53 @@ import junit.framework.TestCase;
 
 public abstract class AbstractAndroidTest extends TestCase {
 	
-	abstract protected String getAppPath();
+	public static String bypassfiledir = "dat";
 	
+	private boolean runnaiveapproach = false;
+	private String[] packageNames = null;
+	private String bypassFileName = null;
+	private String androidcheckingfile = null;
+	
+	public void setRunnaiveApproach(boolean app) {
+		this.runnaiveapproach = app;
+	}
+	public void setPackageNames(String[] packages) {
+		this.packageNames = packages;
+	}
+	public void setByfileName(String fileName) {
+		this.bypassFileName = fileName;
+	}
+	public void setAndroidCheckingFile(String file) {
+		this.androidcheckingfile = file;
+	}
+	
+	abstract protected String getAppPath();
 	abstract protected String getDirPath();
 	
 	static Graph<CGNode> appCallGraph = null;
-	
 	static ClassHierarchy builtCHA = null;
+	
+	protected Collection<Entrypoint> getExtraEntrypoints(CGBuilder builder) {
+		return Collections.EMPTY_SET;
+	}
+	
+	protected Iterable<Entrypoint> getQuerypoints(CGBuilder builder, Iterable<Entrypoint> points) {
+		return points;
+	}
+	
+	
+	protected Iterable<Entrypoint> removeRedundantEntries(Iterable<Entrypoint> points) {
+		Set<String> sigs = new HashSet<String>();
+		Collection<Entrypoint> nonRedundant = new LinkedList<Entrypoint>();
+		for(Entrypoint point : points) {
+			String methodSig = point.getMethod().getSignature();
+			if(!sigs.contains(methodSig)) {
+				nonRedundant.add(point);
+				sigs.add(methodSig);
+			}
+		}
+		return nonRedundant;
+	}
 	
 	public List<AnomalyCallChain> findErrorsInAndroidApp(CG type, CGTraverseGuider ui2startGuider, CGTraverseGuider start2checkGuider)
 	    throws ClassHierarchyException, IOException {
@@ -80,21 +129,6 @@ public abstract class AbstractAndroidTest extends TestCase {
 	    for(IClass runnableC : runnableInClient) {
 	    	Log.logln("   runnable in client: " + runnableC.toString());
 	    }
-	    
-//	    for(IClass c : runnableInClient) {
-//	    	Log.logln("   " + c.toString());
-//	    	for(IMethod m : c.getDeclaredMethods()) {
-//	    		Log.logln("   - " + m + ", type: " + m.getClass());
-//	    		if(m instanceof ShrikeCTMethod) {
-//	    			try {
-//						Log.logln("    -  call sites: " + ((ShrikeCTMethod)m).getCallSites());
-//					} catch (InvalidClassFileException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					}
-//	    		}
-//	    	}
-//	    }
 	    
 	    List<String> entryClasses = new LinkedList<String>();
 	    
@@ -150,8 +184,9 @@ public abstract class AbstractAndroidTest extends TestCase {
 		System.out.println("     " + declaredClasses);
 		
 		//add all UI constructors as the entry point
-	    Iterable<Entrypoint> widgetConstructors = //new LinkedList<Entrypoint>(); 
-	    	CGEntryManager.getConstructors(builder, declaredClasses);
+	    Iterable<Entrypoint> widgetConstructors =
+	    	new LinkedList<Entrypoint>(); //TODO comment it out
+//	    	CGEntryManager.getConstructors(builder, declaredClasses);
 	    
 	    Iterable<Entrypoint> activityConstructors =
 	    	CGEntryManager.getConstructors(builder, activityClasses);
@@ -169,7 +204,43 @@ public abstract class AbstractAndroidTest extends TestCase {
 		}
 		
 		builder.setCGType(type);
+		
+		if(this.bypassFileName != null) {
+			System.err.println("creating by pass file: " + bypassfiledir + "/" + this.bypassFileName);
+			AndroidLogicByPassFileCreator creator = new AndroidLogicByPassFileCreator(null, cha);
+			creator.setDefaultDir(bypassfiledir);
+			creator.createByPassLogicFile(this.bypassFileName, declaredClasses);
+			builder.setByPassFile(this.bypassFileName);
+		}
+		
+		Collection<Entrypoint> extraEntrypoints = this.getExtraEntrypoints(builder);
+		if(!extraEntrypoints.isEmpty()) {
+			System.err.println("Adding: " + extraEntrypoints.size() + " entrypoints!");
+			for(Entrypoint ep : extraEntrypoints) {
+				System.err.println("  --  " + ep);
+			}
+			entries = CGEntryManager.mergeEntrypoints(entries, extraEntrypoints);
+			Log.logln("After adding: " + extraEntrypoints.size() + ", we have: " + Utils.countIterable(entries) + " entrypoints in total.");
+		}
+		
+		Log.logln("All entrypoint in building the call graph:");
+		for(Entrypoint ep : entries) {
+			Log.logln("    " + ep);
+		}
+		entries = removeRedundantEntries(entries);
+		
+		Log.logln("After removing all redundant, number of entries: " + Utils.countIterable(entries));
+		for(Entrypoint ep : entries) {
+			Log.logln("    " + ep);
+		}
+		
 		builder.buildCG(entries);
+		
+		if(this.runnaiveapproach) {
+			TestAndroids.seeNaiveResult(builder.getAppCallGraph(), builder.getClassHierarchy(), packageNames);
+			System.err.println("Exit in running naive approach.");
+			System.exit(1);
+		}
 		
 		System.out.println("number of entry node in the built CG: " + builder.getCallGraph().getEntrypointNodes().size());
 		System.out.println("CG node num: " + builder.getCallGraph().getNumberOfNodes());
@@ -178,15 +249,23 @@ public abstract class AbstractAndroidTest extends TestCase {
 		appCallGraph = builder.getAppCallGraph();
 		builtCHA = builder.getClassHierarchy();
 		
+		Log.logln("app call graph node num: " + appCallGraph.getNumberOfNodes());
+		
 		
 		//set up the anomaly detection
 		UIAnomalyDetector detector = new UIAnomalyDetector(getAppPath());
 		detector.configureCheckingMethods("./tests/edu/washington/cs/detector/checkingmethods_for_android.txt");
+		if(this.androidcheckingfile != null) {
+			System.err.println("Use : " + this.androidcheckingfile + " as checking file.");
+			detector.configureCheckingMethods(this.androidcheckingfile);
+		}
 		detector.setThreadStartGuider(ui2startGuider);
 		detector.setUIAnomalyGuider(start2checkGuider);
 		detector.setNativeMethodConnector(connector);
 		UIAnomalyDetector.DEBUG = true;
 		//UIAnomalyMethodFinder.DEBUG = true;
+		
+		queryPoints = getQuerypoints(builder, queryPoints);
 		
 		//detect the anomaly chain
 		List<AnomalyCallChain> chains = detector.detectUIAnomaly(builder, builder.getCallGraphEntryNodes(queryPoints));
@@ -195,6 +274,30 @@ public abstract class AbstractAndroidTest extends TestCase {
 		chains = CallChainFilter.filter(chains, new RemoveSubsumedChainStrategy());
 		System.out.println("Number of chains after removing subsumption: " + chains.size());
 		
+		chains = Utils.removeRedundantAnomalyCallChains(chains);
+		System.out.println("Number of chains after removing redundant: " + chains.size());
+		
+		chains = CallChainFilter.filter(chains, new RemoveSystemCallStrategy());
+		System.out.println("size of chains after removing system calls: " + chains.size());
+		
+		chains = CallChainFilter.filter(chains, new MergeSameEntryToStartPathStrategy() );
+		
+		if(packageNames != null) {
+			  chains = CallChainFilter.filter(chains, new MergeSamePrefixToLibCallStrategy(packageNames));
+			  System.out.println("size of chains after removing same entry nodes to lib: " + chains.size());
+		}
+		
+		chains = CallChainFilter.filter(chains, new MergeSameTailStrategy());
+		System.out.println("size of chains after merging the same tails: " + chains.size());
+		
+		Log.logln("Number of chains: " + chains.size());
+		int count = 0;
+		for(AnomalyCallChain chain : chains) {
+			Log.logln("The " + count++ + "-th call chain:");
+			Log.logln(chain.getFullCallChainAsString());
+		}
+		
+		System.out.println("Final output chains: " + chains.size());
 		
 		//set it back
 		UIAnomalyMethodFinder.setCheckingMethods("./src/checking_methods.txt");
