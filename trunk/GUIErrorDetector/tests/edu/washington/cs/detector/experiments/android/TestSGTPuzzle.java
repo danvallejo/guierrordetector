@@ -1,12 +1,20 @@
 package edu.washington.cs.detector.experiments.android;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import com.ibm.wala.ipa.callgraph.Entrypoint;
+import com.ibm.wala.ipa.cha.ClassHierarchy;
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
 
 import edu.washington.cs.detector.AnomalyCallChain;
+import edu.washington.cs.detector.CGBuilder;
+import edu.washington.cs.detector.CGEntryManager;
 import edu.washington.cs.detector.CallChainFilter;
 import edu.washington.cs.detector.CGBuilder.CG;
 import edu.washington.cs.detector.NativeMethodConnector;
@@ -56,10 +64,28 @@ public class TestSGTPuzzle extends AbstractAndroidTest {
 		return "D:\\research\\guierror\\subjects\\android-programs\\extracted\\SGTPuzzles-9306-7.apk";
 	}
 	
+	@Override
+	protected Collection<Entrypoint> getExtraEntrypoints(CGBuilder builder) {
+		if(builder.getClassHierarchy() == null) {
+			throw new RuntimeException("Should can makeClassHiearchyAndScope first!");
+		}
+		ClassHierarchy cha = builder.getClassHierarchy();
+		List<String> otherClasses = new LinkedList<String>();
+	    otherClasses.add("android.view.ViewRoot");
+	    Iterable<Entrypoint> otherClassMethods = CGEntryManager.getAllPublicMethods(builder, otherClasses, false);
+	    //the extra entrypoint collection
+	    Collection<Entrypoint> extraEntrypoints = new HashSet<Entrypoint>();
+	    for(Entrypoint ep : otherClassMethods) {
+	    	extraEntrypoints.add(ep);
+	    }
+	    return extraEntrypoints;
+	}
+	
 	public void testFindErrors() throws ClassHierarchyException, IOException {
 		CGTraverseGuider ui2startGuider = new CGTraverseAndroidGuider();
 		CGTraverseExploreClientRunnableStrategy start2checkGuider = new  CGTraverseExploreClientRunnableStrategy(new String[]{"name.boyle.chris.sgtpuzzles"});
-		start2checkGuider.addMethodGuidance("java.lang.Thread.start", "name.boyle.chris.sgtpuzzles.SGTPuzzles$9");
+//		start2checkGuider.addMethodGuidance("java.lang.Thread.start", "name.boyle.chris.sgtpuzzles.SGTPuzzles$9");
+		
 			//new CGTraverseAndroidSafeMethodGuider();
 //		    new CGTraverseOnlyClientRunnableStrategy();
 		
@@ -68,15 +94,17 @@ public class TestSGTPuzzle extends AbstractAndroidTest {
 				"name.boyle.chris.sgtpuzzles.SGTPuzzles.changedState");
 		
 		try {
-		  List<AnomalyCallChain> chains = super.findErrorsInAndroidApp(CG.RTA, ui2startGuider, start2checkGuider, connector);
+//		  super.setRunnaiveApproach(true);
+		  super.setPackageNames(new String[]{"name.boyle"});
+			//this finds bugs
+//		  List<AnomalyCallChain> chains = super.findErrorsInAndroidApp(CG.RTA, ui2startGuider, start2checkGuider, connector);
+		  CG type = CG.FakeZeroCFA;
+		  type = CG.OneCFA;
+//		  type = CG.RTA;
+		  super.setAndroidCheckingFile("./tests/edu/washington/cs/detector/checkingmethods_for_android_extra.txt");
+//		  super.setByfileName("sgtpuzzle.xml");
+		  List<AnomalyCallChain> chains = super.findErrorsInAndroidApp(type, ui2startGuider, start2checkGuider, connector);
 		  
-		  int count = 0;
-		  for(AnomalyCallChain chain : chains) {
-			 System.out.println("The " + count++ + "-th call chain:");
-			 System.out.println(chain.getFullCallChainAsString());
-		  }
-		  
-		  System.out.println("Before filtering: " + chains.size());
 		  
 		} catch (Throwable e) {
 			e.printStackTrace();
