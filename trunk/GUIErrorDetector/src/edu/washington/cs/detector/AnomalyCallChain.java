@@ -89,6 +89,16 @@ public class AnomalyCallChain {
 		return sb.toString();
 	}
 	
+	public static String flatCGNodeListWithoutContext(List<CGNode> nodeList) {
+		assert nodeList != null;
+		StringBuilder sb = new StringBuilder();
+		for(CGNode node : nodeList) {
+			sb.append(node.getMethod().getSignature());
+			sb.append(Globals.lineSep);
+		}
+		return sb.toString();
+	}
+	
 	/**
 	 * A utility method to check whether there is a valid call chain from the
 	 * startNode to the endNode. return the path, else return an empty list.
