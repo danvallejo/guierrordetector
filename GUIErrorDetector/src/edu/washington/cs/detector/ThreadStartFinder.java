@@ -16,7 +16,13 @@ import edu.washington.cs.detector.guider.CGTraverseDefaultGuider;
 import edu.washington.cs.detector.guider.CGTraverseGuider;
 import edu.washington.cs.detector.util.Log;
 
+/**
+ * Another way for comparison is to find all paths between 2 nodes
+ * http://stackoverflow.com/questions/58306/graph-algorithm-to-find-all-connections-between-two-arbitrary-vertices
+ * */
 public class ThreadStartFinder {
+	
+	public static boolean USE_DEF = false;
 
 	public final Graph<CGNode> cg;
 
@@ -65,7 +71,11 @@ public class ThreadStartFinder {
 		while(!queue.isEmpty()) {
 			//System.out.println("visited node: ");
 			//System.out.println(visited);
-			CGNode node = queue.remove(0);
+			int removeIndex = 0;
+			if(USE_DEF) {
+				removeIndex = queue.size() - 1;
+			}
+			CGNode node = queue.remove(removeIndex); //queue.remove(0); //change to remove the last one for dfs
 			
 			assert cgNodeMap.containsKey(node);
 			CallChainNode chainNode = cgNodeMap.get(node);

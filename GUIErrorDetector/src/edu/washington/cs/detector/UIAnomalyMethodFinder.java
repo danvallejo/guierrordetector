@@ -22,6 +22,8 @@ import edu.washington.cs.detector.util.WALAUtils;
 
 public class UIAnomalyMethodFinder extends AbstractMethodFinder {
 	
+	public static boolean USE_DEF = false;
+	
 	public static boolean DEBUG = false;
 	
 	//some methods like Display#getBounds won't touch a UI element, but call checkDevice
@@ -143,7 +145,11 @@ public class UIAnomalyMethodFinder extends AbstractMethodFinder {
 		}
 		//perform BFS search here
 		while(!queue.isEmpty()) {
-			CGNode node = queue.remove(0);
+			int removeIndex = 0;
+			if(USE_DEF) {
+				removeIndex = queue.size() - 1;
+			}
+			CGNode node = queue.remove(removeIndex);//queue.remove(0); //remove the last for DFS
 			Log.logln("Visiting node: " + node, DEBUG);
 			
 			assert cgNodeMap.containsKey(node);

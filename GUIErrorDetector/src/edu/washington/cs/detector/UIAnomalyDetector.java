@@ -27,6 +27,11 @@ public class UIAnomalyDetector {
 	
 	public static final String EXCLUSION_FILE_SWING = "Java60RegressionExclusionsWithoutGUI.txt";
 	public static final String EMPTY_FILE = "EmptyExclusion.txt";
+		
+	public static void setToUseDFS() {
+		ThreadStartFinder.USE_DEF = true;
+		UIAnomalyMethodFinder.USE_DEF = true;
+	}
 	
 	private final String appPath;
 	private String exclusion_file = CallGraphTestUtil.REGRESSION_EXCLUSIONS;
