@@ -1,21 +1,38 @@
 package test.openparameter;
 
-class Entry {
-	public void callFoo2(B p) {
-		p.callFoo();
+
+
+abstract public class B {
+	public void foo()  {}
+	public static B b;
+	public void onCreate() {
+		b = this;
 	}
 }
 
-public class B {
-	private A a;
-	public B(Object o) {
-		a = new A(null);
+class A {
+	C c;
+	
+	public A() {
+		c = new C(this);
 	}
+	
 	public void callFoo() {
-		a.foo();
+		B.b.foo();
+	}
+	
+	public void callAnother() {
+		c.callback();
 	}
 }
-class A {
-	public A(Object o) {}
-	public void foo() {}
+
+class C {
+	A a;
+	public C(A a) {
+		this.a = a;
+	}
+	
+	public void callback() {
+		a.callFoo();
+	}
 }
