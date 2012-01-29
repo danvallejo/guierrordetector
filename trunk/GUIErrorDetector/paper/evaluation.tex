@@ -202,9 +202,9 @@ the error.
  \hline
  SGTPuzzler & 13631 / 13865&  12 / 16 &  0 / 0 & 9546 / 9682& 4 / 4& 1 / 1 & 35198 / 35756 & 1 / 1  & 1 / 1& 104 & 1 \\
  \hline
- Fennec & 14058 / 14387 &  55 / 54 &  0 / 0 & 8263 / 8898 & 0 / 0 & 0 / 0& 29125/ 31759 & xx / xxx & 0 / xxx& 433 & 1 \\
+ Fennec & 14058 / 14387 &  1 / 1 &  0 / 0 & 8263 / 8898 & 1 / 1 & 0 / 0& 29125/ 31759 & 3 / 3 & 1 / 1& 433 & 1 \\
  \hline
- MyTracks & 24036 / 24036 &  161 / 220 & 0 / 0 & 10803 / 13645 & 119 / 119 & 0 / 0 & 39235 / 110977 & 61 / xxx & 0 / xxx& 1192 & 1 \\
+ MyTracks & 24036 / 24036 &  161 / 220 & 0 / 0 & 10803 / 13645 & 119 / 119 & 0 / 0 & 39235 / 110977 & 61 / 1 & 0 / 1 & 1192 & 1 \\
 \hline
 \end{tabular}
 \end{center}
@@ -461,11 +461,11 @@ heuristics can still remove most of them.
 \begin{table}[t]
 \begin{center}
  \fontsize{9pt}{\baselineskip}\selectfont
-\setlength{\tabcolsep}{.01\tabcolsep}
+\setlength{\tabcolsep}{.81\tabcolsep}
 \hspace*{-0.2cm}
 \begin{tabular}{|l||c|c|c|c|c|c|}
 \hline
- Subject & Before & \#Warning & \#Warning & \#Warning & \#Warning& \#Warning \\
+ Subject & Before & \#W & \#W & \#W & \#W& \#W \\
  Program & Filtering & $F_1$ & $F_2$ & $F_3$&$F_4$ & $F_5$\\
 \hline \hline
 \multicolumn{7}{|l|}{SWT desktop applications}   \\
@@ -495,9 +495,9 @@ heuristics can still remove most of them.
  \hline
  SGTPuzzler&  2 &  1 &  1 & 1 &  1 & 1\\
  \hline
- Fennec &  xxxx &  xx &  xxx & xx &  xxx & xx\\
+ Fennec &  122 &  84 & 84 & 84 &  9 & 3\\
  \hline
- MyTracks &  xxxx &  xx &  xxx & xx &  xxx & xx\\
+ MyTracks &  1176 &  441 &  441 & 441 &  63 & 1 \\
 \hline
 \end{tabular}
 \end{center}
@@ -505,16 +505,56 @@ heuristics can still remove most of them.
 \Caption{{\label{table:filters}Number of warnings after applying a set of
 heuristic filters (Section~\ref{sec:heuristic}). Column ``Before Filtering''
 shows the output warning number using the reflection-aware 1-CFA algorithm.
-Column ``\#Warning $F_i$'' represents the number of remaining warnings after applying
+Column ``\#W $F_i$'' represents the number of remaining warnings after applying
 filters 1 -- $i$, and the number in last column is taken
 from Table~\ref{table:results}.
 Results of using other algorithms show similar patterns, which are omitted for brevity.} }
 \end{table}
 
 
+\subsection{Comparing Graph Search Strategies}
+\label{sec:search}
+
+We next empirically compare different search strategies.
+
+Exhaustive search, and dfs, we found exhaustive search strategy
+can not terminte on any of the evaluated subject program, since the
+path is expoentially large to the graph node. For a realistic, program
+We implemented two alternative
+
+We check the path explored by the exhaustive algorithm
+
+Use DFS, avoid going too deep, under the setting of OneCFA. The time cost
+is almost identical
+
+The costs a tremedous more time than BFS, generates more warnings.
+
+
+Hundson: 3, 1
+
+EclipseRunner: 6, 1
+
+S3dropbox: ? , ?  too many warnings time: 31678 (45528 chains), running out of memory
+
+SudokuSolver:  2, 1 too many warnings: 1700, 2090
+
+VirgoFTP: 2, 2
+
+FileBunker:  2, 0  //very long method calls
+
+Fennec: 3, 1
+
+SGTPuzzler: 1, 1
+
+MyTracks: 1, 1
+
 \subsection{Discussions}
 
+\textbf{what about other graph traverse algorithms}
+
 We next discuss several important issues in our evaluation.
+
+excluding the call graph construction time.
 
 \subsubsection{Performance and Scalability}
 
