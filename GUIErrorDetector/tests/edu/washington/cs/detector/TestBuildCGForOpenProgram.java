@@ -27,7 +27,7 @@ public class TestBuildCGForOpenProgram extends TestCase {
 		CGBuilder builder = new CGBuilder(appPath);
 		
 		builder.makeScopeAndClassHierarchy();
-		Iterable<Entrypoint> entries = CGEntryManager.getAllPublicMethods(builder, "test.openparameter.Entry");
+		Iterable<Entrypoint> entries = CGEntryManager.getAllPublicMethods(builder,  "test.openparameter.A", "test.openparameter.B", "test.openparameter.C");
 		
 		System.out.println("Number of entries to build CG: " + Utils.countIterable(entries));
 		System.out.println("All iterables: " + Utils.iterableToCollection(entries));

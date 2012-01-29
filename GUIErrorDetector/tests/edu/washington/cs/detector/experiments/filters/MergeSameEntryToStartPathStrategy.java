@@ -18,7 +18,8 @@ public class MergeSameEntryToStartPathStrategy extends FilterStrategy {
 		Set<String> uniqueEntryToStartPath = new HashSet<String>();
 		
 		for(AnomalyCallChain chain : chains) {
-			String str = AnomalyCallChain.flatCGNodeList(chain.getUI2Start());
+//			String str = AnomalyCallChain.flatCGNodeList(chain.getUI2Start());
+			String str = AnomalyCallChain.flatCGNodeListWithoutContext(chain.getUI2Start());
 			if(!uniqueEntryToStartPath.contains(str)) {
 				uniqueEntryToStartPath.add(str);
 				result.add(chain);

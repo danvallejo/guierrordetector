@@ -28,6 +28,7 @@ import edu.washington.cs.detector.CGBuilder;
 import edu.washington.cs.detector.CGEntryManager;
 import edu.washington.cs.detector.CallChainFilter;
 import edu.washington.cs.detector.NativeMethodConnector;
+import edu.washington.cs.detector.ThreadStartFinder;
 import edu.washington.cs.detector.UIAnomalyDetector;
 import edu.washington.cs.detector.UIAnomalyMethodFinder;
 import edu.washington.cs.detector.CGBuilder.CG;
@@ -36,6 +37,9 @@ import edu.washington.cs.detector.experiments.filters.MergeSamePrefixToLibCallSt
 import edu.washington.cs.detector.experiments.filters.MergeSameTailStrategy;
 import edu.washington.cs.detector.experiments.filters.RemoveSubsumedChainStrategy;
 import edu.washington.cs.detector.experiments.filters.RemoveSystemCallStrategy;
+import edu.washington.cs.detector.experiments.search.AnomalyCallChainSearcher;
+import edu.washington.cs.detector.experiments.search.ExhaustiveSearcher;
+import edu.washington.cs.detector.experiments.search.SimpleClock;
 import edu.washington.cs.detector.experiments.straightforward.TestAndroids;
 import edu.washington.cs.detector.guider.CGTraverseGuider;
 import edu.washington.cs.detector.guider.CGTraverseNoSystemCalls;
@@ -58,6 +62,8 @@ public abstract class AbstractAndroidTest extends TestCase {
 	private String bypassFileName = null;
 	private String androidcheckingfile = null;
 	
+	private boolean useexhaustivesearch = false;
+	
 	public void setRunnaiveApproach(boolean app) {
 		this.runnaiveapproach = app;
 	}
@@ -69,6 +75,10 @@ public abstract class AbstractAndroidTest extends TestCase {
 	}
 	public void setAndroidCheckingFile(String file) {
 		this.androidcheckingfile = file;
+	}
+	
+	protected void setExhaustiveSearch(boolean exhaust) {
+		this.useexhaustivesearch = exhaust;
 	}
 	
 	abstract protected String getAppPath();
@@ -254,7 +264,8 @@ public abstract class AbstractAndroidTest extends TestCase {
 		
 		//set up the anomaly detection
 		UIAnomalyDetector detector = new UIAnomalyDetector(getAppPath());
-		detector.configureCheckingMethods("./tests/edu/washington/cs/detector/checkingmethods_for_android.txt");
+		String defaultcheckingfile = "./tests/edu/washington/cs/detector/checkingmethods_for_android.txt";
+		detector.configureCheckingMethods(defaultcheckingfile);
 		if(this.androidcheckingfile != null) {
 			System.err.println("Use : " + this.androidcheckingfile + " as checking file.");
 			detector.configureCheckingMethods(this.androidcheckingfile);
@@ -269,6 +280,41 @@ public abstract class AbstractAndroidTest extends TestCase {
 		
 		//detect the anomaly chain
 		List<AnomalyCallChain> chains = detector.detectUIAnomaly(builder, builder.getCallGraphEntryNodes(queryPoints));
+		
+		if(this.useexhaustivesearch) {
+			AnomalyCallChainSearcher searcher = new AnomalyCallChainSearcher(builder.getAppCallGraph(), builder.getCallGraphEntryNodes(queryPoints));
+			searcher.setStartGuider(ui2startGuider);
+			searcher.setUiGuider(start2checkGuider);
+			searcher.setConnector(connector);
+			String checkingFile = this.androidcheckingfile ==  null ? defaultcheckingfile : this.androidcheckingfile;
+			searcher.setCheckings(Files.readWholeNoExp(checkingFile).toArray(new String[0]));
+			
+			System.out.println("starting exhaustive search....");
+            long searchStart = System.currentTimeMillis();
+			
+			ExhaustiveSearcher.USE_CLOCK = true;
+			SimpleClock.start();
+			SimpleClock.setBudget(1200000); //20 mins
+			
+			Collection<List<CGNode>> result = searcher.findFullAnomalyCallChains();
+			
+			SimpleClock.reset();
+			ExhaustiveSearcher.USE_CLOCK = false;
+			
+			long searchEnd = System.currentTimeMillis();
+			
+			System.out.println("Number of anomaly call chains in exhaustive search: " + result.size());
+			System.out.println("Search time: " + (searchEnd - searchStart) + " mills");
+			Log.logln("Search time: " + (searchEnd - searchStart) + " mills");
+			
+			List<AnomalyCallChain> initialChains = new LinkedList<AnomalyCallChain>();
+			for(List<CGNode> list : result) {
+				AnomalyCallChain c = new AnomalyCallChain();
+				c.addNodes(new LinkedList<CGNode>(), list.get(0), list);
+				initialChains.add(c);
+			}
+			chains = initialChains;
+		}
 		
 		System.out.println("Number of chains: " + chains.size());
 		chains = CallChainFilter.filter(chains, new RemoveSubsumedChainStrategy());

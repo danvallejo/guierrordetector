@@ -39,7 +39,7 @@ public class MergeSamePrefixToLibCallStrategy extends FilterStrategy {
 //					continue;
 				}
 				List<CGNode> entryToNonLibCall = chain.getFullCallChain().subList(0, index + 1);
-				String chainStr = AnomalyCallChain.flatCGNodeList(entryToNonLibCall);
+				String chainStr = AnomalyCallChain.flatCGNodeListWithoutContext(entryToNonLibCall);
 				if(!chainMap.containsKey(chainStr)) {
 					chainMap.put(chainStr, chain);
 				}

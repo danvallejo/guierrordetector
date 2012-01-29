@@ -15,6 +15,7 @@ import edu.washington.cs.detector.AnomalyCallChain;
 import edu.washington.cs.detector.CGBuilder;
 import edu.washington.cs.detector.CGEntryManager;
 import edu.washington.cs.detector.CGBuilder.CG;
+import edu.washington.cs.detector.UIAnomalyDetector;
 import edu.washington.cs.detector.guider.CGTraverseAndroidGuider;
 import edu.washington.cs.detector.guider.CGTraverseExploreClientRunnableStrategy;
 import edu.washington.cs.detector.guider.CGTraverseGuider;
@@ -133,8 +134,10 @@ public class TestMozillaFirefox extends AbstractAndroidTest {
 			
 			//this finds bugs
 			CG type = CG.FakeZeroCFA;
-//			type = CG.OneCFA;
+			type = CG.OneCFA;
 //			type = CG.RTA;
+			
+			UIAnomalyDetector.setToUseDFS();
 			
 		    List<AnomalyCallChain> chains = super.findErrorsInAndroidApp(type, ui2startGuider, start2checkGuider);
 //		    List<AnomalyCallChain> chains = super.findErrorsInAndroidApp(CG.ZeroCFA, ui2startGuider, start2checkGuider);

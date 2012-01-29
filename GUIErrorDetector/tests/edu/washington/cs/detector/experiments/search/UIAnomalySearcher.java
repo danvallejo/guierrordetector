@@ -15,8 +15,7 @@ public class UIAnomalySearcher extends ExhaustiveSearcher {
 	
 	private ClassHierarchy cha;
 	
-	private String[] checking_methods
-    = Files.readWholeNoExp("./src/checking_methods.txt").toArray(new String[0]);
+	private String[] checking_methods = Files.readWholeNoExp("./src/checking_methods.txt").toArray(new String[0]);
 
 	public UIAnomalySearcher(Graph<CGNode> graph, CGNode startNode) {
 		super(graph, startNode);

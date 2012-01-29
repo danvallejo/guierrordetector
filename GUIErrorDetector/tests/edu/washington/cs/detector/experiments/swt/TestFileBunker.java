@@ -49,10 +49,13 @@ public class TestFileBunker extends TestCase {
         
 		//configure the call graph builder, use 1-CFA as default
 		CGBuilder builder = new CGBuilder(path);
-//		builder.setCGType(CG.OneCFA);
+		builder.setCGType(CG.OneCFA);
 //		builder.setCGType(CG.RTA);
 //		builder.setCGType(CG.ZeroCFA);
-		builder.setCGType(CG.FakeZeroCFA);
+//		builder.setCGType(CG.FakeZeroCFA);
+		
+		UIAnomalyDetector.setToUseDFS();
+		
 		builder.buildCG();
 		//dump debugging information
 		WALAUtils.dumpClasses(builder.getClassHierarchy(), "./logs/loaded_classes.txt");

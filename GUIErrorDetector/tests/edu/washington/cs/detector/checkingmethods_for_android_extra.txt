@@ -4,6 +4,7 @@ android.view.View.onAttachedToWindow()V
 android.view.View.clearFocus()V
 android.view.View.setFlags(int flags, int mask)
 android.view.View.invalidate(Landroid/graphics/Rect;)V
+android.view.View.invalidate()V
 android.view.View.invalidate(IIII)V
 android.view.ViewGroup.invalidateChild(Landroid/view/View;Landroid/graphics/Rect;)V
 android.view.View.handleFocusGainInternal(ILandroid/graphics/Rect;)V

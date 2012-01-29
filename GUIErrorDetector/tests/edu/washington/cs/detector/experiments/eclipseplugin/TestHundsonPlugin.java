@@ -114,11 +114,14 @@ public class TestHundsonPlugin extends AbstractEclipsePluginTest {
 		super.setAddRunnable(false);
 		
 //		super.setCGType(CG.ZeroCFA);
-//		super.setCGType(CG.OneCFA);
+		super.setCGType(CG.OneCFA);
 //		super.setCGType(CG.RTA);
-		super.setCGType(CG.FakeZeroCFA);
+//		super.setCGType(CG.FakeZeroCFA);
 		
 //		super.setRunNaiveApproach(true);
+		
+//		super.setExhaustiveSearch(true); //Experimentation on exhaustive search
+		UIAnomalyDetector.setToUseDFS(); //for experiment using DFS
 		
 		super.setThreadStartGuider(new CGTraverseSWTGuider());
 		super.setUIAnomalyGuider(new CGTraverseSWTGuider());

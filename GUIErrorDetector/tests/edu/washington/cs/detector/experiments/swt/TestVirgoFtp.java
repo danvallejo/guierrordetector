@@ -37,9 +37,12 @@ public class TestVirgoFtp extends TestCase {
         detector.setUIAnomalyGuider(new CGTraverseSWTGuider());
 		
 		CGBuilder builder = new CGBuilder(path);
-//		builder.setCGType(CG.OneCFA);
-		builder.setCGType(CG.RTA);
-		builder.setCGType(CG.FakeZeroCFA);
+		builder.setCGType(CG.OneCFA);
+//		builder.setCGType(CG.RTA);
+//		builder.setCGType(CG.FakeZeroCFA);
+		
+		UIAnomalyDetector.setToUseDFS();
+		
 		builder.buildCG();
 		
 		WALAUtils.dumpClasses(builder.getClassHierarchy(), "./logs/loaded_classes.txt");
