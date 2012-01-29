@@ -2,6 +2,7 @@ package edu.washington.cs.detector.experiments.eclipseplugin;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -26,6 +27,9 @@ import edu.washington.cs.detector.experiments.filters.RemoveNoClientClassStrateg
 import edu.washington.cs.detector.experiments.filters.RemoveSameEntryStrategy;
 import edu.washington.cs.detector.experiments.filters.RemoveSubsumedChainStrategy;
 import edu.washington.cs.detector.experiments.filters.RemoveSystemCallStrategy;
+import edu.washington.cs.detector.experiments.search.AnomalyCallChainSearcher;
+import edu.washington.cs.detector.experiments.search.ExhaustiveSearcher;
+import edu.washington.cs.detector.experiments.search.SimpleClock;
 import edu.washington.cs.detector.experiments.straightforward.TestEclipsePlugins;
 import edu.washington.cs.detector.guider.CGTraverseGuider;
 import edu.washington.cs.detector.guider.CGTraverseNoSystemCalls;
@@ -52,6 +56,7 @@ public abstract class AbstractEclipsePluginTest extends TestCase {
 	private boolean see_ui_access_runnable = false;
 	private boolean runnaiveapproach = false;
 	private boolean addrunnable = true;
+	private boolean useexhaustivesearch = false;
 	
 	//these four methods must be overriden
 	protected abstract Iterable<Entrypoint> getEntrypoints(ClassHierarchy cha);
@@ -92,6 +97,10 @@ public abstract class AbstractEclipsePluginTest extends TestCase {
 	
 	protected void setAddRunnable(boolean runnable) {
 		this.addrunnable = runnable;
+	}
+	
+	protected void setExhaustiveSearch(boolean exhaust) {
+		this.useexhaustivesearch = exhaust;
 	}
 	
 	public Collection<AnomalyCallChain> reportUIErrors() throws IOException, ClassHierarchyException {
@@ -159,10 +168,14 @@ public abstract class AbstractEclipsePluginTest extends TestCase {
 		//note that, the execution will return from here
 		List<AnomalyCallChain> chains  = new LinkedList<AnomalyCallChain>();
 		
+		Collection<CGNode> eventNodes = new LinkedHashSet<CGNode>();
+		
 		if(this.see_ui_access_runnable) {
 			
 			//log the call graph
 			WALAUtils.logCallGraph(builder.getAppCallGraph());
+			
+			long startTime = System.currentTimeMillis();
 			
 			Log.logln("-----All thread runnable ------");
 			UIAccessRunnableFinder finder = new UIAccessRunnableFinder(builder.getAppCallGraph(), cha, this.uiAnomalyGuider,
@@ -219,6 +232,11 @@ public abstract class AbstractEclipsePluginTest extends TestCase {
 					this.getPackages());
 			Collection<AnomalyCallChain> chains8 = finder.findAllUIAccessingRunnables(configMethods);
 			
+			long endTime = System.currentTimeMillis();
+			
+			System.out.println("Time cost in detecting anomalies in normal search: " + (endTime - startTime) + " millis");
+			Log.logln("Time cost in detecting anomalies in normal search: " + (endTime - startTime) + " millis");
+			
 			if(this.addrunnable) {
 			    chains.addAll(chains1);
 			}
@@ -229,13 +247,61 @@ public abstract class AbstractEclipsePluginTest extends TestCase {
 			//chains.addAll(chains6);
 			chains.addAll(chains7);
 			chains.addAll(chains8);
+			
+			//keep a copy of event nodes
+//			eventNodes.addAll(runnables);
+			eventNodes.addAll(jobRuns);
+			eventNodes.addAll(jobMethods);
+			eventNodes.addAll(monitorMethods);
+			eventNodes.addAll(resourceChangeMethods);
+			eventNodes.addAll(actionMethods);
+			eventNodes.addAll(jobChangeMethods);
+			eventNodes.addAll(configMethods);
 		} else {
 		    chains = detector.detectUIAnomaly(builder, startNodes);
 		}
 		
 		System.out.println("Number of anomaly call chains: " + chains.size());
 		
+		chains = this.filterCallChains(chains, startNodes);
 		
+		if(this.useexhaustivesearch) {
+			System.out.println("starting exhaustive search....");
+			
+			AnomalyCallChainSearcher searcher = new AnomalyCallChainSearcher(builder.getAppCallGraph(), eventNodes);
+			searcher.setUiGuider(this.uiAnomalyGuider);
+			
+			long searchStart = System.currentTimeMillis();
+			
+			ExhaustiveSearcher.USE_CLOCK = true;
+			SimpleClock.start();
+			SimpleClock.setBudget(1200000); //20 mins
+			
+			Collection<List<CGNode>> result = searcher.findUIAnomalyCallChains();
+			
+			SimpleClock.reset();
+			ExhaustiveSearcher.USE_CLOCK = false;
+			
+			long searchEnd = System.currentTimeMillis();
+			
+			System.out.println("Number of anomaly call chains in exhaustive search: " + result.size());
+			System.out.println("Search time: " + (searchEnd - searchStart) + " mills");
+			Log.logln("Search time: " + (searchEnd - searchStart) + " mills");
+			
+			List<AnomalyCallChain> initialChains = new LinkedList<AnomalyCallChain>();
+			for(List<CGNode> list : result) {
+				AnomalyCallChain c = new AnomalyCallChain();
+				c.addNodes(new LinkedList<CGNode>(), list.get(0), list);
+				initialChains.add(c);
+			}
+			System.out.println("---------- filtering all chains from exhaustive search -------");
+			chains = this.filterCallChains(initialChains, startNodes);
+		}
+		
+		return chains;
+	}
+	
+	private List<AnomalyCallChain> filterCallChains(List<AnomalyCallChain> chains, Collection<CGNode> startNodes) {
 		chains = CallChainFilter.filter(chains, new RemoveSystemCallStrategy());
 		System.out.println("size of chains after removing system calls: " + chains.size());
 		

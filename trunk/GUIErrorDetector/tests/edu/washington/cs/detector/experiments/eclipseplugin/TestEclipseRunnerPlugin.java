@@ -122,10 +122,13 @@ public class TestEclipseRunnerPlugin extends AbstractEclipsePluginTest {
 		super.setSeeUIAccessRunnable(true);
 		
 //		super.setCGType(CG.ZeroCFA);
-//		super.setCGType(CG.OneCFA);
+		super.setCGType(CG.OneCFA);
 //		super.setCGType(CG.RTA);
-		super.setCGType(CG.ZeroCFA);
+//		super.setCGType(CG.ZeroCFA);
 //		super.setRunNaiveApproach(true);
+		
+//		super.setExhaustiveSearch(true);
+		UIAnomalyDetector.setToUseDFS();
 		
 		super.setThreadStartGuider(new CGTraverseSWTGuider());
 		super.setUIAnomalyGuider(new CGTraverseSWTGuider());

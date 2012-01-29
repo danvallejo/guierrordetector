@@ -13,6 +13,7 @@ import edu.washington.cs.detector.AnomalyCallChain;
 import edu.washington.cs.detector.CGBuilder;
 import edu.washington.cs.detector.CGEntryManager;
 import edu.washington.cs.detector.CallChainFilter;
+import edu.washington.cs.detector.UIAnomalyDetector;
 import edu.washington.cs.detector.UIAnomalyMethodFinder;
 import edu.washington.cs.detector.CGBuilder.CG;
 import edu.washington.cs.detector.experiments.filters.MergeSameEntryToStartPathStrategy;
@@ -112,7 +113,9 @@ public class TestMytracksAndroid extends AbstractAndroidTest {
 			CG type = CG.RTA;
 			type = CG.FakeZeroCFA;
 			type = CG.OneCFA;
-			//this finds bug
+			
+			UIAnomalyDetector.setToUseDFS();
+			
 		    List<AnomalyCallChain> chains = super.findErrorsInAndroidApp(type, ui2startGuider, start2checkGuider);
 //		    List<AnomalyCallChain> chains = super.findErrorsInAndroidApp(CG.OneCFA, ui2startGuider, start2checkGuider);
 //		    List<AnomalyCallChain> chains = super.findErrorsInAndroidApp(CG.FakeZeroCFA, ui2startGuider, start2checkGuider);

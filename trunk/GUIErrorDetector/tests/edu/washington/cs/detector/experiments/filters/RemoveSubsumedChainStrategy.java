@@ -32,7 +32,8 @@ public class RemoveSubsumedChainStrategy extends FilterStrategy {
 		
 		for(AnomalyCallChain chain : chains) {
 			//the flat string of the anomaly call chain
-			String chainStr = AnomalyCallChain.flatCGNodeList(chain.getFullCallChain());
+			String chainStr = //AnomalyCallChain.flatCGNodeList(chain.getFullCallChain());
+				AnomalyCallChain.flatCGNodeListWithoutContext(chain.getFullCallChain());
 			
 			boolean shouldAdd = true;
 			List<AnomalyCallChain> shouldRemoveList = new LinkedList<AnomalyCallChain>();

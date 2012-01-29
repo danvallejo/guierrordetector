@@ -15,6 +15,8 @@ import edu.washington.cs.detector.guider.CGTraverseGuider;
 
 abstract public class ExhaustiveSearcher {
 	
+	public static boolean USE_CLOCK = false;
+	
 	public final Graph<CGNode> graph;
 	
 	public final CGNode startNode;
@@ -42,6 +44,12 @@ abstract public class ExhaustiveSearcher {
 	public Collection<List<CGNode>> breadFirst(Graph<CGNode> graph, LinkedList<CGNode> visited) {
 		Collection<List<CGNode>> returnChains = new LinkedHashSet<List<CGNode>>();
 		
+		if(USE_CLOCK) {
+        	if(SimpleClock.finish()) {
+        		return returnChains;
+        	}
+        }
+		
 		CGNode lastNode = visited.getLast();
 		LinkedList<CGNode> nodes = this.getAdjacentNodes(graph, lastNode);// graph.adjacentNodes(visited.getLast());
 		if(lastNode.getMethod().isNative()) {
@@ -67,6 +75,12 @@ abstract public class ExhaustiveSearcher {
                 List<CGNode> chain = this.generatePath(visited);
                 returnChains.add(chain);
                 
+                if(USE_CLOCK) {
+                	if(SimpleClock.finish()) {
+                		return returnChains;
+                	}
+                }
+                
                 visited.removeLast();
                 break;
             }
@@ -76,6 +90,12 @@ abstract public class ExhaustiveSearcher {
             if (visited.contains(node) || this.isDestNode(node)) {
                 continue;
             }
+            if(USE_CLOCK) {
+            	if(SimpleClock.finish()) {
+            		return returnChains;
+            	}
+            }
+            
             visited.addLast(node);
 //            breadthFirst(graph, visited);
             returnChains.addAll(breadFirst(graph, visited));
@@ -95,9 +115,9 @@ abstract public class ExhaustiveSearcher {
 		return l;
 	}
 	
-	abstract public boolean isDestNode(CGNode node);
+	abstract protected boolean isDestNode(CGNode node);
 	
-	public boolean shouldVisit(CGNode srcNode, CGNode destNode) {
+	private boolean shouldVisit(CGNode srcNode, CGNode destNode) {
 		return guider.traverse(srcNode, destNode);
 	}
 	

@@ -18,6 +18,7 @@ import edu.washington.cs.detector.CGEntryManager;
 import edu.washington.cs.detector.CallChainFilter;
 import edu.washington.cs.detector.CGBuilder.CG;
 import edu.washington.cs.detector.NativeMethodConnector;
+import edu.washington.cs.detector.UIAnomalyDetector;
 import edu.washington.cs.detector.experiments.filters.RemoveNoClientClassStrategy;
 import edu.washington.cs.detector.experiments.filters.RemoveNonClientHeadStrategy;
 import edu.washington.cs.detector.guider.CGTraverseAndroidGuider;
@@ -101,6 +102,10 @@ public class TestSGTPuzzle extends AbstractAndroidTest {
 		  CG type = CG.FakeZeroCFA;
 		  type = CG.OneCFA;
 //		  type = CG.RTA;
+		  
+//		  super.setExhaustiveSearch(true);
+		  UIAnomalyDetector.setToUseDFS();
+		  
 		  super.setAndroidCheckingFile("./tests/edu/washington/cs/detector/checkingmethods_for_android_extra.txt");
 //		  super.setByfileName("sgtpuzzle.xml");
 		  List<AnomalyCallChain> chains = super.findErrorsInAndroidApp(type, ui2startGuider, start2checkGuider, connector);

@@ -17,6 +17,7 @@ import edu.washington.cs.detector.CGBuilder.CG;
 import edu.washington.cs.detector.CGEntryManager;
 import edu.washington.cs.detector.CallChainFilter;
 import edu.washington.cs.detector.SwingUIMethodEvaluator;
+import edu.washington.cs.detector.ThreadStartFinder;
 import edu.washington.cs.detector.UIAnomalyDetector;
 import edu.washington.cs.detector.UIAnomalyMethodFinder;
 import edu.washington.cs.detector.experiments.filters.MatchRunWithInvokeClassStrategy;
@@ -54,6 +55,8 @@ public abstract class AbstractSwingTest extends TestCase {
 	
 	private CGTraverseGuider uiAnomalyGuider = null;
 	
+	private boolean useexhaustivesearch = false;
+	
 	protected void setCGType(CG t) {
 		type = t;
 	}
@@ -80,6 +83,10 @@ public abstract class AbstractSwingTest extends TestCase {
 	
 	protected void setTweakStartnode(boolean tweak) {
 		this.tweak_startnode = tweak;
+	}
+	
+	protected void setExhaustiveSearch(boolean exhaust) {
+		this.useexhaustivesearch = exhaust;
 	}
 	
 	protected Iterable<Entrypoint> getAdditonalEntrypoints(ClassHierarchy cha) {
@@ -188,7 +195,9 @@ public abstract class AbstractSwingTest extends TestCase {
 		}
 
 		//start to detect errors
+		long start = System.currentTimeMillis();
 		chains = detector.detectUIAnomaly(builder, nodes);
+		
 		
 		System.out.println("size of chains before removing redundancy: " + chains.size());
 		chains = Utils.removeRedundantAnomalyCallChains(chains);
@@ -225,6 +234,10 @@ public abstract class AbstractSwingTest extends TestCase {
 		if(expectedNum != -1) {
 		    assertEquals("The number of expected call chain is wrong", expectedNum, chains.size());
 		}
+		
+		long end = System.currentTimeMillis();
+		
+		System.out.println("Total time cost: " + (start - end) + "-millis");
 		
 		//resort the state to move dependent tests
 		UIAnomalyMethodFinder.setMethodEvaluator(null);
