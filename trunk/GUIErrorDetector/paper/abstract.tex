@@ -12,19 +12,20 @@ This paper presents a general technique to find such \textit{invalid thread acce
 errors in multithreaded GUI applications. We formulate finding invalid
 thread access errors as a call graph reachability problem with
 thread spawning as the sources and GUI object accessing as the sinks. 
-Heavy use of reflection in modern GUI applications makes existing
-call graph construction algorithms fail to build a good
-call graph. Thus, we present a method to overcome the limitations, and
-build reflection-aware call graphs.
+Existing call graph construction algorithms fail to build a good
+call graph for modern GUI applications, because of heavy use of reflection.
+Thus, we present a method to build reflection-aware call graphs.
 
 %call graph construction algorithm to overcome the limitations.% of analyzing GUI applications.
 
 
-We implemented our technique and instantiated it on four popular GUI
-platforms: SWT, Eclipse plugin development framework, Java Swing, and
-Android. In an evaluation on 9 subjects over 67000 LOC, our technique
-found a number of real-world errors, suggesting its effectiveness
-and showing good scalability.
+We implemented our technique and instantiated it for four popular GUI
+platforms: SWT, the Eclipse plugin development framework, Swing, and
+Android. In an evaluation on 9 programs comprising 67000 LOC, our technique
+found both previously-known and unknown errors.
+
+%a number of real-world errors, suggesting its effectiveness
+%and showing good scalability.
 
 \end{abstract}
 
