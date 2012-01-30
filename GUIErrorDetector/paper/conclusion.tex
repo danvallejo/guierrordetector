@@ -4,8 +4,8 @@ In this paper, we presented a general technique to find invalid
 thread access errors in multithreaded GUI applications. 
 Our technique statically explores paths in a call graph to check
 whether a non-UI thread can access a GUI object.
-It uses a combined RTA and k-CFA algorithm to construct
-a good call graph, and employs a set of heuristics to
+It uses a reflection-aware call graph construction algorithm
+to build a good call graph, and employs a set of heuristics to
 filter likely false positives and redundant reports.
 Since graphical user interfaces are often inadequately tested due
 to the enormously large space of UI interactions and
@@ -14,10 +14,11 @@ believe that providing a static analysis can allow developers to find
 more potential errors %before the application is released to customers (XXX),
 and thus encourage GUI developers to improve software reliability.
 
-We have demonstrated that our technique can be both practical and useful
-by an evaluation on 10 subjects acrosss 4 popular GUI
-frameworks. Our experiments have shown that we can find bugs
-in real-world programs.
+We have demonstrated that our technique can be useful
+by an evaluation on 9 subjects acrosss 4 popular GUI
+frameworks. 
+%Our experiments have shown that we can find bugs
+%in real-world programs.
 
 
 Besides general issues such as performance or ease of use, our future
@@ -32,7 +33,7 @@ complete and precise call graph. However, our technique still suffers from
 a false positive rate for many GUI applications, due to the conservative
 nature of static analysis. A possible way to reduce such false
 positives is to integrate the current static analysis with
-dynamic analyses~\cite{Jiang:2008:PPS:1453101.1453110, ZhangSBE2011}
+dynamic analyses~\cite{Jiang:2008:PPS:1453101.1453110}%, ZhangSBE2011}
 or symbolic analyses~\cite{xie05:symstra, Pasareanu:2011, halfond09issta, BMF97}
 by employing more accurate information to guide call graph exploration.
 
@@ -40,15 +41,15 @@ by employing more accurate information to guide call graph exploration.
 \textbf{Unit testing multithreaded GUI programs.} Besides
 a static analysis,  software testing is another
 way to improve software quality.  Although many
-GUI testing techniques have been developed recently, few of them can be applied
+testing techniques have been developed recently, few of them can be applied
 to unit test multithreaded GUI programs to find potential errors \textit{earlier}. We
-are interested to investigate how to apply recent advance in automated
-software testing~\cite{Staats:2011:PTO:1985793.1985847, Jagannath:2011:IMU:2025113.2025145, Muccini_Bertolino_Inverardi_2004, Ricca:2001:ATW:381473.381476, Harman:2007}
+are interested in investigating how to apply recent advance in automated
+testing~\cite{Staats:2011:PTO:1985793.1985847, Jagannath:2011:IMU:2025113.2025145, Muccini_Bertolino_Inverardi_2004, Ricca:2001:ATW:381473.381476, Harman:2007}
 to the context of multithreaded GUI applications.
 
 
 %\item
-\textbf{Fixing potential GUI errors.} After a potential error is revealed, fixing
+\textbf{Fixing potential GUI errors.} After an error is revealed, fixing
 it and verifing the patch has often been another important and time-consuming process. Fixing concurrency
 bugs has become especially critical in the multicore era.
 Recently, a few work has been done
