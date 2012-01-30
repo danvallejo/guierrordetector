@@ -22,7 +22,7 @@ and spawns new threads to process lengthy operations in the background. }\vspace
 
 \noindent {\textsc{\textbf{Assumption 1.}}} {We assume that each multithreaded
 GUI application has a single global UI thread. This is true for applications
-built on top of GUI frameworks adapting the single-thread rule. The
+built on top of GUI frameworks adapting the single-GUI-thread rule. The
 only exception is that 
  an application may fork a new process to launch another
 application with its own UI thread. In that case, we require the new
@@ -49,7 +49,7 @@ applications.
 whose execution may read or write a UI object is called a UI-accessing method.}\vspace{1mm}
 
 \noindent  {\textsc{\textbf{Definition 4 (Safe Methods).}}} {GUI frameworks that
-adopt the single-thread rule must provide methods to permit non-UI threads
+adopt the single-GUI-thread rule must provide methods to permit non-UI threads
 to run code in the UI thread. We can such methods \textit{safe methods}, since
 they can be invoked safely by any thread.}\vspace{1mm}
 
