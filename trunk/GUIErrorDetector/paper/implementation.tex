@@ -5,8 +5,8 @@ We implemented the proposed technique using the WALA framework~\cite{walatutoria
 Our prototype tool takes Java bytecode as inputs, works in a fully
 automatic and push-button way to detect potential invalid thread access
 errors, and scales to realistic programs.  
-Optionally, users may specify additional heuristics to guide call graph
-traverse, and annotate call relationships for native methods (Section~\ref{sec:heuristic}).
+Optionally, users may specify additional heuristic filters (Section~\ref{sec:heuristic}) %to guide call graph traverse
+, and annotate call relationships for native methods (Section~\ref{sec:annotation}).
 
 Our current implementation supports four widely-used GUI frameworks, namely
 SWT, Eclipse plugin development, Java Swing, and Android.

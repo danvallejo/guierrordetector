@@ -51,7 +51,7 @@ processing at the whim of the thread scheduler. This makes program behavior comp
 \item The single-thread rule incurs less overhead.
 A GUI framework that attempts to carefully lock critical sections can spend a substantial
 amount of time and space managing locks. Whenever the framework calls a method that might
-be implemented in client code (for example, any public or protected method in a public class),
+be implemented in client code (e.g., any public or protected method in a public class),
 the framework must save its state and release all locks so that the client code can grab locks
 if necessary. When GUI objects return from the method, the framework must re-grab their locks and
 restore states. Therefore, all applications using the framework will bear the cost of this, even though most
@@ -137,7 +137,7 @@ spawns a new thread at line 283. The new thread calls back method
 \CodeIn{onSurfaceChanged} that access GUI objects at line 222, and
 causes an invalid thread access error.
 Our tool
-can find this error and generate a warning as shown in
+can find this error and generate a report as shown in
 Figure~\ref{fig:report}.
 }} %\vspace{-5mm}
 \end{figure}
@@ -161,7 +161,7 @@ in an Android library whose source code may not be available to developers.
 \subsection{Finding Invalid Thread Access Errors}
 \label{sec:finding}
 
-Invalid thread access errors have significantly affect the
+Invalid thread access errors have significantly affected the
 usability of GUIs, but they have not been thoroughly studied in
 the context of multithreaded GUI applications. To ensure GUIs
 behave correctly, effective techniques must be developed to alleviate this problem.
@@ -183,11 +183,11 @@ but many paths executed by bug-triggering UI sequences are still not covered.
 
 A standard way to fix an
 invalid thread access error is to replace direct GUI object accessing code 
-with asynchronized message passing, to ensure a GUI object is accessed in
+with (a)synchronized message passing, to ensure a GUI object is accessed in
 the UI thread. For example, to fix the bug in Figure~\ref{fig:androiderror},
 a developer would wrap line 222 inside a \CodeIn{post} message passing method\footnote{The
 \CodeIn{post} method in class \CodeIn{android.widget.View} is a
-a standard way to send messages to the UI-thread.}, as follows:
+a standard way to send asynchronized messages to the UI-thread.}, as follows:
 
 
 \begin{CodeOut}
@@ -207,15 +207,15 @@ a standard way to send messages to the UI-thread.}, as follows:
 One may wonder that a simple analysis to check whether every GUI object
 accessing code has been wrapped by (a)synchronized message passing may
 be capable to find invalid thread errors. However, such an approach is problematic,
-because not every GUI object access needs to be wrapped by a message passing
-method, e.g., methods that are only called from UI-thread can safely
+because not every GUI object access needs to be wrapped by message passing
+method. For example, methods that are only called from UI-thread can safely
 access any GUI object. On the other hand, using asynchronized message passing has no timing
 guarantee. It is entirely possible that, in some cases, a GUI object has already been
 disposed before the message sent to arrives, causing other bugs. 
 Thus, programmers can not use it everywhere to wrap all GUI object accessing code.
 In our evaluation on real world programs, we found this simple analysis 
 can not be used in practice: it issued
-an unacceptable number of false positives and redundant warnings.
+an unacceptable number of invalid warnings. %false positives and redundant warnings.
 
 
 %program transformation to wrap
@@ -288,20 +288,20 @@ call graph with acceptable precision for GUI applications in the presence of ref
 is non-trivial.
 Existing call graph construction algorithms such as RTA~\cite{rta}
 and k-CFA~\cite{kcfa}
-fails to build a sufficiently complete call graph, due to their limitations
+fails to build a good call graph, due to their limitations
 to reason about reflections.  To alleviate this problem,
-we present a method to build reflection-aware call graph, and
+we present an algorithm to build reflection-aware call graph, and
 also compare its usefulness with existing call graph construction algorithms in
 our experiments. We also note that static analysis may report false positives due to its
 conservative nature, or multiple warnings that actually correspond
-to the same error. To alleviate such limitations, we devise a set
+to the same error. To address such limitations, we devise a set
  of heuristics to filter likely false positives and redundant warnings.
 
 \subsection{Technique Instantiation and Evaluation}
 
 
 We instantiated our technique for four popular GUI frameworks namely SWT,
-eclipse plugin environment, Java Swing, and Android. 
+Eclipse plugin environment, Java Swing, and Android. 
 Swing and SWT are unquestionably 
 two dominating GUI frameworks in developing desktop Java applications.
 Eclipse and its plugin development environment is the de-facto standard
@@ -309,8 +309,8 @@ IDE for Java. Android is the No. 1 platform for
 developing mobile applications with market share 56\% as of Sep 2011.
 Although our technique is generally applicable for GUI
 frameworks adapting the single-thread rule, a specific framework
-may have its own treatment of \textit{UI thread} and \textit{call graph
-entry nodes}. Thus, we must explicitly identify those framework-specific
+may have its own treatment of \textit{UI thread} and \textit{program 
+entry points}. Thus, we must explicitly identify those framework-specific
 parts in our prototype tool implementation.
 
 %Applications built on top of different GUI frameworks have different
@@ -321,13 +321,16 @@ parts in our prototype tool implementation.
 
 
 We implement an invalid thread error detection tool that supports
-the above four GUI frameworks. Our tool works in a fully-automatic,
-push-button manner, and scales to realistic programs.
-We evaluate our implementation on 10 subjects from four different
-frameworks over 75000 LOC. The experiment results demonstrate
-that: our technique is effective (it found 12 real-world errors
-on all supported frameworks, and produced significantly less
-false positives and redundant warnings than the simple analysis);
+the above four GUI frameworks. Our tool works in a fully-automatic
+ manner, and scales to realistic programs.
+We evaluate our implementation on 9 subjects from four different
+frameworks over 67KLOC with 1.4MLOC of dependent library code.
+The experiment results demonstrate
+that: our technique is effective (it found 11 real-world errors
+from four supported frameworks
+%, and produced significantly less
+%false positives and redundant warnings than the simple analysis
+);
 our reflection-aware call graph construction algorithm is
 critical in finding errors in Android applications,
 and our proposed
@@ -352,7 +355,7 @@ the invalid thread access error as a call graph reachability problem,
 and present a general error detection technique.
 In particular, to deal with the unique features in
 multithreaded GUI programs, we propose a reflection-aware
-call graph construction method. (Section~\ref{sec:technique}).
+call graph construction algorithm. (Section~\ref{sec:technique}).
 
 \item \textbf{Implementation.} We implement our technique, and
 instantiate it for four
@@ -360,8 +363,8 @@ popular GUI platforms: SWT, eclipse plugin, Swing, and Android (Section~\ref{sec
 tool implementation is publicly available at:
 \url{http://guierrordetector.googlecode.com}
 
-\item \textbf{Evaluation.} We performed an experiment on 10 subjects
-from 4 different platforms over 75000 LOC to show the usefulness
+\item \textbf{Evaluation.} We performed an experiment on 9 subjects
+from 4 different platforms over 67000 LOC to show the usefulness
 of the proposed technique (Section~\ref{sec:evaluation}).
 
 \end{itemize}
