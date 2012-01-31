@@ -14,17 +14,17 @@
 Our experiment objective is three-fold: to demonstrate the effectiveness
 of our approach in detecting real bugs in multithreaded GUI applications, to 
 compare the reflection-aware call graph construction algorithms
-with existing ones , and to evaluate the usefulness of the proposed 
+with existing ones, and to evaluate the usefulness of the proposed 
  heuristics.  
 
-First, we describe our subject programs (Section~\ref{sec:subjects}) and the experimental procedural (Section~\ref{sec:procedural}).
-We then show that our technique detects bugs in real-world GUI applications on
-four supported frameworks (Section~\ref{sec:errors}). We also compare our technique with
+First, we describe our subject programs (Section~\ref{sec:subjects}) and the experimental procedure (Section~\ref{sec:procedural}).
+We then show that our technique detects bugs in real-world GUI applications (Section~\ref{sec:errors}).
+We also compare our technique with
 a straightfoward approach in Section~\ref{sec:straightforward},  compare the reflection-aware call graph
 construction algorithms with existing algorithms (Section~\ref{sec:reflectionaware}), and
 evaluate different graph search strategies in error detection (Section~\ref{sec:search}).
  Finally, we show that the set of proposed heuristics are effective
-in removing redundant warnings and eliminate false positivies (Section~\ref{sec:filters}). 
+in removing redundant warnings and eliminate false positives (Section~\ref{sec:filters}). 
 
 
 
@@ -33,26 +33,26 @@ in removing redundant warnings and eliminate false positivies (Section~\ref{sec:
 
 %library code: 1.4 million
 
-We use a set of open-source projects from Sourceforge, Google code and Eclipse plugin
+We use a set of open-source projects from Sourceforge, Google code, and the Eclipse plugin
 market as evaluation subjects. To choose subjects for each supported GUI framework,
-we first search the framework keywords (e.g., ``Java Swing'' or ``Java SWT'')
-in the above three source repositories, and then select subjects based on the following
-criterias. First, the subject must be a multithreaded GUI application, not
+we first searched for the framework keywords (e.g., ``Java Swing'' or ``Java SWT'')
+in the above three source repositories, and then selected subjects based on the following
+criteria. First, the subject must be a multithreaded GUI application, not
 an open library. Second, the subject must undergone at least two years of active development,
-and is listed in the first 3 results pages based on popularity. This permits us
-to exclude many pre-mature subjects that may contain obvious errors.
+and is listed in the first 3 result pages based on popularity. This permits us
+to exclude many immature subjects that may contain obvious errors.
 
 The subjects used in our experiment are shown in Table~\ref{table:subjects}. Our
-subjects include end-user applications, programming tools, and games. Specifically:
+subjects include end-user applications, programming tools, and games. 
 
 \begin{itemize}
 \Item \textbf{SWT desktop applications.}
 %VirgoFTP~\cite{virgo} and FileBunker~\cite{filebunker} are two useful SWT desktop applications.
-VirgoFTP~\cite{virgo} implements a simple FTP client based on Java and SWT UI library, and
+VirgoFTP~\cite{virgo} implements a simple FTP client based on Java and SWT UI library.
 FileBunker~\cite{filebunker} is a file backup application which uses one or more GMail accounts as its backup repository.
 
 \Item \textbf{Eclipse plugins.}
-HudsonEclipse~\cite{hudson} adds several new tools to  monitor Hudson build status from Eclipse.
+HudsonEclipse~\cite{hudson} monitors Hudson build status from Eclipse.
 EclipseRunner~\cite{eclipserunner} extends capability of running launch configurations in Eclipse IDE.
 
 \Item \textbf{Swing applications.} %S3dropbox~\cite{s3dropbox} and SudokuSolver~\cite{sudokusolver} are two Swing desktop applications.
@@ -61,9 +61,11 @@ to drag and drop files, which are then uploaded to their Amazon S3 accounts. Sod
 computes Sodoku solutions efficiently using mutlithreading execution. 
 
 \Item  \textbf{Android applications.} %MyTracks~\cite{mytracks}, Fennec~\cite{fennec}, and SGTPuzzles~\cite{sgtpuzzles} are three Android applications.
+SGTPuzzler~\cite{sgtpuzzles} is a single-player logic game.
+Fennec~\cite{fennec}, developed by Mozilla, is the Mozilla
+Firefox web browser for mobile devices. 
 MyTracks~\cite{mytracks}, developed by Google, records users' GPS tracks in outdoor activities, and provides
-interfaces to visualize them on Google Maps. Fennec~\cite{fennec}, developed by Mozilla, is the Mozilla
-Firefox web browser for mobile devices. SGTPuzzles~\cite{sgtpuzzles} is a small logic single-player game.
+interfaces to visualize them on Google Maps. 
 
 \end{itemize}
 
@@ -131,25 +133,25 @@ Swing (1.6)&  167961 &  878 &  13159 \\
 \Caption{{\label{table:subjects} Open source programs
 used in our evaluation. Column ``LOC'' is the number of non-blank, non-comment lines
 of code, as counted by LOCC~\cite{locc}.  Each program is analyzed
-together with its dependent GUI framework, as listed in
+together with its GUI framework, as listed in
 the bottom table.} }
 \end{table}
 
 
-\subsection{Procedural}
+\subsection{Experimental Procedure}
 \label{sec:procedural}
 
-We run our tool on each subject with three call graph construction
+We ran our tool on each subject with three call graph construction
 algorithms: RTA~\cite{rta}, 0-CFA, and 1-CFA~\cite{kcfa}.  When running
 each call graph construction algorithm on three Android applications, we
 use two configurations: with and without the reflection-aware algorithm 
 (Section~\ref{sec:cg}).  We did not use other expensive algorithms like $k$-CFA ($k >$ 1),
-because they can not scale to large programs.
+because they can not scale to our subject programs.
 
 We inspect the source code of each subject to determine whether any
 native methods or project-specific GUI interaction patterns are implemented.
 We found SGTPuzzler is the only subject that uses native methods to interact with
-underlying operating systems. Thus, we manually added 3 \CodeIn{@CalledByNative}
+underlying operating systems. Thus, we manually added 3 \CodeIn{@CalledByNativeMethods}
 annotations for it. Also two subjects MyTracks and Fennec employ a self-defined
 way to interact with the GUI framework. For example, in MyTracks, all non-UI
 threads are initialized via using the library method \CodeIn{android.os.handler.handleCallback}.
@@ -165,7 +167,7 @@ to add extra annotations and heuristic filters. All these
 manual parts are finished in less than 60 minutes.
 
 After provided with necessary annotations and heuristic filters,
-our tool works in a fully-automatic, push-bottom manner. For each output
+our tool works in a fully-automatic, push-button manner. For each output
 warning, we manually determine its validity by either searching the
 bug repository to check whether the same error has been reported before,
 or submitting a new bug report, or writing a test driver to reproduce
@@ -182,7 +184,7 @@ the error.
 \hline
  Subject&  \multicolumn{9}{|c||}{Our Technique} & \multicolumn{2}{|c|}{The Approach in}  \\
 \cline{2-10}
- Program  &  \multicolumn{3}{|c|}{RTA / reflection aware}& \multicolumn{3}{|c|}{0-CFA / reflection aware} & \multicolumn{3}{|c||}{1-CFA / reflection aware} & \multicolumn{2}{|c|}{Section~\ref{sec:straightforward}}  \\
+ Program  &  \multicolumn{3}{|c|}{RTA }& \multicolumn{3}{|c|}{0-CFA } & \multicolumn{3}{|c||}{1-CFA } & \multicolumn{2}{|c|}{Section~\ref{sec:straightforward}}  \\
 \cline{2-12}
  & CG Size & \#Warning & \#Bug & CG Size & \#Warning & \#Bug & CG Size & \#Warning & \#Bug & \#Warning & \#Bug\\
 \hline \hline
@@ -227,10 +229,9 @@ the error.
 in multithreaded GUI programs. Column ``CG Size'' shows the
 call graph size in terms of node number. Column ``\#Warning''
 shows the number of warnings issued by our tool. Column ``\#Bug'' shows
-the actual bugs found. Columns ``RTA / reflection aware '', ``0-CFA / reflection aware'',
-and ``1-CFA / reflection aware'' show the results of using different
-call graph construction algorithms with (before ``/'') or without (after ``/'')
-using the reflection-aware algorithm on Android applications. In each cell of the table
+the actual bugs found. Columns ``RTA '', ``0-CFA'',
+and ``1-CFA'' show the results of using different
+call graph construction algorithms. In each cell of the table
 for Android applications, a slash ``/'' separates the result of
 using normal call graph construction algorithm and the reflection-aware
 call graph construction algorithm. The 6 errors found in VirgoFTP, FileBunker,
@@ -275,9 +276,10 @@ they have the same causes as the rest 11 warnings.
 
 
 \begin{figure}[t]
+\hspace{4mm}\small{In class: com.tomczarniecki.s3.gui.DeleteBucketAction}
+\vspace{-2mm}
 \begin{CodeOut}
 \begin{alltt}
-/* In class: com.tomczarniecki.s3.gui.DeleteBucketAction */
 59.private void deleteBucket() \{
 60.    executor.execute(new Runnable() \{
 61.        public void run() \{
@@ -333,9 +335,10 @@ or memory-consistency errors, particularly in the multi-core era.
 
 
 \begin{figure}[t]
+\hspace{4mm}\small{In class: com.eclipserunner.views.impl.RunnerView}
+\vspace{-2mm}
 \begin{CodeOut}
 \begin{alltt} 
-/* com.eclipserunner.views.impl.RunnerView */
 179.private void initializeResourceChangeListener() \{
 180.  ResourcesPlugin.getWorkspace().addResourceChangeListener(
         new IResourceChangeListener() \{
@@ -444,13 +447,15 @@ can only be found by using the reflection-aware call graph construction algorith
 This is because the error-related GUI object (\CodeIn{msgTextView}) in MyTracks is created
 reflectively as follows.
 
+\vspace{2mm}
+\hspace{3mm}\small{In class: com.google.android.apps.mytracks.StatsUtilities}
+\vspace{-2mm}
 \begin{CodeOut}
 \begin{alltt}
-/*In class: com.google.android.apps.mytracks.StatsUtilities*/
 97.  public void setLatLong(int id, double d) \{
 98.     TextView msgTextView = (TextView) activity.\textbf{findViewById}(id);
 99.     msgTextView.setText(LAT\_LONG\_FORMAT.format(d));
-100.\}
+100. \}
 \end{alltt}
 \end{CodeOut}
  
@@ -648,7 +653,7 @@ Second, our tool cannot compute call relationships
 for inter-process communication between components. It also
 requires users to manually add annotations to characterize
 call relationships that involve native methods. This limitation
-may lead to false negatives. Investigating the false positive
+may lead to false negatives. Investigating the false negative
 rate is ongoing work.
 
 %Future work could evaluate our technique on more subjects, and

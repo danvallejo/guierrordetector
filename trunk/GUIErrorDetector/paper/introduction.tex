@@ -42,7 +42,7 @@ execute on that thread.  There are several advantages to the single-GUI-thread r
 
 \item Concurrency errors, such as races and deadlocks, never occur on GUI objects, without
 requiring GUI developers to become experts at concurrent programming. Programming the
-(\textbf{hard-to-recognized words}) is also simpler and less error-prone.
+framework itself is also simpler and less error-prone.
 
 \item The single-GUI-thread rule incurs less overhead.
 Otherwise, whenever the framework calls a method that might
@@ -189,7 +189,7 @@ a standard way to send asynchronized messages to the UI-thread.}, as follows:
 \end{CodeOut}
 
 Such an approach is desirable for accesses from non-UI threads, but it is unnecessary
-and dangerous fro accesses from the UI thread. Asynchronized message passing offers
+and dangerous for accesses from the UI thread. Asynchronized message passing offers
 no timing guarantee, so that a GUI object may have already been
 disposed before the message sent to it arrives, causing other bugs. 
 In our evaluation on real-world programs, we found a simple analysis that
@@ -262,7 +262,7 @@ is triggered, and fix it if it is a real bug.
 
 Our static analysis is independent of the call graph construction algorithm.
 Given a sound call graph, our analysis is sound in that it does
-not miss true positives. GUI applications tend to (\textbf{recognize}) use of reflection. And
+not miss true positives. GUI applications tend to use of reflection. And
 in the presence of reflection, however, it is
 non-trivial to compute a sound call graph with acceptable precision
 Existing call graph construction algorithms such as RTA~\cite{rta}

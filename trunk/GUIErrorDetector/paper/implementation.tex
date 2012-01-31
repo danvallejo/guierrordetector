@@ -2,17 +2,15 @@
 \label{sec:implementation}
 
 We implemented the proposed technique using the WALA framework~\cite{walatutorial}.
-Our prototype tool takes Java bytecode as inputs, works in a fully
+Our prototype tool takes Java bytecode as input, works in a fully
 automatic and push-button way to detect potential invalid thread access
 errors, and scales to realistic programs.  
 Optionally, users may specify additional heuristic filters (Section~\ref{sec:heuristic}) %to guide call graph traverse
 , and annotate call relationships for native methods (Section~\ref{sec:annotation}).
 
 Our current implementation supports four widely-used GUI frameworks, namely
-SWT, Eclipse plugin development, Java Swing, and Android.
-Our implementation %handles all of the Java language, and
-also takes
-all dependent libraries (e.g., \CodeIn{rt.jar} and \CodeIn{android.jar})
+SWT, Eclipse plugin development, Java Swing, and Android, including
+dependent libraries such as \CodeIn{rt.jar} and \CodeIn{android.jar}.
 into analysis. We implemented the reflection-aware call graph construction
  algorithm (Section~\ref{sec:cg})
 using WALA's \textit{bypass logic}. Our tool parses the configuration file
@@ -25,8 +23,8 @@ decrypt the apk file, and then uses the
 ded translator~\cite{Enck:2011:SAA:2028067.2028088} to convert
 Dalvik bytecode to Java bytecode before feeding to WALA.  The Android system
 library (i.e., \CodeIn{android.jar}) uses many ``stub'' classes as
-placeholder for the sake of efficiency. We manually re-compiled the whole
-\CodeIn{android.jar} from its source code by replacing all ``stub'' classes
+placeholders for the sake of efficiency. We manually re-compiled the whole
+\CodeIn{android.jar} from its source code and replaced all ``stub'' classes
 with real class files.
 
 
