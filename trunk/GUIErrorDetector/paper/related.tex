@@ -13,8 +13,8 @@ Harrold:2000:TR:336512.336532}.
 implemented as tools and adopted by practitioners. Existing techniques automate
 some aspect(s) of GUI testing including model creation
 (for model-based testing)~\cite{androidtesting}, %, Xie:2006:MTC:1172962.1172990},
-test generation~\cite{YuanCohenMemonTSE2011, YuanMemonICSE2007},
-test oracle creation~\cite{MemonFSE2000}, test execution~\cite{MemonFSE2001},
+test generation~\cite{YuanMemonICSE2007},
+test oracle creation~\cite{MemonFSE2000}, test execution~\cite{YuanCohenMemonTSE2011},
 and test script repairing~\cite{Huang:2010:RGT:1828417.1828465, Daniel:2011:AGR:2002931.2002937}.
 For example,
 %Kervinen et al.~\cite{Kervinen06model-basedtesting} present a formal model and architecture for testing
@@ -29,7 +29,7 @@ However, testing is often insufficient to detect many potential
 errors in a GUI application
 due to the huge space of possible interactions
 with a GUI. The large number of possible interactions
-need a large number of test inputs that require substantile human effort.
+need a large number of test inputs that require substantial human effort.
 %The second problem is to determine the coverage of a set of test
 %cases~\cite{MemonFSE2001}. For conventional software, coverage is measured
 %using the amount and type of underlying code exercised.
@@ -141,8 +141,8 @@ framework for expressing call graph construction algorithms, and
 performed a quantitative study comparing different instantiations
 of the framework. Tip and Palsberg~\cite{xta} quantitatively compared
 several low-cost call graph construction algorithms for Java.
-Sundaresan et al.~\cite{Sundaresan:2000} went beyond the tranditional
-CHA and RTA~\cite{rta} approaches in Java and and used type propagation
+Sundaresan et al.~\cite{Sundaresan:2000} went beyond the traditional
+CHA and RTA~\cite{rta} approaches in Java and used type propagation
 for the purpose of obtaining a more precise call graph.
 However, the heavy use of reflection in some GUI applications make
 those algorithms insufficient to build a good call graph.
@@ -151,7 +151,7 @@ such as RTA, 0-CFA, and 1-CFA fails to find UI-specific errors in
 Android applications, due to the incompleteness of the resulting graph.
 
 
-To enable call graph conostruction in the presence of  reflection,
+To enable call graph construction in the presence of  reflection,
 Livshits et al.~\cite{Livshits:2005} presented a static analysis
 that attempts to infer additional information about
 reflective call sites directly from program code. The analysis
@@ -167,7 +167,7 @@ by intercepting JVM system calls, and re-inserts those recorded
 class into a program. However, TamiFlex requires a set of representative
 program executions which may not be available in practice,
  and is only sound with respect to the recorded executions.
-Perphas the most close work to our reflection-aware call graph
+Perhaps the most close work to our reflection-aware call graph
 construction algorithm is Payet and Spoto's Julia
 system~\cite{Payet:2011:SAA:2032266.2032299}, which is independently
 proposed with our algorithm. One difference is that the Julia system
@@ -175,7 +175,7 @@ requires to instrument the code of Android's library class
 \CodeIn{android.view.LayoutInflater} that performs the XML inflation ahead of time,
 then replaces the \CodeIn{findViewById} call with with a
 non-deterministic execution of new statements.
-In constrast, our algorithm leverages the powerful \textit{Bypass logic}
+In contrast, our algorithm leverages the powerful \textit{Bypass logic}
 in the WALA framework to transform the program on-the-fly when
 constructing the call graph, without requiring a separate pass of
 off-line instrumentation.
