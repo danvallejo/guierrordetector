@@ -1,26 +1,16 @@
 \section{Empirical Evaluation}
 \label{sec:evaluation}
 
-%Our experiment investigate the following four research questions:
-
-%\begin{itemize}
-%\Item can our approach detect real bugs in multithreaded GUI applications?
-
-%\Item is the reflection-aware call graph construction algorithm useful?
-
-%\Item how effective is the proposed heuristic? is the reflection-aware call graph construction algorithm useful?
-%\end{itemize}
-
 Our experiment objective is three-fold: to demonstrate the effectiveness
 of our approach in detecting real bugs in multithreaded GUI applications, to 
-compare the reflection-aware call graph construction algorithms
+compare the reflection-aware call graph construction algorithm
 with existing ones, and to evaluate the usefulness of the proposed 
  heuristics.  
 
 First, we describe our subject programs (Section~\ref{sec:subjects}) and the experimental procedure (Section~\ref{sec:procedural}).
 We then show that our technique detects bugs in real-world GUI applications (Section~\ref{sec:errors}).
 We also compare our technique with
-a straightfoward approach in Section~\ref{sec:straightforward},  compare the reflection-aware call graph
+a straightfoward approach (Section~\ref{sec:straightforward}),  compare the reflection-aware call graph
 construction algorithms with existing algorithms (Section~\ref{sec:reflectionaware}), and
 evaluate different graph search strategies in error detection (Section~\ref{sec:search}).
  Finally, we show that the set of proposed heuristics are effective
@@ -37,13 +27,15 @@ We use a set of open-source projects from Sourceforge, Google code, and the Ecli
 market as evaluation subjects. To choose subjects for each supported GUI framework,
 we first searched for the framework keywords (e.g., ``Java Swing'' or ``Java SWT'')
 in the above three source repositories, and then selected subjects based on the following
-criteria. First, the subject must be a multithreaded GUI application, not
-an open library. Second, the subject must undergone at least two years of active development,
+criteria. First, the subject must be a Java application, not
+an open library. Second, the subject must use multithreading in its implementation.
+Third, the subject must undergone at least two years of active development,
 and is listed in the first 3 result pages based on popularity. This permits us
 to exclude many immature subjects that may contain obvious errors.
 
-The subjects used in our experiment are shown in Table~\ref{table:subjects}. Our
-subjects include end-user applications, programming tools, and games. 
+We chose subjects belonging to various categories from all subjects satisfying
+the above criteria. The subjects used in our experiment are shown in Table~\ref{table:subjects},
+which include end-user applications, programming tools, and games. 
 
 \begin{itemize}
 \Item \textbf{SWT desktop applications.}
@@ -64,7 +56,7 @@ computes Sodoku solutions efficiently using mutlithreading execution.
 SGTPuzzler~\cite{sgtpuzzles} is a single-player logic game.
 Fennec~\cite{fennec}, developed by Mozilla, is the Mozilla
 Firefox web browser for mobile devices. 
-MyTracks~\cite{mytracks}, developed by Google, records users' GPS tracks in outdoor activities, and provides
+MyTracks~\cite{mytracks}, developed by Google, records users' GPS tracks, and provides
 interfaces to visualize them on Google Maps. 
 
 \end{itemize}
@@ -81,7 +73,7 @@ interfaces to visualize them on Google Maps.
 \hline \hline
 \multicolumn{4}{|l|}{SWT desktop applications}   \\
  \hline
- VirgoFTP (1.3.5) &  2293 &  20 &  165  \\
+ VirgoFTP (1.3.5) &  10815 &  116 &  1955\\
  \hline
  FileBunker (1.1.2)&  14237 &  150 &  1106  \\
  \hline
@@ -109,7 +101,7 @@ interfaces to visualize them on Google Maps.
  MyTracks (1.1.13.rc4)&  20297 &  143 &  1374 \\
 \hline
 \hline
- Total &  64215 &  554 &  4702 \\
+ Total &  76232 &  650 &  6492\\
 \hline
 \multicolumn{4}{l}{}   \\
 \hline
@@ -144,16 +136,18 @@ the bottom table.} }
 We ran our tool on each subject with three call graph construction
 algorithms: RTA~\cite{rta}, 0-CFA, and 1-CFA~\cite{kcfa}.  When running
 each call graph construction algorithm on three Android applications, we
-use two configurations: with and without the reflection-aware algorithm 
+used two configurations: with and without the reflection-aware algorithm 
 (Section~\ref{sec:cg}).  We did not use other expensive algorithms like $k$-CFA ($k >$ 1),
 because they can not scale to our subject programs.
 
-We inspect the source code of each subject to determine whether any
+We first inspect the source code of each subject to determine whether any
 native methods or project-specific GUI interaction patterns are implemented.
-We found SGTPuzzler is the only subject that uses native methods to interact with
-underlying operating systems. Thus, we manually added 3 \CodeIn{@CalledByNativeMethods}
-annotations for it. Also two subjects MyTracks and Fennec employ a self-defined
-way to interact with the GUI framework. For example, in MyTracks, all non-UI
+Among all evaluated subjects, we found SGTPuzzler is the only program that
+uses native methods to interact with
+the underlying operating system. Thus, we checked the native code carefully,
+and manually added 3 \CodeIn{@CalledByNativeMethods}
+annotations for it. Two subjects MyTracks and Fennec employ a customized pattern
+to interact with the GUI framework. For example, in MyTracks, all non-UI
 threads are initialized via using the library method \CodeIn{android.os.handler.handleCallback}.
 % the \CodeIn{safeInvokeXX}
 %method in the XXX subject first checks whether the current thread is the UI-thread, and
@@ -254,15 +248,16 @@ tool with three different call graph construction algorithms
 on the subject programs. From these results, we can see our
 tool found real errors from each subject on  four
 supported GUI frameworks. The results vary slightly according
-to the specific call graph algorithm used. In general, using
-the 1-CFA algorithm finds most errors (11 in total) and least
-warnings (21 in total). The tradeoffs of using other
-algorithms will be explained in Section~\ref{sec:reflectionaware}.
+to the call graph algorithm used. In general, using
+the 1-CFA algorithm found most errors (11 in total) and least
+warnings (21 in total). The trade-offs of using other call graph
+construction algorithms will be explained in Section~\ref{sec:reflectionaware}.
 
 We further examined the detailed results for each subject.
-Among the 21 warnings issued by using the 1-CFA algorithm, 2
-are false positives, and 8 are redundant:
-they have the same causes as the rest 11 warnings. 
+Among the 21 warnings issued by using the 1-CFA algorithm, 11
+warnings reveals 11 distinct errors, in which 6 are previously-unknwon.
+2 warnings are false positive, and the remaining 8 warnings
+are redundant.
 
 %The primary
 %reason for the false positive is because the precision of call graph,
@@ -310,11 +305,12 @@ a non-UI thread. This error is previously-unknown, and has been confirmed by the
 }} %\vspace{-5mm}
 \end{figure}
 
-Figures~\ref{fig:swingerror} amd~\ref{fig:pluginerror} show
-two real errors our tool has found. Figure~\ref{fig:swingerror}
-shows an invalid thread access error in the S3dropbox
-program. This error happens when the \CodeIn{deterCurrentBucket}
-method at line 63 throws an exception. This error can be hard to
+%Figures~\ref{fig:swingerror} amd~\ref{fig:pluginerror} show
+%two real errors our tool has found. 
+Figure~\ref{fig:swingerror}
+shows an invalid thread access error our tool found in the S3dropbox
+program. This error only happens when the \CodeIn{deterCurrentBucket}
+method at line 63 throws an exception, and can be hard to
 detect by testing, since the test must  execute that specific exception-handling
 path. We reported this error to the S3dropbox developers. Tom Czarniecki,
 a key developer of S3dropbox confirmed this potential single-GUI-thread
@@ -370,11 +366,11 @@ Figure~\ref{fig:pluginerror} shows an error found in the EclipseRunner
 plugin. This error is event-related. It happens when a 
 \CodeIn{ResourceChangeEvent} happen, which then invokes the \CodeIn{refresh}
 method at line 415 to update the user interface. In EclipseRunner
-, the \CodeIn{refresh} method has been
-called by 6 different methods in non-UI threads. Thus, our
+, the \CodeIn{refresh} method is
+called by 6 different methods from the same non-UI thread. Thus, our
 tool issues 6 separate warnings for each caller method to indicate
-different ways to trigger this error, despite that all the 6 warnings
-acutally have the same error cause.
+6 different ways to trigger this error, despite that all the 6 warnings
+acutally have the same error cause and are redundant with one another.
 
 As reflected in our experiments, we found GUI developers have already
 used design patterns, runtime checks, and testing to avoid violating
@@ -386,20 +382,19 @@ would be useful.
 
 \vspace{1mm}
 
-\noindent \textbf{\textit{Summary.}}Our technique finds real errors
+\noindent \textbf{\textit{Summary.}} Our technique can find real errors
 in multithreaded GUI applications on four different frameworks with
-an acceptable false positive rate.
+acceptable accuracy.
 
 \subsubsection{Comparing to a Straightforward Approach}
 \label{sec:straightforward}
 
-As briefly mentioned in Section~\ref{sec:finding}, one way to avoid
-invalid thread access errors is to wrap every GUI access code
-with message passing methods (i.e., the safe methods). Thus, a
+As briefly mentioned in Section~\ref{sec:finding}, one way to prevent
+invalid thread access errors is to wrap every GUI accessing operation
+with message passing (i.e., via the safe methods). Thus, a
 straightforward way to detect potential invalid error
-is to check every method to determine whether all GUI-accessing code
-is probably wrapping by safe methods. If not, this approach
-issues a warning for every violation. 
+is to check every method in the user code to determine whether all GUI-accessing operation
+is probably wrapped. If not, this approach issues a warning.% for every violation. 
 %If not, this approach issues warnings.
 
 We implemented this straightforward approach and experimentally compared it
@@ -410,9 +405,9 @@ error that our technique has found, but issue a huge number of false
 positives and redundant warnings. The primary reason is that this simple approach
 does not globally reason about calling relationship between
 threads, UI-accessing methods, and safe methods, thus it often incorrectly
-classifies GUI accessing code which will never be executed
+classifies GUI accessing operations which will never be executed
 in a non-UI thread as erroneous. Furthermore, our technique
-outputs a method call chain in each reported error, which can help
+outputs a method call chain with each reported error, which can help
 developers understand how an invalid thread access error is triggered.
 
 
@@ -420,19 +415,19 @@ developers understand how an invalid thread access error is triggered.
 \vspace{1mm}
 
 \noindent \textbf{\textit{Summary.}} Our technique provides
-richer contextually information for a potential error, and 
+richer contextually information for the reported error, and 
 is significantly more precise than the straightforward approach.
 
 \subsubsection{Comparing Call Graph Construction Algorithms}
 \label{sec:reflectionaware}
 
-We next compare three call graph construction algorithms (RTA, 0-CFA, and 1-CFA)
+We next compare the three call graph construction algorithms (RTA, 0-CFA, and 1-CFA)
 used in our experiments. As shown in Table~\ref{table:results},  1-CFA found
 more errors with less warnings than the other two algorithms. This
 is because RTA and 0-CFA do not consider the calling context when
-constructing a call graph, and it may
-mix the same method calls by different callers into a single node, and
-then introduce imprecision. 
+constructing a call graph, and may
+mix the same method calls by different callers into a single node, thus
+introducing imprecision. 
 
 %Although the call graphs
 %built by 1-CFA are significantly larger, XXX, the algorithm still runs
@@ -458,6 +453,8 @@ reflectively as follows.
 100. \}
 \end{alltt}
 \end{CodeOut}
+
+\normalsize
  
 In constrast, the error-related GUI objects in the other two Android applications (Fennec
 and SGTPuzzler) are created explicitly, so that a normal call graph construction
@@ -471,28 +468,31 @@ algorithm can create a sufficiently complete call graph.
 
 \vspace{1mm}
 
-\noindent \textbf{\textit{Summary.}} Using the 1-CFA call graph construction
-algorithm is more effective in finding errors, and our reflection-aware call
-graph construction algorithm is critical to find errors on some
+\noindent \textbf{\textit{Summary.}} Using the 1-CFA 
+algorithm finds more errors than 0-CFA and RTA, and our reflection-aware call
+graph construction algorithm is useful to find errors on some
 Android applications.
 
 \subsubsection{Comparing Graph Search Strategies}
 \label{sec:search}
 
-Our error detection algorithm in Figure~\ref{fig:detectalgorithm} uses BFS to search potential
-single-GUI-thread violations. However, other graph search strategies such as
+Our error detection algorithm in Figure~\ref{fig:detectalgorithm} uses BFS to search for
+potential single-GUI-thread violations. However, other graph search strategies such as
 Depth-First Search (DFS) and exhaustive path search can also be employed. To
 understand trade-offs between using different search strategies, we 
 implemented two variants of the algorithm in Figure~\ref{fig:detectalgorithm}, and
 evaluated them on the same subjects with the identical environment settings.
 
-The first variant uses DFS by changing line 7 of Figure~\ref{fig:detectalgorithm}
-to \CodeIn{getReachableStartsByDFS(cg)}, changing line 9 of Figure~\ref{fig:detectalgorithm}
-to \CodeIn{queue} $\leftarrow$ \CodeIn{an empty stack}, and changing queue operations
-(\CodeIn{enqueue} and \CodeIn{dequeue}) to the corresponding stack operations (\CodeIn{push} and \CodeIn{pop}).
-This variant missed one error in the FileBunker subject, and found 8 errors
-in total.  That is because DFS searches deeper into the graph, and the path it finds
-may not be the shortest path.
+The first variant uses DFS for graph traverse by changing method \CodeIn{getReachableStartsByBFS(cg)}
+to \CodeIn{getReachableStartsByDFS(cg)} on line 7, changing line 9 to
+$\mathit{fringe}$ $\leftarrow$ $\mathit{an}$ $\mathit{empty}$ $\mathit{stack}$,
+and changing queue operations (\CodeIn{enqueue} and \CodeIn{dequeue} on lines 11, 13, and 25 of Figure~\ref{fig:androiderror})
+to the correspondiing statck operations (\CodeIn{push} and \CodeIn{pop}).
+
+As a result, this variant found 8 errors in total and missed 1 error in the FileBunker subject.
+The reason is that DFS tends to search deeper into the graph, and the path it returns
+is more likely not to be the shortest one. In the FileBunker subject, the path
+returned by DFS is much longer, and does not actually exist.
 
 %Hundson: 3, 1
 %EclipseRunner: 6, 1
@@ -505,14 +505,14 @@ may not be the shortest path.
 %MyTracks: 1, 1
 
 The second variant uses exhaustive search to find potential errors. This variant
-enumerates all non-cyclic paths from the start nodes, and checks whether each
+enumerates all non-cyclic paths from the start nodes, and then checks whether each
 path spawns a new thread and accesses GUI object without using safe methods. As
-a result, this variant run out of memory on all subjects. We further checked
-the traversed paths before the algorithm terminated, and found none of the explored
+a result, this variant run out of memory on all subjects. We checked
+the output paths before the algorithm terminated, and found none of the explored
 path revealed a valid error. This is because the number of
 non-cyclic paths in a graph is exponetially large to the graph node number.
-For a realistic call graph which often contains thousands of nodes, it is impossible to enumerate all
-paths in practice. 
+For a realistic call graph which often contains thousands of nodes, for which
+it is impossible to enumerate all paths in practice. 
 
 
 \vspace{1mm}
@@ -529,15 +529,18 @@ Section~\ref{sec:heuristic} in terms of the number of removed false positives an
 redundant warnings.
 
 Table~\ref{table:filters} tabulates the results.
-Our static analysis outputs thousands of warnings for the evaluated
-subjects, but the proposed heuristic filters effectively reduces
+Our static analysis output thousands of warnings for the evaluated
+subjects, but the proposed heuristic filters effectively reduced
 the number of likely invalid warnings. On average, five heuristic
-filters remove 99.96\% of the reported warnings as false positives
+filters removed 99.96\% of the reported warnings as false positives
 or redundant warnings. Specifically, heuristic filters 1 and 2 identified
 32.48\% of the warnings as likely false positives, and filters 3, 4,
 and 5 identified 67.48\% of the warnings as redundant warnings.
-We further manually check each filtered warning, and found no
-real errors have been removed.
+Remarkably, the 3rd heuristic filter for removing lexically redundant
+reports is the most effective one on the evaluated subjects: it removes 35277 redundant warnings.
+
+%We further manually check each filtered warning, and found no
+%real errors have been removed.
 
 \vspace{1mm}
 
@@ -606,7 +609,7 @@ Results of using other algorithms show similar patterns, which are omitted for b
 \subsection{Discussions}
 
 \noindent \textbf{\textit{Performance and scalability.}} Our tool
-has been evaluated on 9 subjects with over 67 KLOC and dependent
+has been evaluated on 9 subjects with over 76 KLOC and dependent
 libraries with over 1.4 MLOC, showing good scalability.
 For each subject program, it runs in a practical amount of time. Our evaluations
 were conducted on a 2.67GHz Intel Core PC with 4GB
@@ -645,7 +648,7 @@ an incremental algorithm~\cite{inccg} may achieve better results.
 \noindent \textbf{\textit{Limitations.}}
 Our technique is limited in two aspects. First, it only considers
 non-UI threads that are spawned by the UI-thread after the GUI
-is initialized, and ignores other possible non-UI threads
+is initialized, and ignores other possible non-UI threads (quite unusual)
 that are created during the pre-initialization GUI work. One way
 to remedy this limitation is to design an analysis to identify
 those non-UI threads created before a GUI is launched.
