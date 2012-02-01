@@ -10,7 +10,7 @@ with existing ones, and to evaluate the usefulness of the proposed
 First, we describe our subject programs (Section~\ref{sec:subjects}) and the experimental procedure (Section~\ref{sec:procedural}).
 We then show that our technique detects bugs in real-world GUI applications (Section~\ref{sec:errors}).
 We also compare our technique with
-a straightfoward approach (Section~\ref{sec:straightforward}),  compare the reflection-aware call graph
+a straightforward approach (Section~\ref{sec:straightforward}),  compare the reflection-aware call graph
 construction algorithms with existing algorithms (Section~\ref{sec:reflectionaware}), and
 evaluate different graph search strategies in error detection (Section~\ref{sec:search}).
  Finally, we show that the set of proposed heuristics are effective
@@ -156,7 +156,7 @@ threads are initialized via using the library method \CodeIn{android.os.handler.
 Thus, we add 5 user-defined heuristic filters for these two subjects.%to indicate
 %that they are safe to be invoked from any thread. 
 In this experiment, none of the paper
-authors was familar with the subjects; but we found it is quite easy
+authors was familiar with the subjects; but we found it is quite easy
 to add extra annotations and heuristic filters. All these
 manual parts are finished in less than 60 minutes.
 
@@ -255,9 +255,9 @@ construction algorithms will be explained in Section~\ref{sec:reflectionaware}.
 
 We further examined the detailed results for each subject.
 Among the 21 warnings issued by using the 1-CFA algorithm, 11
-warnings reveals 11 distinct errors, in which 6 are previously-unknwon.
-2 warnings are false positive, and the remaining 8 warnings
-are redundant.
+warnings reveals 11 distinct errors, in which 6 are previously-unknown,
+2 warnings are false positive, and the remaining 8 
+are redundant warnings.
 
 %The primary
 %reason for the false positive is because the precision of call graph,
@@ -370,7 +370,7 @@ method at line 415 to update the user interface. In EclipseRunner
 called by 6 different methods from the same non-UI thread. Thus, our
 tool issues 6 separate warnings for each caller method to indicate
 6 different ways to trigger this error, despite that all the 6 warnings
-acutally have the same error cause and are redundant with one another.
+actually have the same error cause and are redundant with one another.
 
 As reflected in our experiments, we found GUI developers have already
 used design patterns, runtime checks, and testing to avoid violating
@@ -456,7 +456,7 @@ reflectively as follows.
 
 \normalsize
  
-In constrast, the error-related GUI objects in the other two Android applications (Fennec
+In contrast, the error-related GUI objects in the other two Android applications (Fennec
 and SGTPuzzler) are created explicitly, so that a normal call graph construction
 algorithm can create a sufficiently complete call graph.
 
@@ -510,7 +510,7 @@ path spawns a new thread and accesses GUI object without using safe methods. As
 a result, this variant run out of memory on all subjects. We checked
 the output paths before the algorithm terminated, and found none of the explored
 path revealed a valid error. This is because the number of
-non-cyclic paths in a graph is exponetially large to the graph node number.
+non-cyclic paths in a graph is exponentially large to the graph node number.
 For a realistic call graph which often contains thousands of nodes, for which
 it is impossible to enumerate all paths in practice. 
 
@@ -545,7 +545,7 @@ reports is the most effective one on the evaluated subjects: it removes 35277 re
 \vspace{1mm}
 
 \noindent \textbf{\textit{Summary.}} Although a static analysis may
-issue false postivies or redundant reports, a set of well-designed
+issue false positives or redundant reports, a set of well-designed
 heuristics can still remove most of them.
 %Heuristic filter, effective.
 

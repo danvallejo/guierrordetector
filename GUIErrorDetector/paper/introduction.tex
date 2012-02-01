@@ -134,7 +134,7 @@ calls method \CodeIn{setRenderer} which
 spawns a new thread on line 283. This newly created, non-UI thread calls back method
 \CodeIn{onSurfaceChanged} that accesses GUI objects on line 222,
 causing an invalid thread access error. Our tool
-finds this error and generate a report as shown in
+finds this error and generates a report as shown in
 Figure~\ref{fig:report}.
 }} %\vspace{-5mm}
 \end{figure}
@@ -297,7 +297,7 @@ Although our technique is applicable to any GUI
 frameworks with the single-GUI-thread rule, a specific framework
 may have its own treatment of \textit{UI thread} and \textit{program 
 entry points}. Thus, our implementation is parameterized with respect to
-those those framework-specific parts.
+those framework-specific parts.
 
 %Applications built on top of different GUI frameworks have different
 %treatment of \textit{UI thread} and \textit{call graph entry nodes}.
