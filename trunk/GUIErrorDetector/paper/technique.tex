@@ -100,26 +100,19 @@ Each \CodeIn{Thread.start()} node in a call graph indicates that a new,
 non-UI thread is spawned.  After that, from each \CodeIn{Thread.start()}
 node, the algorithm uses BFS again to find reachable UI-accessing methods (lines 9 -- 28).
 Specifically, it uses a queue to keep track of nodes to be visited (line 9),
-and also stores all visited nodes to avoid infinite loop (line 10).
+and stores all visited nodes to avoid infinite loop (line 10).
 The algorithm checks every successive node to be visited (line 18);
 it reports an error if that node is a UI-accessing method (lines 20, 21), or skips
 it if it is a safe method (lines 22, 23), or simply keeps traversing otherwise (line 25).
 
 Note that when the algorithm determines that a UI-accessing method may be invoked
-by a non-UI thread, it computes full method call chain from the entry node to
+by a non-UI thread, it computes a method call chain from the entry node to
 the UI-accessing node as the error report.
 The method \CodeIn{createErrorReport} on line 20 does that. 
-As an example, the method call chain for the error in in Figure~\ref{fig:androiderror}
-is shown in Figure~\ref{fig:report}.
+Figure~\ref{fig:androiderror} shows a method call chain from the entry
+node \CodeIn{LayerView.<init>} to the UI-accessing node \CodeIn{ViewRoot}.\CodeIn{recomputeViewAttributes}
+(for the sake of clarification, we also show the checking method \CodeIn{checkThread} in the reported warning).
 
-Our algorithm in Figure~\ref{fig:detectalgorithm} uses BFS to search
-for potential error-revealing paths, since BFS permits to produce
-small error reports (i.e., shorter method call chains). However,
-other graph search strategies such as Depath-First Search (DFS) or
-exhaustive path search can also be employed. In our evaluation (Section~\ref{sec:search}),
-we empirically compared different graph search strategies, and demonstrate that
-using BFS allows the algorithm to find more errors than DFS and
-exhaustive path search.
 
 
 
@@ -139,12 +132,12 @@ exhaustive path search.
 \FOR{each $\mathit{entryNode}$ in $\mathit{entryNodes}$}
 \STATE $\mathit{threadStartNodes}$ $\leftarrow$ getReachableStartsByBFS($\mathit{cg}$)
 \FOR{each $\mathit{threadStart}$ in $\mathit{threadStartNodes}$}
-\STATE $\mathit{queue}$ $\leftarrow$ an empty queue\\
+\STATE $\mathit{fringe}$ $\leftarrow$ an empty queue\\
 \COMMENT{keep all visited nodes to avoid infinite loop}
 \STATE $\mathit{visited}$ $\leftarrow$ $\emptyset$
-\STATE $\mathit{queue}$.enqueue(getSuccNodes($\mathit{cg}$, $\mathit{threadStart}$))
-\WHILE{$\mathit{queue}$.isNotEmpty()}
-\STATE $\mathit{node}$ $\leftarrow$ $\mathit{queue}$.dequeue()
+\STATE $\mathit{fringe}$.enqueue(getSuccNodes($\mathit{cg}$, $\mathit{threadStart}$))
+\WHILE{$\mathit{fringe}$.isNotEmpty()}
+\STATE $\mathit{node}$ $\leftarrow$ $\mathit{fringe}$.dequeue()
 \IF{$\mathit{node}$ $\in$ $\mathit{visited}$}
 \STATE continue
 \ENDIF
@@ -156,7 +149,7 @@ exhaustive path search.
 \ELSIF{$\mathit{succNode}$ $\in$ $\mathit{safeNodes}$}
 \STATE continue
 \ELSE
-\STATE $\mathit{queue}$.enqueue($\mathit{succNode}$)
+\STATE $\mathit{fringe}$.enqueue($\mathit{succNode}$)
 \ENDIF 
 \ENDFOR
 \ENDWHILE
@@ -173,11 +166,18 @@ is parameterized by the three methods in lines 3--5 which are specific to each G
 } \label{fig:detectalgorithm}
 \end{figure}
 
+The algorithm in Figure~\ref{fig:detectalgorithm} uses BFS to search
+for potential error-revealing paths, since BFS always returns the
+shortest path from the entry node to the UI-accessing node, and thus
+permits to produce small error reports. However,
+other graph search strategies such as Depath-First Search (DFS) or
+exhaustive path search can also be employed. In our evaluation (Section~\ref{sec:search}),
+we empirically compared three different graph search strategies, and demonstrate that
+using BFS allows the algorithm to find more errors than DFS and
+exhaustive path search.
 Given a sound call graph, our algorithm is sound in that it does not
 miss true positives. We note, however, that computing a sound
 call graph in the presence of reflection is non-trivial. 
-In particular, GUI applications built on some popular frameworks like Android
-often use configuration files and reflection to specify GUI layout.
 To alleviate this problem, we next proposed a reflection-aware call graph
 construction algorithm in Section~\ref{sec:cg}.
 
@@ -223,25 +223,6 @@ a Button object by its ID (line 7, the \CodeIn{findViewById} method).}
 \label{fig:sampleandroid}
 \end{figure}
 
-In an object-oriened language wth dynamic dispatch, the
-crucial step in constructing a call graph is to compute a conservative
-approximation of the set of methods that can be invoked by a given
-virtual method call. Call graph construction algorithms have been
-studied intensively in the 1990s. While their original formulations
-use a variety of formalisms, most of them can be recast as set-based
-analyses. Various algorithms differ primarily in the number of sets
-that are used to approximate run-time values of expressions. 
-In practice, algorithms such as RTA that use a single set for the whole
-program scale well but achieves relatively lower precision.  The
-k-CFA algorithms maintains one or several sets per expression achieves better
-precision than RTA (\textit{k} is length of calling context).
-
-%this is wrong for k-CFA, k-CFA maintains several sets per expression, which k > 0
-%should cite Ben Livshit's paper on "Reflection analysis for Java"
-%Donot overclaim "say propose a new technique", instead, say "refine the technique"
-%also need to cite Yannis's paper on solving k-CFA paradox
-
-%\textbf{need to describe why need to traverse from the UI entry, not just from the thread entry}
 
 
 \begin{figure}[t]
@@ -273,9 +254,10 @@ instantiate it for Android applications is presented in Section~\ref{sec:cg}.
 \label{fig:cgalgorithm}
 \end{figure}
 
-Unfortunately, GUI applications often use reflection extensively and make
-existing call graph construction algorithms such as RTA and k-CFA
-fail to build a sufficiently complete call graph.
+GUI applications tend to use reflection intensively. In particular, GUI applications built on 
+top of the Android framework often use configuration files and reflection to specify GUI layout.
+The heavy use of reflection makes many existing call graph construction algorithms such as RTA~\cite{rta}
+and k-CFA~\cite{kcfa} fail to build a sufficiently complete call graph.
 The example code in Figure~\ref{fig:sampleandroid} from an Android application
  illustrates the limitations.
 In Figure~\ref{fig:sampleandroid}, line 6 uses reflection to create a \CodeIn{Button}
@@ -319,36 +301,40 @@ creation statements, pretending that the corresponding concrete object
 has been created.  The algorithm is shown in Figure~\ref{fig:cgalgorithm}.
 It consists of two steps. The first step is a simple program
 transformation to replace reflection calls with object creation statements, and
-the second step is to use a standard call graph construction algorithm
-to construct the graph on the transformed program. The reflection call
-represents a method invocation that relies Java reflection to create
-objects, such as the \CodeIn{findViewById} method in Android applications.
+the second step is to use an existing call graph construction algorithm
+to build the graph on the transformed program. In our context,
+a reflection call represents a framework-specific helper method invocation
+that uses Java reflection to create desirable objects, such as
+the \CodeIn{findViewById} method in Android applications, instead
+of the methods in the \CodeIn{java.lang.reflection} package.
 In Figure~\ref{fig:cgalgorithm}, lines 1--7 show
 the first step of program transformation. The algorithm iterates through every statement
-in an analyzed program. When it sees a reflection call, the algorithm analyzes the
-program to determine a set of possible classes that might be created.
-After that, the algorithm creates a new statement which non-deterministically
+in an analyzed program. When it sees a reflection call, the algorithm
+determines a set of possible objects that might be created.
+After that, the algorithm creates a statement which non-deterministically
 returns a new object from the object set. Line 8 is the second step
-to build a call graph on the transformed program.  In this step,
-any existing call graph construction algorithms can be used.
+to build a call graph on the transformed program. 
 
-The algorithm in Figure~\ref{fig:cgalgorithm} is parameterized in three places:
-line 2, line 3, and line 8. We instantiated it for Android applications as
-follows. On line 2, the predicate $isReflectionCall$ returns true
+This algorithm is parameterized in three places:
+line 2, line 3, and line 8. Currently, we instantiated it
+for Android applications as follows. On line 2,
+the predicate isReflectionCall returns true
 if the $statement$ is a \CodeIn{findViewById(id)} method call. On line 3, method
 \CodeIn{getAllObjectsThatMaybeCreated} parses the associated XML configuration
 file in an Android application to extract the class declaration
- correspondinig to the \CodeIn{id} value. If the \CodeIn{id}
+ correspondinig to the given \CodeIn{id} value. If the \CodeIn{id}
 value is dynamically generated, the method will conservatively
-return all subclasses of the declared type. On line 8, any existing
-call graph construction algorithm can be used to build the call graph
-on top of the transformed program.
+return instances of all subclasses of the declared type.
+On line 8, any existing call graph construction algorithm can be directly
+used.
 
-For the example in Figure~\ref{fig:sampleandroid}, the algorithm
-first parses the XML configuration file to determine that the \CodeIn{button\_id}
-value is mapped to a \CodeIn{Button} instance declaration. Then it
-replaces the reflection call: \CodeIn{findViewById(R.id.button\_id)} 
-with an explicit object creation call: \CodeIn{new Button(null)}.
+Take the code in Figure~\ref{fig:sampleandroid} as an example.
+When the algorithm sees the reflection call
+\CodeIn{findViewById(R.id.button\_id)}, it
+parses the XML configuration file to determine that the \CodeIn{button\_id}
+value is mapped to a \CodeIn{Button} instance. Then, it
+replaces the reflection call
+with an explicit object creation statement: \CodeIn{new Button(null)}.
 After that, the algorithm employs existing call graph construction
 algorithms to analyze the transformed program, and permits them
 to add the call edge \CodeIn{setText} to the resulting graph.

@@ -9,13 +9,15 @@ Optionally, users may specify additional heuristic filters (Section~\ref{sec:heu
 , and annotate call relationships for native methods (Section~\ref{sec:annotation}).
 
 Our current implementation supports four widely-used GUI frameworks, namely
-SWT, Eclipse plugin development, Java Swing, and Android, including
-dependent libraries such as \CodeIn{rt.jar} and \CodeIn{android.jar}.
-into analysis. We implemented the reflection-aware call graph construction
- algorithm (Section~\ref{sec:cg})
-using WALA's \textit{bypass logic}. Our tool parses the configuration file
-in an Android application and modifies the bytecode to replace all
-reflection calls with object creation instructions.
+SWT, Eclipse plugin development, Swing, and Android.
+%, including dependent libraries such as \CodeIn{rt.jar} and \CodeIn{android.jar}.
+%into analysis. 
+We implemented the reflection-aware call graph construction
+ algorithm (Section~\ref{sec:cg}) using WALA's \textit{bypass logic}.
+Our tool does not requires a separated pass of program transformation; it
+first parses the configuration file in an Android application,
+and then intercepts the call graph construction
+process on-the-fly to replace all reflection calls with object creation statements.
 Since Android applications are often fully encrypted and shipped in Dalvik
 bytecode as a single apk file, our tool first uses
 android-apktool~\cite{apktool} to
