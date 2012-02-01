@@ -179,11 +179,11 @@ a standard way to send asynchronized messages to the UI-thread.}, as follows:
      /* In class: org.mozilla.gecko.gfx.LayerRenderer */
 220. public void onSurfaceChanged(GL10 gl, int width, int height) \{
 221.     gl.glViewport(0, 0, width, height);
-         \textbf{mView.post(new Runnable() \{}
-             \textbf{public void run() \{}
+         \textbf{mView.post(new Runnable() \ttlcb}
+             \textbf{public void run() \ttlcb}
 222.             mView.setViewportSize(new IntSize(width, height));
-             \textbf{\}}
-         \textbf{\});}
+             \textbf{\ttrcb}
+         \textbf{\ttrcb);}
      \}
 \end{alltt}
 \end{CodeOut}
