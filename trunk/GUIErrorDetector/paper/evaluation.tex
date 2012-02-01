@@ -442,7 +442,7 @@ can only be found by using the reflection-aware call graph construction algorith
 This is because the error-related GUI object (\CodeIn{msgTextView}) in MyTracks is created
 reflectively as follows.
 
-\vspace{2mm}
+{\vspace{2mm}
 \hspace{3mm}\small{In class: com.google.android.apps.mytracks.StatsUtilities}
 \vspace{-2mm}
 \begin{CodeOut}
@@ -452,10 +452,8 @@ reflectively as follows.
 99.     msgTextView.setText(LAT\_LONG\_FORMAT.format(d));
 100. \}
 \end{alltt}
-\end{CodeOut}
+\end{CodeOut}}
 
-\normalsize
- 
 In contrast, the error-related GUI objects in the other two Android applications (Fennec
 and SGTPuzzler) are created explicitly, so that a normal call graph construction
 algorithm can create a sufficiently complete call graph.
