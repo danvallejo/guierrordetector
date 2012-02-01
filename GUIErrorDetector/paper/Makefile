@@ -1,6 +1,5 @@
 compile:
 	latex guierror.tex
-	latex guierror.tex
 	bibtex guierror 
 	latex guierror.tex
 	latex guierror.tex
@@ -8,8 +7,11 @@ compile:
 ps: compile
 	dvips guierror
 
+# pdf: compile
+# 	dvipdf guierror.dvi guierror.pdf
+
 pdf: compile
-	dvipdf guierror.dvi guierror.pdf
+	pdflatex guierror.tex
 
 all: ps pdf
 
