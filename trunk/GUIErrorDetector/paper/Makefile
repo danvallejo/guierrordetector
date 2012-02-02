@@ -15,11 +15,16 @@ pdf: compile
 
 all: ps pdf
 
+TAGS: tags
+tags:
+	etags `latex-process-inputs -list guierror.tex`
+
 clean:
+	rm -f guierror.aux
+	rm -f guierror.bbl
+	rm -f guierror.blg
+	rm -f guierror.dvi
+	rm -f guierror.log
 	rm -f guierror.pdf
 	rm -f guierror.ps
-	rm -f guierror.dvi
-	rm -f guierror.aux
-	rm -f guierror.blg
-	rm -f guierror.log
-	rm -f guierror.bbl
+	rm -f TAGS
