@@ -88,7 +88,6 @@ public class TestMytracksAndroid extends AbstractAndroidTest {
 //		
 //		return result;
 //	}
-	
 	public void testFindErrors() {
 		CGTraverseGuider ui2startGuider = new CGTraverseAndroidGuider();
 		String[] guiderArray = 
@@ -111,7 +110,7 @@ public class TestMytracksAndroid extends AbstractAndroidTest {
 			super.setByfileName("mytracks.xml");
 			
 			CG type = CG.RTA;
-			type = CG.FakeZeroCFA;
+			type = CG.TempZeroCFA;
 			type = CG.OneCFA;
 			
 			UIAnomalyDetector.setToUseDFS();
@@ -137,7 +136,7 @@ public class TestMytracksAndroid extends AbstractAndroidTest {
 		String extractDir = "D:\\research\\guierror\\subjects\\android-programs\\extracted\\MyTracks-1.1.11.rc1.apk";
 		super.decryptXML(apkToolDir, apkFile, extractDir);
 	}
-	
+
 //	Node: < Application, Lcom/google/android/apps/mytracks/StatsActivity, onSelectedTrackChanged(Lcom/google/android/apps/mytracks/content/Track;Z)V > Context: CallStringContext: [ fakeRootMethod@357 ], line: 244
 //	 -> Node: synthetic < Primordial, Ljava/lang/Thread, start()V > Context: CallStringContext: [ onSelectedTrackChanged@55 ], line: -1
 //	 -> Node: < Application, Landroid/os/HandlerThread, run()V > Context: CallStringContext: [ start@1 ], line: -1
