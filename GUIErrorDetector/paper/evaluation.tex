@@ -140,12 +140,12 @@ used two configurations: with and without the reflection-aware algorithm
 (Section~\ref{sec:cg}).  We did not use other expensive algorithms like $k$-CFA ($k >$ 1),
 because they can not scale to our subject programs.
 
-We first inspect the source code of each subject to determine whether any
-native methods or project-specific GUI interaction patterns are implemented.
-Among all evaluated subjects, we found SGTPuzzler is the only program that
+We first inspected the source code of each subject to determine whether any
+native methods or project-specific GUI interaction patterns were implemented.
+Among all evaluated subjects, SGTPuzzler is the only program that
 uses native methods to interact with
-the underlying operating system. Thus, we checked the native code carefully,
-and manually added 3 \CodeIn{@CalledByNativeMethods}
+the underlying operating system. Thus, we manually checked the possible
+Java methods that a native method may call, and then added 7 \CodeIn{@CalledByNativeMethods}
 annotations for it. Two subjects MyTracks and Fennec employ a customized pattern
 to interact with the GUI framework. For example, in MyTracks, all non-UI
 threads are initialized via using the library method \CodeIn{android.os.handler.handleCallback}.
@@ -153,7 +153,8 @@ threads are initialized via using the library method \CodeIn{android.os.handler.
 %method in the XXX subject first checks whether the current thread is the UI-thread, and
 %then determines whether to direct access a GUI object or wrap the code with
 %message passing. 
-Thus, we add 5 user-defined heuristic filters for these two subjects.%to indicate
+Thus, we add 11 user-defined heuristic filters for these two subjects.
+%to indicate
 %that they are safe to be invoked from any thread. 
 In this experiment, none of the paper
 authors was familiar with the subjects; but we found it is quite easy
@@ -161,8 +162,8 @@ to add extra annotations and heuristic filters. All these
 manual parts are finished in less than 60 minutes.
 
 After provided with necessary annotations and heuristic filters,
-our tool works in a fully-automatic, push-button manner. For each output
-warning, we manually determine its validity by either searching the
+our tool worked in a fully-automatic, push-button manner. For each output
+warning, we manually determined its validity by either searching the
 bug repository to check whether the same error has been reported before,
 or submitting a new bug report, or writing a test driver to reproduce
 the error.
@@ -314,7 +315,7 @@ method at line 63 throws an exception, and can be hard to
 detect by testing, since the test must  execute that specific exception-handling
 path. We reported this error to the S3dropbox developers. Tom Czarniecki,
 a key developer of S3dropbox confirmed this potential single-GUI-thread
-violation. He mentioned that the S3dropbox project has already
+violation. He mentioned that the S3dropbox project had already
 used certain design patterns and practice to avoid such violations (e.g.,
 actions for UI interaction are encapsulated into a \CodeIn{Worker} interface),
 but they still overlooked  the reported code snippet. 
@@ -454,6 +455,7 @@ reflectively as follows.
 \end{alltt}
 \end{CodeOut}}
 
+ 
 In contrast, the error-related GUI objects in the other two Android applications (Fennec
 and SGTPuzzler) are created explicitly, so that a normal call graph construction
 algorithm can create a sufficiently complete call graph.
@@ -637,7 +639,7 @@ In our evaluation, the studied subjects were selected with a bias towards popula
 three open-source repositories. Another threat is that we only employed three
 well-known call graph construction algorithms (i.e., RTA, 0-CFA, and 1-CFA) 
 in our evaluation. It is still unknown whether using other 
-call graph construction algorithms such as XTA~\cite{xta} or
+call graph construction algorithms such as XTA~\cite{xta}, VTA~\cite{Sundaresan:2000} or
 an incremental algorithm~\cite{inccg} may achieve better results.
 
 
