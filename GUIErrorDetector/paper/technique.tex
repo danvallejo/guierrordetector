@@ -8,11 +8,11 @@ the error algorithm for different GUI frameworks.
 
 \subsection{Problem Formulation}
 
-This section formulates the problem. We define the
+This section formulates the problem. We first define the
 notations of \textit{UI thread}, \textit{non-UI threads},
 \textit{UI-accessing methods},
- \textit{safe methods}, and \textit{invalid thread access error}, and
-two assumptions we make with regard to error detection.
+ \textit{safe UI methods}, and \textit{invalid thread access error}, and
+state two assumptions we make with regard to error detection.
 
 \noindent {\textsc{\textbf{Definition 1 (UI Thread).}}} {The UI thread
 is a special thread created by the GUI framework during
@@ -22,10 +22,10 @@ and spawns new threads to process lengthy operations in the background. }\vspace
 
 \noindent {\textsc{\textbf{Assumption 1.}}} {We assume that each multithreaded
 GUI application has a single global UI thread. This is true for applications
-built on top of GUI frameworks adapting the single-GUI-thread rule. The
+built on top of GUI frameworks adopting the single-GUI-thread rule. The
 only exception is that 
  an application may fork a new process to launch another
-application with its own UI thread. In that case, we require the new
+application with its own UI thread. In that case, we require the
 launched application to be analyzed separately.}\vspace{1mm}
 
 \noindent {\textsc{\textbf{Definition 2 (non-UI Thread).}}} {Any other
@@ -48,15 +48,15 @@ applications.
 \noindent {\textsc{\textbf{Definition 3 (UI-Accessing Methods).}}} { A method
 whose execution may read or write a UI object is called a UI-accessing method.}\vspace{1mm}
 
-\noindent  {\textsc{\textbf{Definition 4 (Safe Methods).}}} {GUI frameworks that
+\noindent  {\textsc{\textbf{Definition 4 (Safe UI Methods).}}} {GUI frameworks that
 adopt the single-GUI-thread rule must provide methods to permit non-UI threads
-to run code in the UI thread. We can such methods \textit{safe methods}, since
+to run code in the UI thread. We call such methods \textit{safe UI methods}, since
 they can be invoked safely by any thread.}\vspace{1mm}
 
 \noindent  {\textsc{\textbf{Definition 5 (Invalid Thread Access).}}} {An invalid
-thread access error occurs when the UI thread spawns a non-UI thread, and there
+thread access error occurs when the UI thread may spawn a non-UI thread, and there
 exists a path from the non-UI thread's \CodeIn{start} method to any UI-accessing method
-without going through any safe method. }\vspace{2mm}
+without going through any safe UI method. }\vspace{2mm}
 
 At a high level, to detect an invalid thread access error, an analysis needs to track all
 non-UI threads spawned by the UI thread, and check whether those non-UI threads
@@ -90,7 +90,7 @@ for it on line 3, 4, and 5, respectively. Lines 3--5 are GUI framework-specific.
 As an example, for a SWT desktop application, the entry nodes include
 the single main method, UI-accessing nodes include all methods that
 call method \CodeIn{Display.checkWidget} or \CodeIn{Display.checkDevice},
-and safe methods include two SWT helper methods \CodeIn{Display.asyncExec}  and
+and safe UI methods include two SWT helper methods \CodeIn{Display.asyncExec}  and
 \CodeIn{Display.syncExec} for message passing. The detailed instantiation
 for each supported framework is explained in Section~\ref{sec:platforms}.
 
@@ -103,7 +103,7 @@ Specifically, it uses a queue to keep track of nodes to be visited (line 9),
 and stores all visited nodes to avoid infinite loop (line 10).
 The algorithm checks every successive node to be visited (line 18);
 it reports an error if that node is a UI-accessing method (lines 20, 21), or skips
-it if it is a safe method (lines 22, 23), or simply keeps traversing otherwise (line 25).
+it if it is a safe UI method (lines 22, 23), or simply keeps traversing otherwise (line 25).
 
 Note that when the algorithm determines that a UI-accessing method may be invoked
 by a non-UI thread, it computes a method call chain from the entry node to
@@ -498,10 +498,10 @@ namely SWT, Eclipse plugin environment, Swing, and Android.
 The major framework-specific parts, corresponding to
 lines 3 -- 5 in Figure~\ref{fig:detectalgorithm}, are identifying
 \textbf{call graph entry nodes}, \textbf{UI-accessing nodes},
-and \textbf{safe methods} for each framework.
+and \textbf{safe UI methods} for each framework.
 
 %For each framework, we customize the \textit{call graph entry nodes},
-%\textit{UI-accessing nodes}, and \textit{safe methods} on lines 3 -- 5 of the
+%\textit{UI-accessing nodes}, and \textit{safe UI methods} on lines 3 -- 5 of the
 %algorithm in 
 
 %For the sake of efficiency, they are all using the single thread model.
@@ -509,7 +509,7 @@ and \textbf{safe methods} for each framework.
 %Why these platforms? popularity? account for xxx\% of the GUI. 
 
 %customizing for: entry points, starting points, error checking, thread
-%safe methods, what is the event dispatching thread?
+%safe UI methods, what is the event dispatching thread?
 
 \subsubsection{SWT}
 
@@ -544,10 +544,10 @@ calling these two methods as UI-accessing nodes.
 % any
 %methods that calls the checking method must be invoked in the UI thread.
 
-\item \textbf{Safe methods: } SWT provides two helper methods (\CodeIn{Display.\\asyncExec}
+\item \textbf{Safe UI methods: } SWT provides two helper methods (\CodeIn{Display.\\asyncExec}
 and \CodeIn{Display.syncExec}) to execute code (a)synchro-
 nizedly on the UI thread.
- We treat these two methods as safe methods, since invoking
+ We treat these two methods as safe UI methods, since invoking
 them from any thread 
 %are generally considered to be safe and
 will not cause an invalid thread access error.
@@ -578,7 +578,7 @@ methods in the class that implements \CodeIn{org.eclipse.swt.internal.\\SWTEvent
 called back from the UI thread, thus are used as call graph entry nodes.
 
 
-\item \textbf{UI-accessing nodes} and \textbf{Safe methods} are the same as SWT.
+\item \textbf{UI-accessing nodes} and \textbf{Safe UI methods} are the same as SWT.
 
 \end{itemize}
 
@@ -611,7 +611,7 @@ methods: \CodeIn{repaint()}, \CodeIn{revalidate()}, and \CodeIn{invalidate()}.
 %treat nodes corresponding to those thread unsafe methods %in each GUI class
 %as UI-accessing nodes.
 
-\item \textbf{Safe methods: }  Swing's two helper methods
+\item \textbf{Safe UI methods: }  Swing's two helper methods
 (\CodeIn{SwingUtilities.} \CodeIn{invokeLater} and \CodeIn{SwingUtilities.invokeAndWait}) that execute code in the UI thread.
 
 \end{itemize}
@@ -656,7 +656,7 @@ Thus, we treat
 %whether the current thread is the UI thread or not. Thus, any
 %methods that calls the checking method must be invoked in the UI thread.
 
-\item \textbf{Safe methods: } two helper methods (\CodeIn{View.post}
+\item \textbf{Safe UI methods: } two helper methods (\CodeIn{View.post}
 and \CodeIn{View.postDelay}) that execute code on the UI thread. 
 Invoking them on any thread will not cause an invalid thread access error.
 %Invoking these two methods are generally considered to be safe, and would not
