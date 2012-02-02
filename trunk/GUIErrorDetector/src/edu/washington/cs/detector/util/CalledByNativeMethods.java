@@ -16,6 +16,6 @@ import java.lang.annotation.ElementType;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD})
-public @interface CallByNativeMethods {
+public @interface CalledByNativeMethods {
 	String[] callers();
 }
