@@ -133,7 +133,7 @@ public class TestMozillaFirefox extends AbstractAndroidTest {
 //			super.setByfileName("fennec.xml");
 			
 			//this finds bugs
-			CG type = CG.FakeZeroCFA;
+			CG type = CG.TempZeroCFA;
 			type = CG.OneCFA;
 //			type = CG.RTA;
 			

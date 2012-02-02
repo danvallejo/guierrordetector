@@ -26,6 +26,7 @@ import edu.washington.cs.detector.guider.CGTraverseAndroidSafeMethodGuider;
 import edu.washington.cs.detector.guider.CGTraverseExploreClientRunnableStrategy;
 import edu.washington.cs.detector.guider.CGTraverseGuider;
 import edu.washington.cs.detector.util.Globals;
+import edu.washington.cs.detector.util.NativeAnnotationProcessor;
 import edu.washington.cs.detector.util.WALAUtils;
 
 /**
@@ -87,19 +88,43 @@ public class TestSGTPuzzle extends AbstractAndroidTest {
 		CGTraverseExploreClientRunnableStrategy start2checkGuider = new  CGTraverseExploreClientRunnableStrategy(new String[]{"name.boyle.chris.sgtpuzzles"});
 //		start2checkGuider.addMethodGuidance("java.lang.Thread.start", "name.boyle.chris.sgtpuzzles.SGTPuzzles$9");
 		
-			//new CGTraverseAndroidSafeMethodGuider();
-//		    new CGTraverseOnlyClientRunnableStrategy();
-		
+		//parse the native annotation
 		NativeMethodConnector connector = new NativeMethodConnector();
-		connector.addNativeMethodMapping("name.boyle.chris.sgtpuzzles.SGTPuzzles.init",
-				"name.boyle.chris.sgtpuzzles.SGTPuzzles.changedState");
+		Collection<String[]> pairs = getAllPairs();
+		for(String[] pair : pairs) {
+			connector.addNativeMethodMapping(pair[0], pair[1]);
+		}
+		//only this rule is useful, the remaining is for completeness
+		//the following annotation information is actually read from the @CalledByNativeMethods
+		//for debugging purpose in this experiment, I hard code these parts, 7 annotations in total
+//		connector.addNativeMethodMapping(
+//				"name.boyle.chris.sgtpuzzles.SGTPuzzles.init",
+//				"name.boyle.chris.sgtpuzzles.SGTPuzzles.changedState");
+//		connector.addNativeMethodMapping(
+//				"name.boyle.chris.sgtpuzzles.SGTPuzzles.init",
+//				"name.boyle.chris.sgtpuzzles.SGTPuzzles.gameStarted");
+//		connector.addNativeMethodMapping(
+//				"name.boyle.chris.sgtpuzzles.SGTPuzzles.init",
+//				"name.boyle.chris.sgtpuzzles.SGTPuzzles.addTypeItem");
+//		connector.addNativeMethodMapping(
+//				"name.boyle.chris.sgtpuzzles.SGTPuzzles.configEvent",
+//				"name.boyle.chris.sgtpuzzles.SGTPuzzles.dialogAdd");
+//		connector.addNativeMethodMapping(
+//				"name.boyle.chris.sgtpuzzles.SGTPuzzles.configEvent",
+//				"name.boyle.chris.sgtpuzzles.SGTPuzzles.dialogShow");
+//		connector.addNativeMethodMapping(
+//				"name.boyle.chris.sgtpuzzles.SGTPuzzles.solveEvent",
+//				"name.boyle.chris.sgtpuzzles.SGTPuzzles.messageBox");
+//		connector.addNativeMethodMapping(
+//				"name.boyle.chris.sgtpuzzles.SGTPuzzles.presetEvent",
+//				"name.boyle.chris.sgtpuzzles.SGTPuzzles.tickTypeItem");
 		
 		try {
 //		  super.setRunnaiveApproach(true);
 		  super.setPackageNames(new String[]{"name.boyle"});
 			//this finds bugs
 //		  List<AnomalyCallChain> chains = super.findErrorsInAndroidApp(CG.RTA, ui2startGuider, start2checkGuider, connector);
-		  CG type = CG.FakeZeroCFA;
+		  CG type = CG.TempZeroCFA;
 		  type = CG.OneCFA;
 //		  type = CG.RTA;
 		  
@@ -128,5 +153,17 @@ public class TestSGTPuzzle extends AbstractAndroidTest {
 		String apkFile = "D:\\research\\guierror\\subjects\\android-programs\\SGTPuzzles-9306-7.apk";
 		String extractDir = "D:\\research\\guierror\\subjects\\android-programs\\extracted\\SGTPuzzles-9306-7.apk";
 		super.decryptXML(apkToolDir, apkFile, extractDir);
+	}
+	
+	private Collection<String[]> getAllPairs() {
+		String jarFileName = "D:\\research\\guierror\\subjects\\android-programs\\extracted\\sgtpuzzles-annotation.jar";
+		
+		String lib = "D:\\research\\guierror\\eclipsews\\GUIErrorDetector\\exp-subjects\\original-android.jar";
+		try {
+			Collection<String[]> pairs = NativeAnnotationProcessor.getAllCallingPairsByNativeAnnotations(jarFileName, lib);
+			return pairs;
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 }
