@@ -78,9 +78,9 @@ dynamic call graph of every possible execution.
 In an object-oriented programming language like
 Java, a method is the basic logic unit in a program. Reporting
 potential errors at the method level can be sufficient in most cases.
-Thus, we believe using the call graph is well suited for this problem while
-compared with other program representations like control flow graph or
-program dependence graph. 
+%Thus, we believe using the call graph is well suited for this problem while
+%compared with other program representations like control flow graph or
+%program dependence graph. 
 
 
 Our algorithm in Figure~\ref{fig:detectalgorithm} %works as follows. It
@@ -88,33 +88,39 @@ first constructs a static call graph for the tested program (line 2),
 then specifies entry nodes, UI-accessing nodes, and safe UI nodes
 for it on line 3, 4, and 5, respectively. Lines 3--5 are GUI framework-specific.
 As an example, for a SWT desktop application, the entry nodes include
-the single main method, UI-accessing nodes include all methods that
-call method \CodeIn{Display.checkWidget} or \CodeIn{Display.checkDevice},
+the single main method, UI-accessing nodes include 
+\CodeIn{Display.checkWidget} and \CodeIn{Display.checkDevice},
 and safe UI methods include two SWT helper methods \CodeIn{Display.asyncExec}  and
 \CodeIn{Display.syncExec} for message passing. The detailed instantiation
 for each supported framework is explained in Section~\ref{sec:platforms}.
 
-The algorithm first finds all reachable \CodeIn{Thread.start()}
+The algorithm first performs graph traversal to find all reachable \CodeIn{Thread.start()}
 nodes from the entry nodes (line 6).
 %For each entry node, the algorithm uses standard Breadth First Search (BFS)
 %to find all reachable \CodeIn{Thread.start()} nodes (line 7).
 Each \CodeIn{Thread.start()} node in a call graph indicates that a new,
-non-UI thread is spawned.  After that, from each \CodeIn{Thread.start()}
-node, the algorithm uses BFS to search for reachable UI-accessing
-methods (lines 9 -- 26).
-Specifically, it uses a queue to keep track of the nodes to be visited (line 7),
-and stores all visited nodes to avoid infinite loop (line 8).
-The algorithm checks every successive node to be visited (line 16):
-it reports an error if that node is a UI-accessing method (lines 18, 19), or skips
-it if it is a safe UI method (lines 20, 21), or simply keeps traversing otherwise (line 23).
+non-UI thread is spawned.  The \CodeIn{Thread.start()}
+nodes act as the sources in the main graph traversal.
+The algorithm uses BFS to search for reachable UI-accessing
+methods (lines 10 -- 25).
+The algorithm stops the traversal if it reaches a UI-accessing
+method (lines 16 -- 18) or a safe UI method (lines 19, 20).
+%Specifically, it uses a queue to keep track of the nodes to be visited (line 7),
+%and stores all visited nodes to avoid infinite loop (line 8).
+%The algorithm checks every successive node to be visited (line 16):
+%it reports an error if that node is a UI-accessing method (lines 18, 19), or skips
+%it if it is a safe UI method (lines 20, 21), or simply keeps traversing otherwise (line 23).
 
-Note that when the algorithm determines that a UI-accessing method may be invoked
-by a non-UI thread, it computes a method call chain from the entry node to
-the UI-accessing node as the error report.
-The method \CodeIn{createErrorReport} on line 18 does that. 
-Figure~\ref{fig:androiderror} shows a method call chain from the entry
-node \CodeIn{LayerView.<init>} to the UI-accessing node \CodeIn{ViewRoot}.\CodeIn{recomputeViewAttributes}
-(for the sake of clarification, we also show the checking method \CodeIn{checkThread} in the reported warning).
+The error message created by the method \CodeIn{createErrorReport} on line 17
+includes the method call chain from the entry node to the UI-accessing node
+as the error report. For brevity, we do not show the data structures that store
+the current call chain.
+Figure~\ref{fig:report} shows a method call chain from the entry
+node \CodeIn{LayerView.<init>} to the UI-accessing node \CodeIn{ViewRoot}.\CodeIn{checkThread}.
+%Note that when the algorithm determines that a UI-accessing method may be invoked
+%by a non-UI thread, it computes a method call chain from the entry node to
+%the UI-accessing node as the error report.
+% does that. 
 
 
 
@@ -134,27 +140,24 @@ node \CodeIn{LayerView.<init>} to the UI-accessing node \CodeIn{ViewRoot}.\CodeI
 \STATE $\mathit{safeUINodes}$ $\leftarrow$ getSafeNodes($\mathit{cg}$)\\
 \COMMENT{get all reachable \CodeIn{thread.start()} nodes from entry nodes}
 \STATE $\mathit{threadStarts}$ $\leftarrow$ $\bigcup_{entry \in entryNodes}$ getReachableStarts($\mathit{entry}$)
-\COMMENT{keep the nodes to be visited next in a fringe}
-\STATE $\mathit{fringe}$ $\leftarrow$ an empty queue\\
-\COMMENT{keep all visited nodes to avoid infinite loop}
+\COMMENT{keep the nodes to be visited next in a worklist}
+\STATE $\mathit{worklist}$ $\leftarrow$ an empty queue\\
+\STATE $\mathit{worklist}$.enqueueAll($\mathit{threadStarts}$)
 \STATE $\mathit{visited}$ $\leftarrow$ $\emptyset$
-\STATE $\mathit{fringe}$.enqueueAll($\mathit{threadStarts}$)
-\WHILE{$\mathit{fringe}$.isNotEmpty()}
-\STATE $\mathit{node}$ $\leftarrow$ $\mathit{fringe}$.dequeue()
+\WHILE{$\mathit{worklist}$.isNotEmpty()}
+\STATE $\mathit{node}$ $\leftarrow$ $\mathit{worklist}$.dequeue()
 \IF{$\mathit{node}$ $\in$ $\mathit{visited}$}
 \STATE continue
 \ENDIF
 \STATE $\mathit{visited}$ $\leftarrow$ $\mathit{visited}$ $\cup$ $\mathit{node}$
-\FOR{each $\mathit{succNode}$ in getSuccNodes($\mathit{cg}$, $\mathit{node}$)}
-\IF{$\mathit{succNode}$ $\in$ $\mathit{uiAccessingNodes}$}
-\STATE $\mathit{newError}$ $\leftarrow$ createErrorReport($\mathit{entryNode, succNode}$)
+\IF{$\mathit{node}$ $\in$ $\mathit{uiAccessingNodes}$}
+\STATE $\mathit{newError}$ $\leftarrow$ createErrorReport($\mathit{node}$)
 \STATE $\mathit{errors}$ $\leftarrow$ $\mathit{errors}$ $\cup$ $\mathit{newError}$
-\ELSIF{$\mathit{succNode}$ $\in$ $\mathit{safeUINodes}$}
+\ELSIF{$\mathit{node}$ $\in$ $\mathit{safeUINodes}$}
 \STATE continue
 \ELSE
-\STATE $\mathit{fringe}$.enqueue($\mathit{succNode}$)
+\STATE $\mathit{worklist}$.enqueueAll(getSuccNodes($\mathit{cg}$, $\mathit{node}$))
 \ENDIF 
-\ENDFOR
 \ENDWHILE
 \RETURN $errors$
 %\ENDWHILE
@@ -170,7 +173,7 @@ is parameterized by the three methods in lines 3--5 which are specific to each G
 The algorithm in Figure~\ref{fig:detectalgorithm} uses BFS to search
 for potential error-revealing paths, since BFS always returns the
 shortest path to the UI-accessing node, permitting
-to produce smaller error reports. However,
+smaller error reports. However,
 other graph search strategies such as Depath-First Search (DFS) or
 exhaustive path search can also be employed. In our experiment (Section~\ref{sec:search}),
 we empirically compared three different graph search strategies, and demonstrated that
@@ -196,7 +199,6 @@ construction algorithm in Section~\ref{sec:cg}.
 %\centering
 \begin{CodeOut}
 \begin{alltt}
-
 <LinearLayout>
     <Button android:id="@+id/\textbf{button\_id}" android:text="A Button" />
 </LinearLayout>
@@ -217,7 +219,7 @@ construction algorithm in Section~\ref{sec:cg}.
 14. \}
 \end{alltt}
 \end{CodeOut}
-\caption{Sample GUI application code on the Android platform. The layout
+\vspace*{-3.0ex} \caption{Sample GUI application code on the Android platform. The layout
 XML file (the top) specifies a Button object declaratively, 
 and the Java code (the bottom)
 first loads the XML file (line 6) and then uses reflection to create
@@ -242,23 +244,24 @@ a Button object by its ID (line 7, the \CodeIn{findViewById} method).}
 \STATE $\mathit{cg}$ $\leftarrow$ constructCallGraph($\mathit{P}$)
 \RETURN $\mathit{cg}$
 %\ENDWHILE
-\vspace{-2mm}
 \end{algorithmic}
+\vspace{-3mm}
 \caption{A reflection-aware call graph construction algorithm. Lines
-1--7 show a simple program transformation to replace reflection calls
+1--7 are a simple program transformation to replace reflection calls
 with object creations, and line 8 builds the call graph using
-the existing call graph construction algorithms. This algorithm
-is parameterized by three methods on line 2, 3, and 8. How to
-instantiate it for the Android framework is presented in Section~\ref{sec:cg}.
+an existing call graph construction algorithm. This algorithm
+is parameterized by two methods on lines 2 and 3. 
+How to instantiate it for the Android framework is presented in Section~\ref{sec:cg}.
 %This algorithm is parameterized by the call graph construction
 %algorithm on line 8, in which any existing algorithm can be used.
 } 
 \label{fig:cgalgorithm}
 \end{figure}
 
-GUI applications tend to use reflection intensively. In particular, GUI applications built on 
-top of the Android framework often use configuration files and reflection to specify GUI layout.
-The heavy use of reflection makes many existing call graph construction algorithms such as RTA~\cite{rta}
+%GUI applications tend to use reflection intensively. In particular,
+GUI applications built on top of the Android framework
+use configuration files and reflection to specify GUI layout.
+As a result, call graph construction algorithms such as RTA~\cite{rta}
 and k-CFA~\cite{kcfa} fail to build a sufficiently complete call graph.
 The example code in Figure~\ref{fig:sampleandroid} from an Android application
  illustrates the limitations.
@@ -269,10 +272,10 @@ is clicked, its event handling code (lines 9--11) updates the text.
 %the current view to a list declared at line 2.
 
 When analyzing the code in Figure~\ref{fig:sampleandroid}, existing call graph algorithms
-fail to conclude that variable \CodeIn{button} declared at line 7
-point to a \CodeIn{Button} object due to its limitation in deal with the
+fail to conclude that the variable \CodeIn{button} declared at line 7
+points to a \textit{non-null} \CodeIn{Button} object due to its limitation in deal with the
 reflection call \CodeIn{findViewById}. As a result, the built 
-call graph will miss the calling edge corresponding to the
+call graph will exclude the calling edge corresponding to the
 \CodeIn{setText} method call on line 10. 
 
 %Existing call graph algorithms failed either suffer from the problem of incompleteness
@@ -297,37 +300,38 @@ call graph will miss the calling edge corresponding to the
 
 
 To address this limitation, we present an algorithm to construct
-a reflection-aware call graph based on simple program transformation.
-The basic idea to replace reflection calls with explicit object
+a reflection-aware call graph based on a simple program transformation.
+The basic idea is to replace reflection calls with explicit object
 creation statements, pretending that the corresponding concrete object
 has been created.  The algorithm is shown in Figure~\ref{fig:cgalgorithm}.
-It consists of two steps. The first step is a simple program
+It consists of two steps. The first step (lines 1 -- 7) is a simple program
 transformation to replace reflection calls with object creation statements, and
-the second step is to use an existing call graph construction algorithm
+the second step (line 8) uses an existing call graph construction algorithm
 to build the graph on the transformed program. In our context,
 a reflection call represents a framework-specific helper method invocation
 that uses Java reflection to create desirable objects, such as
 the \CodeIn{findViewById} method in Android applications, instead
 of the methods in the \CodeIn{java.lang.reflection} package.
-In Figure~\ref{fig:cgalgorithm}, lines 1--7 show
-the first step of program transformation. The algorithm iterates through every statement
-in an analyzed program. When it sees a reflection call, the algorithm
+%In Figure~\ref{fig:cgalgorithm}, lines 1--7 show
+%the first step of program transformation. The algorithm iterates through every statement
+%in an analyzed program.
+When it sees a reflection call, the algorithm
 determines a set of possible objects that might be created.
-After that, the algorithm creates a statement which non-deterministically
-returns a new object from the object set. Line 8 is the second step
-to build a call graph on the transformed program. 
+After that, the algorithm creates a statement that non-deterministically
+returns a new object from the object set.
+%Line 8 is the second step
+%to build a call graph on the transformed program. 
 
-This algorithm is parameterized in three places:
-line 2, line 3, and line 8. Currently, we instantiated it
-for Android applications as follows. On line 2,
-the predicate isReflectionCall returns true
-if the $statement$ is a \CodeIn{findViewById(id)} method call. On line 3, method
-\CodeIn{getAllObjectsThatMaybeCreated} parses the associated XML configuration
+This algorithm is parameterized by two methods on
+lines 2 and 3. When instantiated for the Android framework,
+the predicate isReflectionCall on line 2 returns true
+if the $statement$ is a \CodeIn{findViewById(id)} method call, and the method
+getAllObjectsThatMaybeCreated on line 3 parses the associated XML configuration
 file in an Android application to extract the class declaration
  correspondinig to the given \CodeIn{id} value. If the \CodeIn{id}
-value is dynamically generated, the method will conservatively
+value is dynamically generated, this method will conservatively
 return instances of all subclasses of the declared type.
-On line 8, any existing call graph construction algorithm can be applied.
+%On line 8, any existing call graph construction algorithm can be applied.
 
 Take the code in Figure~\ref{fig:sampleandroid} as an example.
 When the algorithm sees the reflection call
@@ -342,7 +346,7 @@ to add the call edge \CodeIn{setText} to the resulting graph.
 
 As demonstrated in our experiments, using this reflection-aware call
 graph construction algorithm helps in detecting errors
-in Android applications.
+in Android applications (Section~\ref{sec:evaluation}).
 
 % combined RTA and k-CFA
 %call graph construction algorithm as shown in Figure~\ref{fig:cgalgorithm}.
@@ -535,13 +539,13 @@ a SWT desktop application has a single main method as the entry point. By defaul
 the main method is executed in the UI thread after the GUI
 is initialized.
 
-\item \textbf{UI-accessing nodes: } SWT provides explicit
-runtime checking for illegal thread accesses. Any methods for manipulating
-GUI object must call methods \CodeIn{Display.checkWidget}
-or \CodeIn{Display.checkDevice} to check whether the current
-thread is the UI thread or not.
-Thus, we treat nodes (in both user code and framework code) corresponding to the methods
-calling these two methods as UI-accessing nodes.
+\item \textbf{UI-accessing nodes: } the \CodeIn{Display.checkWidget}
+and \CodeIn{Display.} \CodeIn{checkDevice} methods. SWT uses the above
+two methods to explicitly check illegal thread accesses at runtime.
+Any methods for manipulating GUI object must call (one of) these two methods
+ to determine whether the current thread is the UI thread or not.
+%Thus, we treat nodes (in both user code and framework code) corresponding to the methods
+%calling these two methods as UI-accessing nodes.
 %must be invoked
 %in the UI thread and as
 %UI-accessing nodes.
@@ -653,7 +657,7 @@ and any class in the user code that subclasses \CodeIn{Activity} as call graph e
 We also add all overridden Android GUI event handling methods in user
 code as entry nodes, since they must be called back from the UI thread.
 
-\item \textbf{UI-accessing nodes: }every method calling \CodeIn{ViewRoot.checkThread}.
+\item \textbf{UI-accessing nodes: }the \CodeIn{ViewRoot.checkThread} method.
 Like SWT, Android explicitly checks whether
 the current thread is a UI thread or not before accessing a GUI object via
 the \CodeIn{ViewRoot.checkThread} method.
