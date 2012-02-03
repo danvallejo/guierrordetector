@@ -5,8 +5,9 @@ We implemented the proposed technique using the WALA framework~\cite{walatutoria
 Our prototype tool takes Java bytecode as input, works in a fully
 automatic and push-button way to detect potential invalid thread access
 errors, and scales to realistic programs.  
-Optionally, users may specify additional heuristic filters (Section~\ref{sec:heuristic}) %to guide call graph traverse
-, and annotate call relationships for native methods (Section~\ref{sec:annotation}).
+
+%Optionally, users may specify additional heuristic filters (Section~\ref{sec:heuristic}) %to guide call graph traverse
+%, and annotate call relationships for native methods (Section~\ref{sec:annotation}).
 
 Our current implementation supports four widely-used GUI frameworks, namely
 SWT, Eclipse plugin development, Swing, and Android.
@@ -14,8 +15,10 @@ SWT, Eclipse plugin development, Swing, and Android.
 %into analysis. 
 We implemented the reflection-aware call graph construction
  algorithm (Section~\ref{sec:cg}) using WALA's \textit{bypass logic}.
-Our tool does not requires a separated pass of program transformation; it
-first parses the configuration file in an Android application,
+Unlike similar tools~\cite{Payet:2011:SAA:2032266.2032299}, our tool
+does not require a separated
+pass of program instrumentation; instead, it
+parses the configuration file in an Android application,
 and then intercepts the call graph construction
 process on-the-fly to replace all reflection calls with object creation statements.
 Since Android applications are often fully encrypted and shipped in Dalvik

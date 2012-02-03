@@ -85,7 +85,7 @@ program dependence graph.
 
 Our algorithm in Figure~\ref{fig:detectalgorithm} %works as follows. It
 first constructs a static call graph for the tested program (line 2),
-then specifies entry nodes, UI-accessing nodes, and safe nodes
+then specifies entry nodes, UI-accessing nodes, and safe UI nodes
 for it on line 3, 4, and 5, respectively. Lines 3--5 are GUI framework-specific.
 As an example, for a SWT desktop application, the entry nodes include
 the single main method, UI-accessing nodes include all methods that
@@ -94,21 +94,24 @@ and safe UI methods include two SWT helper methods \CodeIn{Display.asyncExec}  a
 \CodeIn{Display.syncExec} for message passing. The detailed instantiation
 for each supported framework is explained in Section~\ref{sec:platforms}.
 
-For each entry node, the algorithm uses standard Breadth First Search (BFS)
-to find all reachable \CodeIn{Thread.start()} nodes (line 7).
+The algorithm first finds all reachable \CodeIn{Thread.start()}
+nodes from the entry nodes (line 6).
+%For each entry node, the algorithm uses standard Breadth First Search (BFS)
+%to find all reachable \CodeIn{Thread.start()} nodes (line 7).
 Each \CodeIn{Thread.start()} node in a call graph indicates that a new,
 non-UI thread is spawned.  After that, from each \CodeIn{Thread.start()}
-node, the algorithm uses BFS again to find reachable UI-accessing methods (lines 9 -- 28).
-Specifically, it uses a queue to keep track of nodes to be visited (line 9),
-and stores all visited nodes to avoid infinite loop (line 10).
-The algorithm checks every successive node to be visited (line 18);
-it reports an error if that node is a UI-accessing method (lines 20, 21), or skips
-it if it is a safe UI method (lines 22, 23), or simply keeps traversing otherwise (line 25).
+node, the algorithm uses BFS to search for reachable UI-accessing
+methods (lines 9 -- 26).
+Specifically, it uses a queue to keep track of the nodes to be visited (line 7),
+and stores all visited nodes to avoid infinite loop (line 8).
+The algorithm checks every successive node to be visited (line 16):
+it reports an error if that node is a UI-accessing method (lines 18, 19), or skips
+it if it is a safe UI method (lines 20, 21), or simply keeps traversing otherwise (line 23).
 
 Note that when the algorithm determines that a UI-accessing method may be invoked
 by a non-UI thread, it computes a method call chain from the entry node to
 the UI-accessing node as the error report.
-The method \CodeIn{createErrorReport} on line 20 does that. 
+The method \CodeIn{createErrorReport} on line 18 does that. 
 Figure~\ref{fig:androiderror} shows a method call chain from the entry
 node \CodeIn{LayerView.<init>} to the UI-accessing node \CodeIn{ViewRoot}.\CodeIn{recomputeViewAttributes}
 (for the sake of clarification, we also show the checking method \CodeIn{checkThread} in the reported warning).
@@ -118,24 +121,24 @@ node \CodeIn{LayerView.<init>} to the UI-accessing node \CodeIn{ViewRoot}.\CodeI
 
 \begin{figure}[t]
 \textbf{Input}: a Java program $\mathit{P}$\\
-\textbf{Output}: a set of potential invalid thread access $\mathit{errors}$\\
+\textbf{Output}: a set of potential invalid thread access errors\\
 %\textbf{Auxiliary Methods:}\\
 %getSuccNodes($\mathit{g}$, $\mathit{n}$): return node $\mathit{n}$'s successive
 %nodes in the graph $\mathit{g}$\\
 \vspace{-4mm}
 \begin{algorithmic}[1]
-\STATE $\mathit{errors}$ $\leftarrow$ $\emptyset$
+\STATE $\mathit{errors}$ $\leftarrow$ $\emptyset$ 
 \STATE $\mathit{cg}$ $\leftarrow$ constructCallGraph($\mathit{P}$)
 \STATE $\mathit{entryNodes}$ $\leftarrow$ getEntryNodes($\mathit{cg}$)
-\STATE $\mathit{uiAccessNodes}$ $\leftarrow$ getUIAccessNodes($\mathit{cg}$)
-\STATE $\mathit{safeNodes}$ $\leftarrow$ getSafeNodes($\mathit{cg}$)
-\FOR{each $\mathit{entryNode}$ in $\mathit{entryNodes}$}
-\STATE $\mathit{threadStartNodes}$ $\leftarrow$ getReachableStartsByBFS($\mathit{cg}$)
-\FOR{each $\mathit{threadStart}$ in $\mathit{threadStartNodes}$}
+\STATE $\mathit{uiAccessingNodes}$ $\leftarrow$ getUIAccessNodes($\mathit{cg}$)
+\STATE $\mathit{safeUINodes}$ $\leftarrow$ getSafeNodes($\mathit{cg}$)\\
+\COMMENT{get all reachable \CodeIn{thread.start()} nodes from entry nodes}
+\STATE $\mathit{threadStarts}$ $\leftarrow$ $\bigcup_{entry \in entryNodes}$ getReachableStarts($\mathit{entry}$)
+\COMMENT{keep the nodes to be visited next in a fringe}
 \STATE $\mathit{fringe}$ $\leftarrow$ an empty queue\\
 \COMMENT{keep all visited nodes to avoid infinite loop}
 \STATE $\mathit{visited}$ $\leftarrow$ $\emptyset$
-\STATE $\mathit{fringe}$.enqueue(getSuccNodes($\mathit{cg}$, $\mathit{threadStart}$))
+\STATE $\mathit{fringe}$.enqueueAll($\mathit{threadStarts}$)
 \WHILE{$\mathit{fringe}$.isNotEmpty()}
 \STATE $\mathit{node}$ $\leftarrow$ $\mathit{fringe}$.dequeue()
 \IF{$\mathit{node}$ $\in$ $\mathit{visited}$}
@@ -143,18 +146,16 @@ node \CodeIn{LayerView.<init>} to the UI-accessing node \CodeIn{ViewRoot}.\CodeI
 \ENDIF
 \STATE $\mathit{visited}$ $\leftarrow$ $\mathit{visited}$ $\cup$ $\mathit{node}$
 \FOR{each $\mathit{succNode}$ in getSuccNodes($\mathit{cg}$, $\mathit{node}$)}
-\IF{$\mathit{succNode}$ $\in$ $\mathit{uiAccessNodes}$}
+\IF{$\mathit{succNode}$ $\in$ $\mathit{uiAccessingNodes}$}
 \STATE $\mathit{newError}$ $\leftarrow$ createErrorReport($\mathit{entryNode, succNode}$)
 \STATE $\mathit{errors}$ $\leftarrow$ $\mathit{errors}$ $\cup$ $\mathit{newError}$
-\ELSIF{$\mathit{succNode}$ $\in$ $\mathit{safeNodes}$}
+\ELSIF{$\mathit{succNode}$ $\in$ $\mathit{safeUINodes}$}
 \STATE continue
 \ELSE
 \STATE $\mathit{fringe}$.enqueue($\mathit{succNode}$)
 \ENDIF 
 \ENDFOR
 \ENDWHILE
-\ENDFOR
-\ENDFOR
 \RETURN $errors$
 %\ENDWHILE
 \vspace{-2mm}
@@ -168,13 +169,14 @@ is parameterized by the three methods in lines 3--5 which are specific to each G
 
 The algorithm in Figure~\ref{fig:detectalgorithm} uses BFS to search
 for potential error-revealing paths, since BFS always returns the
-shortest path from the entry node to the UI-accessing node, and thus
-permits to produce small error reports. However,
+shortest path to the UI-accessing node, permitting
+to produce smaller error reports. However,
 other graph search strategies such as Depath-First Search (DFS) or
-exhaustive path search can also be employed. In our evaluation (Section~\ref{sec:search}),
-we empirically compared three different graph search strategies, and demonstrate that
-using BFS allows the algorithm to find more errors than DFS and
+exhaustive path search can also be employed. In our experiment (Section~\ref{sec:search}),
+we empirically compared three different graph search strategies, and demonstrated that
+using BFS, algorithm found more errors than DFS and
 exhaustive path search.
+
 Given a sound call graph, our algorithm is sound in that it does not
 miss true positives. We note, however, that computing a sound
 call graph in the presence of reflection is non-trivial. 
@@ -247,7 +249,7 @@ a Button object by its ID (line 7, the \CodeIn{findViewById} method).}
 with object creations, and line 8 builds the call graph using
 the existing call graph construction algorithms. This algorithm
 is parameterized by three methods on line 2, 3, and 8. How to
-instantiate it for Android applications is presented in Section~\ref{sec:cg}.
+instantiate it for the Android framework is presented in Section~\ref{sec:cg}.
 %This algorithm is parameterized by the call graph construction
 %algorithm on line 8, in which any existing algorithm can be used.
 } 
@@ -270,8 +272,8 @@ When analyzing the code in Figure~\ref{fig:sampleandroid}, existing call graph a
 fail to conclude that variable \CodeIn{button} declared at line 7
 point to a \CodeIn{Button} object due to its limitation in deal with the
 reflection call \CodeIn{findViewById}. As a result, the built 
-call graph will miss the calling edge corresponding to the method
-call \CodeIn{setText} at line 10. 
+call graph will miss the calling edge corresponding to the
+\CodeIn{setText} method call on line 10. 
 
 %Existing call graph algorithms failed either suffer from the problem of incompleteness
 %or imprecision. The k-CFA algorithm performs points-to analysis with call
@@ -325,8 +327,7 @@ file in an Android application to extract the class declaration
  correspondinig to the given \CodeIn{id} value. If the \CodeIn{id}
 value is dynamically generated, the method will conservatively
 return instances of all subclasses of the declared type.
-On line 8, any existing call graph construction algorithm can be directly
-used.
+On line 8, any existing call graph construction algorithm can be applied.
 
 Take the code in Figure~\ref{fig:sampleandroid} as an example.
 When the algorithm sees the reflection call
@@ -340,7 +341,7 @@ algorithms to analyze the transformed program, and permits them
 to add the call edge \CodeIn{setText} to the resulting graph.
 
 As demonstrated in our experiments, using this reflection-aware call
-graph construction algorithm is critical to detect errors
+graph construction algorithm helps in detecting errors
 in Android applications.
 
 % combined RTA and k-CFA
@@ -379,10 +380,10 @@ Our static analysis takes the call relationship specified by this
 annotation into consideration when traversing the call graph. 
 Adding annotations for native methods is optional and requires manual effort.
 In our experiments, 1 out of 9 programs uses native methods to interact with
-the underlying operating system, and we added 3 annotations for it. We manually
-searched the source files, and inspected the code to determine target methods
-that a native method will call, if there are any. We found this annotation,
-although requires manual effort to add, was useful: one real-world bug
+the underlying operating system. We manually
+searched the source files, inspected the code to determine possible target methods
+that may be called by a native method, and added 7 annotations for this program.
+We found such an annotation, was useful: one real-world bug
 can only be reported with using the user-provided annotations.
 
 \subsubsection{Heuristic Filtering}
@@ -409,7 +410,7 @@ method call chain containing certain library calls
 like \CodeIn{Runtime.}\CodeIn{shutDown} are unlikely to
 be buggy. For example, the \CodeIn{Runtime.}\CodeIn{shutDown}
 method is called when JVM terminates, and uses multithreading
-to dispose all GUI objects after the program exits.
+to dispose all GUI objects when the program exits.
 We encoded a list of common library calls by proposing
 a basic set of library calls that seemed natural and
 generally applicable, based on our programming experience.
@@ -448,9 +449,9 @@ for programmers to interpret.
 
 
 %\item
-\textbf{4. Filter Report With the Same $k$ Head Methods}. A method can call
+\textbf{4. Filter Report With the Same Head Methods from The Entry Node to \CodeIn{Thread.start()}}. A method can call
 multiple methods that access GUI objects, such as:
-
+\vspace{-1mm}
 \begin{CodeOut}
 \begin{alltt}
      public void m() \{
@@ -470,23 +471,28 @@ In fact, these two chains may have the same error root: knowning that
 method \CodeIn{m()} is called by a non-UI thread is sufficient to understand
 the error.
 This filter compares two reported chains that have the same
-$k$ ($k$ is user-settable with a default value 5 as used in our
-experiments) head nodes, and removes the longer one.
+head nodes from the entry node to \CodeIn{Thread}.\CodeIn{start()},
+and removes the longer one.
+%$k$ ($k$ is user-settable with a default value 5 as used in our
+%experiments) head nodes, and removes the longer one.
 
 %\item
-\textbf{5. Filter Report With the Same $k$ Tail Methods}. A method
+\textbf{5. Filter Report With the Same Tail Methods from \CodeIn{Thread}.
+\CodeIn{start()}
+to the UI-accessing node}. A method
 can have multiple callers, so that method call chains with the same tail are likely
 to just represent different ways to trigger the same error. This filter compares 
 two reported method call chains that share the same 
-$k$ ($k$ is user-settable with a default value 5 as used in our
-experiments) tail nodes, and removes the longer one.
+tail nodes from \CodeIn{Thread.start()} to the UI-accessing node, and
+removes the longer one.
 
 
 %\end{enumerate}
 \vspace{1mm}
 
-All above 5 filters are based on heuristics, and thus are not sound in
-that it may filter real bugs. However, as we will show in
+Among the above 5 filters, filters 2 and 3 are sound
+in that they will not filter real bugs, and other 3 filters
+are based on heuristics. However, as we will show in
 our experiments, these filters work remarkably well in practice.
 
 
@@ -530,7 +536,7 @@ the main method is executed in the UI thread after the GUI
 is initialized.
 
 \item \textbf{UI-accessing nodes: } SWT provides explicit
-runtime checking for illegal thread access. Any methods for manipulating
+runtime checking for illegal thread accesses. Any methods for manipulating
 GUI object must call methods \CodeIn{Display.checkWidget}
 or \CodeIn{Display.checkDevice} to check whether the current
 thread is the UI thread or not.
@@ -575,7 +581,7 @@ implement functionalities. When a plugin starts, Eclipse
 calls back the overridden extension points to handle the
 upcoming events. All SWT GUI event handling methods (i.e., the overriden
 methods in the class that implements \CodeIn{org.eclipse.swt.internal.\\SWTEventListener}) are
-called back from the UI thread, thus are used as call graph entry nodes.
+always called back from the UI thread, thus are used as call graph entry nodes.
 
 
 \item \textbf{UI-accessing nodes} and \textbf{Safe UI methods} are the same as SWT.
@@ -651,7 +657,6 @@ code as entry nodes, since they must be called back from the UI thread.
 Like SWT, Android explicitly checks whether
 the current thread is a UI thread or not before accessing a GUI object via
 the \CodeIn{ViewRoot.checkThread} method.
-Thus, we treat 
 %method. This method is the only place where Android checks
 %whether the current thread is the UI thread or not. Thus, any
 %methods that calls the checking method must be invoked in the UI thread.

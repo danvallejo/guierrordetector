@@ -20,8 +20,7 @@ of violating it, and a technique for statically detecting such violations.
 \subsection{\hspace{-1.1ex}\mbox{The}~\mbox{Single-thread}~\mbox{Rule}~\mbox{for}~\mbox{GUI}~\mbox{Object}~\mbox{Access}}
 
 Many popular GUI frameworks such as Swing~\cite{swing}, SWT~\cite{swt}, Eclipse plugin~\cite{eclipse},
-Android~\cite{android}, Qt~\cite{qt}, MacOS Cocoa~\cite{macos},
-and X Windows~\cite{xwindow}
+Android~\cite{android}, Qt~\cite{qt}, and MacOS Cocoa~\cite{macos}
 adopt the \textit{single-GUI-thread rule}:
 
 \vspace{-2mm}
@@ -65,7 +64,8 @@ program comprehension and testing would be more difficult.
 The single-GUI-thread rule requires GUI application developers to
  ensure that all GUI objects are accessed only by the UI thread.
 If not, an \textit{invalid thread access error} will occur. This may
-terminate the application, but it is considered \textbf{hard-to-recognize? probabably?} to nondeterministic concurrency errors.
+terminate the application, but it is considered preferable
+to nondeterministic concurrency errors.
 
 The single-GUI-thread rule can be easily violated since a spawned non-UI thread often needs to update
 the GUI  after its  task is finished.
@@ -126,12 +126,11 @@ to fix bug 51757 and verify the patch.
 221.    gl.glViewport(0, 0, width, height);
 222.    mView.setViewportSize(new IntSize(width, height));
      \}
-
 \end{alltt}
 \end{CodeOut}
-\vspace*{-2.0ex} \Caption{{\label{fig:androiderror} 
-Bug 703256 reported on 11/17/2011 in Mozilla Firefox release 10.0.a.rc3
-for Android. On line 74, \CodeIn{LayerView}'s constructor
+\vspace*{-3.0ex} \Caption{{\label{fig:androiderror} 
+Bug 703256 reported on 11/17/2011 in Fennec (Mozilla Firefox for Android)
+release 10.0.a.rc3. On line 74, \CodeIn{LayerView}'s constructor
 calls method \CodeIn{setRenderer} which 
 spawns a new thread on line 283. This newly created, non-UI thread calls back method
 \CodeIn{onSurfaceChanged} that accesses GUI objects on line 222,
@@ -163,7 +162,7 @@ access errors. Currently, no effective techniques exist. %must be developed.% to
 %is insufficient to detect such errors. 
 It is infeasible for testing to cover the enormous space of possible interactions
 with a GUI. Each sequence of GUI events can result in
-a difficult state, and each GUI event may need to be evaluated in all of
+a different state, and each GUI event may need to be evaluated in all of
 these states. A well-developed software system like Eclipse
 often has a well-designed test suite that achieves fairly high statement coverage;
 but many paths executed by bug-triggering UI sequences are still not covered.
@@ -175,10 +174,11 @@ by wrapping line 222 inside a \CodeIn{post} message passing method\footnote{The
 \CodeIn{post} method in class \CodeIn{android.widget.View} is a
 a standard way to send asynchronized messages to the UI-thread.}, as follows:
 
-
+{\vspace{2mm}
+\hspace{3mm}\small{In class: org.mozilla.gecko.gfx.LayerRenderer}
+\vspace{-2mm}
 \begin{CodeOut}
 \begin{alltt}
-     /* In class: org.mozilla.gecko.gfx.LayerRenderer */
 220. public void onSurfaceChanged(GL10 gl, int width, int height) \{
 221.     gl.glViewport(0, 0, width, height);
          \textbf{mView.post(new Runnable() \ttlcb}
@@ -188,7 +188,7 @@ a standard way to send asynchronized messages to the UI-thread.}, as follows:
          \textbf{\ttrcb);}
      \}
 \end{alltt}
-\end{CodeOut}
+\end{CodeOut}}
 
 Such an approach is desirable for accesses from non-UI threads, but it is unnecessary
 and dangerous for accesses from the UI thread. Asynchronized message passing offers
@@ -244,7 +244,7 @@ reports no warnings, the code is guaranteed to be bug-free.
 %$\rightarrow$\CodeIn{ \scriptsize{org.mozilla.gecko.gfx.LayerView.setViewportSize(IntSize;)}}\\
 %\hspace{5mm}\CodeIn{...}\\
 %$\rightarrow$\CodeIn{ \scriptsize{android.view.ViewRoot.checkThread()}}
-\vspace*{-2.0ex} \Caption{{\label{fig:report} Our tool reports
+\vspace*{-3.0ex} \Caption{{\label{fig:report} Our tool reports
 a method call chain that reveals the potential error in
 Figure~\ref{fig:androiderror}. $\rightarrow$ represents
 the call relationship
@@ -292,21 +292,21 @@ two dominant GUI frameworks for desktop Java applications.
 Eclipse is the de-facto standard IDE for Java. Android is the \#1 platform for
 mobile applications with market share 56\% as of Sep 2011.
 Although our technique is applicable to any GUI
-framework with the single-GUI-thread rule. Each framework
+framework with the single-GUI-thread rule, each framework
 has its own definition of \textit{UI thread} and \textit{program 
 entry points}. Thus, our implementation is parameterized with respect to
 those framework-specific parts.
 
 
-Our tool works in a fully automatic, push-button manner, and scales to realistic programs.
+Our tool works in a fully automatic, push-button manner,
+and scales to realistic programs.
 We evaluated our implementation on 9 programs comprising over 76000 LOC.
 The experiment results demonstrate
 that: our technique is effective (it found 11 real-world errors
-from four supported frameworks and produced 10 false positive warnings);
-our reflection-aware call graph construction algorithm is
-critical in finding errors in Android applications;
-and our proposed
-heuristics significantly reduce the number of
+from four supported frameworks and produced only 10 false positive warnings);
+our reflection-aware call graph construction algorithm helps in
+finding errors in Android applications;
+and our proposed heuristics significantly reduce the number of
 false positives and redundant warnings.
 
 
