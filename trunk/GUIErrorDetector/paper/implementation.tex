@@ -25,7 +25,7 @@ Since Android applications are often fully encrypted and shipped in Dalvik
 bytecode as a single apk file, our tool first uses
 android-apktool~\cite{apktool} to
 decrypt the apk file, and then uses the 
-ded translator~\cite{Enck:2011:SAA:2028067.2028088} to convert
+ded translator~\cite{ded} to convert
 Dalvik bytecode to Java bytecode before feeding to WALA.  The Android system
 library (i.e., \CodeIn{android.jar}) uses many ``stub'' classes as
 placeholders for the sake of efficiency. We manually re-compiled the whole
