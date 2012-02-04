@@ -88,7 +88,7 @@ first constructs a static call graph for the tested program (line 2),
 then specifies entry nodes, UI-accessing nodes, and safe UI nodes
 for it on line 3, 4, and 5, respectively. Lines 3--5 are GUI framework-specific.
 As an example, for a SWT desktop application, the entry nodes include
-the single main method, UI-accessing nodes include 
+the single main method, UI-accessing nodes include methods
 \CodeIn{Display.checkWidget} and \CodeIn{Display.checkDevice},
 and safe UI methods include two SWT helper methods \CodeIn{Display.asyncExec}  and
 \CodeIn{Display.syncExec} for message passing. The detailed instantiation
@@ -102,7 +102,7 @@ Each \CodeIn{Thread.start()} node in a call graph indicates that a new,
 non-UI thread is spawned.  The \CodeIn{Thread.start()}
 nodes act as the sources in the main graph traversal.
 The algorithm uses BFS to search for reachable UI-accessing
-methods (lines 10 -- 25).
+methods (lines 10 -- 24).
 The algorithm stops the traversal if it reaches a UI-accessing
 method (lines 16 -- 18) or a safe UI method (lines 19, 20).
 %Specifically, it uses a queue to keep track of the nodes to be visited (line 7),
@@ -177,7 +177,7 @@ smaller error reports. However,
 other graph search strategies such as Depath-First Search (DFS) or
 exhaustive path search can also be employed. In our experiment (Section~\ref{sec:search}),
 we empirically compared three different graph search strategies, and demonstrated that
-using BFS, algorithm found more errors than DFS and
+using BFS, the algorithm found more errors than DFS and
 exhaustive path search.
 
 Given a sound call graph, our algorithm is sound in that it does not
@@ -222,8 +222,8 @@ construction algorithm in Section~\ref{sec:cg}.
 \vspace*{-3.0ex} \caption{Sample GUI application code on the Android platform. The layout
 XML file (the top) specifies a Button object declaratively, 
 and the Java code (the bottom)
-first loads the XML file (line 6) and then uses reflection to create
-a Button object by its ID (line 7, the \CodeIn{findViewById} method).}
+first loads the XML file (line 5) and then uses reflection to create
+a Button object by its ID (line 6, the \CodeIn{findViewById} method).}
 \label{fig:sampleandroid}
 \end{figure}
 
@@ -272,7 +272,7 @@ is clicked, its event handling code (lines 9--11) updates the text.
 %the current view to a list declared at line 2.
 
 When analyzing the code in Figure~\ref{fig:sampleandroid}, existing call graph algorithms
-fail to conclude that the variable \CodeIn{button} declared at line 7
+fail to conclude that the variable \CodeIn{button} declared at line 6
 points to a \textit{non-null} \CodeIn{Button} object due to its limitation in deal with the
 reflection call \CodeIn{findViewById}. As a result, the built 
 call graph will exclude the calling edge corresponding to the
@@ -328,7 +328,7 @@ the predicate isReflectionCall on line 2 returns true
 if the $statement$ is a \CodeIn{findViewById(id)} method call, and the method
 getAllObjectsThatMaybeCreated on line 3 parses the associated XML configuration
 file in an Android application to extract the class declaration
- correspondinig to the given \CodeIn{id} value. If the \CodeIn{id}
+ corresponding to the given \CodeIn{id} value. If the \CodeIn{id}
 value is dynamically generated, this method will conservatively
 return instances of all subclasses of the declared type.
 %On line 8, any existing call graph construction algorithm can be applied.
@@ -383,11 +383,10 @@ may call method \CodeIn{javaMethod()}.
 Our static analysis takes the call relationship specified by this
 annotation into consideration when traversing the call graph. 
 Adding annotations for native methods is optional and requires manual effort.
-In our experiments, 1 out of 9 programs uses native methods to interact with
-the underlying operating system. We manually
+In our experiments, 1 out of 9 programs uses native methods. We manually
 searched the source files, inspected the code to determine possible target methods
 that may be called by a native method, and added 7 annotations for this program.
-We found such an annotation, was useful: one real-world bug
+We found such an annotation was useful: one error
 can only be reported with using the user-provided annotations.
 
 \subsubsection{Heuristic Filtering}
@@ -453,7 +452,7 @@ for programmers to interpret.
 
 
 %\item
-\textbf{4. Filter Report With the Same Head Methods from The Entry Node to \CodeIn{Thread.start()}}. A method can call
+\textbf{4. Filter Report With the Same Head Methods from the Entry Node to \CodeIn{Thread.start()}}. A method can call
 multiple methods that access GUI objects, such as:
 \vspace{-1mm}
 \begin{CodeOut}
@@ -475,7 +474,7 @@ In fact, these two chains may have the same error root: knowning that
 method \CodeIn{m()} is called by a non-UI thread is sufficient to understand
 the error.
 This filter compares two reported chains that have the same
-head nodes from the entry node to \CodeIn{Thread}.\CodeIn{start()},
+head methods from the entry node to \CodeIn{Thread}.\CodeIn{start()},
 and removes the longer one.
 %$k$ ($k$ is user-settable with a default value 5 as used in our
 %experiments) head nodes, and removes the longer one.
@@ -483,11 +482,11 @@ and removes the longer one.
 %\item
 \textbf{5. Filter Report With the Same Tail Methods from \CodeIn{Thread}.
 \CodeIn{start()}
-to the UI-accessing node}. A method
+to the UI-accessing Method}. A method
 can have multiple callers, so that method call chains with the same tail are likely
 to just represent different ways to trigger the same error. This filter compares 
 two reported method call chains that share the same 
-tail nodes from \CodeIn{Thread.start()} to the UI-accessing node, and
+tail from \CodeIn{Thread.start()} to the UI-accessing methods, and
 removes the longer one.
 
 
@@ -497,14 +496,14 @@ removes the longer one.
 Among the above 5 filters, filters 2 and 3 are sound
 in that they will not filter real bugs, and other 3 filters
 are based on heuristics. However, as we will show in
-our experiments, these filters work remarkably well in practice.
+our experiments, these filters work remarkably well in practice (Section~\ref{sec:filters}).
 
 
 \subsection{Instantiation for Different Frameworks}
 \label{sec:platforms}
 
-We instantiated our error detection techniques for four popular GUI frameworks,
-namely SWT, Eclipse plugin environment, Swing, and Android.
+We instantiated our error detection technique for four popular GUI frameworks:
+SWT, Eclipse plugin, Swing, and Android.
 The major framework-specific parts, corresponding to
 lines 3 -- 5 in Figure~\ref{fig:detectalgorithm}, are identifying
 \textbf{call graph entry nodes}, \textbf{UI-accessing nodes},
@@ -526,7 +525,7 @@ and \textbf{safe UI methods} for each framework.
 %SWT is an open source widget toolkit for Java designed to provide efficient,
 %portable access to the GUI facilities of the operating systems
 %on which it is implemented.
- We instantiate our technique for SWT applications as follows:
+ We instantiated our technique for SWT applications as follows:
 
 %starts from its main method.
 %By default, the thread that the main method executes is the UI thread. Thus, we instantiate
@@ -541,8 +540,8 @@ is initialized.
 
 \item \textbf{UI-accessing nodes: } the \CodeIn{Display.checkWidget}
 and \CodeIn{Display.} \CodeIn{checkDevice} methods. SWT uses the above
-two methods to explicitly check illegal thread accesses at runtime.
-Any methods for manipulating GUI object must call (one of) these two methods
+two methods to explicitly check thread accesses at runtime.
+Any methods for manipulating GUIs object must call (one of) these two methods
  to determine whether the current thread is the UI thread or not.
 %Thus, we treat nodes (in both user code and framework code) corresponding to the methods
 %calling these two methods as UI-accessing nodes.
@@ -582,9 +581,9 @@ on top of the SWT framework. However, unlike a SWT desktop application,
 an Eclipse plugin does not have a main method as a single program entry point.
 Instead, it extends extension points provided by the Eclispe framework to
 implement functionalities. When a plugin starts, Eclipse
-calls back the overridden extension points to handle the
+calls back the overridden methods to handle the
 upcoming events. All SWT GUI event handling methods (i.e., the overriden
-methods in the class that implements \CodeIn{org.eclipse.swt.internal.\\SWTEventListener}) are
+methods in the class that implements \CodeIn{org.eclipse.swt.internal.SWTEvent-\\Listener}) are
 always called back from the UI thread, thus are used as call graph entry nodes.
 
 
@@ -622,7 +621,7 @@ methods: \CodeIn{repaint()}, \CodeIn{revalidate()}, and \CodeIn{invalidate()}.
 %as UI-accessing nodes.
 
 \item \textbf{Safe UI methods: }  Swing's two helper methods
-(\CodeIn{SwingUtilities.} \CodeIn{invokeLater} and \CodeIn{SwingUtilities.invokeAndWait}) that execute code in the UI thread.
+(\CodeIn{SwingUtilities.} \CodeIn{invokeLater} and \CodeIn{SwingUtilities.invokeAndWait}) that execute code on the UI thread.
 
 \end{itemize}
 
@@ -655,7 +654,7 @@ an \CodeIn{Activity} object is created and manipulated by the UI thread. Thus, w
 all public methods defined in the \CodeIn{Activity} class 
 and any class in the user code that subclasses \CodeIn{Activity} as call graph entry nodes.
 We also add all overridden Android GUI event handling methods in user
-code as entry nodes, since they must be called back from the UI thread.
+code as entry nodes, since they are also called back from the UI thread.
 
 \item \textbf{UI-accessing nodes: }the \CodeIn{ViewRoot.checkThread} method.
 Like SWT, Android explicitly checks whether
