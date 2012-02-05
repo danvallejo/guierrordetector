@@ -1,8 +1,10 @@
 package edu.washington.cs.detector;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +25,8 @@ import edu.washington.cs.detector.util.Log;
 public class ThreadStartFinder {
 	
 	public static boolean USE_DEF = false;
+	
+	public static boolean check_find_all_starts = false;
 
 	public final Graph<CGNode> cg;
 
@@ -116,7 +120,31 @@ public class ThreadStartFinder {
 			}
 		}
 		
+		//just check whether the algorithm has found every reachable start node
+		//this is just for debugging purpose which let users know some starts are not reachable
+		if(check_find_all_starts) {
+			Collection<CGNode> allStarts = getAllThreadStartNodes(this.cg);
+			Collection<CGNode> traversedStarts = new LinkedHashSet<CGNode>();
+			for(CallChainNode node : threadStarts) {
+				traversedStarts.add(node.getNode());
+			}
+			Log.logln("All starts: " + allStarts);
+			Log.logln("All traversed: " + traversedStarts);
+			Log.logln("There are: " + allStarts.size()
+					+ ", but the algorithm only traverses: " + traversedStarts.size() + " of them.");
+		}
+		
 		return threadStarts;
+	}
+	
+	public static Collection<CGNode> getAllThreadStartNodes(Graph<CGNode> graph) {
+		Collection<CGNode> set = new LinkedHashSet<CGNode>();
+		for(CGNode node : graph) {
+			if(isThreadStartNode(node)) {
+				set.add(node);
+			}
+		}
+		return set;
 	}
 	
 	public static boolean isThreadStartNode(CGNode node) {
