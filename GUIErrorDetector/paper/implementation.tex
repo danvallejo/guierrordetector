@@ -1,23 +1,200 @@
 \section{Implementation}
 \label{sec:implementation}
 
-We implemented the proposed technique using the WALA framework~\cite{walatutorial}.
-Our prototype tool takes Java bytecode as input, works in a fully
-automatic and push-button way to detect potential invalid thread access
+We instantiated the proposed technique for four widely-used
+GUI frameworks, namely SWT, Eclipse plugin development, Swing, and Android;
+and implemented a prototype tool.
+Our tool is built on top of the WALA framework~\cite{walatutorial}.
+It takes Java bytecode as input, 
+automatically detects potential invalid thread access
 errors, and scales to realistic programs.  
 
-%Optionally, users may specify additional heuristic filters (Section~\ref{sec:heuristic}) %to guide call graph traverse
-%, and annotate call relationships for native methods (Section~\ref{sec:annotation}).
+%We implemented the proposed technique using the WALA framework~\cite{walatutorial}.
+%Our prototype tool takes Java bytecode as input, 
+%automatically detects potential invalid thread access
+%errors, and scales to realistic programs.  
 
-Our current implementation supports four widely-used GUI frameworks, namely
-SWT, Eclipse plugin development, Swing, and Android.
-%, including dependent libraries such as \CodeIn{rt.jar} and \CodeIn{android.jar}.
-%into analysis. 
+
+
+
+%Static Single Assignment (SSA) transformation to get limited flow sensitivity
+\subsection{Instantiation for Different Frameworks}
+\label{sec:platforms}
+
+%We instantiated our error detection technique for four popular GUI frameworks:
+%SWT, Eclipse plugin, Swing, and Android.
+When instantiating our error detection technique for different
+frameworks, the major framework-specific parts, corresponding to
+lines 3 -- 5 in Figure~\ref{fig:detectalgorithm}, are identifying
+\textbf{call graph entry nodes}, \textbf{UI-accessing nodes},
+and \textbf{safe UI methods} for each framework.
+
+%For each framework, we customize the \textit{call graph entry nodes},
+%\textit{UI-accessing nodes}, and \textit{safe UI methods} on lines 3 -- 5 of the
+%algorithm in 
+
+%For the sake of efficiency, they are all using the single thread model.
+
+%Why these platforms? popularity? account for xxx\% of the GUI. 
+
+%customizing for: entry points, starting points, error checking, thread
+%safe UI methods, what is the event dispatching thread?
+
+\newcommand{\smallstep}{\vspace{-2mm}}
+\subsubsection{SWT}
+
+ We instantiated our technique for SWT applications as follows:
+
+\begin{itemize}
+\smallstep
+
+\item \textbf{Call graph entry nodes: } the main method. Like a normal Java program,
+a SWT desktop application has a single main method as the entry point. By default,
+the main method is executed in the UI thread after the GUI
+is initialized.
+
+\smallstep
+
+\item \textbf{UI-accessing nodes: } the \CodeIn{Display.checkWidget}
+and \CodeIn{Display.} \CodeIn{checkDevice} methods. SWT uses the above
+two methods to explicitly check thread accesses at runtime.
+%Any methods for manipulating GUIs object must call (one of) these two methods
+% to determine whether the current thread is the UI thread or not.
+\smallstep
+
+\item \textbf{Safe UI methods: } \CodeIn{Display.asyncExec}
+and \CodeIn{Display.syncExec}. SWT provides these two methods
+to execute code (a)synchro- nizedly on the UI thread.
+%We treat these two methods as safe UI methods, since invoking
+%them from any thread 
+%will not cause an invalid thread access error.
+
+\end{itemize}
+
+\subsubsection{Eclipse plugin}
+
+We instantiated our technique for the Eclipse plugin development framework as follows:
+
+\smallstep
+
+%Unlike a SWT desktop application, an eclipse plugin, though is developed in SWT,
+%has no single main method. Instead, (XXX) it extends certain extension points
+%exposed by the eclipse framework, and eclipse will XXX. To instantiate our
+%technique for the Eclipse plugin environment, we need to redefine the
+%call graph entry points.
+
+\begin{itemize}
+
+\item \textbf{Call graph entry nodes: } all user code methods that override
+ SWT GUI event handling methods. Eclipse
+calls back the overridden methods to handle the
+events. All SWT GUI event handling methods (i.e., the overriden
+methods in the class that implements \CodeIn{org.eclipse.swt.internal.SWTEventListener}) are
+always called back from the UI thread, thus are used as call graph entry nodes.
+
+\smallstep
+
+\item \textbf{UI-accessing nodes} and \textbf{Safe UI methods} are the same as SWT.
+
+\end{itemize}
+
+\subsubsection{Swing}
+
+
+A Swing application has a single main method, but contains three kinds of
+threads: \textit{initial thread} that executes initial application code from the main method,
+the \textit{UI thread}, where all GUI manipulation code is executed,
+and the \textit{worker thread} where time-consuming background tasks are executed.
+After a Swing program starts, its initial thread exits and the UI thread takes charge
+of the application and starts to execute all event-handling code or spawns new worker threads. 
+We instantiated our technique for Swing as follows:
+%XXXX Therefore, we can not directly
+%use the main method as the call graph entry point, since it is not invoked
+%by the UI thread. We customize our technique for Swing as follows:
+
+\begin{itemize}
+
+\item \textbf{Call graph entry nodes:} all overridden Swing GUI event handling
+methods in user code. Those event handling methods are always
+called back from the UI thread.
+
+\smallstep
+
+\item \textbf{UI-accessing nodes:} %as stated in Swing's documentation,
+all methods defined in each Swing GUI class except for three thread-safe
+methods: \CodeIn{repaint()}, \CodeIn{revalidate()}, and \CodeIn{invalidate()}.
+
+\smallstep
+
+\item \textbf{Safe UI methods: } 
+\CodeIn{SwingUtilities.}\CodeIn{invokeLater} and \CodeIn{Swing-\\Utilities.invokeAndWait} that execute code on the UI thread.
+
+\end{itemize}
+
+\smallstep
+
+\subsubsection{Android}
+
+Android is a Java-based platform for embedded or mobile devices. 
+An Android program does not have a single entry point but can
+rather use parts of other Android applications on-demand and can require their
+services by calling corresponding event handlers, directly or through the
+operating system. In particular, Android applications use \textit{activities}
+(i.e., instances of the \CodeIn{Activity} class)
+to interact with users through a visual interface and handle GUI events.
+We instantiated our technique for Android programs as follows:
+%, with some notable exceptions such as the
+%lifecycle of activities.
+
+%An XML \textit{manifest file} registers the components of an application. Other XML
+%fies describe the visual layout of the activities. Activities \textit{inflate}
+%layout files into
+%visual objects (a hierarchy of views), through an \textit{inflater} provided by the An-
+%droid library. This means that library or user-defined views are not explicitly
+%created by new statements but rather inflated through \textit{reflection}. Library meth-
+%ods such as \CodeIn{findViewById} access the inflated views.
+
+
+\begin{itemize}
+
+\item \textbf{Call graph entry nodes: }in an Android application,
+an \CodeIn{Activity} object is created and manipulated by the UI thread. Thus, we treat
+all public methods defined in the \CodeIn{Activity} class 
+and any overriding definitions in its subclasses as call graph entry nodes.
+We also add all overridden Android GUI event handling methods in user
+code as entry nodes, since they are also called back from the UI thread.
+
+\smallstep
+
+\item \textbf{UI-accessing nodes: }the \CodeIn{ViewRoot.checkThread} method.
+Like SWT, Android explicitly checks whether
+the current thread is a UI thread or not before accessing a GUI object via
+the \CodeIn{ViewRoot.checkThread} method.
+
+\smallstep
+
+\item \textbf{Safe UI methods: } \CodeIn{View.post}
+and \CodeIn{View.postDelay} that execute code on the UI thread. 
+%Invoking them on any thread will not cause an invalid thread access error.
+%Invoking these two methods are generally considered to be safe, and would not
+%cause an invalid thread access error.
+
+\end{itemize}
+
+
+Instantiating our general technique to  a specific framework
+requires moderate human effort. We wrote around 500 lines of Java code in total to achieve
+the above four instantiations.
+
+\subsection{Implementation Details}
+
+%Our current implementation supports four widely-used GUI frameworks:
+%SWT, Eclipse plugin development, Swing, and Android.
 We implemented the reflection-aware call graph construction
  algorithm (Section~\ref{sec:cg}) using WALA's \textit{bypass logic}.
 Unlike similar tools~\cite{Payet:2011:SAA:2032266.2032299}, our tool
-does not require a separated
-pass of program instrumentation; instead, it
+does not require a separate
+pass for program instrumentation; instead, it
 parses the configuration file in an Android application,
 and then intercepts the call graph construction
 process on-the-fly to replace all reflection calls with object creation statements.
@@ -28,9 +205,6 @@ decrypt the apk file, and then uses the
 ded translator~\cite{ded} to convert
 Dalvik bytecode to Java bytecode before feeding to WALA.  The Android system
 library (i.e., \CodeIn{android.jar}) uses many ``stub'' classes as
-placeholders for the sake of efficiency. We manually re-compiled the whole
-\CodeIn{android.jar} from its source code and replaced all ``stub'' classes
-with real class files.
-
-
-%Static Single Assignment (SSA) transformation to get limited flow sensitivity
+placeholders for the sake of efficiency. We manually re-compiled 
+\CodeIn{android.jar} from its source code, so it contains real
+class files rather than stubs.

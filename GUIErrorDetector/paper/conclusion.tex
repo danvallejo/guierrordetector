@@ -5,8 +5,8 @@ thread access errors for multithreaded GUI applications.
 Our technique statically explores paths in a call graph to check
 whether a non-UI thread can access a GUI object.
 It uses a reflection-aware call graph construction algorithm
-to build a good call graph, and employs a set of heuristics to
-filter likely false positives and redundant warnings.
+to build a good call graph, and employs a set of sound and heuristic
+filters to filter likely false positives and redundant warnings.
 Since graphical user interfaces are often inadequately tested due
 to the enormously large space of UI interactions and
 extreme resource constraints during their development, we
