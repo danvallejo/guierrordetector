@@ -280,7 +280,7 @@ also compare its usefulness with existing call graph construction algorithms in
 our experiments. Static analysis may report false positives due to its
 conservative nature, or multiple warnings that actually correspond
 to the same error. To address such limitations, we devise a set
- of heuristics to filter likely false positives and redundant warnings.
+ of sound and heuristic filters to remove likely false positives and redundant warnings.
 
 \subsection{Technique Instantiation and Evaluation}
 
@@ -300,13 +300,13 @@ those framework-specific parts.
 
 Our tool works in a fully automatic, push-button manner,
 and scales to realistic programs.
-We evaluated our implementation on 9 programs comprising over 76000 LOC.
+We evaluated our implementation on \subnum programs comprising over \totaloc LOC.
 The experiment results demonstrate
-that: our technique is effective (it found 11 real-world errors
-from four supported frameworks and produced only 10 false positive warnings);
+that: our technique is effective (it found \bugs real-world errors
+from four supported frameworks and produced only \falses false positive warnings);
 our reflection-aware call graph construction algorithm helps in
 finding errors in Android applications;
-and our proposed heuristics significantly reduce the number of
+and our proposed filters significantly reduce the number of
 false positives and redundant warnings.
 
 
@@ -332,8 +332,8 @@ popular GUI platforms: SWT, Eclipse plugin, Swing, and Android (Section~\ref{sec
 tool implementation is publicly available at
 \url{http://guierrordetector.googlecode.com}.
 
-\item \textbf{Evaluation.} We applied our tool to 9 programs 
-from 4 different frameworks, comprising over 76000 LOC. The results
+\item \textbf{Evaluation.} We applied our tool to \subnum programs 
+from 4 different frameworks, comprising over \totaloc LOC. The results
 show the usefulness of the proposed technique (Section~\ref{sec:evaluation}).
 
 \end{itemize}
