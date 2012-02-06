@@ -48,6 +48,7 @@ public class ThreadError {
 			final Runnable r = new Runnable() {
 				@Override
 				public void run() {
+					System.out.println(Display.getCurrent());
 					helloWorldTest.setText("I want to change the text.");
 				}
 
