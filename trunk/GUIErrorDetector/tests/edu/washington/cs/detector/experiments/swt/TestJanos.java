@@ -3,48 +3,48 @@ package edu.washington.cs.detector.experiments.swt;
 import java.io.IOException;
 import java.util.List;
 
+import junit.framework.TestCase;
 import edu.washington.cs.detector.AnomalyCallChain;
 import edu.washington.cs.detector.CGBuilder;
 import edu.washington.cs.detector.CallChainFilter;
 import edu.washington.cs.detector.TestCommons;
 import edu.washington.cs.detector.UIAnomalyDetector;
 import edu.washington.cs.detector.CGBuilder.CG;
-import edu.washington.cs.detector.experimental.InvalidThreadAccessDetector;
 import edu.washington.cs.detector.experiments.filters.MergeSamePrefixToLibCallStrategy;
 import edu.washington.cs.detector.experiments.filters.MergeSameTailStrategy;
+import edu.washington.cs.detector.experiments.filters.RemoveSameEntryStrategy;
 import edu.washington.cs.detector.experiments.filters.RemoveSystemCallStrategy;
 import edu.washington.cs.detector.guider.CGTraverseSWTGuider;
 import edu.washington.cs.detector.util.Globals;
 import edu.washington.cs.detector.util.Utils;
 import edu.washington.cs.detector.util.WALAUtils;
-import junit.framework.TestCase;
 
-public class TestArecaBackup extends TestCase {
-	public String dir = "D:\\research\\guierror\\subjects\\swt-subjects\\areca-latest\\";
-		
+public class TestJanos extends TestCase {
+    public String dir = "D:\\research\\guierror\\subjects\\swt-subjects\\janos\\janos-exp\\";
 	
-    public String appPath = dir + "areca-latest.jar";
-	
+    public String appPath = dir + "janos.jar";
     
-    
-	public String libJar = dir + "activation.jar"
-	    + Globals.pathSep + dir + "commons-net-1.4.1.jar"
-	    + Globals.pathSep + dir +  "jakarta-oro-2.0.8.jar"
-	    + Globals.pathSep + dir + "jsch.jar"
-	    + Globals.pathSep + dir +  "local_policy.jar"
-	    + Globals.pathSep + dir +  "mail.jar"
-	    + Globals.pathSep + dir +  "org.eclipse.core.commands_3.2.0.I20060605-1400.jar"
-	    + Globals.pathSep + dir +  "org.eclipse.equinox.common_3.2.0.v20060603.jar"
-	    + Globals.pathSep + dir +  "org.eclipse.jface_3.2.0.I20060605-1400.jar"
-        + Globals.pathSep + "D:\\develop-tools\\eclipse\\eclipse\\plugins\\org.eclipse.swt.win32.win32.x86_64_3.6.2.v3659c.jar";
-	    
+	public String libJar =  dir + "commons-jxpath-1.1.jar"
+	     + Globals.pathSep + dir + "swt.jar"
+	     + Globals.pathSep + dir + "commons-lang-2.3.jar"
+	     + Globals.pathSep + dir + "commons-logging.jar"
+	     + Globals.pathSep + dir + "commons-logging-api.jar"
+	     + Globals.pathSep + dir + "joda-time-1.5.2.jar"
+	     + Globals.pathSep + dir + "log4j-1.2.15.jar"
+	     + Globals.pathSep + dir + "mx4j-impl.jar"
+	     + Globals.pathSep + dir + "mx4j-jmx.jar"
+	     + Globals.pathSep + dir + "mx4j-remote.jar"
+	     + Globals.pathSep + dir + "mx4j-tools.jar"
+	     + Globals.pathSep + dir + "sbbi-jmx-1.0.jar"
+	     + Globals.pathSep + dir + "sbbi-upnplib-1.0.4.jar";
+
+	String[] packages = new String[]{"net.sf.janos", "net.sbbi"};
 	
-	public void testArecaBackup() throws IOException {
+	String logFile = "./logs/janos-anomalies.txt";
+	
+	public void testJanos() throws IOException {
 		String path = appPath + Globals.pathSep + libJar;
-		
-//        UIAnomalyDetector detector = new UIAnomalyDetector(path);
-        
-        InvalidThreadAccessDetector detector = new InvalidThreadAccessDetector(path);
+        UIAnomalyDetector detector = new UIAnomalyDetector(path);
         
         detector.setThreadStartGuider(new CGTraverseSWTGuider());
         detector.setUIAnomalyGuider(new CGTraverseSWTGuider());
@@ -74,11 +74,14 @@ public class TestArecaBackup extends TestCase {
 		System.out.println("No of chains after removing common tails: " + chains.size());
 		
 		filter = new CallChainFilter(chains);
-		chains = filter.apply(new MergeSamePrefixToLibCallStrategy(new String[]{"com.application.areca", "com.jcraft.jsch", "com.myJava"}));
+		chains = filter.apply(new MergeSamePrefixToLibCallStrategy(packages));
 		System.out.println("No of chains after removing common tails of lib calls: " + chains.size());
 		
-		Utils.dumpAnomalyCallChains(chains, "./logs/areca-anomalies.txt");
+//		filter = new CallChainFilter(chains);
+//		chains = filter.apply(new RemoveSameEntryStrategy());
+//		System.out.println("No of chains after removing common heads: " + chains.size());
+		
+		Utils.dumpAnomalyCallChains(chains, logFile);
 		
 	}
-	
 }

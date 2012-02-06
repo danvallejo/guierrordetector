@@ -70,7 +70,7 @@ public class TestS3Dropbox extends AbstractSwingTest {
 //		super.setCGType(CG.RTA);
 //		super.setCGType(CG.ZeroCFA);
 		
-		UIAnomalyDetector.setToUseDFS(); //use DFS
+//		UIAnomalyDetector.setToUseDFS(); //use DFS
 		
 		super.setNondefaultCG(true);
 //		super.setAddHandlers(true);
