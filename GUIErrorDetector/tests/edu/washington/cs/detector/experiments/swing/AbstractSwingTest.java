@@ -20,6 +20,7 @@ import edu.washington.cs.detector.SwingUIMethodEvaluator;
 import edu.washington.cs.detector.ThreadStartFinder;
 import edu.washington.cs.detector.UIAnomalyDetector;
 import edu.washington.cs.detector.UIAnomalyMethodFinder;
+import edu.washington.cs.detector.experimental.InvalidThreadAccessDetector;
 import edu.washington.cs.detector.experiments.filters.MatchRunWithInvokeClassStrategy;
 import edu.washington.cs.detector.experiments.filters.MergeSamePrefixToLibCallStrategy;
 import edu.washington.cs.detector.experiments.filters.RemoveNoClientClassStrategy;
@@ -57,6 +58,8 @@ public abstract class AbstractSwingTest extends TestCase {
 	
 	private boolean useexhaustivesearch = false;
 	
+	private boolean useworklist = false;
+	
 	protected void setCGType(CG t) {
 		type = t;
 	}
@@ -89,6 +92,10 @@ public abstract class AbstractSwingTest extends TestCase {
 		this.useexhaustivesearch = exhaust;
 	}
 	
+	protected void setUseWorklist(boolean worklist) {
+		this.useworklist = worklist;
+	}
+	
 	protected Iterable<Entrypoint> getAdditonalEntrypoints(ClassHierarchy cha) {
 		return Collections.emptySet();
 	}
@@ -113,6 +120,8 @@ public abstract class AbstractSwingTest extends TestCase {
 	    ClassHierarchyException {
 		
 		UIAnomalyDetector detector = new UIAnomalyDetector(appPath);
+		
+//		InvalidThreadAccessDetector detector = new InvalidThreadAccessDetector(appPath);
 		
 		/** a few configurations to configure the tool for swing*/
 		if(type != null) {

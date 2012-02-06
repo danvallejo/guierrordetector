@@ -9,6 +9,7 @@ import edu.washington.cs.detector.CallChainFilter;
 import edu.washington.cs.detector.TestCommons;
 import edu.washington.cs.detector.UIAnomalyDetector;
 import edu.washington.cs.detector.CGBuilder.CG;
+import edu.washington.cs.detector.experimental.InvalidThreadAccessDetector;
 import edu.washington.cs.detector.experiments.filters.MergeSameEntryToStartPathStrategy;
 import edu.washington.cs.detector.experiments.filters.MergeSameTailStrategy;
 import edu.washington.cs.detector.experiments.filters.RemoveContainingNodeStrategy;
@@ -42,7 +43,9 @@ public class TestFileBunker extends TestCase {
 		UIAnomalyDetector.DEBUG = true;
 		
 		//initialize a UI anomaly detector
-        UIAnomalyDetector detector = new UIAnomalyDetector(path);
+//        UIAnomalyDetector detector = new UIAnomalyDetector(path);
+		
+		InvalidThreadAccessDetector detector = new InvalidThreadAccessDetector(path);
         
         detector.setThreadStartGuider(new CGTraverseSWTGuider());
         detector.setUIAnomalyGuider(new CGTraverseSWTGuider());
@@ -54,7 +57,7 @@ public class TestFileBunker extends TestCase {
 //		builder.setCGType(CG.ZeroCFA);
 //		builder.setCGType(CG.FakeZeroCFA);
 		
-		UIAnomalyDetector.setToUseDFS();
+//		UIAnomalyDetector.setToUseDFS();
 		
 		builder.buildCG();
 		//dump debugging information

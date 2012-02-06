@@ -137,7 +137,7 @@ public class TestMozillaFirefox extends AbstractAndroidTest {
 			type = CG.OneCFA;
 //			type = CG.RTA;
 			
-			UIAnomalyDetector.setToUseDFS();
+//			UIAnomalyDetector.setToUseDFS();
 			
 		    List<AnomalyCallChain> chains = super.findErrorsInAndroidApp(type, ui2startGuider, start2checkGuider);
 //		    List<AnomalyCallChain> chains = super.findErrorsInAndroidApp(CG.ZeroCFA, ui2startGuider, start2checkGuider);

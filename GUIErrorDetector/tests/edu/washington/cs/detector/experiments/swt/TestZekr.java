@@ -9,7 +9,6 @@ import edu.washington.cs.detector.CallChainFilter;
 import edu.washington.cs.detector.TestCommons;
 import edu.washington.cs.detector.UIAnomalyDetector;
 import edu.washington.cs.detector.CGBuilder.CG;
-import edu.washington.cs.detector.experimental.InvalidThreadAccessDetector;
 import edu.washington.cs.detector.experiments.filters.MergeSamePrefixToLibCallStrategy;
 import edu.washington.cs.detector.experiments.filters.MergeSameTailStrategy;
 import edu.washington.cs.detector.experiments.filters.RemoveSystemCallStrategy;
@@ -19,32 +18,38 @@ import edu.washington.cs.detector.util.Utils;
 import edu.washington.cs.detector.util.WALAUtils;
 import junit.framework.TestCase;
 
-public class TestArecaBackup extends TestCase {
-	public String dir = "D:\\research\\guierror\\subjects\\swt-subjects\\areca-latest\\";
-		
+public class TestZekr extends TestCase {
+    public String dir = "D:\\research\\guierror\\subjects\\swt-subjects\\zekr-exp\\";
 	
-    public String appPath = dir + "areca-latest.jar";
-	
+    public String appPath = dir + "zekr.jar";
     
-    
-	public String libJar = dir + "activation.jar"
-	    + Globals.pathSep + dir + "commons-net-1.4.1.jar"
-	    + Globals.pathSep + dir +  "jakarta-oro-2.0.8.jar"
-	    + Globals.pathSep + dir + "jsch.jar"
-	    + Globals.pathSep + dir +  "local_policy.jar"
-	    + Globals.pathSep + dir +  "mail.jar"
-	    + Globals.pathSep + dir +  "org.eclipse.core.commands_3.2.0.I20060605-1400.jar"
-	    + Globals.pathSep + dir +  "org.eclipse.equinox.common_3.2.0.v20060603.jar"
-	    + Globals.pathSep + dir +  "org.eclipse.jface_3.2.0.I20060605-1400.jar"
-        + Globals.pathSep + "D:\\develop-tools\\eclipse\\eclipse\\plugins\\org.eclipse.swt.win32.win32.x86_64_3.6.2.v3659c.jar";
+	public String libJar = dir + "basicplayer-3.0.jar"
+	   + Globals.pathSep + dir + "commons-codec-1.3.jar"
+	   + Globals.pathSep + dir + "commons-collections-3.2.1.jar"
+	   + Globals.pathSep + dir + "commons-configuration-1.6.jar"
+	   + Globals.pathSep + dir + "commons-io-1.4.jar"
+	   + Globals.pathSep + dir + "commons-lang-2.4.jar"
+	   + Globals.pathSep + dir + "commons-logging-1.0.4.jar"
+	   + Globals.pathSep + dir + "jlayer-1.0.1.jar"
+	   + Globals.pathSep + dir + "jorbis-0.0.17.jar"
+	   + Globals.pathSep + dir + "jspeex-0.9.7.jar"
+	   + Globals.pathSep + dir + "log4j-1.2.8.jar"
+	   + Globals.pathSep + dir + "lucene-core-3.0.0.jar"
+	   + Globals.pathSep + dir + "lucene-highlighter-3.0.0.jar"
+	   + Globals.pathSep + dir + "lucene-memory-3.0.0.jar"
+	   + Globals.pathSep + dir + "lucene-misc-3.0.0.jar"
+	   + Globals.pathSep + dir + "lucene-snowball-3.0.0.jar"
+	   + Globals.pathSep + dir + "mp3spi-1.9.4.jar"
+	   + Globals.pathSep + dir + "swt.jar"
+	   + Globals.pathSep + dir + "tritonus-jorbis-0.3.6.jar"
+	   + Globals.pathSep + dir + "tritonus-share-0.3.6.jar"
+	   + Globals.pathSep + dir + "velocity-1.6.2.jar"
+	   + Globals.pathSep + dir + "vorbisspi-1.0.3.jar";
 	    
 	
-	public void testArecaBackup() throws IOException {
+	public void testZekr() throws IOException {
 		String path = appPath + Globals.pathSep + libJar;
-		
-//        UIAnomalyDetector detector = new UIAnomalyDetector(path);
-        
-        InvalidThreadAccessDetector detector = new InvalidThreadAccessDetector(path);
+        UIAnomalyDetector detector = new UIAnomalyDetector(path);
         
         detector.setThreadStartGuider(new CGTraverseSWTGuider());
         detector.setUIAnomalyGuider(new CGTraverseSWTGuider());
@@ -74,11 +79,10 @@ public class TestArecaBackup extends TestCase {
 		System.out.println("No of chains after removing common tails: " + chains.size());
 		
 		filter = new CallChainFilter(chains);
-		chains = filter.apply(new MergeSamePrefixToLibCallStrategy(new String[]{"com.application.areca", "com.jcraft.jsch", "com.myJava"}));
+		chains = filter.apply(new MergeSamePrefixToLibCallStrategy(new String[]{"net.sf.zekr"}));
 		System.out.println("No of chains after removing common tails of lib calls: " + chains.size());
 		
-		Utils.dumpAnomalyCallChains(chains, "./logs/areca-anomalies.txt");
+		Utils.dumpAnomalyCallChains(chains, "./logs/zekr-anomalies.txt");
 		
 	}
-	
 }

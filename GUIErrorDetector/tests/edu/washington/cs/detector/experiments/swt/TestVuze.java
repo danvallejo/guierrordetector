@@ -9,7 +9,6 @@ import edu.washington.cs.detector.CallChainFilter;
 import edu.washington.cs.detector.TestCommons;
 import edu.washington.cs.detector.UIAnomalyDetector;
 import edu.washington.cs.detector.CGBuilder.CG;
-import edu.washington.cs.detector.experimental.InvalidThreadAccessDetector;
 import edu.washington.cs.detector.experiments.filters.MergeSamePrefixToLibCallStrategy;
 import edu.washington.cs.detector.experiments.filters.MergeSameTailStrategy;
 import edu.washington.cs.detector.experiments.filters.RemoveSystemCallStrategy;
@@ -19,32 +18,19 @@ import edu.washington.cs.detector.util.Utils;
 import edu.washington.cs.detector.util.WALAUtils;
 import junit.framework.TestCase;
 
-public class TestArecaBackup extends TestCase {
-	public String dir = "D:\\research\\guierror\\subjects\\swt-subjects\\areca-latest\\";
-		
+public class TestVuze extends TestCase {
+   public String dir = "D:\\research\\guierror\\subjects\\swt-subjects\\vuze-4.7\\";
 	
-    public String appPath = dir + "areca-latest.jar";
-	
+    public String appPath = dir + "vuze-4.7.jar";
     
-    
-	public String libJar = dir + "activation.jar"
-	    + Globals.pathSep + dir + "commons-net-1.4.1.jar"
-	    + Globals.pathSep + dir +  "jakarta-oro-2.0.8.jar"
-	    + Globals.pathSep + dir + "jsch.jar"
-	    + Globals.pathSep + dir +  "local_policy.jar"
-	    + Globals.pathSep + dir +  "mail.jar"
-	    + Globals.pathSep + dir +  "org.eclipse.core.commands_3.2.0.I20060605-1400.jar"
-	    + Globals.pathSep + dir +  "org.eclipse.equinox.common_3.2.0.v20060603.jar"
-	    + Globals.pathSep + dir +  "org.eclipse.jface_3.2.0.I20060605-1400.jar"
+	public String libJar = dir + "apache-log4j.jar"
+	    + Globals.pathSep + dir + "commons-cli-1.2.jar"
         + Globals.pathSep + "D:\\develop-tools\\eclipse\\eclipse\\plugins\\org.eclipse.swt.win32.win32.x86_64_3.6.2.v3659c.jar";
 	    
 	
-	public void testArecaBackup() throws IOException {
+	public void testVuze() throws IOException {
 		String path = appPath + Globals.pathSep + libJar;
-		
-//        UIAnomalyDetector detector = new UIAnomalyDetector(path);
-        
-        InvalidThreadAccessDetector detector = new InvalidThreadAccessDetector(path);
+        UIAnomalyDetector detector = new UIAnomalyDetector(path);
         
         detector.setThreadStartGuider(new CGTraverseSWTGuider());
         detector.setUIAnomalyGuider(new CGTraverseSWTGuider());
@@ -74,11 +60,10 @@ public class TestArecaBackup extends TestCase {
 		System.out.println("No of chains after removing common tails: " + chains.size());
 		
 		filter = new CallChainFilter(chains);
-		chains = filter.apply(new MergeSamePrefixToLibCallStrategy(new String[]{"com.application.areca", "com.jcraft.jsch", "com.myJava"}));
+		chains = filter.apply(new MergeSamePrefixToLibCallStrategy(new String[]{"com.aelitis.azureus"}));
 		System.out.println("No of chains after removing common tails of lib calls: " + chains.size());
 		
-		Utils.dumpAnomalyCallChains(chains, "./logs/areca-anomalies.txt");
+		Utils.dumpAnomalyCallChains(chains, "./logs/vuze-anomalies.txt");
 		
 	}
-	
 }

@@ -32,6 +32,7 @@ import edu.washington.cs.detector.ThreadStartFinder;
 import edu.washington.cs.detector.UIAnomalyDetector;
 import edu.washington.cs.detector.UIAnomalyMethodFinder;
 import edu.washington.cs.detector.CGBuilder.CG;
+import edu.washington.cs.detector.experimental.InvalidThreadAccessDetector;
 import edu.washington.cs.detector.experiments.filters.MergeSameEntryToStartPathStrategy;
 import edu.washington.cs.detector.experiments.filters.MergeSamePrefixToLibCallStrategy;
 import edu.washington.cs.detector.experiments.filters.MergeSameTailStrategy;
@@ -263,7 +264,11 @@ public abstract class AbstractAndroidTest extends TestCase {
 		
 		
 		//set up the anomaly detection
-		UIAnomalyDetector detector = new UIAnomalyDetector(getAppPath());
+//		UIAnomalyDetector detector = new UIAnomalyDetector(getAppPath());
+		
+		InvalidThreadAccessDetector detector = new InvalidThreadAccessDetector(getAppPath());
+		
+		
 		String defaultcheckingfile = "./tests/edu/washington/cs/detector/checkingmethods_for_android.txt";
 		detector.configureCheckingMethods(defaultcheckingfile);
 		if(this.androidcheckingfile != null) {
