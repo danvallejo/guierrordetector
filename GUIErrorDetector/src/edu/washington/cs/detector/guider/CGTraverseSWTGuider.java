@@ -35,7 +35,7 @@ public class CGTraverseSWTGuider implements CGTraverseGuider {
 		return true;
 	}
 	
-	private boolean matchExcludedSWTCalls(CGNode dest) {
+	protected boolean matchExcludedSWTCalls(CGNode dest) {
 		String destStr = dest.toString();
 		for(String str : swtCalls) {
 			if(destStr.indexOf(str) != -1) {
