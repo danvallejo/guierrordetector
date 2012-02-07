@@ -5,9 +5,7 @@ Our experimental objective is three-fold: to demonstrate the effectiveness
 of our approach in detecting real errors in multithreaded GUI applications, to 
 compare the reflection-aware call graph construction algorithm
 with existing ones, and to evaluate the usefulness of the proposed 
- filters.  
-
-\textbf{This part needs to re-write, talk sound/heuristic filters separately}
+error filters.  
 
 First, we describe our subject programs (Section~\ref{sec:subjects}) and the experimental procedure (Section~\ref{sec:procedural}).
 We then show that our technique detects bugs in real-world GUI applications (Section~\ref{sec:errors}).
@@ -45,16 +43,22 @@ which include end-user applications, programming tools, and games.
 \Item \textbf{SWT desktop applications.}
 %VirgoFTP~\cite{virgo} and FileBunker~\cite{filebunker} are two useful SWT desktop applications.
 VirgoFTP~\cite{virgo} implements a simple FTP client based on Java and SWT UI library.
-FileBunker~\cite{filebunker} is a file backup application which uses one or more GMail accounts as its backup repository.
+FileBunker~\cite{filebunker} is a file backup application which uses one or more GMail
+accounts as its backup repository. ArecaBackup~\cite{areca} offers a personal
+file backup solution for Linux and Windows.
+
 
 \Item \textbf{Eclipse plugins.}
 HudsonEclipse~\cite{hudson} monitors Hudson build status from Eclipse.
 EclipseRunner~\cite{eclipserunner} extends Eclipse's capability to run launch configurations.
 
+
 \Item \textbf{Swing applications.} %S3dropbox~\cite{s3dropbox} and SudokuSolver~\cite{sudokusolver} are two Swing desktop applications.
 S3dropbox~\cite{s3dropbox}  allows users
 to drag and drop files to their Amazon S3 accounts. SudokuSolver~\cite{sudokusolver}
 computes Sudoku solutions efficiently using mutlithreading execution. 
+
+\smallstep
 
 \Item  \textbf{Android applications.} %MyTracks~\cite{mytracks}, Fennec~\cite{fennec}, and SGTPuzzles~\cite{sgtpuzzles} are three Android applications.
 SGTPuzzler~\cite{sgtpuzzles} is a single-player logic game.
@@ -81,6 +85,8 @@ interfaces to visualize them on Google Maps.
  \hline
  FileBunker (1.1.2)&  14237 &  150 &  1106  \\
  \hline
+ ArecaBackup (7.2)&   23226 &  444 &  4729 \\
+ \hline
  \hline
 \multicolumn{4}{|l|}{Eclipse plugins}   \\
  \hline
@@ -105,7 +111,7 @@ interfaces to visualize them on Google Maps.
  MyTracks (1.1.13.rc4)&  20297 &  143 &  1374 \\
 \hline
 \hline
- Total &  76232 &  650 &  6492\\
+ Total &  99458 &  1094 &  11221 \\
 \hline
 \multicolumn{4}{l}{}   \\
 \hline
@@ -181,7 +187,7 @@ the error.
 \hline
  Subject&  \multicolumn{9}{|c||}{Our Technique} & Requiring Wrappers  \\
 \cline{2-10}
- Program  &  \multicolumn{3}{|c|}{RTA }& \multicolumn{3}{|c|}{0-CFA } & \multicolumn{3}{|c||}{1-CFA } & (Section~\ref{sec:straightforward})  \\
+ Program  &  \multicolumn{3}{|c||}{RTA }& \multicolumn{3}{|c||}{0-CFA } & \multicolumn{3}{|c||}{1-CFA } & (Section~\ref{sec:straightforward})  \\
 \cline{2-11}
  & CG Size & \#Warning & \#Bug & CG Size & \#Warning & \#Bug & CG Size & \#Warning & \#Bug & \#Warning \\
 \hline \hline
@@ -190,6 +196,8 @@ the error.
  VirgoFTP&  12401 &  2 &  2 & 10858 & 2 & 2 & 43598 & 2 & 2& 149  \\
  \hline
  FileBunker &  18951 &  1 &  0 & 15743 & 0 & 0 & 76088 & 2 & 1& 693  \\
+ \hline
+ ArecaBackup&  20882 &  1  &  0 & 19697 & 1 & 1  & 116398 & 1 & 1 & 3021\\
  \hline
  \hline
 \multicolumn{11}{|l|}{Eclipse plugins}   \\
@@ -217,7 +225,7 @@ the error.
  MyTracks & 24036 / 24036 &  161 / 220 & 0 / 0 & 10803 / 13645 & 119 / 119 & 0 / 0 & 39235 / 110977 & 1 / 1 & 0 / 1 & 1192 \\
 \hline
 \hline
- Total & 178279 / 178842 &  188 / 251 & 6 / 6 & 129744 / 133357 & 137 / 137& 7 / 7 & 461423 / 536358& 21 / 21 & 10 / 11 & 3521 \\
+ Total & 199161 / 199724 &  189 / 252 & 7 / 7 & 149441 / 153054& 138 / 138& 8 / 8 & 577821 / 652756& 22 / 22 & 11 / 12 & 6542\\
 \hline
 \end{tabular}
 \end{center}
@@ -231,7 +239,7 @@ and ``1-CFA'' show the results of using different
 call graph construction algorithms. In each cell of the table
 for Android applications, a slash ``/'' separates the result of
 using normal call graph construction algorithm and the reflection-aware
-call graph construction algorithm. The \bugs errors found in VirgoFTP, FileBunker,
+call graph construction algorithm. The \newbugs errors found in VirgoFTP, FileBunker, ArecaBackup
 S3dropbox, and SudokuSolver are previously  unknown. As a comparison, the
 results of a straightforward approach (Section~\ref{sec:straightforward}) are shown at the far right.} }
 \end{table*}
@@ -537,18 +545,12 @@ exhaustive search in our error detection algorithm.
 \label{sec:filters}
 
 Table~\ref{table:filters} measures the effectiveness of the proposed 
-error filters of Section~\ref{sec:heuristic}
-
+error filters of Section~\ref{sec:heuristic}.
 The five error filters removed 99.96\% of the reported warnings as false positives
-or redundant warnings. Specifically, heuristic filters 1 and 2 identified
-29.38\% of the warnings as likely false positives, and filters 3, 4,
-and 5 identified 70.58\% of the warnings as redundant warnings.
-The 3rd filter for removing lexically redundant
-reports is the most effective one.
-% on the evaluated subjects: it removes 37019 redundant warnings.
-
-%We further manually check each filtered warning, and found no
-%real errors have been removed.
+or redundant warnings. Specifically, two sound filters 1 and 2 identified
+removed 36.52\% of the warnings, and three heuristic filters 3, 4, and 5
+removed 63.44\% of the warnings. Among them, the 1st filter for removing
+lexically redundant reports is the most effective one. 
 
 \vspace{1mm}
 
@@ -572,37 +574,39 @@ sound and heuristic filters can still remove most of them.
 \hline \hline
 \multicolumn{7}{|l|}{SWT desktop applications}   \\
  \hline
- VirgoFTP &  21 &  21 &  3 & 3 &  2 & 2\\
+ VirgoFTP &  21 &  21 &  21 & 7 &  2 & 2\\
  \hline
- FileBunker &  4494 &  3210 &  3210 &  642 &  2 & 2\\
+ FileBunker &  4494 &  4494 &  3210 &  3210 &  10  & 2\\
+ \hline
+ ArecaBackup &  6219 &  438 & 438 &  438  &  1 & 1\\
  \hline
  \hline
 \multicolumn{7}{|l|}{Eclipse plugins}   \\
  %\hline
  %EclipseRunner &  xxxx &  xx &  xxx & xx &  xxx & xx\\
  \hline
- EclipseRunner&  1621 &  1487 &  1487 & 1487 &  6 & 6\\
+ EclipseRunner&  1644 &  1644 &  1644 & 1644 &  6 & 6\\
  \hline
- HundsonEclipse&  3192 &  2417 &  2417 & 9 &  3 & 3\\
+ HundsonEclipse&  1367 &  567 &  567 & 567 &  3 & 3\\
  \hline
  \hline
 \multicolumn{7}{|l|}{Swing desktop applications}   \\
  \hline
- S3dropbox&  45528 &  31978 &  31978 & 9 &  1 & 1\\
+ S3dropbox&  45528 &  31978 &  31978 & 30975 &  9 & 1\\
  \hline
- SudokuSolver &  58 &  58 &  58 & 2 &  2 & 2\\
+ SudokuSolver &  58 &  58 &  58 & 58  &  2 & 2\\
  \hline
  \hline
 \multicolumn{7}{|l|}{Android mobile applications}   \\
  \hline
  SGTPuzzler&  2 &  1 &  1 & 1 &  1 & 1\\
  \hline
- Fennec &  122 &  122 & 84 & 84 &  9 & 3\\
+ Fennec &  122 &  84 & 84 & 84 &  9 & 3\\
  \hline
- MyTracks &  1176 &  1176 &  441 & 441 &  63 & 1 \\
+ MyTracks &  1176 &  1176 &  483 & 441 &  69 & 1 \\
 \hline
  \hline
- Total &  56214 &  40470 &  39697 &  2678 &  89 & 21 \\
+ Total &  60631 &  40461 &  38484 &  37425 &  112 & 22 \\
  \hline
 \end{tabular}
 \end{center}

@@ -40,7 +40,7 @@ and \textbf{safe UI methods} for each framework.
 %customizing for: entry points, starting points, error checking, thread
 %safe UI methods, what is the event dispatching thread?
 
-\newcommand{\smallstep}{\vspace{-2mm}}
+
 \subsubsection{SWT}
 
  We instantiated our technique for SWT applications as follows:
@@ -55,7 +55,7 @@ is initialized.
 
 \smallstep
 
-\item \textbf{UI-accessing nodes: } the \CodeIn{Display.checkWidget}
+\item \textbf{UI-accessing nodes: } the \CodeIn{Widget.checkWidget}
 and \CodeIn{Display.} \CodeIn{checkDevice} methods. SWT uses the above
 two methods to explicitly check thread accesses at runtime.
 %Any methods for manipulating GUIs object must call (one of) these two methods
