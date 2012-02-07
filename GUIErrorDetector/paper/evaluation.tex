@@ -192,7 +192,7 @@ the error.
 \hline \hline
 \multicolumn{11}{|l|}{SWT desktop applications}   \\
  \hline
- VirgoFTP&  12401 &  2 &  2 & 10858 & 2 & 2 & 43598 & 2 & 2& 149  \\
+ VirgoFTP&  12401 &  1 &  1 & 10858 & 1 & 1 & 43598 & 2 & 2& 149  \\
  \hline
  FileBunker &  18951 &  1 &  0 & 15743 & 0 & 0 & 76088 & 2 & 1& 693  \\
  \hline
@@ -224,7 +224,7 @@ the error.
  MyTracks & 24036 / 24036 &  161 / 220 & 0 / 0 & 10803 / 13645 & 119 / 119 & 0 / 0 & 39235 / 110977 & 1 / 1 & 0 / 1 & 1192 \\
 \hline
 \hline
- Total & 199161 / 199724 &  189 / 252 & 7 / 7 & 149441 / 153054& 138 / 138& 8 / 8 & 577821 / 652756& 22 / 22 & 11 / 12 & 6542\\
+ Total & 199161 / 199724 &  188 / 251 & 6 / 6 & 149441 / 153054& 137 / 137& 7 / 7 & 577821 / 652756& 22 / 22 & 11 / 12 & 6542\\
 \hline
 \end{tabular}
 \end{center}
@@ -371,7 +371,7 @@ subtle to find. For example, our tool found two new errors in SudokuSolver.
 One error only happens when
 the given Sudoku is unsolvable; and the other one happens
 when  JVM fails to launch the mail composing window of the
-user default mail client (after a user clicks "eMail Me" button).
+user default mail client (after a user clicks the "eMail Me" button).
 
 As reflected in our experiments, we found GUI developers have already
 used design patterns, runtime checks, and testing to avoid violating
@@ -430,13 +430,27 @@ more errors with fewer false positive warnings than the other two algorithms. Th
 is because RTA and 0-CFA do not consider the calling context when
 constructing a call graph, and may
 mix the same method calls by different callers into a single node, thus
-introducing imprecision. 
+introducing imprecision. Although the error-revealing path exists in
+the less precise graphs, it presents the error detection algorithm finding it.
+Figure~\ref{fig:ex} illustrates this limitation.
 
-%Although the call graphs
-%built by 1-CFA are significantly larger, XXX, the algorithm still runs
-%in a practical amouont of time. For example,
-%our tool finished building the call graph for the largest subject (xxx)
-%within xxx minutes.
+\begin{figure}[t]
+  \centering
+  \includegraphics[scale=0.33]{cgexample}
+  \vspace*{-5.0ex}\caption {{\label{fig:ex} (a) shows an example code, in which
+\CodeIn{safeMtd} is a Safe UI method, and \CodeIn{uiAcc} is a UI-Accessing method.
+(b) shows a less precise call graph built by RTA or 0-CFA, and (c) shows a more
+precise call graph built by 1-CFA. The node for \CodeIn{Thread.run()}
+method is omitted for brevity. Using the less precise call graph, the error
+detection algorithm will report an invalid method call chain: \CodeIn{entry()}
+$\rightarrow$ \CodeIn{f()} $\rightarrow$ \CodeIn{start()} $\rightarrow$ \CodeIn{uiAcc()},
+but miss the actual error path: \CodeIn{entry()} $\rightarrow$ \CodeIn{g1()} $\rightarrow$
+\CodeIn{g2()} $\rightarrow$ \CodeIn{start()} $\rightarrow$ \CodeIn{uiAcc()}. The
+actual error path can only be found when using the more precise call graph.
+}}
+\end{figure}
+
+
 
 The results in Table~\ref{table:results} also show that using a reflection-aware
 call graph construction algorithm helps in finding errors in Android
@@ -536,7 +550,7 @@ error filters of Section~\ref{sec:heuristic}.
 The five error filters removed 99.96\% of the reported warnings as false positives
 or redundant warnings. Specifically, two sound filters 1 and 2 
 removed 34.44\% of the warnings, and three heuristic filters 3, 4, and 5
-removed 65.52\% of the warnings. Among them, the 4th filter for removing
+removed a further 65.52\% of the warnings. Among them, the 4th filter for removing
 reports with the same head methods from the entry node to \CodeIn{Thread.start()}
 is the most effective one. 
 
@@ -605,7 +619,7 @@ shows the number of warnings by the reflection-aware 1-CFA algorithm.
 Other algorithms show similar patterns, which are omitted for brevity.
 Column ``$F_{i,...,j}$'' represents the number of remaining warnings after applying
 the $i$th to $j$th filters as defined in Section~\ref{sec:heuristic}.
-The numbers in the last column are the same as the subcolumn ``\#Warnings"
+The numbers in the last column are the same as the subcolumn ``\#Warning"
 under column ``1-CFA'' in Table~\ref{table:results}.
 } }
 \end{table}
@@ -619,7 +633,7 @@ with over 1.4 MLOC, showing good scalability. Our evaluations
 were conducted on a 2.67GHz Intel Core PC with 4GB
 physical memory (1GB is allocated for JVM), running Fedora 16.
 For the most time-consuming subject, MyTracks, our tool finished the whole analysis
-within 686 seconds using the most expensive call graph construction
+within 209 seconds using the most expensive call graph construction
 algorithm: the reflection-aware 1-CFA algorithm. Analyzing
 other subjects using different algorithms took less time.
 The performance has not been tuned, and we believe

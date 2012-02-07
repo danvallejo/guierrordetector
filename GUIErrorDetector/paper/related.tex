@@ -175,8 +175,8 @@ requires to instrument the code of Android's library class
 \CodeIn{android.view.LayoutInflater} that performs the XML inflation ahead of time,
 then replaces the \CodeIn{findViewById} call with with a
 non-deterministic execution of new statements.
-In contrast, our algorithm leverages the powerful \textit{Bypass logic}
-in the WALA framework to transform the program on-the-fly when
+In contrast, our algorithm leverages WALA's \textit{bypass logic}
+to transform the program on-the-fly when
 constructing the call graph, without requiring a separate pass of
 off-line instrumentation.
 
