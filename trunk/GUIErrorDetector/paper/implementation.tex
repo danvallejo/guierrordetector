@@ -57,7 +57,9 @@ is initialized.
 
 \item \textbf{UI-accessing nodes: } the \CodeIn{Widget.checkWidget}
 and \CodeIn{Display.} \CodeIn{checkDevice} methods. SWT uses the above
-two methods to explicitly check thread accesses at runtime.
+two methods to explicitly check whether the current thread is a UI thread
+or not, and throw a \CodeIn{RuntimeException} if the checking fails.
+%thread accesses at runtime.
 %Any methods for manipulating GUIs object must call (one of) these two methods
 % to determine whether the current thread is the UI thread or not.
 \smallstep
@@ -143,16 +145,6 @@ operating system. In particular, Android applications use \textit{activities}
 (i.e., instances of the \CodeIn{Activity} class)
 to interact with users through a visual interface and handle GUI events.
 We instantiated our technique for Android programs as follows:
-%, with some notable exceptions such as the
-%lifecycle of activities.
-
-%An XML \textit{manifest file} registers the components of an application. Other XML
-%fies describe the visual layout of the activities. Activities \textit{inflate}
-%layout files into
-%visual objects (a hierarchy of views), through an \textit{inflater} provided by the An-
-%droid library. This means that library or user-defined views are not explicitly
-%created by new statements but rather inflated through \textit{reflection}. Library meth-
-%ods such as \CodeIn{findViewById} access the inflated views.
 
 
 \begin{itemize}
@@ -167,9 +159,10 @@ code as entry nodes, since they are also called back from the UI thread.
 \smallstep
 
 \item \textbf{UI-accessing nodes: }the \CodeIn{ViewRoot.checkThread} method.
-Like SWT, Android explicitly checks whether
-the current thread is a UI thread or not before accessing a GUI object via
-the \CodeIn{ViewRoot.checkThread} method.
+Like SWT, Android explicitly performs runtim checking before accessing
+a GUI object via the \CodeIn{ViewRoot.checkThread} method. If the current
+thread is a non-UI thread, the \CodeIn{ViewRoot.checkThread} method throws
+a \CodeIn{RuntimeException}.
 
 \smallstep
 
@@ -193,8 +186,7 @@ the above four instantiations.
 We implemented the reflection-aware call graph construction
  algorithm (Section~\ref{sec:cg}) using WALA's \textit{bypass logic}.
 Unlike similar tools~\cite{Payet:2011:SAA:2032266.2032299}, our tool
-does not require a separate
-pass for program instrumentation; instead, it
+does not require a separate pass for program instrumentation; instead, it
 parses the configuration file in an Android application,
 and then intercepts the call graph construction
 process on-the-fly to replace all reflection calls with object creation statements.

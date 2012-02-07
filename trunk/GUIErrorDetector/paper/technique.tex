@@ -389,9 +389,11 @@ may call method \CodeIn{javaMethod()}.
 
 \noindent Our static analysis takes the call relationship specified by this
 annotation into consideration when traversing the call graph. 
+
 Adding annotations for native methods is optional and requires manual effort.
 In our experiments, 1 out of \subnum programs uses native methods. We manually
-searched the source files, inspected the code to determine possible target methods
+searched the Java source files to find all native methods,
+inspected the C code to determine possible target methods
 that may be called by a native method, and added \annotationnum annotations for this program.
 We found such an annotation was useful: one error
 is only reported when using the user-provided annotations.
@@ -505,7 +507,9 @@ can have multiple callers, so that method call chains with the same tail are lik
 to just represent different ways to trigger the same error. This filter compares 
 two reported method call chains that share the same 
 tail from \CodeIn{Thread.start()} to the UI-accessing methods, and
-removes the longer one.
+removes the longer one. Using filters 4 and 5 together results in
+only one error per \CodeIn{Thread.start()}.
+
 
 
 %\end{enumerate}
