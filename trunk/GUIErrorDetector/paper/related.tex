@@ -43,8 +43,8 @@ using a static analysis can potentially explore
 all paths to find potential errors without actually executing the tested code. 
 Compared with software testing, a static analysis tool may
 report false positives and redundant warnings due to its conservative nature.
-Nevertheless, as we demonstrated in our experiments, using a few simple heuristics
-can dramatically reduce the number of false positives and redundant warnings to
+Nevertheless, as we demonstrated in our experiments, using a few simple error
+filters can dramatically reduce the number of false positives and redundant warnings to
 an acceptable level.
 
 
@@ -121,11 +121,11 @@ Unfortunately, due to the exponential size of the search space,
  it is hard for model checking approaches to scale to a realistic multithreaded GUI application
  without compromising the detection capability. To our best knowledge,
 we are not aware of any software model checking approach can scale to the subjects
-as large as those used in our experiments (including the library code). Compared with model checking, the static analysis
-algorithm presented in this paper chooses call graph as the
-abstraction level with a set of heuristics, and thus achieves good
-scalability with reasonable precision. It is specifically designed to find invalid thread
-access errors instead of being a general property checking tool. 
+as large as those used in our experiments (including the library code).
+The technique presented in this paper is specifically designed to find invalid thread
+errors instead of being a general property checking tool. 
+It chooses call graph as a coarse-grained program representation with a
+set of error filters, achieving good scalability with reasonable accuracy.
 
 %For this reason,
 %our technique achieves good scalability with reasonable precision.
@@ -134,7 +134,7 @@ access errors instead of being a general property checking tool.
 
 A lot of effort has been spent on analyzing function pointers in C
 as well as virtual method calls in C++ and Java ~\cite{rta, kcfa,
-xta, inccg, Sundaresan:2000, Might:2010}.
+xta, inccg, Sundaresan:2000}.
 We briefly mention some of the highlights of call graph construction
 algorithms for Java here. Grove et al~\cite{kcfa} described a unified
 framework for expressing call graph construction algorithms, and
@@ -147,8 +147,8 @@ for the purpose of obtaining a more precise call graph.
 However, the heavy use of reflection in some GUI applications make
 those algorithms insufficient to build a good call graph.
 As reflected in our experiments, using standard call graph algorithms
-such as RTA, 0-CFA, and 1-CFA fails to find UI-specific errors in
-Android applications, due to the incompleteness of the resulting graph.
+fails to find errors in some
+Android applications. %, due to the incompleteness of the resulting graph.
 
 
 To enable call graph construction in the presence of  reflection,

@@ -89,7 +89,7 @@ then specifies entry nodes, UI-accessing nodes, and safe UI nodes
 for it on line 3, 4, and 5, respectively. Lines 3--5 are GUI framework-specific.
 As an example, for a SWT desktop application, the entry nodes include
 the single main method, UI-accessing nodes include methods
-\CodeIn{Display.checkWidget} and \CodeIn{Display.checkDevice},
+\CodeIn{Widget.checkWidget} and \CodeIn{Display.checkDevice},
 and safe UI methods include two SWT helper methods \CodeIn{Display.asyncExec}  and
 \CodeIn{Display.syncExec} for message passing. The detailed instantiation
 for each supported framework is explained in Section~\ref{sec:platforms}.
