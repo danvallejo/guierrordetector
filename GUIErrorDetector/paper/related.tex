@@ -157,8 +157,8 @@ that attempts to infer additional information about
 reflective call sites directly from program code. The analysis
 attempts to use information stored in string constants to resolve
 reflective calls statically. Their approach focuses on standard Java
-reflection library calls (e.g., \CodeIn{java.lang.Class.forName}) but not on
-framework-specific ones (e.g., \CodeIn{android.view.View.findViewById}).
+reflection calls (e.g., \CodeIn{java.lang.Class.forName}) but not on
+framework-specific ones (e.g., \CodeIn{android.view.View.find-\\ViewById}).
 The WALA framework implements a similar approach to handle Java
 reflections, but still fails to build a sufficiently complete call graph for
 Android applications. TamiFlex~\cite{Bodden:2011}, a pure dynamic

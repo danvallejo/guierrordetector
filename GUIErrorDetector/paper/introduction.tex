@@ -132,6 +132,7 @@ to fix bug 51757 and verify the patch.
      \}
 \end{alltt}
 \end{CodeOut}
+\tinystep
 \vspace*{-3.0ex} \Caption{{\label{fig:androiderror} 
 Bug 703256 reported on 11/17/2011 in Fennec (Mozilla Firefox for Android)
 release 10.0.a.rc3. On line 74, \CodeIn{LayerView}'s constructor
@@ -248,6 +249,7 @@ reports no warnings, the code is guaranteed to be bug-free.
 %$\rightarrow$\CodeIn{ \scriptsize{org.mozilla.gecko.gfx.LayerView.setViewportSize(IntSize;)}}\\
 %\hspace{5mm}\CodeIn{...}\\
 %$\rightarrow$\CodeIn{ \scriptsize{android.view.ViewRoot.checkThread()}}
+\tinystep
 \vspace*{-3.0ex} \Caption{{\label{fig:report} Our tool reports
 a method call chain that reveals the potential error in
 Figure~\ref{fig:androiderror}. $\rightarrow$ represents
