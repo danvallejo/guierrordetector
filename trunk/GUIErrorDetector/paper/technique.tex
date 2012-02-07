@@ -433,17 +433,21 @@ for programmers to interpret.
 
 %\item
 \textbf{2. Filter Reports With User-Annotated Methods}. Besides general
-library calls, users are also permitted to explicitly annotate methods
+library calls, users are also permitted to explicitly annotate project-specific methods
 that will never trigger an error.
-For example, the Android GUI framework provides a utility method 
-\CodeIn{runOnUIThread} to check whether the current thread is the UI thread
-before executing the code. If the current thread is not the UI thread,
-this method will be executed on the UI thread via message passing.
-Thus, a reported method call chain containing an annotated 
-can be safely removed. We produced the list of annotated methods
-during analyzing programs on different GUI frameworks; we did this
-only between experiments rather than biasing experiments by tuning
-our tool to specific programs.
+%For example, the Android GUI framework provides a utility method 
+%\CodeIn{runOnUIThread} to check whether the current thread is the UI thread
+%before executing the code. If the current thread is not the UI thread,
+%this method will be executed on the UI thread via message passing.
+%Thus,
+A reported method call chain containing an annotated 
+can be safely removed. In our experiments, we produced a list of \filternum
+annotated methods for two subjects because they are using a customized
+pattern to interact with the GUI framework.
+
+%during analyzing programs on different GUI frameworks; we did this
+%only between experiments rather than biasing experiments by tuning
+%our tool to specific programs.
 
 
 \subsubsection{Heuristic Filters}

@@ -14,8 +14,7 @@ a straightforward approach (Section~\ref{sec:straightforward}),  compare
 different call graph construction algorithms (Section~\ref{sec:reflectionaware}), and
 evaluate various graph search strategies in error detection (Section~\ref{sec:search}).
  Finally, we show that the proposed filters are effective
-in removing redundant warnings and eliminating
-false positives (Section~\ref{sec:filters}). 
+in removing warnings (Section~\ref{sec:filters}). 
 
 
 
@@ -44,7 +43,7 @@ which include end-user applications, programming tools, and games.
 %VirgoFTP~\cite{virgo} and FileBunker~\cite{filebunker} are two useful SWT desktop applications.
 VirgoFTP~\cite{virgo} implements a simple FTP client based on Java and SWT UI library.
 FileBunker~\cite{filebunker} is a file backup application which uses one or more GMail
-accounts as its backup repository. ArecaBackup~\cite{areca} offers a personal
+accounts as its backup repository. ArecaBackup~\cite{areca} offers a local
 file backup solution for Linux and Windows.
 
 
@@ -162,7 +161,7 @@ threads are initialized via using the library method \CodeIn{android.os.handler.
 %method in the XXX subject first checks whether the current thread is the UI-thread, and
 %then determines whether to direct access a GUI object or wrap the code with
 %message passing. 
-Thus, we add 11 user-defined filters for these two subjects.
+Thus, we add \filternum user-defined filters for these two subjects.
 %to indicate
 %that they are safe to be invoked from any thread. 
 In this experiment, none of the paper
@@ -241,7 +240,8 @@ for Android applications, a slash ``/'' separates the result of
 using normal call graph construction algorithm and the reflection-aware
 call graph construction algorithm. The \newbugs errors found in VirgoFTP, FileBunker, ArecaBackup
 S3dropbox, and SudokuSolver are previously  unknown. As a comparison, the
-results of a straightforward approach (Section~\ref{sec:straightforward}) are shown at the far right.} }
+results of a straightforward approach, called ``Requiring Wrappers'' (Section~\ref{sec:straightforward}),
+are shown at the far right.} }
 \end{table*}
 
 \subsection{Results}
@@ -254,30 +254,18 @@ results of a straightforward approach (Section~\ref{sec:straightforward}) are sh
 \subsubsection{Errors in Multithreaded GUI Applications}
 \label{sec:errors}
 
-Table~\ref{table:results} tabulates the experimental results.
-Our tool found real errors in each subject programs.
-
-%of running our
-%tool with three different call graph construction algorithms
-%on the subject programs. From these results, we can see our
-%tool found real errors from each subject on  four
-%supported GUI frameworks. The results vary slightly according
-%to the call graph algorithm used. In general, using
-%the 1-CFA algorithm found most errors (\bugs in total) and least
-%false positive warnings (\falses in total). 
-
-%We further examined the detailed results for each subject.
-Among the \warnings warnings issued when using the 1-CFA call graph algorithm, \bugs
-warnings reveal \bugs distinct errors (\newbugs are previously unknown),
+As shown Table~\ref{table:results},  our tool found
+real errors in each subject program. Using the 1-CFA
+call graph algorithm, our tool issued 22 warnings, among
+which \bugs warnings reveal \bugs distinct errors (\newbugs are previously unknown),
 2 warnings are false positives, and the remaining 8 warnings
 are redundant. Section~\ref{sec:reflectionaware} compares with other call graph
 construction algorithms.
 
-We have submitted all of the newly-found errors
-to the developers. As of Feb 2012, 1 error in S3dropbox has been confirmed.
-4 errors can be reproduced and validated in our own experimental environment, and
-1 error from FileBunker was submitted but has not been verified
-by its developers yet.
+We have submitted all \newbugs new errors
+to the subject developers. As of Feb 2012, 1 error in S3dropbox has been confirmed,
+4 errors have been reproduced and validated in our own experimental environment, and
+2 errors in FileBunker and ArecaBackup had not been verified by developers yet.
 
 
 
@@ -328,12 +316,11 @@ violation. He mentioned that the S3dropbox project uses
 certain design patterns to avoid such violations (e.g.,
 actions for UI interaction are encapsulated into a \CodeIn{Worker} interface),
 but they still overlooked  the error our tool found.
-
 Another reason they overlooked this violation is because some GUI frameworks like Swing
 do not provide any run-time checks for invalid thread accesses. Swing
 GUI might not exhibit user-visible faults on many erreoneous executions.
-However, as clearly stated in the official documentation~\cite{swing}, Swing is a single-GUI-threaded GUI
-toolkit and invoking Swing code from multiple threads risks thread interference
+However, as clearly stated in the official documentation~\cite{swing}, %Swing is a single-GUI-threaded GUI toolkit and
+accessing Swing GUI objects from non-UI threads risks thread interference
 or memory-consistency errors.
 
 
@@ -380,11 +367,11 @@ tool issues 6 separate warnings to indicate
 6 different ways to trigger this error. 5 of the warnings are redundant.
 
 Besides the above two examples, other errors our tool reported were also
-subtle to find. Take the two newly-found errors in SudokuSolver
-as an example. One error happens when
-the given Sudoku is unsolvable; and the other one happens
-when the program fails to launch the mail composing window of the
-user default mail client (after clicking "eMail Me" button).
+subtle to find. For example, our tool found two new errors in SudokuSolver.
+One error only happens when
+the given sudoku is unsolvable; and the other one happens
+when the JVM fails to launch the mail composing window of the
+user default mail client (after a user clicks "eMail Me" button).
 
 As reflected in our experiments, we found GUI developers have already
 used design patterns, runtime checks, and testing to avoid violating
@@ -506,7 +493,7 @@ and changing queue operations (\CodeIn{enqueueAll}, and \CodeIn{dequeue}
 on lines 9, 12, and
 23 in Figure~\ref{fig:androiderror}, respectively)
 to the corresponding statck operations (\CodeIn{pushAll}, and \CodeIn{pop}).
-This variant found 10 errors in total and missed 1 error in the FileBunker subject.
+This variant found 11 errors in total and missed 1 error in the FileBunker subject.
 The reason is that DFS tends to search deeper into the graph, and the path it returns
 may not be the shortest one and is more likely to be an infeasible path in practice.
 %For the FileBunker subject, paths
@@ -547,10 +534,11 @@ exhaustive search in our error detection algorithm.
 Table~\ref{table:filters} measures the effectiveness of the proposed 
 error filters of Section~\ref{sec:heuristic}.
 The five error filters removed 99.96\% of the reported warnings as false positives
-or redundant warnings. Specifically, two sound filters 1 and 2 identified
-removed 36.52\% of the warnings, and three heuristic filters 3, 4, and 5
-removed 63.44\% of the warnings. Among them, the 1st filter for removing
-lexically redundant reports is the most effective one. 
+or redundant warnings. Specifically, two sound filters 1 and 2 
+removed 34.44\% of the warnings, and three heuristic filters 3, 4, and 5
+removed 65.52\% of the warnings. Among them, the 4th filter for removing
+reports with the same head methods from the entry node to \CodeIn{Thread.start()}
+is the most effective one. 
 
 \vspace{1mm}
 
@@ -576,7 +564,7 @@ sound and heuristic filters can still remove most of them.
  \hline
  VirgoFTP &  21 &  21 &  21 & 7 &  2 & 2\\
  \hline
- FileBunker &  4494 &  4494 &  3210 &  3210 &  10  & 2\\
+ FileBunker &  4494 &  4494 &  4494 &  3210 &  10  & 2\\
  \hline
  ArecaBackup &  6219 &  438 & 438 &  438  &  1 & 1\\
  \hline
@@ -601,12 +589,12 @@ sound and heuristic filters can still remove most of them.
  \hline
  SGTPuzzler&  2 &  1 &  1 & 1 &  1 & 1\\
  \hline
- Fennec &  122 &  84 & 84 & 84 &  9 & 3\\
+ Fennec &  122 &  84 & 80 & 80 &  9 & 3\\
  \hline
  MyTracks &  1176 &  1176 &  483 & 441 &  69 & 1 \\
 \hline
  \hline
- Total &  60631 &  40461 &  38484 &  37425 &  112 & 22 \\
+ Total &  60631 &  40461 &  39764 &  37421 &  112 & 22 \\
  \hline
 \end{tabular}
 \end{center}
@@ -646,8 +634,8 @@ There are two major threats to validity in our evaluation.
 One threat is the degree to which the subject programs
 used in our experiment are representative of true practice.
 In our evaluation, the studied subjects were selected with a bias towards popularity from
-three open-source repositories. Another threat is that we only employed three
-well-known call graph construction algorithms (i.e., RTA, 0-CFA, and 1-CFA) 
+well-known open-source repositories. Another threat is that we only employed three
+widely-used call graph construction algorithms (i.e., RTA, 0-CFA, and 1-CFA) 
 in our evaluation. It is still unknown whether using other 
 call graph construction algorithms such as XTA~\cite{xta}, VTA~\cite{Sundaresan:2000} or
 an incremental algorithm~\cite{inccg} may achieve better results.
