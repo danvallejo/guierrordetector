@@ -157,7 +157,7 @@ public class CGBuilder {
 			System.out.println("Use CFA with precision: " + this.cfaprecision);
 			builder = WALAUtils.makeCFABuilder(this.cfaprecision, options,  cache, cha, scope);
 		} else if (this.type == CG.TempZeroCFA) {
-			System.out.println("Use Fake-0-CFA with precision: " + this.cfaprecision);
+			System.out.println("Use Temp-0-CFA with 0 context precision ");
 			builder = WALAUtils.makeCFABuilder(0, options, cache, cha, scope);
 		}else {
 			throw new RuntimeException("The CG type: " + type + " is unknonw");
