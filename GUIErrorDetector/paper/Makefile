@@ -1,3 +1,8 @@
+PDF_FIGURES = cgexample.pdf
+
+# Ensure that fonts are embedded in the resulting PDF file
+EPSTOPDF = GS_OPTIONS="-dEmbedAllFonts=true -dPDFSETTINGS=/printer" epstopdf
+
 compile:
 	latex guierror.tex
 	bibtex guierror 
@@ -10,8 +15,8 @@ ps: compile
 # pdf: compile
 # 	dvipdf guierror.dvi guierror.pdf
 
-pdf: compile
-	pdflatex guierror.tex
+pdf: compile ${PDF_FIGURES}
+	dvipdf guierror.dvi guierror.pdf
 
 all: ps pdf
 
@@ -28,3 +33,7 @@ clean:
 	rm -f guierror.pdf
 	rm -f guierror.ps
 	rm -f TAGS
+
+cgexample.pdf: cgexample.eps
+	${EPSTOPDF} $<
+
