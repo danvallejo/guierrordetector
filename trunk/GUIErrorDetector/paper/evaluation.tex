@@ -262,7 +262,7 @@ which \bugs warnings reveal \bugs distinct errors (\newbugs are previously unkno
 are redundant. Section~\ref{sec:reflectionaware} compares with other call graph
 construction algorithms.
 
-We have submitted all \newbugs new errors
+We submitted all \newbugs new errors
 to the subject developers. As of Feb 2012, 1 error in S3dropbox has been confirmed,
 4 errors have been reproduced and validated in our own experimental environment, and
 2 errors in FileBunker and ArecaBackup had not been verified by developers yet.
@@ -297,10 +297,10 @@ to the subject developers. As of Feb 2012, 1 error in S3dropbox has been confirm
 \vspace*{-2.0ex} \Caption{{\label{fig:swingerror} An
 invalid thread access error reported by our tool
 in the S3dropbox Swing application. The error occurs when
-the method \CodeIn{deleteCurrentBucket} invoked at line 63 throws
+the method \CodeIn{deleteCurrentBucket} invoked on line 63 throws
 an exception, which causes method \CodeIn{deleteError} to
-access a Swing GUI object \CodeIn{display} at line 79 from
-a non-UI thread. This error is previously-unknown, and has been confirmed by the S3dropbox developers.
+access a Swing GUI object \CodeIn{display} on line 79 from
+a non-UI thread. This error is previously unknown, and has been confirmed by the S3dropbox developers.
 }} %\vspace{-5mm}
 \end{figure}
 
@@ -347,10 +347,10 @@ or memory-consistency errors.
 \vspace*{-2.0ex} \Caption{{\label{fig:pluginerror} An
 invalid thread access error reported by our tool
 for the EclipseRunner plugin. In Eclipse, the
-callback method \CodeIn{resourceChanged} at line 181
+callback method \CodeIn{resourceChanged} on line 181
 is invoked by non-UI threads when a \CodeIn{ResourceChangeEvent}
 happens. However, the \CodeIn{refresh} method directly accesses
-GUI objects (to refresh the view at line 415) without any
+GUI objects (to refresh the view on line 415) without any
 protection and thus triggers the error.
 This error has been reported by other users 13 months after the
 buggy code was checked in, and fixed by developers.
@@ -360,7 +360,7 @@ buggy code was checked in, and fixed by developers.
 Figure~\ref{fig:pluginerror} shows an error found in the EclipseRunner
 plugin. This error is event-related. It happens when a 
 \CodeIn{ResourceChangeEvent} happen, which then invokes the \CodeIn{refresh}
-method at line 415 to update the user interface. In EclipseRunner,
+method on line 415 to update the user interface. In EclipseRunner,
 the \CodeIn{refresh} method is
 called by 6 different methods from the same non-UI thread. Thus, our
 tool issues 6 separate warnings to indicate
@@ -369,8 +369,8 @@ tool issues 6 separate warnings to indicate
 Besides the above two examples, other errors our tool reported were also
 subtle to find. For example, our tool found two new errors in SudokuSolver.
 One error only happens when
-the given sudoku is unsolvable; and the other one happens
-when the JVM fails to launch the mail composing window of the
+the given Sudoku is unsolvable; and the other one happens
+when  JVM fails to launch the mail composing window of the
 user default mail client (after a user clicks "eMail Me" button).
 
 As reflected in our experiments, we found GUI developers have already
