@@ -2,8 +2,8 @@
 \label{sec:technique}
 
 We first give a high-level formulation of the problem, then present
-the error detection algorithm. Finally, we show how to instantiate
-the error algorithm for different GUI frameworks.
+the error detection algorithm. Finally, we present how to 
+construct a reflection-aware call graph and filter the error reports.
 
 
 \subsection{Problem Formulation}
@@ -185,9 +185,10 @@ exhaustive path search.
 
 Given a sound call graph, our algorithm is sound in that it does not
 miss true positives. We note, however, that computing a sound
-call graph in the presence of reflection is non-trivial. 
+call graph in the presence of reflection and native methods is non-trivial. 
 To alleviate this problem, we next proposed a reflection-aware call graph
-construction algorithm in Section~\ref{sec:cg}.
+construction algorithm in Section~\ref{sec:cg} and annotation support
+for native methods in Section~\ref{sec:annotation}.
 
 \subsubsection{Reflection}
 \label{sec:cg}
@@ -277,9 +278,12 @@ is clicked, its event handling code (lines 9--11) updates the text.
 When analyzing the code in Figure~\ref{fig:sampleandroid}, existing call graph algorithms
 fail to conclude that the variable \CodeIn{button} declared at line 6
 points to a \textit{non-null} \CodeIn{Button} object due to its limitation in deal with the
-reflection call \CodeIn{findViewById}. As a result, the built 
-call graph will exclude the calling edge corresponding to the
-\CodeIn{setText} method call on line 10. 
+reflection call \CodeIn{findViewById}, and exclude the calling edge
+corresponding to the \CodeIn{setText} method call on line 10 in the resulting call graph. 
+
+%. As a result, the built 
+%call graph will exclude the calling edge corresponding to the
+%\CodeIn{setText} method call on line 10. 
 
 %Existing call graph algorithms failed either suffer from the problem of incompleteness
 %or imprecision. The k-CFA algorithm performs points-to analysis with call
@@ -349,7 +353,7 @@ to add the call edge \CodeIn{setText} to the resulting graph.
 
 As demonstrated in our experiments, using this reflection-aware call
 graph construction algorithm helps in detecting errors
-in Android applications (Section~\ref{sec:evaluation}).
+in Android applications (Section~\ref{sec:reflectionaware}).
 
 % combined RTA and k-CFA
 %call graph construction algorithm as shown in Figure~\ref{fig:cgalgorithm}.
@@ -398,7 +402,7 @@ is only reported when using the user-provided annotations.
 A static analysis can exhaustively check possible error paths; but may report
 paths that do not actually exist (false positives) or multiple paths
  that have the same error cause (redundant warnings). We devise
-5 filters below to remove likely false positives and redundant warnings.
+5 error filters below to remove likely false positives and redundant warnings.
 The first 2 filters are sound in that they will not filter real bugs, and
 other 3 filters are based on heuristics. Orthogonally, filters 2
 and 3 are for eliminating false positives, and filters 1, 4, and 5
@@ -440,7 +444,7 @@ that will never trigger an error.
 %before executing the code. If the current thread is not the UI thread,
 %this method will be executed on the UI thread via message passing.
 %Thus,
-A reported method call chain containing an annotated 
+A reported method call chain containing an annotated  method
 can be safely removed. In our experiments, we produced a list of \filternum
 annotated methods for two subjects because they are using a customized
 pattern to interact with the GUI framework.
@@ -459,7 +463,7 @@ like \CodeIn{Runtime.}\CodeIn{shutDown} are unlikely to
 be buggy. For example, the \CodeIn{Runtime.}\CodeIn{shutDown}
 method is called when JVM terminates, and uses multithreading
 to dispose all GUI objects when the program exits.
-We encoded a list of common library calls by proposing
+We encoded a list of 25 common library calls by proposing
 a basic set of library calls that seemed natural and
 generally applicable, based on our programming experience.
 We later added other calls we found helpful in analyzing
@@ -480,9 +484,9 @@ multiple methods that access GUI objects, such as:
 If method \CodeIn{m()} is invoked by a non-UI thread, method call chains that
 only differ in the last few method nodes may be reported separately, such as:
 
-\CodeIn{a()} $\rightarrow$ ...\CodeIn{Thread.start()} $\rightarrow$ \CodeIn{m()} $\rightarrow$ \CodeIn{accessUIObject1()} ...
+\CodeIn{a()} $\rightarrow$ ...\CodeIn{Thread.start()} ... $\rightarrow$ \CodeIn{m()} $\rightarrow$ \CodeIn{accessUIObject1()} ...
 
-\CodeIn{a()} $\rightarrow$ ...\CodeIn{Thread.start()} $\rightarrow$ \CodeIn{m()} $\rightarrow$ \CodeIn{accessUIObject2()} ...
+\CodeIn{a()} $\rightarrow$ ...\CodeIn{Thread.start()} ... $\rightarrow$ \CodeIn{m()} $\rightarrow$ \CodeIn{accessUIObject2()} ...
 
 In fact, these two chains may have the same error root: knowning that
 method \CodeIn{m()} is called by a non-UI thread is sufficient to understand

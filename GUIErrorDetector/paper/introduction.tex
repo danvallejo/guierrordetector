@@ -284,7 +284,7 @@ also compare its usefulness with existing call graph construction algorithms in
 our experiments. Static analysis may report false positives due to its
 conservative nature, or multiple warnings that actually correspond
 to the same error. To address such limitations, we devise a set
- of sound and heuristic filters to remove likely false positives and redundant warnings.
+ of error filters to remove likely false positives and redundant warnings.
 
 \subsection{Technique Instantiation and Evaluation}
 
@@ -304,7 +304,7 @@ those framework-specific parts.
 
 Our tool works in a fully automatic, push-button manner,
 and scales to realistic programs.
-We evaluated our implementation on \subnum programs comprising over \totaloc LOC.
+We evaluated our implementation on \subnum programs comprising \totaloc LOC.
 The experiment results demonstrate
 that: our technique is effective (it found \bugs real-world errors
 from four supported frameworks and produced only \falses false positive warnings);
@@ -343,7 +343,7 @@ tool implementation is publicly available at
 \smallstep
 
 \item \textbf{Evaluation.} We applied our tool to \subnum programs 
-from 4 different frameworks, comprising over \totaloc LOC. The results
+from 4 different frameworks, comprising \totaloc LOC. The results
 show the usefulness of the proposed technique (Section~\ref{sec:evaluation}).
 
 \end{itemize}
