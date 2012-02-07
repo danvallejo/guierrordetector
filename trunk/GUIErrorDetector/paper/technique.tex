@@ -404,9 +404,6 @@ can be safely removed. In our experiments, we produced a list of \filternum
 annotated methods for two subjects because they are using a customized
 pattern to interact with the GUI framework.
 
-%during analyzing programs on different GUI frameworks; we did this
-%only between experiments rather than biasing experiments by tuning
-%our tool to specific programs.
 
 
 \subsubsection{Heuristic Filters}
@@ -422,7 +419,9 @@ We encoded a list of 25 common library calls by proposing
 a basic set of library calls that seemed natural and
 generally applicable, based on our programming experience.
 We later added other calls we found helpful in analyzing
-programs and that we believed would be generally useful.
+programs on different GUI frameworks and that we believed would be generally useful.
+We did this only between experiments rather than biasing experiments by tuning
+our tool to specific programs.
 
 \textbf{4. Filter Report With the Same Head Methods from the Entry Node to \CodeIn{Thread.start()}}. A method can call
 multiple methods that access GUI objects, such as:
