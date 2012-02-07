@@ -1,13 +1,12 @@
+
+\tinystep
+\tinystep
 \section{Implementation}
 \label{sec:implementation}
 
 We instantiated the proposed technique for four widely-used
 GUI frameworks, namely SWT, Eclipse plugin development, Swing, and Android;
-and implemented a prototype tool.
-Our tool is built on top of the WALA framework~\cite{walatutorial}.
-It takes Java bytecode as input, 
-automatically detects potential invalid thread access
-errors, and scales to realistic programs.  
+and implemented an error detection tool.
 
 %We implemented the proposed technique using the WALA framework~\cite{walatutorial}.
 %Our prototype tool takes Java bytecode as input, 
@@ -15,32 +14,19 @@ errors, and scales to realistic programs.
 %errors, and scales to realistic programs.  
 
 
+\tinystep
 
 
-%Static Single Assignment (SSA) transformation to get limited flow sensitivity
 \subsection{Instantiation for Different Frameworks}
 \label{sec:platforms}
 
-%We instantiated our error detection technique for four popular GUI frameworks:
-%SWT, Eclipse plugin, Swing, and Android.
 When instantiating our error detection technique for different
 frameworks, the major framework-specific parts, corresponding to
 lines 3 -- 5 in Figure~\ref{fig:detectalgorithm}, are identifying
 \textbf{call graph entry nodes}, \textbf{UI-accessing nodes},
 and \textbf{safe UI methods} for each framework.
 
-%For each framework, we customize the \textit{call graph entry nodes},
-%\textit{UI-accessing nodes}, and \textit{safe UI methods} on lines 3 -- 5 of the
-%algorithm in 
-
-%For the sake of efficiency, they are all using the single thread model.
-
-%Why these platforms? popularity? account for xxx\% of the GUI. 
-
-%customizing for: entry points, starting points, error checking, thread
-%safe UI methods, what is the event dispatching thread?
-
-
+\tinystep
 \subsubsection{SWT}
 
  We instantiated our technique for SWT applications as follows:
@@ -67,23 +53,15 @@ or not, and throw a \CodeIn{RuntimeException} if the checking fails.
 \item \textbf{Safe UI methods: } \CodeIn{Display.asyncExec}
 and \CodeIn{Display.syncExec}. SWT provides these two methods
 to execute code (a)synchro- nizedly on the UI thread.
-%We treat these two methods as safe UI methods, since invoking
-%them from any thread 
-%will not cause an invalid thread access error.
 
 \end{itemize}
 
+\tinystep
 \subsubsection{Eclipse plugin}
 
 We instantiated our technique for the Eclipse plugin development framework as follows:
 
 \smallstep
-
-%Unlike a SWT desktop application, an eclipse plugin, though is developed in SWT,
-%has no single main method. Instead, (XXX) it extends certain extension points
-%exposed by the eclipse framework, and eclipse will XXX. To instantiate our
-%technique for the Eclipse plugin environment, we need to redefine the
-%call graph entry points.
 
 \begin{itemize}
 
@@ -91,7 +69,7 @@ We instantiated our technique for the Eclipse plugin development framework as fo
  SWT GUI event handling methods. Eclipse
 calls back the overridden methods to handle the
 events. All SWT GUI event handling methods (i.e., the overriden
-methods in the class that implements \CodeIn{org.eclipse.swt.internal.SWTEventListener}) are
+methods in the class that implements \CodeIn{org.eclipse.swt.internal.SWTEvent-\\Listener}) are
 always called back from the UI thread, thus are used as call graph entry nodes.
 
 \smallstep
@@ -100,8 +78,8 @@ always called back from the UI thread, thus are used as call graph entry nodes.
 
 \end{itemize}
 
+\tinystep
 \subsubsection{Swing}
-
 
 A Swing application has a single main method, but contains three kinds of
 threads: \textit{initial thread} that executes initial application code from the main method,
@@ -110,9 +88,6 @@ and the \textit{worker thread} where time-consuming background tasks are execute
 After a Swing program starts, its initial thread exits and the UI thread takes charge
 of the application and starts to execute all event-handling code or spawns new worker threads. 
 We instantiated our technique for Swing as follows:
-%XXXX Therefore, we can not directly
-%use the main method as the call graph entry point, since it is not invoked
-%by the UI thread. We customize our technique for Swing as follows:
 
 \begin{itemize}
 
@@ -124,7 +99,7 @@ called back from the UI thread.
 
 \item \textbf{UI-accessing nodes:} %as stated in Swing's documentation,
 all methods defined in each Swing GUI class except for three thread-safe
-methods: \CodeIn{repaint()}, \CodeIn{revalidate()}, and \CodeIn{invalidate()}.
+methods: \CodeIn{repaint()}, \CodeIn{revali-\\date()}, and \CodeIn{invalidate()}.
 
 \smallstep
 
@@ -168,12 +143,10 @@ a \CodeIn{RuntimeException}.
 
 \item \textbf{Safe UI methods: } \CodeIn{View.post}
 and \CodeIn{View.postDelay} that execute code on the UI thread. 
-%Invoking them on any thread will not cause an invalid thread access error.
-%Invoking these two methods are generally considered to be safe, and would not
-%cause an invalid thread access error.
 
 \end{itemize}
 
+\tinystep
 
 Instantiating our general technique to  a specific framework
 requires moderate human effort. We wrote around 500 lines of Java code in total to achieve
@@ -181,8 +154,12 @@ the above four instantiations.
 
 \subsection{Implementation Details}
 
-%Our current implementation supports four widely-used GUI frameworks:
-%SWT, Eclipse plugin development, Swing, and Android.
+We implemented our error detection tool using
+the WALA framework~\cite{walatutorial}.
+Our tool takes Java bytecode as input, 
+automatically detects potential invalid thread access
+errors, and scales to realistic programs.  
+
 We implemented the reflection-aware call graph construction
  algorithm (Section~\ref{sec:cg}) using WALA's \textit{bypass logic}.
 Unlike similar tools~\cite{Payet:2011:SAA:2032266.2032299}, our tool

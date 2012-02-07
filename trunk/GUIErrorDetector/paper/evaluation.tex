@@ -1,4 +1,5 @@
 \section{Empirical Evaluation}
+\smallstep
 \label{sec:evaluation}
 
 Our experimental objective is three-fold: to demonstrate the effectiveness
@@ -138,6 +139,8 @@ together with its GUI framework, as listed in
 the bottom table.} }
 \end{table}
 
+\smallstep
+\tinystep
 
 \subsection{Experimental Procedure}
 \label{sec:procedural}
@@ -156,7 +159,7 @@ the underlying operating system. Thus, we manually checked the possible
 Java methods that a native method may call, and then added \annotationnum \CodeIn{@CalledByNativeMethods}
 annotations for it. Two subjects MyTracks and Fennec employ a customized pattern
 to interact with the GUI framework. For example, in MyTracks, all non-UI
-threads are initialized via using the library method \CodeIn{android.os.handler.handleCallback}.
+threads are initialized via using the library method \CodeIn{android.os.} \CodeIn{handler.handleCallback}.
 % the \CodeIn{safeInvokeXX}
 %method in the XXX subject first checks whether the current thread is the UI-thread, and
 %then determines whether to direct access a GUI object or wrap the code with
@@ -237,19 +240,21 @@ the actual bugs found. Columns ``RTA '', ``0-CFA'',
 and ``1-CFA'' show the results of using different
 call graph construction algorithms. In each cell of the table
 for Android applications, a slash ``/'' separates the result of
-using normal call graph construction algorithm and the reflection-aware
+using standard call graph construction algorithm and the reflection-aware
 call graph construction algorithm. The \newbugs errors found in VirgoFTP, FileBunker, ArecaBackup
 S3dropbox, and SudokuSolver are previously  unknown. As a comparison, the
-results of a straightforward approach, called ``Requiring Wrappers'' (Section~\ref{sec:straightforward}),
+results of the ``Requiring Wrappers'' approach (Section~\ref{sec:straightforward}),
 are shown at the far right.} }
 \end{table*}
 
+\tinystep
 \subsection{Results}
 \label{sec:results}
 
 %Table~\ref{table:results} show the errors in
 %our subject programs, and Table~\ref{table:filters} show
 %the effect of applying each heuristic filter.
+\smallstep
 
 \subsubsection{Errors in Multithreaded GUI Applications}
 \label{sec:errors}
@@ -292,8 +297,10 @@ to the subject developers. As of Feb 2012, 1 error in S3dropbox has been confirm
 79.    display.showErrorMessage("Delete failed", 
         String.format(text, controller.getSelectedBucketName())); 
 80.\}
+\smallstep
 \end{alltt}
 \end{CodeOut}
+\smallstep
 \vspace*{-2.0ex} \Caption{{\label{fig:swingerror} An
 invalid thread access error reported by our tool
 in the S3dropbox Swing application. The error occurs when
@@ -307,8 +314,8 @@ a non-UI thread. This error is previously unknown, and has been confirmed by the
 %Figures~\ref{fig:swingerror} amd~\ref{fig:pluginerror} show
 %two real errors our tool has found. 
 Figure~\ref{fig:swingerror}
-shows an invalid thread access error our tool found in the S3dropbox
-program. This error only happens when the \CodeIn{deleteCurrentBucket}
+shows an invalid thread access error our tool found in S3dropbox.
+This error happens when the \CodeIn{deleteCurrentBucket}
 call on line 63 throws an exception, making it hard to
 detect by testing. We reported this error to the S3dropbox developers. Tom Czarniecki,
 a key developer of S3dropbox, confirmed this single-GUI-thread
@@ -344,6 +351,7 @@ or memory-consistency errors.
 416.\}
 \end{alltt}
 \end{CodeOut}
+\smallstep
 \vspace*{-2.0ex} \Caption{{\label{fig:pluginerror} An
 invalid thread access error reported by our tool
 for the EclipseRunner plugin. In Eclipse, the
@@ -430,18 +438,18 @@ more errors with fewer false positive warnings than the other two algorithms. Th
 is because RTA and 0-CFA do not consider the calling context when
 constructing a call graph, and may
 mix the same method calls by different callers into a single node, thus
-introducing imprecision. Although the error-revealing path exists in
-the less precise graphs, it presents the error detection algorithm finding it.
+introducing imprecision. Although the error-revealing paths exist in
+less precise graphs, the impreicison prevents our algorithm finding them.
 Figure~\ref{fig:ex} illustrates this limitation.
 
 \begin{figure}[t]
   \centering
   \includegraphics[scale=0.33]{cgexample}
-  \vspace*{-5.0ex}\caption {{\label{fig:ex} (a) shows an example code, in which
-\CodeIn{safeMtd} is a Safe UI method, and \CodeIn{uiAcc} is a UI-Accessing method.
+  \vspace*{-3.0ex}\caption {{\label{fig:ex} (a) shows an example code, in which
+\CodeIn{safeMtd()} is a Safe UI method, and \CodeIn{uiAcc()} is a UI-Accessing method.
 (b) shows a less precise call graph built by RTA or 0-CFA, and (c) shows a more
-precise call graph built by 1-CFA. The node for \CodeIn{Thread.run()}
-method is omitted for brevity. Using the less precise call graph, the error
+precise call graph built by 1-CFA. Nodes for constructors and \CodeIn{Thread.run()}
+are omitted for brevity. Using the less precise call graph, the error
 detection algorithm will report an invalid method call chain: \CodeIn{entry()}
 $\rightarrow$ \CodeIn{f()} $\rightarrow$ \CodeIn{start()} $\rightarrow$ \CodeIn{uiAcc()},
 but miss the actual error path: \CodeIn{entry()} $\rightarrow$ \CodeIn{g1()} $\rightarrow$
@@ -614,7 +622,7 @@ sound and heuristic filters can still remove most of them.
 \end{center}
 \vspace{-15pt}
 \Caption{{\label{table:filters}Number of warnings after applying a set of
-sound and heuristic filters. Column ``Before Filtering''
+sound and heuristic error filters. Column ``Before Filtering''
 shows the number of warnings by the reflection-aware 1-CFA algorithm.
 Other algorithms show similar patterns, which are omitted for brevity.
 Column ``$F_{i,...,j}$'' represents the number of remaining warnings after applying

@@ -89,7 +89,7 @@ then specifies entry nodes, UI-accessing nodes, and safe UI nodes
 for it on line 3, 4, and 5, respectively. Lines 3--5 are GUI framework-specific.
 As an example, for a SWT desktop application, the entry nodes include
 the single main method, UI-accessing nodes include methods
-\CodeIn{Widget.checkWidget} and \CodeIn{Display.checkDevice},
+\CodeIn{Widget.checkWidget} and \CodeIn{Display.} \CodeIn{checkDevice},
 and safe UI methods include two SWT helper methods \CodeIn{Display.asyncExec}  and
 \CodeIn{Display.syncExec} for message passing. The detailed instantiation
 for each supported framework is explained in Section~\ref{sec:platforms}.
@@ -256,8 +256,6 @@ with object creations, and line 8 builds the call graph using
 an existing call graph construction algorithm. This algorithm
 is parameterized by two methods on lines 2 and 3. 
 How to instantiate it for the Android framework is presented in Section~\ref{sec:cg}.
-%This algorithm is parameterized by the call graph construction
-%algorithm on line 8, in which any existing algorithm can be used.
 } 
 \label{fig:cgalgorithm}
 \end{figure}
@@ -272,39 +270,12 @@ The example code in Figure~\ref{fig:sampleandroid} from an Android application
 In Figure~\ref{fig:sampleandroid}, line 6 uses reflection to create a \CodeIn{Button}
 object by looking up its id declared in the associated XML file. When this button
 is clicked, its event handling code (lines 9--11) updates the text.
-%d caches
-%the current view to a list declared at line 2.
 
 When analyzing the code in Figure~\ref{fig:sampleandroid}, existing call graph algorithms
 fail to conclude that the variable \CodeIn{button} declared at line 6
 points to a \textit{non-null} \CodeIn{Button} object due to its limitation in deal with the
 reflection call \CodeIn{findViewById}, and exclude the calling edge
 corresponding to the \CodeIn{setText} method call on line 10 in the resulting call graph. 
-
-%. As a result, the built 
-%call graph will exclude the calling edge corresponding to the
-%\CodeIn{setText} method call on line 10. 
-
-%Existing call graph algorithms failed either suffer from the problem of incompleteness
-%or imprecision. The k-CFA algorithm performs points-to analysis with call
-%graph construction interleavingly, and maintains a value set for every expression.
-%For example, it concludes that variable \CodeIn{cachedViews} can only point
-%to a \CodeIn{LinkedList} object and the method call \CodeIn{add} at line 12
-%can only correspond to \CodeIn{LinkedList.add}. However, k-CFA fails to
-%conclude that variable \CodeIn{button} declared at line 7 points to
-%a \CodeIn{Button} object due to its limitation in dealing with reflection. Thus, k-CFA
-%may miss the call graph edge corresponding to the method call \CodeIn{setText} at line 11. 
-%On the other hand, using a coarse-grained algorithm like RTA~\cite{} can not still
-%fully solve this problem. RTA adds an edge for a method invocation 
-%to the call graph if an object of the receiver's type (or subtype)
-%has been created.  By explicitly specifying that all GUI classes declared in the XML file will be created,
-%RTA maintains a global value set for those GUI object type, and  adds a
-%call edge \CodeIn{setText} to the call graph. However, RTA introduces 
-%unnecessary precision loss: it may
-%may conclude that the \CodeIn{cachedViews} variable at line 2
-%point to any created \CodeIn{List} objects created somewhere else in the program, despite the
-%fact that \CodeIn{cachedViews} can only be a \CodeIn{LinkedList} object.
-
 
 To address this limitation, we present an algorithm to construct
 a reflection-aware call graph based on a simple program transformation.
@@ -319,15 +290,10 @@ a reflection call represents a framework-specific helper method invocation
 that uses Java reflection to create desirable objects, such as
 the \CodeIn{findViewById} method in Android applications, instead
 of the methods in the \CodeIn{java.lang.reflection} package.
-%In Figure~\ref{fig:cgalgorithm}, lines 1--7 show
-%the first step of program transformation. The algorithm iterates through every statement
-%in an analyzed program.
 When it sees a reflection call, the algorithm
 determines a set of possible objects that might be created.
 After that, the algorithm creates a statement that non-deterministically
 returns a new object from the object set.
-%Line 8 is the second step
-%to build a call graph on the transformed program. 
 
 This algorithm is parameterized by two methods on
 lines 2 and 3. When instantiated for the Android framework,
@@ -349,24 +315,11 @@ replaces the reflection call
 with an explicit object creation statement: \CodeIn{new Button(null)}.
 After that, the algorithm employs existing call graph construction
 algorithms to analyze the transformed program, and permits them
-to add the call edge \CodeIn{setText} to the resulting graph.
+to include the call edge \CodeIn{setText} in the resulting graph.
 
 As demonstrated in our experiments, using this reflection-aware call
 graph construction algorithm helps in detecting errors
 in Android applications (Section~\ref{sec:reflectionaware}).
-
-% combined RTA and k-CFA
-%call graph construction algorithm as shown in Figure~\ref{fig:cgalgorithm}.
-%The algorithm shares the same spirit as k-CFA to maintain a value set
-%for each expression. However, the only difference is that our
-%algorithm uses a RTA-style treatment for constructing the value set for
-%GUI classes: it parses the XML configuration file and explicitly
-%adds a raw object to each declared GUI variable's value set. Thus,
-%For the example in Figure~\ref{fig:sampleandroid}, this
-%combined algorithm concludes that a \CodeIn{Button} object has been
-%created at line 7 and then adds the call edge \CodeIn{setText} to the
-%graph. It also concludes that the \CodeIn{cachedViews} variable can only
-%point to a \CodeIn{LinkedList} object, avoiding unnecessary precision loss.
 
 
 \subsubsection{Native Methods}
