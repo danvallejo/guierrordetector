@@ -440,20 +440,21 @@ constructing a call graph, and may
 mix the same method calls by different callers into a single node, thus
 introducing imprecision. Although the error-revealing paths exist in
 less precise graphs, the impreicison prevents our algorithm finding them.
-Figure~\ref{fig:ex} illustrates this limitation.
+Figure~\ref{fig:ex} illustrates this point.
 
 \begin{figure}[t]
   \centering
-  \includegraphics[scale=0.33]{cgexample}
-  \vspace*{-3.0ex}\caption {{\label{fig:ex} (a) shows an example code, in which
-\CodeIn{safeMtd()} is a Safe UI method, and \CodeIn{uiAcc()} is a UI-Accessing method.
+  \includegraphics[scale=0.45]{cgexample}
+  \vspace*{-5.0ex}\caption {{\label{fig:ex} (a) shows an example code, in which
+\CodeIn{safe()} is a Safe UI method, and \CodeIn{uiAcc()} is a UI-Accessing method.
 (b) shows a less precise call graph built by RTA or 0-CFA, and (c) shows a more
-precise call graph built by 1-CFA. Nodes for constructors and \CodeIn{Thread.run()}
-are omitted for brevity. Using the less precise call graph, the error
+precise call graph built by 1-CFA. Nodes for constructors are omitted for brevity.
+Using the less precise call graph, the error
 detection algorithm will report an invalid method call chain: \CodeIn{entry()}
-$\rightarrow$ \CodeIn{f()} $\rightarrow$ \CodeIn{start()} $\rightarrow$ \CodeIn{uiAcc()},
+$\rightarrow$ \CodeIn{f()} $\rightarrow$ \CodeIn{start()} $\rightarrow$ \CodeIn{run()}
+$\rightarrow$ \CodeIn{uiAcc()},
 but miss the actual error path: \CodeIn{entry()} $\rightarrow$ \CodeIn{g1()} $\rightarrow$
-\CodeIn{g2()} $\rightarrow$ \CodeIn{start()} $\rightarrow$ \CodeIn{uiAcc()}. The
+\CodeIn{g2()} $\rightarrow$ \CodeIn{start()} $\rightarrow$ \CodeIn{run()} $\rightarrow$ \CodeIn{uiAcc()}. The
 actual error path can only be found when using the more precise call graph.
 }}
 \end{figure}
@@ -513,7 +514,7 @@ line 8 in Figure~\ref{fig:detectalgorithm} to:
 $\mathit{worklist}$ $\leftarrow$ $\mathit{an}$ $\mathit{empty}$ $\mathit{stack}$,
 and changing queue operations (\CodeIn{enqueueAll}, and \CodeIn{dequeue}
 on lines 9, 12, and
-23 in Figure~\ref{fig:androiderror}, respectively)
+23 in Figure~\ref{fig:detectalgorithm}, respectively)
 to the corresponding statck operations (\CodeIn{pushAll}, and \CodeIn{pop}).
 This variant found 11 errors in total and missed 1 error in the FileBunker subject.
 The reason is that DFS tends to search deeper into the graph, and the path it returns

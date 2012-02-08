@@ -264,7 +264,7 @@ event dispatching thread before accessing a GUI object.
 
 Our static analysis formulates finding invalid thread access as a call graph reachability
 problem. Given a call graph, our technique traverses
-every possible path from its entry nodes, checking whether
+paths from its entry nodes, checking whether
 any path accesses a GUI object from a non-UI thread. If 
 a suspicious path is found, the static analysis warns of a potential error.
 The warning is in the form of a method
