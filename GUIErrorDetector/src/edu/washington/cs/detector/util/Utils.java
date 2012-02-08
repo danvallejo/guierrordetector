@@ -33,6 +33,16 @@ import edu.washington.cs.detector.CallChainNode;
 
 public class Utils {
 	
+	public static void checkTrue(boolean cond) {
+		checkTrue(cond, "");
+	}
+	
+	public static void checkTrue(boolean cond, String msg) {
+		if(!cond) {
+			throw new RuntimeException(msg);
+		}
+	}
+	
 	public static String translateSlashToDot(String str) {
 		assert str != null;
 		return str.replace('/', '.');

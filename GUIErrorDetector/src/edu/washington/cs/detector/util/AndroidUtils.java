@@ -204,7 +204,7 @@ public class AndroidUtils {
 		return declaredUIComponents;
 	}
 	
-	private static Set<String> getLibWidgets() {
+	public static Set<String> getLibWidgets() {
 		Set<String> widgetSet = new HashSet<String>();
 		for(String widgetName : widgetShortNames) {
 			widgetSet.add(widgetName);
@@ -269,7 +269,7 @@ public class AndroidUtils {
 		return ACTIVITY;
 	}
 	
-	private static String WIDGET_PACKAGE = "android.widget";
+	static String WIDGET_PACKAGE = "android.widget";
 	
 	private static IClass VIEW = null;
 	
@@ -397,7 +397,7 @@ public class AndroidUtils {
 		"ZoomControls"
 	};
 	
-	private static Set<String> getOtherUIs() {
+	public static Set<String> getOtherUIs() {
 		Set<String> uiSet = new HashSet<String>();
 		for(String uiName : otherUIs) {
 			uiSet.add(uiName);
