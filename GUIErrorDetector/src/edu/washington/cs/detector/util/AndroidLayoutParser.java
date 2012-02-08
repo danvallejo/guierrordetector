@@ -81,6 +81,8 @@ public class AndroidLayoutParser {
 				validatedMap.put(idKey, value);
 			} else if (otherAndroidUIFullName.contains(value)) {
 				validatedMap.put(idKey, value);
+			} else if (value.equals("WebView")) {
+				validatedMap.put(idKey, "android.webkit.WebView");
 			} else {
 				Utils.checkTrue(cha != null);
 				IClass VIEW = AndroidUtils.getWidgetView(cha);
@@ -111,8 +113,10 @@ public class AndroidLayoutParser {
 				for (int i = 0; i < attributes.getLength(); i++) {
 					if (attributes.getQName(i).equals("android:id")) {
 						String idValue = attributes.getValue(i);
-						Utils.checkTrue(idValue.startsWith(id_prefix));
-						String id = idValue.substring(id_prefix.length());
+						Utils.checkTrue(idValue.indexOf("/") != -1);
+//						Utils.checkTrue(idValue.startsWith(id_prefix), "ID: " + idValue + ", qname: " + qName);
+//						String id = idValue.substring(id_prefix.length());
+						String id = idValue.substring(idValue.indexOf("/") + 1);
 						Utils.checkTrue(!idMap.containsKey(id));
 						idMap.put(id, qName);
 					}
