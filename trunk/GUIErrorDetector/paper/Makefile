@@ -12,11 +12,13 @@ compile:
 ps: compile
 	dvips guierror
 
-# pdf: compile
+## Using pdflatex instead of dvipdf saves 9 lines.
+# pdf: compile ${PDF_FIGURES}
 # 	dvipdf guierror.dvi guierror.pdf
 
 pdf: compile ${PDF_FIGURES}
-	dvipdf guierror.dvi guierror.pdf
+	pdflatex guierror.tex
+	pdflatex guierror.tex
 
 all: ps pdf
 
