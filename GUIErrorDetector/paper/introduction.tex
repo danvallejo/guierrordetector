@@ -9,8 +9,8 @@ GUI applications often spawn separate threads to handle time-consuming
 operations in the background, such as expensive computation, I/O tasks,
 and network requests. This permits the GUI to respond to new events
 even before the lengthy task completes. However, the use of multiple threads
-enables new types of errors which may compromise robustness, possible.
-We now discuss a programming rule for multithreaded GUIs, the consequence
+enables new types of errors that may compromise robustness.
+We now discuss a standard programming rule for multithreaded GUIs, the consequences
 of violating it, and a technique for statically detecting such violations.
 
 
@@ -71,31 +71,31 @@ If not, an \textit{invalid thread access error} will occur. This may
 terminate the application, but it is considered preferable
 to nondeterministic concurrency errors.
 
-The single-GUI-thread rule can be easily violated since a spawned non-UI thread often needs to update
+The single-GUI-thread rule can be easily violated; since a spawned non-UI thread often needs to update
 the GUI  after its  task is finished.
-In practice, invalid thread access errors are \textit{frequent}, \textit{severe}, and \textit{hard} to debug.
+In practice, invalid thread access errors are \textit{frequent}, \textit{severe}, and \textit{hard to debug}.
 %and \textit{difficult to avoid}.
 
 Take the popular Standard Widget Toolkit (SWT) GUI framework as an example. 
-The invalid thread access error is one of the top 3 bugs in developing a SWT application, and is
-the source of many relevant concurrency bugs~\cite{top3bugs}.
+Invalid thread access is one of the top 3 bugs in developing a SWT application, and is
+the source of many concurrency bugs~\cite{top3bugs}.
 A Google search for ``SWTException:Invalid thread access''  returns over 11,800 entries,
 consisting of numerous bug reports, forum posts, and mailing list threads on
 this problem. Eclipse, the IDE for Java development, is built on top of SWT\@.
 Searching for ``SWTException:Invalid thread access'' in Eclipse's bug repository
 and discussion forum returns over 2732 bug reports and 351 distinct threads, respectively. 
 We manually studied all 156 distinct \textit{confirmed} bug reports, and 
-found this error has been reported in at least 20 distinct Eclipse projects
+found this error has been confirmed in at least 20 distinct Eclipse projects
 and 40 distinct Eclipse components. Even after over 10 years of active development,
-a recent release of Eclipse still contains this error (bug id: 333533, reported in 01/2011).
+a recent release of Eclipse still contains this error (bug id: 333533, reported in January 2011).
  In addition, the invalid thread access error
-is severe. It is user-perceivable; it cannot be recovered by the program itself,
+is severe. It is user-perceivable, it cannot be recovered by the program itself,
 and it often terminates the whole application. In many circumstances as described in the bug reports,
-users can only restart the application to recover from the error.
+users must restart the application to recover from the error.
 Furthermore, many reported  errors are non-trivial to diagnose and fix.
 Developers usually need non-local reasoning to find the specific
 UI interactions that can trigger the bug;  it took developers 2 years
-to fix bug 51757 and verify the patch.
+to fix Eclipse bug 51757 and verify the patch.
 
 \begin{figure}[t]
 \hspace{6mm}\small{In class: org.mozilla.gecko.gfx.LayerView}
@@ -161,21 +161,21 @@ in an Android library.
 \label{sec:finding}
 
 To ensure that GUIs behave correctly, developers must prevent or detect invalid thread
-access errors. Currently, no effective techniques exist. %must be developed.% to alleviate this problem.
+access errors. Current techniques are not effective. %must be developed.% to alleviate this problem.
 
 %Software testing, the most widely used method to ensure program correctness,
 %is insufficient to detect such errors. 
 It is infeasible for testing to cover the enormous space of possible interactions
 with a GUI. Each sequence of GUI events can result in
 a different state, and each GUI event may need to be evaluated in all of
-these states. A well-developed software system like Eclipse
-often has a well-designed test suite that achieves fairly high statement coverage;
+these states. A  software system like Eclipse
+often has a test suite that achieves fairly high statement coverage,
 but many paths executed by bug-triggering UI sequences are still not covered.
 
 Stylized coding patterns are also inadequate. One possible rule is to always
-access GUI objects via asynchronized message passing, to ensure a GUI object is accessed in
+access GUI objects via asynchronous message passing, to ensure a GUI object is accessed in
 the UI thread. For example, a developer could have prevented the bug in Figure~\ref{fig:androiderror}
-by wrapping line 222 inside a \CodeIn{post} message passing method\footnote{The
+by wrapping line 222 inside a \CodeIn{post} message-passing method\footnote{The
 \CodeIn{post} method in class \CodeIn{android.widget.View} is a
 a standard way to send asynchronized messages to the UI-thread.}, as follows:
 
@@ -258,7 +258,7 @@ between methods, and \CodeIn{checkThread} is an Android library
 method  that checks whether the current thread is the
 event dispatching thread before accessing a GUI object.
 8 more methods in the call chain, shown as
-\CodeIn{\small{...}} above, are omitted for brevity.
+``\CodeIn{\small{...}}" above, are omitted for brevity.
 }} %\vspace{-5mm}
 \end{figure}
 

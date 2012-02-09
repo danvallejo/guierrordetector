@@ -14,13 +14,13 @@ thread access errors as a call graph reachability problem with
 thread spawning as the sources and GUI object accessing as the sinks. 
 Standard call graph construction algorithms fail to build a good
 call graph for some modern GUI applications, because of heavy use of reflection.
-Thus, we use a method to build reflection-aware call graphs.
+Thus, our technique builds reflection-aware call graphs.
 
 
 We implemented our technique and instantiated it for four popular Java GUI
 platforms: SWT, the Eclipse plugin development framework, Swing, and
 Android. In an evaluation on \subnum programs comprising \totaloc LOC, our technique
-found both previously-known and unknown errors.
+found 5 previously-known errors and 7 new ones.
 
 \end{abstract}
 
