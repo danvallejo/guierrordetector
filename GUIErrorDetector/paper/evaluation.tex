@@ -40,7 +40,8 @@ We chose subjects belonging to various categories from those subjects satisfying
 the above criteria. The subjects used in our experiment are shown in Table~\ref{table:subjects},
 which include end-user applications, programming tools, and games. 
 
-\begin{itemize}
+
+\begin{itemize}%\addtolength{\itemsep}{-0.5\baselineskip}
 \Item \textbf{SWT desktop applications.}
 %VirgoFTP~\cite{virgo} and FileBunker~\cite{filebunker} are two useful SWT desktop applications.
 VirgoFTP~\cite{virgo} implements a simple FTP client based on Java and SWT UI library.
@@ -668,13 +669,19 @@ an incremental algorithm~\cite{inccg} may achieve better results.
 \vspace{1mm}
 
 \noindent \textbf{\textit{Limitations.}}
-Our technique is limited in two aspects. First, it only considers
+Our technique is limited in three aspects. First, it only considers
 non-UI threads that are spawned by the UI-thread after the GUI
 is initialized, and ignores other possible non-UI threads (quite unusual)
 that are created during the pre-initialization GUI work. One way
 to remedy this limitation is to design an analysis to identify
 those non-UI threads created before a GUI is launched.
-Second, our tool cannot compute call relationships
+Second, like many bug-finding techniques, our technique
+is neither sound nor complete. It may miss true positives due
+to the graph search strategy the algorithm employs, or
+issue false positives because the conservative nature of
+a static analysis. Designing better call graph construction
+and search algorithm may alleviate this limitation.
+Third, our tool cannot compute call relationships
 for inter-process communication between components. It also
 requires users to manually add annotations to characterize
 call relationships that involve native methods. This limitation

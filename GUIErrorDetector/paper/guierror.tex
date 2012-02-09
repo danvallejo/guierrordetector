@@ -47,6 +47,15 @@
 \newcommand{\smallstep}{\vspace{-2mm}}
 \newcommand{\tinystep}{\vspace{-1mm}}
 
+\newenvironment{myitemize}{
+\begin{itemize}
+  \setlength{\leftmargin}{0pt}
+  \setlength{\itemsep}{4pt}
+  \setlength{\parskip}{-4pt}
+  \setlength{\parsep}{-1pt}
+}{\end{itemize}}
+
+
 \begin{document}
 
 \title{Finding Errors in Multithreaded GUI Applications}
