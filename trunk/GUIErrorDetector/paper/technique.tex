@@ -2,7 +2,7 @@
 \label{sec:technique}
 
 We first give a high-level formulation of the problem, then present
-the error detection algorithm. Finally, we present how to 
+the error detection algorithm. Finally, we show how to 
 construct a reflection-aware call graph and filter the error reports.
 
 
@@ -272,9 +272,9 @@ object by looking up its id declared in the associated XML file. When this butto
 is clicked, its event handling code (lines 9--11) updates the text.
 
 When analyzing the code in Figure~\ref{fig:sampleandroid}, existing call graph algorithms
-fail to conclude that the variable \CodeIn{button} declared at line 6
-points to a \textit{non-null} \CodeIn{Button} object due to its limitation in deal with the
-reflection call \CodeIn{findViewById}, and exclude the calling edge
+fail to conclude that the variable \CodeIn{button} declared on line 6
+points to a \textit{non-null} \CodeIn{Button} object due to its limitation in handling the
+reflection call \CodeIn{findViewById}, and exclude the edge
 corresponding to the \CodeIn{setText} method call on line 10 in the resulting call graph. 
 
 To address this limitation, we present an algorithm to construct
@@ -300,7 +300,7 @@ lines 2 and 3. When instantiated for the Android framework,
 the predicate isReflectionCall on line 2 returns true
 if the $statement$ is a \CodeIn{findViewById(id)} method call, and the method
 getAllObjectsThatMaybeCreated on line 3 parses the associated XML configuration
-file in an Android application to extract the class declaration
+file to extract the class declaration
  corresponding to the given \CodeIn{id} value. If the \CodeIn{id}
 value is dynamically generated, this method will conservatively
 return instances of all subclasses of the declared type.
@@ -391,8 +391,8 @@ for programmers to interpret.
 
 
 %\item
-\textbf{2. Filter Reports With User-Annotated Methods}. Besides general
-library calls, users are also permitted to explicitly annotate project-specific methods
+\textbf{2. Filter Reports With User-Annotated Methods}. Users are
+permitted to explicitly annotate project-specific methods
 that will never trigger an error.
 %For example, the Android GUI framework provides a utility method 
 %\CodeIn{runOnUIThread} to check whether the current thread is the UI thread
@@ -416,7 +416,7 @@ be buggy. For example, the \CodeIn{Runtime.}\CodeIn{shutDown}
 method is called when JVM terminates, and uses multithreading
 to dispose all GUI objects when the program exits.
 We encoded a list of 25 common library calls by proposing
-a basic set of library calls that seemed natural and
+a basic set of library calls that seemed %natural and
 generally applicable, based on our programming experience.
 We later added other calls we found helpful in analyzing
 programs on different GUI frameworks and that we believed would be generally useful.

@@ -57,7 +57,7 @@ must bear this cost.
 
 \item GUI events are dispatched in a predictable order from a single event queue.
 If the thread scheduler could arbitrarily interleave component changes, then event processing,
-program comprehension and testing would be more difficult.
+program comprehension, and testing would be more difficult.
 \end{itemize}
 
 %Single-threaded GUI frameworks are not unique to Java; ,
@@ -201,7 +201,7 @@ no timing guarantee, so a GUI object may have already been
 disposed before the message sent to it arrives, causing other bugs. 
 In our evaluation on real-world programs, we found a simple analysis that
 requires GUI operations to be in a message issues
-an unacceptable number of false positives and redundant warnings.
+an unacceptable number of warnings. %false positives and redundant warnings.
 
 
 %program transformation to wrap
@@ -219,7 +219,7 @@ an unacceptable number of false positives and redundant warnings.
 
 This paper uses static analysis to find potential GUI errors.
 Static analysis has two advantages compared to dynamic approaches such as
- testing. First, a static analysis can explore every path of the program without
+ testing. First, a static analysis can explore paths of the program without
 executing the code, and without the need for a test suite.
 Second, a static analysis can verify the code: if it
 reports no warnings, the code is guaranteed to be bug-free. 
@@ -307,20 +307,20 @@ those framework-specific parts.
 Our tool works in a fully automatic, push-button manner,
 and scales to realistic programs.
 We evaluated our implementation on \subnum programs comprising \totaloc LOC.
-The experiment results demonstrate
+The experimental results demonstrate
 that: our technique is effective (it found \bugs real-world errors
 from four supported frameworks and produced only \falses false positive warnings);
 our reflection-aware call graph construction algorithm helps in
 finding errors in Android applications;
-and our proposed filters significantly reduce the number of
-false positives and redundant warnings.
-
-
+and our proposed filters significantly reduce the number of warnings.
+%false positives and redundant warnings.
 
 
 \subsection{Contributions}
 
 This paper makes the following contributions:
+
+\tinystep
 
 \begin{itemize}
 \item \textbf{Problem.} To the best of our knowledge, we are the first to address

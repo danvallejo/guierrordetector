@@ -1,5 +1,6 @@
+
+\tinystep
 \section{Empirical Evaluation}
-\smallstep
 \label{sec:evaluation}
 
 Our experimental objective is three-fold: to demonstrate the effectiveness
@@ -227,7 +228,7 @@ the error.
  MyTracks & 24036 / 24036 &  161 / 220 & 0 / 0 & 10803 / 13645 & 119 / 119 & 0 / 0 & 39235 / 110977 & 1 / 1 & 0 / 1 & 1192 \\
 \hline
 \hline
- Total & 199161 / 199724 &  188 / 251 & 6 / 6 & 149441 / 153054& 137 / 137& 7 / 7 & 577821 / 652756& 22 / 22 & 11 / 12 & 6542\\
+ Total & 199161 / 199724 &  188 / 251 & 5 / 5 & 149441 / 153054& 137 / 137& 6 / 6 & 577821 / 652756& 22 / 22 & 11 / 12 & 6542\\
 \hline
 \end{tabular}
 \end{center}
@@ -374,7 +375,7 @@ called by 6 different methods from the same non-UI thread. Thus, our
 tool issues 6 separate warnings to indicate
 6 different ways to trigger this error. 5 of the warnings are redundant.
 
-Besides the above two examples, other errors our tool reported were also
+Besides the above two examples, other errors our tool reported are also
 subtle to find. For example, our tool found two new errors in SudokuSolver.
 One error only happens when
 the given Sudoku is unsolvable; and the other one happens
@@ -401,7 +402,7 @@ acceptable accuracy.
 \label{sec:straightforward}
 
 As briefly mentioned in Section~\ref{sec:finding}, one way to prevent
-invalid thread access errors is to wrap every GUI accessing operation
+invalid thread access errors is to wrap every GUI-accessing operation
 with message passing (i.e., via the safe UI methods). Although
 this approach can give rise to other types of errors, a
 straightforward way to detect potential invalid thread access errors
@@ -410,7 +411,7 @@ is not wrapped.
 
 As shown in the far right column of ``Requiring Wrappers'' in
 Table~\ref{table:results}, Requiring Wrappers could identify every
-error that our technique found, but it issues a huge number of warnings,
+error that our technique found, but it issued a huge number of warnings,
 most of which are probably false positives.
 The primary reason is that this simple approach
 does not globally reason about the calling relationship between
@@ -450,7 +451,7 @@ Figure~\ref{fig:ex} illustrates this point.
 (b) shows a less precise call graph built by RTA or 0-CFA, and (c) shows a more
 precise call graph built by 1-CFA. Nodes for constructors are omitted for brevity.
 Using the less precise call graph, the error
-detection algorithm will report an invalid method call chain: \CodeIn{entry()}
+detection algorithm in Figure~\ref{fig:detectalgorithm} will report an invalid method call chain: \CodeIn{entry()}
 $\rightarrow$ \CodeIn{f()} $\rightarrow$ \CodeIn{start()} $\rightarrow$ \CodeIn{run()}
 $\rightarrow$ \CodeIn{uiAcc()},
 but miss the actual error path: \CodeIn{entry()} $\rightarrow$ \CodeIn{g1()} $\rightarrow$
@@ -537,9 +538,9 @@ enumerates all non-cyclic paths from all reachable \CodeIn{Thread.start()} nodes
 to each UI-accessing node, and then checks whether each
 path spawns a new thread and accesses GUI objects without using safe UI methods.
 This variant ran out of memory on all subjects. We checked
-the output paths before the algorithm terminated, and found none of the explored
-path revealed a real error. This is because the number of
-non-cyclic paths in a graph is exponential in the graph node number.
+the explored paths before the algorithm terminated, and found none of them
+revealed a real error. This is because the number of
+non-cyclic paths in a graph is exponential in the graph size.%node number.
 For a realistic call graph which often contains thousands of nodes,
 it is infeasible to enumerate all paths.
 %only a very few amount of paths can be enumerated within a practical amount of time.
@@ -567,7 +568,7 @@ is the most effective one.
 
 \noindent \textbf{\textit{Summary.}} Although a static analysis may
 issue false positives or redundant reports, a set of well-designed
-sound and heuristic filters can still remove most of them.
+error filters can remove most of them.
 %Heuristic filter, effective.
 
 \begin{table}[t]
