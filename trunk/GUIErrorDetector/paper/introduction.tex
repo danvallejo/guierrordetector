@@ -277,8 +277,9 @@ inspect the method call chain, understand how the error
 could be triggered, and fix it if it is a real bug.
 
 Our static analysis is independent of the call graph construction algorithm.
-Given a sound call graph, our analysis is sound in that it does
-not miss true positives. GUI applications tend to use reflection, and
+%Given a sound call graph, our analysis is sound in that it does
+%not miss true positives.
+However, modern GUI applications tend to use reflection, and
 in the presence of reflection, existing call graph construction algorithms such as RTA~\cite{rta}
 and k-CFA~\cite{kcfa} fail to build a good call graph.
 To alleviate this problem, we use an algorithm to build reflection-aware call graph, and
