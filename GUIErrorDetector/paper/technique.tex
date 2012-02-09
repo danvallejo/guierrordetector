@@ -104,7 +104,7 @@ nodes from each entry node (line 7).
 Each \CodeIn{Thread.start()} node in a call graph indicates that a new,
 non-UI thread is spawned.  The \CodeIn{Thread.start()}
 nodes act as the sources in the main graph traversal.
-The algorithm uses BFS to search for reachable UI-accessing
+The algorithm uses Breadth-First Search (BFS) to search for reachable UI-accessing
 methods (lines 11 -- 25).
 The algorithm stops the traversal if it reaches a UI-accessing
 method (lines 17 -- 19) or a safe UI method (lines 20, 21).
@@ -177,7 +177,7 @@ The algorithm in Figure~\ref{fig:detectalgorithm} uses BFS to search
 for potential error-revealing paths, since BFS always returns the
 shortest path to the UI-accessing node, permitting
 smaller error reports. However,
-other graph search strategies such as Depath-First Search (DFS) or
+other graph search strategies such as Depth-First Search (DFS) or
 exhaustive path search can also be employed. In our experiment (Section~\ref{sec:search}),
 we empirically compared three different graph search strategies, and demonstrated that
 using BFS, the algorithm found more errors than DFS and
@@ -396,7 +396,7 @@ for programmers to interpret.
 
 
 %\item
-\textbf{2. Filter Reports With User-Annotated Methods}. Users are
+\textbf{2. Filter Reports with User-Annotated Methods}. Users are
 permitted to explicitly annotate project-specific methods
 that will never trigger an error.
 %For example, the Android GUI framework provides a utility method 
@@ -406,7 +406,7 @@ that will never trigger an error.
 %Thus,
 A reported method call chain containing an annotated  method
 can be safely removed. In our experiments, we produced a list of \filternum
-annotated methods for two subjects because they are using a customized
+annotated methods for two subjects because they use a customized
 pattern to interact with the GUI framework.
 
 
@@ -428,7 +428,7 @@ programs on different GUI frameworks and that we believed would be generally use
 We did this only between experiments rather than biasing experiments by tuning
 our tool to specific programs.
 
-\textbf{4. Filter Report With the Same Head Methods from the Entry Node to \CodeIn{Thread.start()}}. A method can call
+\textbf{4. Filter Report with the Same Head Methods from the Entry Node to \CodeIn{Thread.start()}}. A method can call
 multiple methods that access GUI objects, such as:
 \vspace{-2mm}
 \begin{CodeOut}
@@ -457,7 +457,7 @@ and removes the longer one.
 %experiments) head nodes, and removes the longer one.
 
 %\item
-\textbf{5. Filter Report With the Same Tail Methods from \CodeIn{Thread}.
+\textbf{5. Filter Report with the Same Tail Methods from \CodeIn{Thread}.
 \CodeIn{start()}
 to the UI-accessing Method}. A method
 can have multiple callers, so that method call chains with the same tail are likely
@@ -474,8 +474,8 @@ only one error per \CodeIn{Thread.start()}.
 
 As we will show in our experiments (Section~\ref{sec:filters}), these filters
 work remarkably well by reducing over 99\% of the reported warnings. In addition,
-we also found that only using sound filters was not sufficient. The overwhelming
-number of warnings after applied sound filters motivated the use
+we also found that using sound filters alone was insufficient. The overwhelming
+number of warnings after sound filters were applied motivated the use
 of heuristic filters.
 
 

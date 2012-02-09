@@ -385,7 +385,7 @@ Besides the above two examples, other errors our tool reported are also
 subtle to find. For example, our tool found two new errors in SudokuSolver.
 One error only happens when
 the given Sudoku is unsolvable; and the other one happens
-when  JVM fails to launch the mail composing window of the
+when  JVM fails to launch the %mail composing window of the
 user default mail client.% (after a user clicks the "eMail Me" button).
 
 As reflected in our experiments, we found GUI developers have already
@@ -446,7 +446,7 @@ is because RTA and 0-CFA do not consider the calling context when
 constructing a call graph, and may
 mix the same method calls by different callers into a single node, thus
 introducing imprecision. Although the error-revealing paths exist in
-less precise graphs, the impreicison prevents our algorithm finding them.
+less precise graphs, the impreicison prevents our algorithm from finding them.
 Figure~\ref{fig:ex} illustrates this point.
 
 \begin{figure}[t]
@@ -512,7 +512,7 @@ Android applications.
 
 Our error detection algorithm in Figure~\ref{fig:detectalgorithm} uses BFS to search for
 potential single-GUI-thread violations. However, other graph search strategies such as
-Depth-First Search (DFS) and exhaustive path search can also be employed. To
+DFS and exhaustive path search can also be employed. To
 understand trade-offs between using different search strategies, we 
 implemented two variants of the algorithm in Figure~\ref{fig:detectalgorithm}, and
 evaluated them on the same subjects with the identical environment settings.
