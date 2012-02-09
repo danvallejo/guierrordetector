@@ -217,6 +217,9 @@ an unacceptable number of warnings. %false positives and redundant warnings.
 %Here are a few reasons, first, for the sake of efficiency, UI must use multi-thread to perform updates and processing user requests; second, there is no language level enforcement to prevent this error; and third, programmers often forget corner cases like an event listener that may init a non-UI thread to update a UI component.
 %Furthermore, asyncExec has no timing guarantee, and programmers can not use it everywhere
 
+\smallskip
+
+\textbf{Our approach: static analysis.}
 This paper uses static analysis to find potential GUI errors.
 Static analysis has two advantages compared to dynamic approaches such as
  testing. First, a static analysis can explore paths of the program without

@@ -58,6 +58,8 @@ thread access error occurs when the UI thread may spawn a non-UI thread, and the
 exists a path from the non-UI thread's \CodeIn{start} method to any UI-accessing method
 without going through any safe UI method. }\vspace{1mm}
 
+
+\noindent  {\textsc{\textbf{Problem.}}}
 At a high level, to detect an invalid thread access error, an analysis needs to track all
 non-UI threads spawned by the UI thread, and check whether those non-UI threads
 may invoke a UI-accessing method.
