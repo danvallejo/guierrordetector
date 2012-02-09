@@ -43,7 +43,7 @@ execute on that thread.  There are several advantages to the single-GUI-thread r
 GUI developers need not become experts at concurrent programming. Programming the
 framework itself is also simpler and less error-prone.
 
-\smallstep
+\tinystep
 
 \item The single-GUI-thread rule incurs less overhead.
 Otherwise, whenever the framework calls a method that might
@@ -53,7 +53,7 @@ if necessary. When GUI objects return from the method, the framework must re-gra
 restore states.  Even applications that do not require concurrent access to the GUI
 must bear this cost.
 
-\smallstep
+\tinystep
 
 \item GUI events are dispatched in a predictable order from a single event queue.
 If the thread scheduler could arbitrarily interleave component changes, then event processing,
@@ -326,7 +326,7 @@ This paper makes the following contributions:
 \item \textbf{Problem.} To the best of our knowledge, we are the first to address
 the invalid thread access error detection problem for multithreaded GUI applications.
 
-\smallstep
+\tinystep
 
 \item \textbf{Technique.} We formulate finding
 the invalid thread access error as a call graph reachability problem,
@@ -334,7 +334,7 @@ and present a general error detection technique.
 In addition, we use a reflection-aware
 call graph construction algorithm. (Section~\ref{sec:technique}).
 
-\smallstep
+\tinystep
 
 \item \textbf{Implementation.} We implemented our technique and
 instantiated it for four
@@ -342,7 +342,7 @@ popular GUI platforms: SWT, Eclipse plugin, Swing, and Android (Section~\ref{sec
 tool implementation is publicly available at
 \url{http://guierrordetector.googlecode.com}.
 
-\smallstep
+\tinystep
 
 \item \textbf{Evaluation.} We applied our tool to \subnum programs 
 from 4 different frameworks, comprising \totaloc LOC. The results

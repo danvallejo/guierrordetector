@@ -41,6 +41,7 @@ the above criteria. The subjects used in our experiment are shown in Table~\ref{
 which include end-user applications, programming tools, and games. 
 
 
+\begin{myindentpar}{-2mm}
 \begin{itemize}%\addtolength{\itemsep}{-0.5\baselineskip}
 \Item \textbf{SWT desktop applications.}
 %VirgoFTP~\cite{virgo} and FileBunker~\cite{filebunker} are two useful SWT desktop applications.
@@ -49,18 +50,21 @@ FileBunker~\cite{filebunker} is a file backup application which uses one or more
 accounts as its backup repository. ArecaBackup~\cite{areca} offers a local
 file backup solution for Linux and Windows.
 
+\vspace{0.5mm}
+\vspace{0.5mm}
 
 \Item \textbf{Eclipse plugins.}
 HudsonEclipse~\cite{hudson} monitors Hudson build status from Eclipse.
 EclipseRunner~\cite{eclipserunner} extends Eclipse's capability to run launch configurations.
 
+\vspace{0.5mm}
 
 \Item \textbf{Swing applications.} %S3dropbox~\cite{s3dropbox} and SudokuSolver~\cite{sudokusolver} are two Swing desktop applications.
 S3dropbox~\cite{s3dropbox}  allows users
 to drag and drop files to their Amazon S3 accounts. SudokuSolver~\cite{sudokusolver}
 computes Sudoku solutions efficiently using mutlithreading execution. 
 
-\smallstep
+\vspace{0.5mm}
 
 \Item  \textbf{Android applications.} %MyTracks~\cite{mytracks}, Fennec~\cite{fennec}, and SGTPuzzles~\cite{sgtpuzzles} are three Android applications.
 SGTPuzzler~\cite{sgtpuzzles} is a single-player logic game.
@@ -70,6 +74,7 @@ MyTracks~\cite{mytracks}, developed by Google, records users' GPS tracks, and pr
 interfaces to visualize them on Google Maps. 
 
 \end{itemize}
+\end{myindentpar}
 
 
 \begin{table}[t]
@@ -381,7 +386,7 @@ subtle to find. For example, our tool found two new errors in SudokuSolver.
 One error only happens when
 the given Sudoku is unsolvable; and the other one happens
 when  JVM fails to launch the mail composing window of the
-user default mail client (after a user clicks the "eMail Me" button).
+user default mail client.% (after a user clicks the "eMail Me" button).
 
 As reflected in our experiments, we found GUI developers have already
 used design patterns, runtime checks, and testing to avoid violating
@@ -500,6 +505,7 @@ so the standard call graph construction algorithm is sufficient.
 algorithm finds more errors than 0-CFA and RTA, and our reflection-aware call
 graph construction algorithm helps to find errors on some
 Android applications.
+
 
 \subsubsection{Comparing Graph Search Strategies}
 \label{sec:search}
@@ -677,10 +683,10 @@ to remedy this limitation is to design an analysis to identify
 those non-UI threads created before a GUI is launched.
 Second, like many bug-finding techniques, our technique
 is neither sound nor complete. It may miss true positives due
-to the graph search strategy the algorithm employs, or
-issue false positives because the conservative nature of
-a static analysis. Designing better call graph construction
-and search algorithm may alleviate this limitation.
+to the used graph search strategy, or
+issue false positives due to the conservative nature of
+a static analysis. Designing better call graph construction algorithms
+and graph search strategies may alleviate this limitation.
 Third, our tool cannot compute call relationships
 for inter-process communication between components. It also
 requires users to manually add annotations to characterize
