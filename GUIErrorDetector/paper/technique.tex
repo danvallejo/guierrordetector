@@ -212,20 +212,20 @@ for native methods in Section~\ref{sec:annotation}.
     <Button android:id="@+id/\textbf{button\_id}" android:text="A Button" />
 </LinearLayout>
 
-1. public class MyActivity extends Activity \{
+1. public class MyActivity extends Activity \ttlcb
 2.    @Override
-3.    public void onCreate(Bundle savedInstanceState) \{
+3.    public void onCreate(Bundle savedInstanceState) \ttlcb
 4.        super.onCreate(savedInstanceState);
 5.        setContentView(R.layout.main);
 6.        Button button = (Button) findViewById(R.id.\textbf{button\_id});
-7.        button.setOnClickListener(new Button.OnClickListener() \{
+7.        button.setOnClickListener(new Button.OnClickListener() \ttlcb
 8.            @Override
-9.            public void onClick(View v) \{
+9.            public void onClick(View v) \ttlcb
 10.               button.setText("Button Clicked.");
-11.           \}
-12.       \});
-13.   \}
-14. \}
+11.           \ttrcb
+12.       \ttrcb);
+13.   \ttrcb
+14. \ttrcb
 \end{alltt}
 \end{CodeOut}
 \vspace*{-3.0ex} \caption{Sample GUI application code on the Android platform. The layout
@@ -339,10 +339,10 @@ the following code snippet indicates that native methods \CodeIn{native1()} and 
 may call method \CodeIn{javaMethod()}.
 
 %\noindent 
-\CodeIn{@CalledByNativeMethods(callers=\{"native1", "native2"\})}
+\CodeIn{@CalledByNativeMethods(callers=\ttlcb"native1", "native2"\ttrcb)}
 
 %\noindent
-\CodeIn{public void javaMethod() \{ ... \}}
+\CodeIn{public void javaMethod() \ttlcb\ ... \ttrcb}
 
 
 \noindent Our static analysis takes the call relationship specified by this
@@ -433,10 +433,10 @@ multiple methods that access GUI objects, such as:
 \vspace{-2mm}
 \begin{CodeOut}
 \begin{alltt}
-     public void m() \{
+     public void m() \ttlcb
          accessUIObject1();
          accessUIObject2();
-     \}
+     \ttrcb
 \end{alltt}
 \end{CodeOut}
 \vspace{-2mm}
