@@ -286,24 +286,24 @@ to the subject developers. As of Feb 2012, 1 error in S3dropbox has been confirm
 \vspace{-2mm}
 \begin{CodeOut}
 \begin{alltt}
-59.private void deleteBucket() \{
-60.    executor.execute(new Runnable() \{
-61.        public void run() \{
-62.            try \{
+59.private void deleteBucket() \ttlcb
+60.    executor.execute(new Runnable() \ttlcb
+61.        public void run() \ttlcb
+62.            try \ttlcb
 63.                controller.deleteCurrentBucket();
-64.            \} catch (Exception e) \{
+64.            {\ttrcb} catch (Exception e) \ttlcb
 65.                logger.info("Delete failed", e);
 66.                deleteError(); 
-67.            \}
-68.       \}
-69.    \});
-70.\}
+67.            \ttrcb
+68.       \ttrcb
+69.    \ttrcb);
+70.\ttrcb
 
-77.private void deleteError() \{
+77.private void deleteError() \ttlcb
 78.    String text = "Cannot delete folder .....";
 79.    display.showErrorMessage("Delete failed", 
         String.format(text, controller.getSelectedBucketName())); 
-80.\}
+80.\ttrcb
 \smallstep
 \end{alltt}
 \end{CodeOut}
@@ -344,18 +344,18 @@ or memory-consistency errors.
 \vspace{-2mm}
 \begin{CodeOut}
 \begin{alltt} 
-179.private void initializeResourceChangeListener() \{
+179.private void initializeResourceChangeListener() \ttlcb
 180.  ResourcesPlugin.getWorkspace().addResourceChangeListener(
-        new IResourceChangeListener() \{
-181.      public void resourceChanged(IResourceChangeEvent event) \{
+        new IResourceChangeListener() \ttlcb
+181.      public void resourceChanged(IResourceChangeEvent event) \ttlcb
 182.        refresh();
-183.      \}
-184.  \}, IResourceChangeEvent.POST\_CHANGE);
-185.\}
+183.      \ttrcb
+184.  \ttrcb, IResourceChangeEvent.POST\_CHANGE);
+185.\ttrcb
 
-414.public void refresh() \{
+414.public void refresh() \ttlcb
 415.  getViewer().refresh();
-416.\}
+416.\ttrcb
 \end{alltt}
 \end{CodeOut}
 \smallstep
@@ -480,10 +480,10 @@ reflectively as follows.
 \vspace{-2mm}
 \begin{CodeOut}
 \begin{alltt}
-97.  public void setLatLong(int id, double d) \{
+97.  public void setLatLong(int id, double d) \ttlcb
 98.     TextView msgTextView = (TextView) activity.\textbf{findViewById}(id);
 99.     msgTextView.setText(LAT\_LONG\_FORMAT.format(d));
-100. \}
+100. \ttrcb
 \end{alltt}
 \end{CodeOut}}
 

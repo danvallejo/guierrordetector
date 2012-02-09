@@ -81,7 +81,7 @@ The invalid thread access error is one of the top 3 bugs in developing a SWT app
 the source of many relevant concurrency bugs~\cite{top3bugs}.
 A Google search for ``SWTException:Invalid thread access''  returns over 11,800 entries,
 consisting of numerous bug reports, forum posts, and mailing list threads on
-this problem. Eclipse, the IDE for Java development, is built on top of SWT.
+this problem. Eclipse, the IDE for Java development, is built on top of SWT\@.
 Searching for ``SWTException:Invalid thread access'' in Eclipse's bug repository
 and discussion forum returns over 2732 bug reports and 351 distinct threads, respectively. 
 We manually studied all 156 distinct \textit{confirmed} bug reports, and 
@@ -102,34 +102,34 @@ to fix bug 51757 and verify the patch.
 \vspace{-2mm}
 \begin{CodeOut}
 \begin{alltt}
-68.  public LayerView(Context context, LayerController controller) \{
+68.  public LayerView(Context context, LayerController controller) \ttlcb
 69.     super(context);
         ....
 73.     mRenderer = new LayerRenderer(this);
 74.     setRenderer(mRenderer);
         ...
-     \}
+     \ttrcb
 \end{alltt}
 \end{CodeOut}
 \hspace{6mm} \small{In Android library class: android.opengl.GLSurfaceView}
 \vspace{-2mm}
 \begin{CodeOut}
 \begin{alltt}
-272. public void setRenderer(Renderer renderer) \{
+272. public void setRenderer(Renderer renderer) \ttlcb
         ...
 282.    mGLThread = new GLThread(renderer);
 283.    mGLThread.start();   
-     \}
+     \ttrcb
 \end{alltt}
 \end{CodeOut}
  \hspace{6mm}\small{In class: org.mozilla.gecko.gfx.LayerRenderer}
 \vspace{-2mm}
 \begin{CodeOut}
 \begin{alltt}
-220. public void onSurfaceChanged(GL10 gl, int width, int height) \{
+220. public void onSurfaceChanged(GL10 gl, int width, int height) \ttlcb
 221.    gl.glViewport(0, 0, width, height);
 222.    mView.setViewportSize(new IntSize(width, height));
-     \}
+     \ttrcb
 \end{alltt}
 \end{CodeOut}
 \tinystep
@@ -184,14 +184,14 @@ a standard way to send asynchronized messages to the UI-thread.}, as follows:
 \vspace{-2mm}
 \begin{CodeOut}
 \begin{alltt}
-220. public void onSurfaceChanged(GL10 gl, int width, int height) \{
+220. public void onSurfaceChanged(GL10 gl, int width, int height) \ttlcb
 221.     gl.glViewport(0, 0, width, height);
          \textbf{mView.post(new Runnable() \ttlcb}
              \textbf{public void run() \ttlcb}
 222.             mView.setViewportSize(new IntSize(width, height));
              \textbf{\ttrcb}
          \textbf{\ttrcb);}
-     \}
+     \ttrcb
 \end{alltt}
 \end{CodeOut}}
 
