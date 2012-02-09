@@ -47,13 +47,13 @@
 \newcommand{\smallstep}{\vspace{-2mm}}
 \newcommand{\tinystep}{\vspace{-1mm}}
 
-\newenvironment{myitemize}{
-\begin{itemize}
-  \setlength{\leftmargin}{0pt}
-  \setlength{\itemsep}{4pt}
-  \setlength{\parskip}{-4pt}
-  \setlength{\parsep}{-1pt}
-}{\end{itemize}}
+
+\newenvironment{myindentpar}[1]%
+{\begin{list}{}%
+         {\setlength{\leftmargin}{#1}}%
+         \item[]%
+}
+{\end{list}}
 
 
 \begin{document}

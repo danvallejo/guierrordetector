@@ -57,11 +57,13 @@ to execute code (a)synchro- nizedly on the UI thread.
 \end{itemize}
 
 \tinystep
+\tinystep
 \subsubsection{Eclipse plugin}
 
 We instantiated our technique for the Eclipse plugin development framework as follows:
 
 \smallstep
+\begin{myindentpar}{-2mm}
 
 \begin{itemize}
 
@@ -73,12 +75,14 @@ methods in the class that implements \CodeIn{org.eclipse.swt.internal.SWTEvent-\
 always called back from the UI thread.
 %, thus are used as call graph entry nodes.
 
-\smallstep
+\tinystep
 
 \item \textbf{UI-accessing nodes} and \textbf{Safe UI methods} are the same as SWT.
 
 \end{itemize}
+\end{myindentpar}
 
+\tinystep
 \tinystep
 \tinystep
 \subsubsection{Swing}
@@ -91,27 +95,31 @@ After a Swing program starts, its initial thread exits and the UI thread takes c
 of the application and starts to execute all event-handling code or spawns new worker threads. 
 We instantiated our technique for Swing as follows:
 
+\begin{myindentpar}{-2mm}
 \begin{itemize}
+\tinystep
 
 \item \textbf{Call graph entry nodes:} all user code methods that override
 Swing GUI event handling methods. Those event handling methods are always
 called back from the UI thread.
 
-\smallstep
+\tinystep
 
 \item \textbf{UI-accessing nodes:} %as stated in Swing's documentation,
 all methods defined in each Swing GUI class except for three thread-safe
 methods: \CodeIn{repaint()}, \CodeIn{revali-\\date()}, and \CodeIn{invalidate()}.
 
-\smallstep
+\tinystep
 
 \item \textbf{Safe UI methods: } 
 \CodeIn{SwingUtilities.}\CodeIn{invokeLater} and \CodeIn{Swing-\\Utilities.invokeAndWait} that execute code on the UI thread.
 
 \end{itemize}
+\end{myindentpar}
 
 \smallstep
 
+\tinystep
 \subsubsection{Android}
 
 Android is a Java-based platform for embedded or mobile devices. 
@@ -127,7 +135,9 @@ to interact with users through a visual interface and handle GUI events.
 We instantiated our technique for Android programs as follows:
 
 
+\begin{myindentpar}{-2mm}
 \begin{itemize}
+\tinystep
 
 \item \textbf{Call graph entry nodes: }in an Android application,
 an \CodeIn{Activity} object is created and manipulated by the UI thread. Thus, we treat
@@ -136,7 +146,7 @@ and any overriding definitions in its subclasses as call graph entry nodes.
 We also add all user code methods that override Android GUI event handling methods
 as entry nodes, since they are called back from the UI thread.
 
-\smallstep
+\tinystep
 
 \item \textbf{UI-accessing nodes: }the \CodeIn{ViewRoot.checkThread} method.
 Like SWT, Android explicitly performs runtime checking before accessing
@@ -144,12 +154,13 @@ a GUI object via the \CodeIn{ViewRoot.checkThread} method. If the current
 thread is a non-UI thread, the \CodeIn{ViewRoot.checkThread} method throws
 a \CodeIn{RuntimeException}.
 
-\smallstep
+\tinystep
 
 \item \textbf{Safe UI methods: } \CodeIn{View.post}
 and \CodeIn{View.postDelay} that execute code on the UI thread. 
 
 \end{itemize}
+\end{myindentpar}
 
 \tinystep
 
