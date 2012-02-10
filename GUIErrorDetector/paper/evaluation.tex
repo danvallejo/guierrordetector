@@ -238,7 +238,7 @@ the error.
 \end{tabular}
 \end{center}
 \vspace{-15pt}
-\Caption{{\label{table:results}Experimental results in finding invalid thread access errors
+\Caption{{\label{table:results}Experimental results in finding invalid-thread-access errors
 in multithreaded GUI programs. Column ``CG Size'' shows the
 call graph size in terms of node number. Column ``\#Warning''
 shows the number of warnings issued by our tool. Column ``\#Bug'' shows
@@ -249,7 +249,7 @@ for Android applications, a slash ``/'' separates the result of
 using standard call graph construction algorithm and our call
 graph construction algorithm in Section~\ref{sec:cgcon} (dealing
 with reflection calls and adding \annotationnum native method annotations
-for SGTPuzzler). The \newbugs errors found in VirgoFTP, FileBunker, ArecaBackup
+for SGTPuzzler). The \newbugs errors found in VirgoFTP, FileBunker, ArecaBackup,
 S3dropbox, and SudokuSolver are previously  unknown. As a comparison, the
 results of the ``Requiring Wrappers'' approach (Section~\ref{sec:straightforward}),
 are shown at the far right.} }
@@ -408,7 +408,7 @@ acceptable accuracy.
 \subsubsection{Comparison to Requiring Wrappers}
 \label{sec:straightforward}
 
-As briefly mentioned in Section~\ref{sec:finding}, one way to prevent
+As mentioned in Section~\ref{sec:finding}, one way to prevent
 invalid thread access errors is to wrap every GUI-accessing operation
 with message passing (i.e., via the safe UI methods). Although
 this approach can give rise to other types of errors, a
@@ -445,25 +445,26 @@ used in our experiments. As shown in Table~\ref{table:results},  1-CFA found
 more errors than the other two algorithms. This
 is because RTA and 0-CFA do not consider the calling context when
 constructing a call graph, and 
-mix the same method calls by different callers into a single node, thus
+mix calls to the same method from different callers into a single node, thus
 introducing imprecision. Although the error paths exist in
-less precise graphs, the impreicison prevents our algorithm from finding them.
-Figure~\ref{fig:ex} illustrates this point.
+the less precise graphs, our algorithm does not report them because of its heuristics
+for outputting the shortest possible call chain. Figure~\ref{fig:ex} illustrates this point.
 
 \begin{figure}[t]
   \centering
   \includegraphics[scale=0.45]{cgexample}
-  \vspace*{-5.0ex}\caption {{\label{fig:ex} (a) shows an example code, in which
+  \vspace*{-5.0ex}\caption {{\label{fig:ex} (a) shows example code, in which
 \CodeIn{safe()} is a Safe UI method, and \CodeIn{uiAcc()} is a UI-accessing method.
 (b) shows a less precise call graph built by RTA or 0-CFA, and (c) shows a more
 precise call graph built by 1-CFA. Nodes for constructors are omitted for brevity.
-Using the less precise call graph, the error
-detection algorithm in Figure~\ref{fig:detectalgorithm} will report an invalid method call chain: \CodeIn{entry()}
+Using the less precise call graph, our error
+detection algorithm (Figure~\ref{fig:detectalgorithm}) reports an invalid method
+call chain: \CodeIn{entry()}
 $\rightarrow$ \CodeIn{f()} $\rightarrow$ \CodeIn{start()} $\rightarrow$ \CodeIn{run()}
-$\rightarrow$ \CodeIn{uiAcc()},
-but miss the actual error path: \CodeIn{entry()} $\rightarrow$ \CodeIn{g1()} $\rightarrow$
-\CodeIn{g2()} $\rightarrow$ \CodeIn{start()} $\rightarrow$ \CodeIn{run()} $\rightarrow$ \CodeIn{uiAcc()}. The
-actual error path can only be found when using the more precise call graph.
+$\rightarrow$ \CodeIn{uiAcc()}. It does not report
+the actual error path because it is longer: \CodeIn{entry()} $\rightarrow$ \CodeIn{g1()} $\rightarrow$
+\CodeIn{g2()} $\rightarrow$ \CodeIn{start()} $\rightarrow$ \CodeIn{run()} $\rightarrow$ \CodeIn{uiAcc()}.
+The algorithm outputs the actual error path when using the more precise call graph.
 }}
 \end{figure}
 
@@ -489,10 +490,12 @@ reflectively as follows.
 \end{CodeOut}}
 
 Another error in SGTPuzzler is only reported when adding \annotationnum native method
-annotations (Section~\ref{sec:annotation}). The error in Fennec
-can be found by using a standard call graph construction algorithm.
-This is because the error-related GUI objects are created explicitly,
-so the standard call graph construction algorithm is sufficient.
+annotations (Section~\ref{sec:annotation}). 
+
+%The error in Fennec
+%can be found by using a standard call graph construction algorithm.
+%This is because the error-related GUI objects are created explicitly,
+%so the standard call graph construction algorithm is sufficient.
 
 %Without
 %replacing the reflection calls with explicit object creation instructions,
@@ -504,21 +507,42 @@ so the standard call graph construction algorithm is sufficient.
 
 \noindent \textbf{\textit{Summary.}} Using the 1-CFA 
 algorithm finds more errors than 0-CFA and RTA, and our call
-graph construction algorithm helps to find errors on some
+graph construction algorithm helps to find errors in some
 Android applications.
 
 
 \subsubsection{Comparing Graph Search Strategies}
 \label{sec:search}
 
-Our error detection algorithm in Figure~\ref{fig:detectalgorithm} uses BFS to search for
-potential single-GUI-thread violations. However, other graph search strategies such as
+Our error detection algorithm in Figure~\ref{fig:detectalgorithm} uses a
+slightly modified BFS to search for
+potential single-GUI-thread violations. However, standard BFS
+and other graph search strategies such as
 DFS and exhaustive path search can also be employed. To
 understand trade-offs between using different search strategies, we 
-implemented two variants of the algorithm in Figure~\ref{fig:detectalgorithm}, and
+implemented three variants of the algorithm in Figure~\ref{fig:detectalgorithm}, and
 evaluated them on the same subjects with the identical environment settings.
 
-The first variant uses DFS for graph traversal by changing
+The first variant uses standard BFS for graph traversal by deleting
+lines 6 and 23 in Figure~\ref{fig:detectalgorithm}, and changing
+7 in Figure~\ref{fig:detectalgorithm} to:
+
+\vspace{0.2mm}
+$\mathit{worklist}$ $\leftarrow$ $\bigcup_{entry \in entryNodes}$ getReachableStarts($\mathit{entry}$)
+\vspace{0.2mm}
+
+\noindent This variant returns the shortest path from \textit{any} \CodeIn{Thread.start()} node
+to \textit{any} UI-accessing node, rather than the shortest path from \textit{a given}
+\CodeIn{Thread.start()} node to \textit{any} UI-accessing node as the algorithm in
+Figure~\ref{fig:detectalgorithm} does.
+This variant found 10 errors in total and missed 1 error in S3dropbox and 1 error in
+SudokuSolver. This is because in BFS (either the standard BFS or our algorithm), each
+node will \textit{only} be visited once; but in the standard BFS, if a node has been covered
+in an error path from a \CodeIn{Thread.start()} node, that node will not be visited again
+even when the standard BFS traverses from another \CodeIn{Thread.start()} node, thus
+missing potential errors.
+
+The second variant uses DFS for graph traversal by changing
 the data structure of $\mathit{worklist}$ on line 7 in Figure~\ref{fig:detectalgorithm} to
 a stack, and changing queue operations (\CodeIn{dequeue} and \CodeIn{enqueueAll}
 on lines 10 and 21 in Figure~\ref{fig:detectalgorithm}, respectively)
@@ -529,17 +553,8 @@ may not be the shortest one and is more likely to be an infeasible path in pract
 %For the FileBunker subject, paths
 %returned by DFS are much longer than BFS, and do not actually exist.
 
-%Hundson: 3, 1
-%EclipseRunner: 6, 1
-%S3dropbox: ? , ?  too many warnings time: 31678 (45528 chains), running out of memory
-%SudokuSolver:  2, 1 too many warnings: 1700, 2090
-%VirgoFTP: 2, 2
-%FileBunker:  2, 0  //very long method calls
-%Fennec: 3, 1
-%SGTPuzzler: 1, 1
-%MyTracks: 1, 1
 
-The second variant uses exhaustive search to find potential errors. This variant
+The third variant uses exhaustive search to find potential errors. This variant
 enumerates all non-cyclic paths from all reachable \CodeIn{Thread.start()} nodes
 to each UI-accessing node, and then checks whether each
 path spawns a new thread and accesses GUI objects without using safe UI methods.
@@ -554,21 +569,20 @@ it is infeasible to enumerate all paths.
 
 \vspace{1mm}
 
-\noindent \textbf{\textit{Summary.}} Using BFS finds more errors than DFS and
-exhaustive search in our error detection algorithm. 
+\noindent \textbf{\textit{Summary.}} Our algorithm finds more errors than
+using standard BFS, DFS and exhaustive search in error detection.
 
 
 \subsubsection{Evaluating Error Filters}
 \label{sec:filters}
 
-Table~\ref{table:filters} measures the effectiveness of the proposed 
+Table~\ref{table:filters} measures the effectiveness of the
 error filters of Section~\ref{sec:heuristic}.
-The five error filters removed 99.96\% of the reported warnings as false positives
+The five error filters removed 99.96\% of the reported warnings as likely false positives
 or redundant warnings. Specifically, two sound filters 1 and 2 
 removed 34.44\% of the warnings, and three heuristic filters 3, 4, and 5
-removed a further 65.52\% of the warnings. Among them, the 4th filter for removing
-reports with the same head methods from the entry node to \CodeIn{Thread.start()}
-is the most effective one. 
+removed a further 65.52\% of the warnings. The most effective filter is
+\#4, for removing reports with the same head methods from the entry node to \CodeIn{Thread.start()}.
 
 \vspace{1mm}
 
@@ -641,11 +655,11 @@ under column ``1-CFA'' in Table~\ref{table:results}.
 \end{table}
 
 
-\subsection{Discussions}
+\subsection{Discussion}
 
 \noindent \textbf{\textit{Performance and scalability.}} Our tool
 has been evaluated on \subnum subjects with over \totaloc LOC and frameworks
-with over 1.4 MLOC, showing good scalability. Our evaluations
+with 1.4 MLOC, showing good scalability. Our evaluations
 were conducted on a 2.67GHz Intel Core PC with 4GB
 physical memory (1GB is allocated for JVM), running Fedora 16.
 For the most time-consuming subject, MyTracks, our tool finished the whole analysis
@@ -666,9 +680,9 @@ used in our experiment are representative of true practice.
 In our evaluation, the studied subjects were selected with a bias towards popularity from
 well-known open-source repositories. Another threat is that we only employed three
 widely-used call graph construction algorithms (i.e., RTA, 0-CFA, and 1-CFA) 
-in our evaluation. It is still unknown whether using other 
+in our evaluation. Using other 
 call graph construction algorithms such as XTA~\cite{xta}, VTA~\cite{Sundaresan:2000} or
-an incremental algorithm~\cite{inccg} may achieve better results.
+an incremental algorithm~\cite{inccg} might achieve divergent results.
 
 
 \vspace{1mm}
@@ -684,8 +698,8 @@ Second, like many bug-finding techniques, our technique
 is neither sound nor complete. It may miss true positives due
 to the graph search strategy, or
 issue false positives due to the conservative nature of
-a static analysis. Designing better call graph construction algorithms
-and graph search strategies may alleviate this limitation.
+a static analysis. Designing better call graph construction algorithms,
+graph search strategies, and filtering heuristics may alleviate this limitation.
 Third, our tool cannot compute call relationships
 for inter-process communication between components. It also
 requires users to manually add annotations to characterize
@@ -701,5 +715,5 @@ Invalid thread access errors  can be subtle to detect in many cases.
 The technique presented in this paper offers a promising solution.
 Our technique finds real-world errors and issues
 few false positive warnings. Our
-proposed filters are useful to reduce the number of warnings.
+proposed filters are useful in reducing the number of warnings.
 

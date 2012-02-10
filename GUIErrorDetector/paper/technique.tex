@@ -96,7 +96,7 @@ then specifies entry nodes, UI-accessing nodes, and safe UI nodes
 for it on lines 3, 4, and 5, respectively. Lines 3 -- 5 are GUI framework-specific.
 As an example, for a SWT desktop application, the entry nodes include
 the single main method, UI-accessing nodes include methods
-\CodeIn{Widget.checkWidget} and \CodeIn{Display.} \CodeIn{checkDevice},
+\CodeIn{Widget.checkWidget} and \CodeIn{Display.}\CodeIn{checkDevice},
 and safe UI methods include two SWT helper methods \CodeIn{Display.asyncExec}  and
 \CodeIn{Display.syncExec} for message passing. Section~\ref{sec:platforms}
 explains the detailed instantiation for each supported framework.
@@ -369,7 +369,7 @@ paths that do not actually exist (false positives) or multiple paths
 5 error filters below to remove likely false positives and redundant warnings.
 The first 2 filters are sound in that they will not filter real bugs, and
 the other 3 filters are based on heuristics. Orthogonally, filters 2
-and 3 are for eliminating false positives, and filters 1, 4, and 5
+and 3 are for reducing false positives, and filters 1, 4, and 5
 are for reducing redundant warnings.
 
 %1 - subsumed, 2 - user annotated, 3 - sysem call, 4 heand  5,  tail
