@@ -227,14 +227,14 @@ the error.
  \hline
 \multicolumn{11}{|l|}{Android mobile applications}   \\
  \hline
- SGTPuzzler & 13631 / 13865&  12 / 16 &  0 / 0 & 9546 / 9682& 4 / 4& 1 / 1 & 35198 / 35756 & 1 / 1  & 1 / 1& 104 \\
+ SGTPuzzler & 13631 / 13865&  1 / 16 &  0 / 0 & 9546 / 9682& 0 / 4& 0 / 1 & 35198 / 35756 & 0 / 1  & 0 / 1& 104 \\
  \hline
  Fennec & 14058 / 14387 &  1 / 1 &  0 / 0 & 8263 / 8898 & 1 / 1 & 0 / 0& 29125/ 31759 & 3 / 3 & 1 / 1& 433 \\
  \hline
  MyTracks & 24036 / 24036 &  161 / 220 & 0 / 0 & 10803 / 13645 & 119 / 119 & 0 / 0 & 39235 / 110977 & 1 / 1 & 0 / 1 & 1192 \\
 \hline
 \hline
- Total & 199161 / 199724 &  188 / 251 & 5 / 5 & 149441 / 153054& 137 / 137& 6 / 6 & 577821 / 652756& 22 / 22 & 11 / 12 & 6542\\
+ Total & 199161 / 199724 &  177 / 251 & 5 / 5 & 149441 / 153054& 133 / 137& 6 / 7 & 577821 / 652756& 21 / 22 & 10 / 12 & 6542\\
 \hline
 \end{tabular}
 \end{center}
@@ -248,7 +248,8 @@ and ``1-CFA'' show the results of using different
 call graph construction algorithms. In each cell of the table
 for Android applications, a slash ``/'' separates the result of
 using standard call graph construction algorithm and the reflection-aware
-call graph construction algorithm. The \newbugs errors found in VirgoFTP, FileBunker, ArecaBackup
+call graph construction algorithm (with \annotationnum native method annotations
+for SGTPuzzler). The \newbugs errors found in VirgoFTP, FileBunker, ArecaBackup
 S3dropbox, and SudokuSolver are previously  unknown. As a comparison, the
 results of the ``Requiring Wrappers'' approach (Section~\ref{sec:straightforward}),
 are shown at the far right.} }
@@ -275,7 +276,7 @@ are redundant. Section~\ref{sec:reflectionaware} compares with other call graph
 construction algorithms.
 
 We submitted all \newbugs new errors
-to the subject developers. As of Feb 2012, 1 error in S3dropbox has been confirmed,
+to the subject developers. As of February 2012, 1 error in S3dropbox has been confirmed,
 4 errors have been reproduced and validated in our own experimental environment, and
 2 errors in FileBunker and ArecaBackup had not been verified by developers yet.
 
@@ -441,7 +442,7 @@ access to be wrapped.
 
 We next compare the three call graph construction algorithms (RTA, 0-CFA, and 1-CFA)
 used in our experiments. As shown in Table~\ref{table:results},  1-CFA found
-more errors with fewer false positive warnings than the other two algorithms. This
+more errors than the other two algorithms. This
 is because RTA and 0-CFA do not consider the calling context when
 constructing a call graph, and may
 mix the same method calls by different callers into a single node, thus
@@ -468,10 +469,10 @@ actual error path can only be found when using the more precise call graph.
 
 
 
-The results in Table~\ref{table:results} also show that using a reflection-aware
-call graph construction algorithm helps in finding errors in Android
-applications. One error from the MyTracks Android application
-can only be found by using the reflection-aware call graph construction algorithm.
+The results in Table~\ref{table:results} also show that using the
+call graph construction algorithm in Section~\ref{sec:cgcon}
+helps in finding errors in Android applications. One error from the MyTracks Android application
+can only be found by using the reflection-aware call graph construction algorithm (Section~\ref{sec:cg}).
 This is because the error-related GUI object (\CodeIn{msgTextView}) in MyTracks is created
 reflectively as follows.
 
@@ -487,8 +488,8 @@ reflectively as follows.
 \end{alltt}
 \end{CodeOut}}
 
- 
-Errors in the other two Android applications (Fennec and SGTPuzzler)
+Another error in SGTPuzzler is only reported when adding \annotationnum native method
+annotations (Section~\ref{sec:annotation}). The error in Fennec
 can be found by using a standard call graph construction algorithm.
 This is because the error-related GUI objects are created explicitly,
 so the standard call graph construction algorithm is sufficient.
@@ -518,12 +519,10 @@ implemented two variants of the algorithm in Figure~\ref{fig:detectalgorithm}, a
 evaluated them on the same subjects with the identical environment settings.
 
 The first variant uses DFS for graph traversal by changing
-line 8 in Figure~\ref{fig:detectalgorithm} to:
-$\mathit{worklist}$ $\leftarrow$ $\mathit{an}$ $\mathit{empty}$ $\mathit{stack}$,
-and changing queue operations (\CodeIn{enqueueAll}, and \CodeIn{dequeue}
-on lines 9, 12, and
-23 in Figure~\ref{fig:detectalgorithm}, respectively)
-to the corresponding statck operations (\CodeIn{pushAll}, and \CodeIn{pop}).
+the data structure of $\mathit{worklist}$ on line 7 in Figure~\ref{fig:detectalgorithm} to
+a stack, and changing queue operations (\CodeIn{dequeue}, and \CodeIn{enqueueAll}
+on lines 10, and 21 in Figure~\ref{fig:detectalgorithm}, respectively)
+to the corresponding statck operations (\CodeIn{pop}, and \CodeIn{pushAll}).
 This variant found 11 errors in total and missed 1 error in the FileBunker subject.
 The reason is that DFS tends to search deeper into the graph, and the path it returns
 may not be the shortest one and is more likely to be an infeasible path in practice.
