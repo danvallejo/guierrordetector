@@ -195,13 +195,13 @@ a standard way to send asynchronized messages to the UI-thread.}, as follows:
 \end{alltt}
 \end{CodeOut}}
 
-Such an approach is desirable for accesses from non-UI threads, but it is unnecessary
-and dangerous for accesses from the UI thread. Asynchronized message passing offers
-no timing guarantee, so a GUI object may have already been
-disposed before the message sent to it arrives, causing other bugs. 
+Such an approach is desirable for accesses from non-UI threads, but it is unnecessary.
 In our evaluation on real-world programs, we found a simple analysis that
 requires GUI operations to be in a message issues
 an unacceptable number of warnings. %false positives and redundant warnings.
+Furthermore, this approach is dangerous for accesses from the UI thread. Asynchronized message passing offers
+no timing guarantee, so a GUI object may have already been
+disposed before the message sent to it arrives, causing other bugs. 
 
 
 %program transformation to wrap
@@ -224,7 +224,7 @@ This paper uses static analysis to find potential GUI errors.
 Static analysis has two advantages compared to dynamic approaches such as
  testing. First, a static analysis can explore paths of the program without
 executing the code, and without the need for a test suite.
-Second, a static analysis can verify the code: if it
+Second, a static analysis can verify the code: if a sound static analysis
 reports no warnings, the code is guaranteed to be bug-free. 
 
 
@@ -284,13 +284,17 @@ Our static analysis is independent of the call graph construction algorithm.
 %not miss true positives.
 However, modern GUI applications tend to use reflection, and
 in the presence of reflection, existing call graph construction algorithms such as RTA~\cite{rta}
-and k-CFA~\cite{kcfa} fail to build a good call graph.
-To alleviate this problem, we use an algorithm to build reflection-aware call graph, and
+and k-CFA~\cite{kcfa} fail to build a complete call graph.
+To alleviate this problem, we present an algorithm to build a reflection-aware call graph, and
 also compare its usefulness with existing call graph construction algorithms in
-our experiments. Static analysis may report false positives due to its
+our experiments.
+
+Static analysis may report false positives due to its
 conservative nature, or multiple warnings that actually correspond
 to the same error. To address such limitations, we devise a set
  of error filters to remove likely false positives and redundant warnings.
+The filters introduce potential unsoundness to our algorithm, but in practice
+they work well and make our technique usable.
 
 \subsection{Technique Instantiation and Evaluation}
 
@@ -305,15 +309,15 @@ Although our technique is applicable to any GUI
 framework with the single-GUI-thread rule, each framework
 has its own definition of \textit{UI thread} and \textit{program 
 entry points}. Thus, our implementation is parameterized with respect to
-those framework-specific parts.
+those framework-specific parts (see Section~\ref{sec:platforms}).
 
 
-Our tool works in a fully automatic, push-button manner,
+Our tool works in an automatic manner,
 and scales to realistic programs.
 We evaluated our implementation on \subnum programs comprising \totaloc LOC.
 The experimental results demonstrate
 that: our technique is effective (it found \bugs real-world errors
-from four supported frameworks and produced only \falses false positive warnings);
+ and produced only \falses false positive warnings);
 our reflection-aware call graph construction algorithm helps in
 finding errors in Android applications;
 and our proposed filters significantly reduce the number of warnings.
@@ -336,7 +340,7 @@ the invalid thread access error detection problem for multithreaded GUI applicat
 the invalid thread access error as a call graph reachability problem,
 and present a general error detection technique.
 In addition, we use a reflection-aware
-call graph construction algorithm. (Section~\ref{sec:technique}).
+call graph construction algorithm (Section~\ref{sec:technique}).
 
 \tinystep
 

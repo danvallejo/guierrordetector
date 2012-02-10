@@ -1,15 +1,16 @@
 \section{Technique}
 \label{sec:technique}
 
-We first give a high-level formulation of the problem, then present
-the error detection algorithm. Finally, we show how to 
-construct a reflection-aware call graph and filter the error reports.
+We first give a high-level formulation of the problem (Section~\ref{sec:probl}), then present
+the error detection algorithm (Section~\ref{sec:algorithm}). Finally, we show how to 
+construct a reflection-aware call graph (Section~\ref{sec:cgcon}) and filter the error reports (Section~\ref{sec:heuristic}).
 
 
 \subsection{Problem Formulation}
+\label{sec:probl}
 
-This section formulates the problem. We first define the
-notations of \textit{UI thread}, \textit{non-UI threads},
+This section formulates the problem. We first define 
+\textit{UI thread}, \textit{non-UI threads},
 \textit{UI-accessing methods},
  \textit{safe UI methods}, and \textit{invalid thread access error}, and
 state two assumptions we make with regard to error detection.
@@ -17,8 +18,8 @@ state two assumptions we make with regard to error detection.
 \noindent {\textsc{\textbf{Definition 1 (UI Thread).}}} {The UI thread
 is a special thread created by the GUI framework during
 GUI initialization. After the GUI becomes visible, the UI thread
-takes charge of the application to handle events from the GUI,
-and spawns new threads to process lengthy operations in the background. }\vspace{1mm}
+takes charge of the application to handle events from the GUI.
+It spawns new threads to process lengthy operations in the background. }\vspace{1mm}
 
 \noindent {\textsc{\textbf{Assumption 1.}}} {We assume that each multithreaded
 GUI application has a single global UI thread. This is true for applications
@@ -36,25 +37,24 @@ threads except for the UI thread in a multithreaded GUI application
 thread is spawned by the UI thread. Under this assumption,
 we ignore all non-UI threads created by the GUI framework
 before the UI thread has been initialized. That is, all post-initialization
-GUI work naturally occurs in the UI thread. Once the GUI is visible, the
+GUI work occurs in the UI thread. Once the GUI is visible, the
 application is driven by events, which are always handled in the UI thread.
 We believe this assumption is reasonable, since if a non-UI thread 
 spawned during pre-initialization GUI work accesses a GUI object, an exception becomes
 immediately apparent and the whole application may abort even before the
-GUI is visible. This is highly unlikely for realistic GUI
+GUI is visible. This is highly unlikely for fielded GUI
 applications.
 }\vspace{1mm}
 
-\noindent {\textsc{\textbf{Definition 3 (UI-Accessing Methods).}}} { A method
+\noindent {\textsc{\textbf{Definition 3 (UI-Accessing Method).}}} { A method
 whose execution may read or write a UI object is called a UI-accessing method.}\vspace{1mm}
 
-\noindent  {\textsc{\textbf{Definition 4 (Safe UI Methods).}}} {GUI frameworks that
+\noindent  {\textsc{\textbf{Definition 4 (Safe UI Method).}}} {GUI frameworks that
 adopt the single-GUI-thread rule must provide methods to permit non-UI threads
 to run code in the UI thread. We call such methods \textit{safe UI methods}, since
 they can be invoked safely by any thread.}\vspace{1mm}
 
-\noindent  {\textsc{\textbf{Definition 5 (Invalid Thread Access).}}} {An invalid
-thread access error occurs when the UI thread may spawn a non-UI thread, and there
+\noindent  {\textsc{\textbf{Definition 5 (Invalid Thread Access).}}} {An invalid-thread-access error occurs when the UI thread may spawn a non-UI thread, and there
 exists a path from the non-UI thread's \CodeIn{start} method to any UI-accessing method
 without going through any safe UI method. }\vspace{1mm}
 
@@ -67,9 +67,10 @@ may invoke a UI-accessing method.
 \tinystep
 
 \subsection{Error Detection Algorithm}
+\label{sec:algorithm}
 
-The algorithm for detecting potential invalid thread access errors
-is shown in Figure~\ref{fig:detectalgorithm}. Our algorithm uses a
+Figure~\ref{fig:detectalgorithm} shows the algorithm for detecting
+potential invalid thread access errors. Our algorithm uses a
 static call graph as the program representation for a multithreaded
 GUI application. A Java call graph represents calling relationships
 between methods. Specifically, each node represents a method and each
@@ -79,9 +80,11 @@ dynamic call graphs over all possible executions of the program.
 A conservative, or sound, static call graph is a superset of
 the ideal call graph; it over-approximates the
 dynamic call graph of every possible execution. 
-In an object-oriented programming language like
-Java, a method is the basic logic unit in a program. Reporting
-potential errors at the method level can be sufficient in most cases.
+Our algorithm's reports are in terms of methods, as shown in Figure~\ref{fig:report}.
+
+%In an object-oriented programming language like
+%Java, a method is the basic logic unit in a program. Reporting
+%potential errors at the method level can be sufficient in most cases.
 %Thus, we believe using the call graph is well suited for this problem while
 %compared with other program representations like control flow graph or
 %program dependence graph. 
@@ -90,13 +93,13 @@ potential errors at the method level can be sufficient in most cases.
 Our algorithm in Figure~\ref{fig:detectalgorithm} %works as follows. It
 first constructs a static call graph for the tested program (line 2),
 then specifies entry nodes, UI-accessing nodes, and safe UI nodes
-for it on line 3, 4, and 5, respectively. Lines 3--5 are GUI framework-specific.
+for it on lines 3, 4, and 5, respectively. Lines 3 -- 5 are GUI framework-specific.
 As an example, for a SWT desktop application, the entry nodes include
 the single main method, UI-accessing nodes include methods
 \CodeIn{Widget.checkWidget} and \CodeIn{Display.} \CodeIn{checkDevice},
 and safe UI methods include two SWT helper methods \CodeIn{Display.asyncExec}  and
-\CodeIn{Display.syncExec} for message passing. The detailed instantiation
-for each supported framework is explained in Section~\ref{sec:platforms}.
+\CodeIn{Display.syncExec} for message passing. Section~\ref{sec:platforms}
+explains the detailed instantiation for each supported framework.
 
 The algorithm first performs graph traversal to find
 all reachable \CodeIn{Thread.start()}
@@ -107,9 +110,9 @@ Each \CodeIn{Thread.start()} node in a call graph indicates that a new,
 non-UI thread is spawned.  The \CodeIn{Thread.start()}
 nodes act as the sources in the main graph traversal.
 The algorithm uses Breadth-First Search (BFS) to search for reachable UI-accessing
-methods (lines 11 -- 25).
+methods (lines 9 -- 23).
 The algorithm stops the traversal if it reaches a UI-accessing
-method (lines 17 -- 19) or a safe UI method (lines 20, 21).
+method (lines 15 -- 17) or a safe UI method (lines 18, 19).
 %Specifically, it uses a queue to keep track of the nodes to be visited (line 7),
 %and stores all visited nodes to avoid infinite loop (line 8).
 %The algorithm checks every successive node to be visited (line 16):
@@ -118,9 +121,9 @@ method (lines 17 -- 19) or a safe UI method (lines 20, 21).
 
 The error message created by the method \CodeIn{createErrorReport} on line 18
 includes the method call chain from the entry node to the UI-accessing node
-as the error report. For brevity, we do not show the data structures that store
+as the error report. For brevity, the algorithm does not show the data structures that store
 the current call chain.
-Figure~\ref{fig:report} shows a method call chain from the entry
+The error report in Figure~\ref{fig:report} displays a method call chain from the entry
 node \CodeIn{LayerView.<init>} to the UI-accessing node \CodeIn{ViewRoot}.\CodeIn{checkThread}.
 %Note that when the algorithm determines that a UI-accessing method may be invoked
 %by a non-UI thread, it computes a method call chain from the entry node to
@@ -143,12 +146,9 @@ node \CodeIn{LayerView.<init>} to the UI-accessing node \CodeIn{ViewRoot}.\CodeI
 \STATE $\mathit{uiAccessingNodes}$ $\leftarrow$ getUIAccessingNodes($\mathit{cg}$)
 \STATE $\mathit{safeUINodes}$ $\leftarrow$ getSafeUINodes($\mathit{cg}$)\\
 \FOR{each $\mathit{entryNode}$ in $\mathit{entryNodes}$}
-\STATE $\mathit{threadStarts}$ $\leftarrow$ getReachableStarts($\mathit{entryNode}$)\\
-\COMMENT{keep the nodes to be visited next in a worklist}
-\STATE $\mathit{worklist}$ $\leftarrow$ an empty queue\\
-\STATE $\mathit{worklist}$.enqueueAll($\mathit{threadStarts}$)
+\STATE $\mathit{worklist}$ $\leftarrow$ getReachableStarts($\mathit{entryNode}$)
 \STATE $\mathit{visited}$ $\leftarrow$ $\emptyset$
-\WHILE{$\mathit{worklist}$.isNotEmpty()}
+\WHILE{$\mathit{worklist}$ $\neq$ $\emptyset$}
 \STATE $\mathit{node}$ $\leftarrow$ $\mathit{worklist}$.dequeue()
 \IF{$\mathit{node}$ $\in$ $\mathit{visited}$}
 \STATE continue
@@ -170,7 +170,7 @@ node \CodeIn{LayerView.<init>} to the UI-accessing node \CodeIn{ViewRoot}.\CodeI
 \end{algorithmic}
 \caption{Algorithm for detecting invalid thread access errors in multithreaded GUI programs. 
 Any call graph construction algorithm can be used (line 2). The algorithm
-is parameterized by the three methods in lines 3--5 which are specific to each GUI framework
+is parameterized by the three methods in lines 3 -- 5 which are specific to each GUI framework
  as described in Section~\ref{sec:platforms}.
 } \label{fig:detectalgorithm}
 \end{figure}
@@ -188,6 +188,7 @@ exhaustive path search.
 \tinystep
 
 \subsection{Call Graph Construction}
+\label{sec:cgcon}
 
 %Given a sound call graph, our algorithm is sound in that it does not
 %miss true positives. We note, however, 
@@ -245,11 +246,11 @@ a Button object by its ID (line 6, the \CodeIn{findViewById} method).}
 \textbf{Output}: a call graph $\mathit{cg}$\\
 \vspace{-5mm}
 \begin{algorithmic}[1]
-\FOR{each $\mathit{statement}$ in $\mathit{P}$}
-\IF{isReflectionCall($statement$)}
-\STATE $\mathit{objectSet}$ $\leftarrow$ getAllObjectsThatMaybeCreated($\mathit{statement}$)
-\STATE $\mathit{newStmt}$ $\leftarrow$ createObjectCreationStatement($\mathit{objectSet}$)
-\STATE replace $\mathit{statement}$ with $\mathit{newStmt}$
+\FOR{each $\mathit{expression}$ in $\mathit{P}$}
+\IF{isReflectionCall($expression$)}
+\STATE $\mathit{objectSet}$ $\leftarrow$ getAllObjectsThatMaybeCreated($\mathit{expression}$)
+\STATE $\mathit{newExpr}$ $\leftarrow$ createObjectCreationExpression($\mathit{objectSet}$)
+\STATE replace $\mathit{expression}$ with $\mathit{newExpr}$
 \ENDIF
 \ENDFOR
 \STATE $\mathit{cg}$ $\leftarrow$ constructCallGraph($\mathit{P}$)
@@ -258,7 +259,7 @@ a Button object by its ID (line 6, the \CodeIn{findViewById} method).}
 \end{algorithmic}
 \vspace{-3mm}
 \caption{A reflection-aware call graph construction algorithm. Lines
-1--7 are a simple program transformation to replace reflection calls
+1 -- 7 are a simple program transformation to replace reflection calls
 with object creations, and line 8 builds the call graph using
 an existing call graph construction algorithm. This algorithm
 is parameterized by two methods on lines 2 and 3. 
@@ -276,21 +277,21 @@ The example code in Figure~\ref{fig:sampleandroid} from an Android application
  illustrates the limitations.
 In Figure~\ref{fig:sampleandroid}, line 6 uses reflection to create a \CodeIn{Button}
 object by looking up its id declared in the associated XML file. When this button
-is clicked, its event handling code (lines 9--11) updates the text.
+is clicked, its event handling code (lines 9 -- 11) updates the text.
 
 When analyzing the code in Figure~\ref{fig:sampleandroid}, existing call graph algorithms
 fail to conclude that the variable \CodeIn{button} declared on line 6
-points to a \textit{non-null} \CodeIn{Button} object due to its limitation in handling the
-reflection call \CodeIn{findViewById}, and exclude the edge
-corresponding to the \CodeIn{setText} method call on line 10 in the resulting call graph. 
+points to a \textit{non-null} \CodeIn{Button} object due to their limitations in handling the
+reflection call \CodeIn{findViewById}. The resulting call graph
+omits the edge corresponding to the \CodeIn{setText} method call on line 10.
 
 To address this limitation, we present an algorithm to construct
 a reflection-aware call graph based on a simple program transformation.
 The basic idea is to replace reflection calls with explicit object
-creation statements, pretending that the corresponding concrete object
+creation expressions, pretending that the corresponding concrete object
 has been created.  The algorithm is shown in Figure~\ref{fig:cgalgorithm}.
 It consists of two steps. The first step (lines 1 -- 7) is a simple program
-transformation to replace reflection calls with object creation statements, and
+transformation to replace reflection calls with object creation expressions, and
 the second step (line 8) uses an existing call graph construction algorithm
 to build the graph on the transformed program. In our context,
 a reflection call represents a framework-specific helper method invocation
@@ -299,13 +300,13 @@ the \CodeIn{findViewById} method in Android applications, instead
 of the methods in the \CodeIn{java.lang.reflection} package.
 When it sees a reflection call, the algorithm
 determines a set of possible objects that might be created.
-After that, the algorithm creates a statement that non-deterministically
+After that, the algorithm creates an expression that non-deterministically
 returns a new object from the object set.
 
 This algorithm is parameterized by two methods on
 lines 2 and 3. When instantiated for the Android framework,
 the predicate isReflectionCall on line 2 returns true
-if the $statement$ is a \CodeIn{findViewById(id)} method call, and the method
+if the $expression$ is a \CodeIn{findViewById(id)} method call, and the method
 getAllObjectsThatMaybeCreated on line 3 parses the associated XML configuration
 file to extract the class declaration
  corresponding to the given \CodeIn{id} value. If the \CodeIn{id}
@@ -319,7 +320,7 @@ When the algorithm sees the reflection call
 parses the XML configuration file to determine that the \CodeIn{button\_id}
 value is mapped to a \CodeIn{Button} instance. Then, it
 replaces the reflection call
-with an explicit object creation statement: \CodeIn{new Button(null)}.
+with an explicit object creation expression: \CodeIn{new Button(null)}.
 After that, the algorithm employs existing call graph construction
 algorithms to analyze the transformed program, and permits them
 to include the call edge \CodeIn{setText} in the resulting graph.
