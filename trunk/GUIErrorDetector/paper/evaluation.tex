@@ -246,8 +246,9 @@ the actual bugs found. Columns ``RTA '', ``0-CFA'',
 and ``1-CFA'' show the results of using different
 call graph construction algorithms. In each cell of the table
 for Android applications, a slash ``/'' separates the result of
-using standard call graph construction algorithm and the reflection-aware
-call graph construction algorithm (with \annotationnum native method annotations
+using standard call graph construction algorithm and our call
+graph construction algorithm in Section~\ref{sec:cgcon} (dealing
+with reflection calls and adding \annotationnum native method annotations
 for SGTPuzzler). The \newbugs errors found in VirgoFTP, FileBunker, ArecaBackup
 S3dropbox, and SudokuSolver are previously  unknown. As a comparison, the
 results of the ``Requiring Wrappers'' approach (Section~\ref{sec:straightforward}),
@@ -439,13 +440,13 @@ access to be wrapped.
 \subsubsection{Comparing Call Graph Construction Algorithms}
 \label{sec:reflectionaware}
 
-We next compare the three call graph construction algorithms (RTA, 0-CFA, and 1-CFA)
+We next compare the 3 call graph construction algorithms (RTA, 0-CFA, and 1-CFA)
 used in our experiments. As shown in Table~\ref{table:results},  1-CFA found
 more errors than the other two algorithms. This
 is because RTA and 0-CFA do not consider the calling context when
-constructing a call graph, and may
+constructing a call graph, and 
 mix the same method calls by different callers into a single node, thus
-introducing imprecision. Although the error-revealing paths exist in
+introducing imprecision. Although the error paths exist in
 less precise graphs, the impreicison prevents our algorithm from finding them.
 Figure~\ref{fig:ex} illustrates this point.
 
@@ -502,7 +503,7 @@ so the standard call graph construction algorithm is sufficient.
 \vspace{1mm}
 
 \noindent \textbf{\textit{Summary.}} Using the 1-CFA 
-algorithm finds more errors than 0-CFA and RTA, and our reflection-aware call
+algorithm finds more errors than 0-CFA and RTA, and our call
 graph construction algorithm helps to find errors on some
 Android applications.
 
@@ -579,7 +580,7 @@ error filters can remove most of them.
 \begin{table}[t]
 \begin{center}
  \fontsize{9pt}{\baselineskip}\selectfont
-\setlength{\tabcolsep}{.46\tabcolsep}
+\setlength{\tabcolsep}{.40\tabcolsep}
 \hspace*{-0.2cm}
 \begin{tabular}{|l||c|c|c|c|c|c|}
 \hline

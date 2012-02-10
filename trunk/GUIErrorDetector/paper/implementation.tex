@@ -70,7 +70,7 @@ We instantiated our technique for the Eclipse plugin development framework as fo
  SWT GUI event handling methods. Eclipse
 calls back the overridden methods to handle the
 events. All SWT GUI event handling methods (i.e., the overriden
-methods in the class that implements \CodeIn{org.eclipse.swt.internal.SWTEvent-\\Listener}) are
+methods in the class that implements \CodeIn{org.eclipse.swt.internal.SWTEventListener}) are
 always called back from the UI thread.
 %, thus are used as call graph entry nodes.
 
@@ -111,7 +111,7 @@ methods: \CodeIn{repaint()}, \CodeIn{revali-\\date()}, and \CodeIn{invalidate()}
 \tinystep
 
 \item \textbf{Safe UI methods: } 
-\CodeIn{SwingUtilities.}\CodeIn{invokeLater} and \CodeIn{Swing-\\Utilities.invokeAndWait}, which execute code on the UI thread.
+\CodeIn{SwingUtilities.}\CodeIn{invokeLater} and \CodeIn{SwingUti-\\lities.invokeAndWait}, which execute code on the UI thread.
 
 \end{itemize}
 \end{myindentpar}
