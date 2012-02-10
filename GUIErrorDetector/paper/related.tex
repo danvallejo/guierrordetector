@@ -12,8 +12,8 @@ call graph construction algorithms.
 %\noindent \textit{\textbf{Analysis and Testing for GUI Applications}}
 Automated GUI testing is a challenging tasks~\cite{Bertolino:2007:STR:1253532.1254712,
 Harrold:2000:TR:336512.336532}.
- Many GUI analysis and testing techniques have been proposed in the past decade; some have been
-implemented as tools and adopted by practitioners. Existing techniques automate
+ Many GUI analysis and testing techniques have been proposed in the past decade.
+Existing techniques automate
 some aspect(s) of GUI testing including model creation
 (for model-based testing)~\cite{androidtesting}, %, Xie:2006:MTC:1172962.1172990},
 test generation~\cite{YuanMemonICSE2007},
@@ -23,31 +23,21 @@ For example,
 %Kervinen et al.~\cite{Kervinen06model-basedtesting} present a formal model and architecture for testing
 %concurrently running applications. The behavior of the system under test
 %needs to be specified manually as a labeled transition system. 
-Guitar~\cite{YuanCohenMemonTSE2011, YuanMemonICSE2007}%, Xie:2006:MTC:1172962.1172990}
+Guitar~\cite{YuanCohenMemonTSE2011, YuanMemonICSE2007}
 is a GUI testing framework for Java and Microsoft Windows applications. 
 Yuan and Memon~\cite{YuanMemonICSE2007} generate event-sequence based test cases for GUI
-programs. Their model-based approach can generate test cases automatically using a structural event
-generation graph. 
+programs using a structural event generation graph. 
 However, testing is often insufficient to detect many potential
-errors in a GUI application
-due to the huge space of possible interactions
-with a GUI. The large number of possible interactions
-need a large number of test inputs that require substantial human effort.
-%The second problem is to determine the coverage of a set of test
-%cases~\cite{MemonFSE2001}. For conventional software, coverage is measured
-%using the amount and type of underlying code exercised.
-%These measures do not work well for GUI testing, because
-%what matters is not only how much of the code is tested,
-%but in how many different possible states of the software
-%each piece of code is tested. This makes it hard to determine
-%the completeness of a test suite. 
+errors in a GUI application due to the huge space of possible UI interactions.
+%The large number of possible interactions
+%requires a large number of test inputs that require substantial human effort.
 In contrast, as suggested in this paper,
-using a static analysis can potentially explore
-all paths to find potential errors without actually executing the tested code. 
-Compared with software testing, a static analysis tool may
+using a static analysis can explore paths to find potential errors without actually executing the tested code,
+and find potential errors missed by testing.
+Compared to software testing, a static analysis tool may
 report false positives and redundant warnings due to its conservative nature.
-Nevertheless, as we demonstrated in our experiments, using a few simple error
-filters can dramatically reduce the number of false positives and redundant warnings to
+However, as we demonstrated in our experiments, using a few simple error
+filters can dramatically reduce the number of warnings to
 an acceptable level.
 
 
@@ -90,21 +80,23 @@ algorithms or some criteria based automata.
 %Bodden and Havelund~\cite{Bodden:2008} uses AOP for
 %race detection by providing three novel pointcuts to the AspectJ language.
 More recently, Goldilock~\cite{Elmas:2007} uses the hybrid model that combines the happens-before and lock-based
-approaches to identify data races based on an execution. By exploiting the insight
-that a full generality of the happens-before is unnecessary in most data accesses,
-FastTrack~\cite{Flanagan:2009} proposes an adaptive representation for the happen-before
-relation to efficiently and precisely detect races at runtime. However, finding
-invalid thread access errors is quite different than detecting data races in
-a multithreaded program. A data race occurs when two concurrent threads access
+approaches to identify data races based on an execution.
+%By exploiting the insight
+%that a full generality of the happens-before is unnecessary in most data accesses,
+%FastTrack~\cite{Flanagan:2009} proposes an adaptive representation for the happen-before
+%relation to efficiently and precisely detect races at runtime.
+However, finding
+invalid thread access errors is quite different than detecting data races.
+A data race occurs when two concurrent threads access
 a shared variable and when at least one access is a write and the threads
 use no explicit mechanism to prevent the accesses from being simultaneous. In contrast,
 an invalid thread access error occurs when a non-UI thread accesses (reads or writes) a GUI object.
-Unlike detecting potential data races, finding invalid thread access error does not require monitoring every shared-memory
-reference and verify that consistent locking behavior is observed among different threads. Instead,
-our technique only needs to track whether a non-UI thread can reach a GUI object or not,
+Unlike detecting data races, finding invalid thread access error does not require monitoring every shared-memory
+reference and verify that consistent locking behavior is observed among different threads.
+A technique only needs to track whether a non-UI thread can accesses a GUI object or not,
 and is much cheaper.
 How to leverage the recent advance in data race detection to 
-improve our technique is one of our future work.
+improve our technique is our future work.
 
 %Significantly different from the concurrency bug finding work....
 
@@ -112,9 +104,10 @@ improve our technique is one of our future work.
 
 An alternative way to find bugs in multithreaded programs is using model checking~\cite{Nori:2010:ESO, Inverardi:2000, Siegel:2008}.
 By exhaustively exploring the thread scheduling space, a model checker can
-report counter examples for the potential bugs with a counter example. For example,
-CHESS~\cite{chess} dynamically explores the thread scheduling decisions to expose
-concurrency bugs using a context-bounded approach. 
+report counter examples for the potential bugs with a counter example.
+%For example,
+%CHESS~\cite{chess} dynamically explores the thread scheduling decisions to expose
+%concurrency bugs using a context-bounded approach. 
 %Shacham et al~\cite{Shacham:2007} uses
 %a model checker to construct the witness for data races reported by the lockset algorithm.
 Unfortunately, due to the exponential size of the search space,
@@ -125,7 +118,7 @@ as large as those used in our experiments (including the library code).
 The technique presented in this paper is specifically designed to find invalid thread
 errors instead of being a general property checking tool. 
 It chooses call graph as a coarse-grained program representation with a
-set of error filters, achieving good scalability with reasonable accuracy.
+set of error filters, to achieve good scalability with reasonable accuracy.
 
 %For this reason,
 %our technique achieves good scalability with reasonable precision.
@@ -136,53 +129,48 @@ set of error filters, achieving good scalability with reasonable accuracy.
 %\vspace{1mm}
 
 %\noindent \textit{\textbf{Call Graph Construction Algorithms}}
-A lot of effort has been spent on analyzing function pointers in C
-as well as virtual method calls in C++ and Java ~\cite{rta, kcfa,
-xta, inccg, Sundaresan:2000}.
+A lot of effort has been spent on building call graphs for
+Object-oriented programs~\cite{rta, kcfa, xta, inccg, Sundaresan:2000}.
 We briefly mention some of the highlights of call graph construction
 algorithms for Java here. Grove et al~\cite{kcfa} described a unified
 framework for expressing call graph construction algorithms, and
-performed a quantitative study comparing different instantiations
-of the framework. Tip and Palsberg~\cite{xta} quantitatively compared
+studied different instantiations of the framework.
+Tip and Palsberg~\cite{xta} quantitatively compared
 several low-cost call graph construction algorithms for Java.
-Sundaresan et al.~\cite{Sundaresan:2000} went beyond the traditional
-CHA and RTA~\cite{rta} approaches in Java and used type propagation
-for the purpose of obtaining a more precise call graph.
-However, the heavy use of reflection in some GUI applications make
-those algorithms insufficient to build a good call graph.
+Sundaresan et al.~\cite{Sundaresan:2000} went beyond the% traditional
+CHA and RTA~\cite{rta} approaches and used type propagation
+to build a more precise call graph.
+However, the use of reflection makes
+those algorithms insufficient to build a complete call graph.
 As reflected in our experiments, using standard call graph algorithms
-fails to find errors in some
-Android applications. %, due to the incompleteness of the resulting graph.
+misses errors in some Android applications. %, due to the incompleteness of the resulting graph.
 
 
 To enable call graph construction in the presence of  reflection,
 Livshits et al.~\cite{Livshits:2005} presented a static analysis
-that attempts to infer additional information about
-reflective call sites directly from program code. The analysis
-attempts to use information stored in string constants to resolve
+to reason about reflective calls. The analysis
+attempts to infer additional information stored in string constants to resolve
 reflective calls statically. Their approach focuses on standard Java
-reflection calls (e.g., \CodeIn{java.lang.Class.forName}) but not on
-framework-specific ones (e.g., \CodeIn{android.view.View.find-\\ViewById}).
-The WALA framework implements a similar approach to handle Java
-reflections, but still fails to build a sufficiently complete call graph for
+reflection calls (e.g., \CodeIn{Class.forName}) instead of the
+framework-specific ones (e.g., \CodeIn{View.findViewById}).
+The standard call graph algorithms we used from WALA handles standard Java
+reflection calls as~\cite{Livshits:2005} does, but still fails to build
+a sufficiently complete call graph for
 Android applications. TamiFlex~\cite{Bodden:2011}, a pure dynamic
-approach, dumps all reflectively-created class instances to a file
+approach, records all reflectively-created class instances
 by intercepting JVM system calls, and re-inserts those recorded 
 class into a program. However, TamiFlex requires a set of representative
-program executions which may not be available in practice,
- and is only sound with respect to the recorded executions.
-Perhaps the most close work to our reflection-aware call graph
+program executions and is only sound with respect to the given executions.
+Perhaps the closest work to our call graph
 construction algorithm is Payet and Spoto's Julia
-system~\cite{Payet:2011:SAA:2032266.2032299}, which is independently
-proposed with our algorithm. One difference is that the Julia system
-requires to instrument the code of Android's library class
-\CodeIn{android.view.LayoutInflater} that performs the XML inflation ahead of time,
-then replaces the \CodeIn{findViewById} call with with a
-non-deterministic execution of new statements.
-In contrast, our algorithm leverages WALA's \textit{bypass logic}
-to transform the program on-the-fly when
-constructing the call graph, without requiring a separate pass of
-off-line instrumentation.
+system~\cite{Payet:2011:SAA:2032266.2032299}. The Julia system
+needs to first instrument Android's library code that performs the XML inflation,
+and then replaces the \CodeIn{findViewById} call with the corresponding
+object creation expressions. In additiona, the Julia system does not handle
+native methods when building call graphs. In contrast, our technique provides
+annotation support for native methods, and our tool does not need a separate
+pass of off-line instrumentation. The reflection-aware call graph is created
+online by incerpting the standard call graph construction process.
 
 
 
