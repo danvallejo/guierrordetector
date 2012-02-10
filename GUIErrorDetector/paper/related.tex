@@ -1,54 +1,44 @@
 \section{Related Work}
 
 Work related to this paper falls into three main categories; (1)
-techniques and tools to analyze and test GUI programs; (2)
-bug finding techniques for general multithreaded programs; and (3)
+analyzing and testing GUI applications; (2)
+bug finding techniques for multithreaded programs; and (3)
 call graph construction algorithms.
 
 \tinystep
-\subsection{Analysis and Testing for GUI Applications}
+\subsection{Analyzing and Testing GUI Applications}
 %\vspace{1mm}
 
 %\noindent \textit{\textbf{Analysis and Testing for GUI Applications}}
-Automated GUI testing is a challenging tasks~\cite{Bertolino:2007:STR:1253532.1254712,
+Automated GUI testing is a challenging task~\cite{Bertolino:2007:STR:1253532.1254712,
 Harrold:2000:TR:336512.336532}.
- Many GUI analysis and testing techniques have been proposed in the past decade.
-Existing techniques automate
-some aspect(s) of GUI testing including model creation
+Various techniques automate GUI testing including model creation
 (for model-based testing)~\cite{androidtesting}, %, Xie:2006:MTC:1172962.1172990},
 test generation~\cite{YuanMemonICSE2007},
 test oracle creation~\cite{MemonFSE2000}, test execution~\cite{YuanCohenMemonTSE2011},
 and test script repairing~\cite{Huang:2010:RGT:1828417.1828465, Daniel:2011:AGR:2002931.2002937}.
 For example,
-%Kervinen et al.~\cite{Kervinen06model-basedtesting} present a formal model and architecture for testing
-%concurrently running applications. The behavior of the system under test
-%needs to be specified manually as a labeled transition system. 
 Guitar~\cite{YuanCohenMemonTSE2011, YuanMemonICSE2007}
 is a GUI testing framework for Java and Microsoft Windows applications. 
-Yuan and Memon~\cite{YuanMemonICSE2007} generate event-sequence based test cases for GUI
+Yuan and Memon~\cite{YuanMemonICSE2007} generate event-sequence-based test cases for GUI
 programs using a structural event generation graph. 
 However, testing is often insufficient to detect many potential
 errors in a GUI application due to the huge space of possible UI interactions.
 %The large number of possible interactions
 %requires a large number of test inputs that require substantial human effort.
-In contrast, as suggested in this paper,
-using a static analysis can explore paths to find potential errors without actually executing the tested code,
-and find potential errors missed by testing.
-Compared to software testing, a static analysis tool may
+In contrast, a static analysis can explore all paths to find potential errors missed by testing.
+Compared to software testing, a static analysis tool such as ours may
 report false positives and redundant warnings due to its conservative nature.
-However, as we demonstrated in our experiments, using a few simple error
-filters can dramatically reduce the number of warnings to
+In our experiments, simple error filters reduced the number of warnings to
 an acceptable level.
 
 
 Michail and Xie~\cite{michail05:helping} proposed a tool-based approach to help users avoid bugs
-in GUI applications. Their approach monitors user's action in the background,
-and gives a user a warning as well as the opportunity to abort the action, when
+in GUI applications. Their approach monitors a user's action in the background,
+and gives a warning as well as the opportunity to abort the action, when
 a user attempts an action that has led to problems in the past. 
-As a comparison, our work aims to find unknown errors in multithreaded
-GUI applications, while their work aims to prevent an existing bug
-from happening again.
-%is significantly different than their
+Their work aims to prevent an existing bug from happening again.
+By contrast, our work aims to find unknown errors.
 
 
 Recently, Payet and Spoto~\cite{Payet:2011:SAA:2032266.2032299} presented a static
@@ -56,12 +46,11 @@ analysis framework for Android programs based on  abstract
 interpretation. Their framework focuses on the Android platform, and
  consists of 7 existing static analyses such as
 nullness analysis, class analysis, and termination analysis.  However,
-their framework does not support detecting the invalid thread access
+their framework does not support detecting invalid-thread-access
 errors, and uses a quite different abstraction than ours.
 To the best of our knowledge, we are the first to address the invalid
 thread access error detection problem for multithreaded GUI applications, and
-our core technique is a general one that can be tailored for
-various GUI frameworks.
+our core technique has been tailored for four GUI frameworks.
 
 
 \tinystep
@@ -71,53 +60,36 @@ various GUI frameworks.
 
 %\noindent \textit{\textbf{Finding Bugs in Multithreaded Programs}}
 A rich body of techniques have been developed to detect bugs in multithreaded programs~\cite{Huang:2011:PPC:2001420.2001438, Weeratunge:2010, Huang:2011:EST}.
-%Active testing frameworks like AssertFuzzer~\cite{Sen:2008} uses the trace information to detect
-%and create atomicity schedule violations.
 Static analysis tools such as Chord~\cite{Naik:2006}
- explore multithreaded bugs by statically analyzing the program. Runtime
-analysis tools such as Eraser~\cite{Savage:1997}  dynamically detect concurrency bugs using the lockset
-algorithms or some criteria based automata. 
-%Bodden and Havelund~\cite{Bodden:2008} uses AOP for
-%race detection by providing three novel pointcuts to the AspectJ language.
-More recently, Goldilock~\cite{Elmas:2007} uses the hybrid model that combines the happens-before and lock-based
+explore multithreaded programs. Runtime
+analysis tools such as Eraser~\cite{Savage:1997}  dynamically detect concurrency bugs using lockset
+algorithms or some criteria-based automata. 
+More recently, Goldilocks~\cite{Elmas:2007} uses a
+hybrid model that combines the happens-before and lock-based
 approaches to identify data races based on an execution.
-%By exploiting the insight
-%that a full generality of the happens-before is unnecessary in most data accesses,
-%FastTrack~\cite{Flanagan:2009} proposes an adaptive representation for the happen-before
-%relation to efficiently and precisely detect races at runtime.
-However, finding
-invalid thread access errors is quite different than detecting data races.
+However, finding invalid-thread-access errors is quite different than detecting data races.
 A data race occurs when two concurrent threads access
 a shared variable and when at least one access is a write and the threads
 use no explicit mechanism to prevent the accesses from being simultaneous. In contrast,
 an invalid thread access error occurs when a non-UI thread accesses (reads or writes) a GUI object.
-Unlike detecting data races, finding invalid thread access error does not require monitoring every shared-memory
-reference and verify that consistent locking behavior is observed among different threads.
+Unlike detecting data races, finding an invalid-thread-access error does not require monitoring every shared-memory
+reference to verify that consistent locking behavior is observed among different threads.
 A technique only needs to track whether a non-UI thread can accesses a GUI object or not,
-and is much cheaper.
-How to leverage the recent advance in data race detection to 
-improve our technique is our future work.
+and is much cheaper. Leveraging data race detection to 
+improve our technique is future work.
 
-%Significantly different from the concurrency bug finding work....
-
-%They are often limited to detect errors manifested in a specific concrete execution.
 
 An alternative way to find bugs in multithreaded programs is using model checking~\cite{Nori:2010:ESO, Inverardi:2000, Siegel:2008}.
 By exhaustively exploring the thread scheduling space, a model checker can
-report counter examples for the potential bugs with a counter example.
-%For example,
-%CHESS~\cite{chess} dynamically explores the thread scheduling decisions to expose
-%concurrency bugs using a context-bounded approach. 
-%Shacham et al~\cite{Shacham:2007} uses
-%a model checker to construct the witness for data races reported by the lockset algorithm.
+report counterexamples as bug reports.
 Unfortunately, due to the exponential size of the search space,
- it is hard for model checking approaches to scale to a realistic multithreaded GUI application
- without compromising the detection capability. To our best knowledge,
-we are not aware of any software model checking approach can scale to subjects
+it is hard for model checking approaches to scale to a realistic multithreaded GUI application
+ without compromising the error detection capability. 
+We are not aware of any software model checking approach that scales to programs
 as large as those used in our experiments (including the library code).
 The technique presented in this paper is specifically designed to find invalid thread
 errors instead of being a general property checking tool. 
-It chooses call graph as a coarse-grained program representation with a
+It chooses the call graph as a coarse-grained program representation with a
 set of error filters, to achieve good scalability with reasonable accuracy.
 
 %For this reason,
@@ -129,32 +101,28 @@ set of error filters, to achieve good scalability with reasonable accuracy.
 %\vspace{1mm}
 
 %\noindent \textit{\textbf{Call Graph Construction Algorithms}}
-A lot of effort has been spent on building call graphs for
-Object-oriented programs~\cite{rta, kcfa, xta, inccg, Sundaresan:2000}.
-We briefly mention some of the highlights of call graph construction
-algorithms for Java here. Grove et al~\cite{kcfa} described a unified
+We briefly mention some call graph construction
+algorithms for Java. Grove et al.~\cite{kcfa} described a unified
 framework for expressing call graph construction algorithms, and
 studied different instantiations of the framework.
 Tip and Palsberg~\cite{xta} quantitatively compared
 several low-cost call graph construction algorithms for Java.
 Sundaresan et al.~\cite{Sundaresan:2000} went beyond the
-CHA and RTA~\cite{rta} approaches and used type propagation
-to build a more precise call graph.
-However, the use of reflection makes
-those algorithms insufficient to build a complete call graph.
+RTA~\cite{rta} approach and used type propagation
+to build a more precise call graph.  However,
+those algorithms do not build a complete call graph in the presence of reflection.
 As reflected in our experiments, using standard call graph algorithms
-misses errors in some Android applications. %, due to the incompleteness of the resulting graph.
+misses errors in some Android applications.
 
 
-To enable call graph construction in the presence of  reflection,
 Livshits et al.~\cite{Livshits:2005} presented a static analysis
 to reason about reflective calls. The analysis
 attempts to infer additional information stored in string constants to resolve
 reflective calls statically. Their approach focuses on standard Java
-reflection calls (e.g., \CodeIn{Class.forName}) instead of the
-framework-specific ones (e.g., \CodeIn{View.findViewById}).
+reflection calls (e.g., \CodeIn{Class.forName}) instead of
+framework-specific ones (e.g., \CodeIn{View.find-\\ViewById}).
 The standard call graph algorithms implemented in WALA, which we used
-in our experiments, actually handle standard Java
+in our experiments, actually handles standard Java
 reflection calls as~\cite{Livshits:2005} does, but still fails to build
 a sufficiently complete call graph for
 Android applications. TamiFlex~\cite{Bodden:2011}, a pure dynamic
@@ -167,11 +135,11 @@ construction algorithm is Payet and Spoto's Julia
 system~\cite{Payet:2011:SAA:2032266.2032299}. The Julia system
 needs to first instrument Android's library code that performs the XML inflation,
 and then replaces the \CodeIn{findViewById} call with the corresponding
-object creation expressions. In additiona, the Julia system does not handle
+object creation expressions. In addition, the Julia system does not handle
 native methods when building call graphs. In contrast, our technique provides
 annotation support for native methods, and our tool does not need a separate
 pass of off-line instrumentation. The reflection-aware call graph is created
-online by incerpting the standard call graph construction process.
+online by intercepting the standard call graph construction process.
 
 
 
