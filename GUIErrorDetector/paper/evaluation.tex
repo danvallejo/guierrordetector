@@ -5,7 +5,7 @@
 
 Our experimental objective is three-fold: to demonstrate the effectiveness
 of our approach in detecting real errors in multithreaded GUI applications, to 
-compare the reflection-aware call graph construction algorithm
+compare our call graph construction algorithm
 with existing ones, and to evaluate the usefulness of the proposed 
 error filters.  
 
@@ -25,7 +25,7 @@ in removing warnings (Section~\ref{sec:filters}).
 
 %library code: 1.4 million
 
-We use a set of open-source projects from Sourceforge, Google code,
+We used a set of open-source projects from Sourceforge, Google code,
 and the Eclipse plugin
 market as evaluation subjects. To choose subjects for each supported GUI framework,
 we first searched for the framework keywords (e.g., ``Java Swing'' or ``Java SWT'')
@@ -33,20 +33,19 @@ in the above three source repositories, and then selected subjects based on the 
 criteria. First, the subject must be a Java application, not
 an open library. Second, the subject must use multithreading in its implementation.
 Third, the subject must have undergone at least two years of active development,
-and is listed in the first 3 result pages based on popularity. This permits us
+and it is listed in the first 3 result pages based on popularity. This permits us
 to exclude immature subjects that may contain obvious errors.
 
-We chose subjects belonging to various categories from those subjects satisfying
-the above criteria. The subjects used in our experiment are shown in Table~\ref{table:subjects},
-which include end-user applications, programming tools, and games. 
+The subjects used in our experiment (Table~\ref{table:subjects})
+include end-user applications, programming tools, and games. 
 
 
 \begin{myindentpar}{-2mm}
 \begin{itemize}%\addtolength{\itemsep}{-0.5\baselineskip}
 \Item \textbf{SWT desktop applications.}
 %VirgoFTP~\cite{virgo} and FileBunker~\cite{filebunker} are two useful SWT desktop applications.
-VirgoFTP~\cite{virgo} implements a simple FTP client based on Java and SWT UI library.
-FileBunker~\cite{filebunker} is a file backup application which uses one or more GMail
+VirgoFTP~\cite{virgo} implements a simple FTP client based on Java and the SWT UI library.
+FileBunker~\cite{filebunker} is a file backup application that uses one or more GMail
 accounts as its backup repository. ArecaBackup~\cite{areca} offers a local
 file backup solution for Linux and Windows.
 
@@ -55,14 +54,14 @@ file backup solution for Linux and Windows.
 
 \Item \textbf{Eclipse plugins.}
 HudsonEclipse~\cite{hudson} monitors Hudson build status from Eclipse.
-EclipseRunner~\cite{eclipserunner} extends Eclipse's capability to run launch configurations.
+EclipseRunner~\cite{eclipserunner} extends Eclipse's capability of running launch configurations.
 
 \vspace{0.5mm}
 
 \Item \textbf{Swing applications.} %S3dropbox~\cite{s3dropbox} and SudokuSolver~\cite{sudokusolver} are two Swing desktop applications.
 S3dropbox~\cite{s3dropbox}  allows users
 to drag and drop files to their Amazon S3 accounts. SudokuSolver~\cite{sudokusolver}
-computes Sudoku solutions efficiently using mutlithreading execution. 
+computes Sudoku solutions efficiently using mutlithreaded execution. 
 
 \vspace{0.5mm}
 
@@ -155,14 +154,14 @@ the bottom table.} }
 We ran our tool on each subject with three call graph construction
 algorithms: RTA~\cite{rta}, 0-CFA, and 1-CFA~\cite{kcfa}.  When running
 each call graph construction algorithm on three Android applications, we
-used two configurations: with and without the reflection-aware algorithm 
-(Section~\ref{sec:cg}).  We did not use more expensive algorithms like $k$-CFA ($k >$ 1),
-because they can not scale to our subject programs.
+used two configurations: with and without our enhancements
+(Section~\ref{sec:cgcon}).  We did not use more expensive algorithms like $k$-CFA ($k >$ 1),
+because they do not scale to our subject programs.
 
 We first inspected the source code of each subject to determine whether any
 native methods or project-specific GUI interaction patterns were implemented.
 Only SGTPuzzler uses native methods to interact with
-the underlying operating system. Thus, we manually checked the possible
+the underlying operating system. For it, we manually checked the possible
 Java methods that a native method may call, and then added \annotationnum \CodeIn{@CalledByNativeMethods}
 annotations for it. Two subjects MyTracks and Fennec employ a customized pattern
 to interact with the GUI framework. For example, in MyTracks, all non-UI
@@ -171,7 +170,7 @@ threads are initialized via using the library method \CodeIn{android.os.} \CodeI
 %method in the XXX subject first checks whether the current thread is the UI-thread, and
 %then determines whether to direct access a GUI object or wrap the code with
 %message passing. 
-Thus, we add \filternum user-defined filters for these two subjects.
+We added \filternum user-defined filters for these two subjects.
 %to indicate
 %that they are safe to be invoked from any thread. 
 In this experiment, none of the paper
@@ -179,8 +178,8 @@ authors was familiar with the subjects; but we found it is quite easy
 to add extra annotations and user-defined filters. All these
 manual parts took less than a total of 60 minutes.
 
-For each output
-warning, we manually determined its validity by either searching the
+For all \subnum programs, we manually determined validity of each output warning
+by either searching the
 bug repository to check whether the same error has been reported before,
 or submitting a new bug report, or writing a test driver to reproduce
 the error.
@@ -270,7 +269,7 @@ are shown at the far right.} }
 As shown Table~\ref{table:results},  our tool found
 real errors in each subject program. Using the 1-CFA
 call graph algorithm, our tool issued 22 warnings, among
-which \bugs warnings reveal \bugs distinct errors (\newbugs are previously unknown),
+which \bugs warnings reveal \bugs distinct errors (\newbugs were previously unknown),
 2 warnings are false positives, and the remaining 8 warnings
 are redundant. Section~\ref{sec:reflectionaware} compares with other call graph
 construction algorithms.
@@ -278,7 +277,7 @@ construction algorithms.
 We submitted all \newbugs new errors
 to the subject developers. As of February 2012, 1 error in S3dropbox has been confirmed,
 4 errors have been reproduced and validated in our own experimental environment, and
-2 errors in FileBunker and ArecaBackup had not been verified by developers yet.
+2 errors in FileBunker and ArecaBackup had not yet been verified by developers.
 
 
 
@@ -330,10 +329,10 @@ a key developer of S3dropbox, confirmed this single-GUI-thread
 violation. He mentioned that the S3dropbox project uses
 certain design patterns to avoid such violations (e.g.,
 actions for UI interaction are encapsulated into a \CodeIn{Worker} interface),
-but they still overlooked  the error our tool found.
+but the developers still overlooked  the error our tool found.
 Another reason they overlooked this violation is because some GUI frameworks like Swing
-do not provide any run-time checks for invalid thread accesses. Swing
-GUI might not exhibit user-visible faults on many erreoneous executions.
+do not provide any run-time checks for invalid thread accesses. The Swing
+GUI does not exhibit user-visible faults on some erreoneous executions.
 However, as clearly stated in the official documentation~\cite{swing}, %Swing is a single-GUI-threaded GUI toolkit and
 accessing Swing GUI objects from non-UI threads risks thread interference
 or memory-consistency errors.

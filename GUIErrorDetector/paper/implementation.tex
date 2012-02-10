@@ -42,12 +42,11 @@ is initialized.
 \smallstep
 
 \item \textbf{UI-accessing nodes: } the \CodeIn{Widget.checkWidget}
-and \CodeIn{Display.} \CodeIn{checkDevice} methods. SWT uses the above
-two methods to explicitly check whether the current thread is a UI thread,
-and throw a \CodeIn{RuntimeException} if the checking fails.
-%thread accesses at runtime.
-%Any methods for manipulating GUIs object must call (one of) these two methods
-% to determine whether the current thread is the UI thread or not.
+and \CodeIn{Display.} \CodeIn{checkDevice} methods. SWT performs
+runtime checking before accessing a GUI object via these methods.
+If the current thread is a non-UI thread, the \CodeIn{Widget.checkWidget}
+and \CodeIn{Display.checkDevice} methods throw a \CodeIn{RuntimeException}.
+
 \smallstep
 
 \item \textbf{Safe UI methods: } \CodeIn{Display.asyncExec}
@@ -92,7 +91,7 @@ threads: the \textit{initial thread} that executes initial application code from
 the \textit{UI thread}, where all GUI manipulation code is executed,
 and the \textit{worker thread} where time-consuming background tasks are executed.
 After a Swing program starts, its initial thread exits and the UI thread takes charge
-of the application and starts to execute all event-handling code or spawns new worker threads. 
+of the application and starts to execute event-handling code or spawn new worker threads. 
 We instantiated our technique for Swing as follows:
 
 \begin{myindentpar}{-2mm}
@@ -112,7 +111,7 @@ methods: \CodeIn{repaint()}, \CodeIn{revali-\\date()}, and \CodeIn{invalidate()}
 \tinystep
 
 \item \textbf{Safe UI methods: } 
-\CodeIn{SwingUtilities.}\CodeIn{invokeLater} and \CodeIn{Swing-\\Utilities.invokeAndWait} that execute code on the UI thread.
+\CodeIn{SwingUtilities.}\CodeIn{invokeLater} and \CodeIn{Swing-\\Utilities.invokeAndWait}, which execute code on the UI thread.
 
 \end{itemize}
 \end{myindentpar}
@@ -157,7 +156,7 @@ a \CodeIn{RuntimeException}.
 \tinystep
 
 \item \textbf{Safe UI methods: } \CodeIn{View.post}
-and \CodeIn{View.postDelay} that execute code on the UI thread. 
+and \CodeIn{View.postDelay}, which execute code on the UI thread. 
 
 \end{itemize}
 \end{myindentpar}
@@ -177,7 +176,7 @@ automatically detects potential invalid thread access
 errors, and scales to realistic programs.  
 We implemented the reflection-aware call graph construction
  algorithm (Section~\ref{sec:cg}) using WALA's \textit{bypass logic}.
-Unlike existing tools~\cite{Payet:2011:SAA:2032266.2032299}, our tool
+Unlike other tools~\cite{Payet:2011:SAA:2032266.2032299}, our tool
 does not require a separate pass for program instrumentation; instead, it
 parses the configuration file in an Android application,
 and then intercepts the call graph construction

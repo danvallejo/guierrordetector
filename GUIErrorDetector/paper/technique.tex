@@ -325,9 +325,6 @@ After that, the algorithm employs existing call graph construction
 algorithms to analyze the transformed program, and permits them
 to include the call edge \CodeIn{setText} in the resulting graph.
 
-As demonstrated in our experiments, using this reflection-aware call
-graph construction algorithm helps in detecting errors
-in Android applications (Section~\ref{sec:reflectionaware}).
 
 
 \subsubsection{Native Methods}
@@ -352,12 +349,16 @@ may call method \CodeIn{javaMethod()}.
 annotation into consideration when traversing the call graph. 
 
 Adding annotations for native methods is optional and requires manual effort.
-In our experiments, 1 out of \subnum programs uses native methods. We manually
+In our experiments, 1 out of \subnum programs (SGTPuzzler) uses native methods. We manually
 searched the Java source files to find all native methods,
 inspected the C code to determine possible target methods
 that may be called by a native method, and added \annotationnum annotations for this program.
 We found such an annotation was useful: one error
 is only reported when using the user-provided annotations.
+
+As demonstrated in our experiments, using our call
+graph construction algorithm helps in detecting errors
+in Android applications (Section~\ref{sec:reflectionaware}).
 
 \subsection{Filtering the Error Reports}
 \label{sec:heuristic}
@@ -367,7 +368,7 @@ paths that do not actually exist (false positives) or multiple paths
  that have the same error cause (redundant warnings). We devise
 5 error filters below to remove likely false positives and redundant warnings.
 The first 2 filters are sound in that they will not filter real bugs, and
-other 3 filters are based on heuristics. Orthogonally, filters 2
+the other 3 filters are based on heuristics. Orthogonally, filters 2
 and 3 are for eliminating false positives, and filters 1, 4, and 5
 are for reducing redundant warnings.
 
@@ -388,12 +389,12 @@ are for reducing redundant warnings.
 
 \textbf{1. Filter Lexically Redundant Reports}. One reported method call
 chain can lexically subsume another one. For example, suppose that two
-reported method call chains: \CodeIn{a()} $\rightarrow$ \CodeIn{b()}
+reported method call chains; \CodeIn{a()} $\rightarrow$ \CodeIn{b()}
 $\rightarrow$ \CodeIn{c()} and 
-\CodeIn{d()} $\rightarrow$ \CodeIn{a()} $\rightarrow$ \CodeIn{b()} $\rightarrow$ \CodeIn{c()}
+\CodeIn{d()} $\rightarrow$ \CodeIn{a()} $\rightarrow$ \CodeIn{b()} $\rightarrow$ \CodeIn{c()},
 both lead to a potential error, since $\CodeIn{d()}$ and \CodeIn{a()}
-are two distinct entry methods. The second call chain should
-be removed and would not reduce the error detection capability, since
+are two distinct entry methods. The second call chain can
+be removed without reducing the error detection capability, since
 the first chain reveals the same error and is shorter 
 for programmers to interpret.
 
@@ -409,7 +410,7 @@ that will never trigger an error.
 %Thus,
 A reported method call chain containing an annotated  method
 can be safely removed. In our experiments, we produced a list of \filternum
-annotated methods for two subjects because they use a customized
+annotated methods for two subjects (Fennec and MyTracks) because they use a customized
 pattern to interact with the GUI framework.
 
 
@@ -428,12 +429,12 @@ a basic set of library calls that seemed %natural and
 generally applicable, based on our programming experience.
 We later added other calls we found helpful in analyzing
 programs on different GUI frameworks and that we believed would be generally useful.
-We did this only between experiments rather than biasing experiments by tuning
-our tool to specific programs.
+%We did this only between experiments rather than biasing experiments by tuning
+%our tool to specific programs.
 
 \textbf{4. Filter Report with the Same Head Methods from the Entry Node to \CodeIn{Thread.start()}}. A method can call
 multiple methods that access GUI objects, such as:
-\vspace{-2mm}
+\vspace{-1mm}
 \begin{CodeOut}
 \begin{alltt}
      public void m() \ttlcb
@@ -450,7 +451,7 @@ only differ in the last few method nodes may be reported separately, such as:
 
 \CodeIn{a()} $\rightarrow$ ...\CodeIn{Thread.start()} ... $\rightarrow$ \CodeIn{m()} $\rightarrow$ \CodeIn{accessUIObject2()} ...
 
-In fact, these two chains may have the same error root: knowning that
+In fact, these two chains may have the same error root cause: knowing that
 method \CodeIn{m()} is called by a non-UI thread is sufficient to understand
 the error.
 This filter compares two reported chains that have the same
@@ -463,7 +464,7 @@ and removes the longer one.
 \textbf{5. Filter Report with the Same Tail Methods from \CodeIn{Thread}.
 \CodeIn{start()}
 to the UI-accessing Method}. A method
-can have multiple callers, so that method call chains with the same tail are likely
+can have multiple callers, so method call chains with the same tail are likely
 to just represent different ways to trigger the same error. This filter compares 
 two reported method call chains that share the same 
 tail from \CodeIn{Thread.start()} to the UI-accessing methods, and
