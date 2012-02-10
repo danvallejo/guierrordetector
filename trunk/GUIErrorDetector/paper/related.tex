@@ -113,7 +113,7 @@ report counter examples for the potential bugs with a counter example.
 Unfortunately, due to the exponential size of the search space,
  it is hard for model checking approaches to scale to a realistic multithreaded GUI application
  without compromising the detection capability. To our best knowledge,
-we are not aware of any software model checking approach can scale to the subjects
+we are not aware of any software model checking approach can scale to subjects
 as large as those used in our experiments (including the library code).
 The technique presented in this paper is specifically designed to find invalid thread
 errors instead of being a general property checking tool. 
@@ -137,7 +137,7 @@ framework for expressing call graph construction algorithms, and
 studied different instantiations of the framework.
 Tip and Palsberg~\cite{xta} quantitatively compared
 several low-cost call graph construction algorithms for Java.
-Sundaresan et al.~\cite{Sundaresan:2000} went beyond the% traditional
+Sundaresan et al.~\cite{Sundaresan:2000} went beyond the
 CHA and RTA~\cite{rta} approaches and used type propagation
 to build a more precise call graph.
 However, the use of reflection makes
@@ -153,7 +153,8 @@ attempts to infer additional information stored in string constants to resolve
 reflective calls statically. Their approach focuses on standard Java
 reflection calls (e.g., \CodeIn{Class.forName}) instead of the
 framework-specific ones (e.g., \CodeIn{View.findViewById}).
-The standard call graph algorithms we used from WALA handles standard Java
+The standard call graph algorithms implemented in WALA, which we used
+in our experiments, actually handle standard Java
 reflection calls as~\cite{Livshits:2005} does, but still fails to build
 a sufficiently complete call graph for
 Android applications. TamiFlex~\cite{Bodden:2011}, a pure dynamic

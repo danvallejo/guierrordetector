@@ -197,7 +197,7 @@ a standard way to send asynchronized messages to the UI-thread.}, as follows:
 
 Such an approach is desirable for accesses from non-UI threads, but it is unnecessary.
 In our evaluation on real-world programs, we found a simple analysis that
-requires GUI operations to be in a message issues
+requires GUI operations to be in a message issued
 an unacceptable number of warnings. %false positives and redundant warnings.
 Furthermore, this approach is dangerous for accesses from the UI thread. Asynchronized message passing offers
 no timing guarantee, so a GUI object may have already been
@@ -303,8 +303,8 @@ We implemented an invalid-thread-error detection tool that supports
 four popular GUI frameworks: SWT, Eclipse plugin environment,
 Swing, and Android. Swing and SWT are the
 two dominant GUI frameworks for desktop Java applications.
-Eclipse is the de-facto standard IDE for Java. Android is the \#1 platform for
-mobile applications with market share 56\% as of Sep 2011.
+Eclipse is a widely-used IDE for Java. Android is the \#1 platform for
+mobile applications with market share 56\% as of September 2011.
 Although our technique is applicable to any GUI
 framework with the single-GUI-thread rule, each framework
 has its own definition of \textit{UI thread} and \textit{program 
@@ -320,7 +320,7 @@ that: our technique is effective (it found \bugs real-world errors
  and produced only \falses false positive warnings);
 our reflection-aware call graph construction algorithm helps in
 finding errors in Android applications;
-and our proposed filters significantly reduce the number of warnings.
+and our proposed error filters significantly reduce the number of warnings.
 %false positives and redundant warnings.
 
 

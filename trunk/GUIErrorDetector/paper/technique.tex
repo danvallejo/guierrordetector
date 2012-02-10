@@ -119,7 +119,7 @@ method (lines 15 -- 17) or a safe UI method (lines 18, 19).
 %it reports an error if that node is a UI-accessing method (lines 18, 19), or skips
 %it if it is a safe UI method (lines 20, 21), or simply keeps traversing otherwise (line 23).
 
-The error message created by the method \CodeIn{createErrorReport} on line 18
+The error message created by the method \CodeIn{createErrorReport} on line 16
 includes the method call chain from the entry node to the UI-accessing node
 as the error report. For brevity, the algorithm does not show the data structures that store
 the current call chain.
@@ -325,6 +325,9 @@ After that, the algorithm employs existing call graph construction
 algorithms to analyze the transformed program, and permits them
 to include the call edge \CodeIn{setText} in the resulting graph.
 
+As demonstrated in our experiments, this reflection-aware call
+graph construction algorithm helps in detecting errors
+in Android applications (Section~\ref{sec:reflectionaware}).
 
 
 \subsubsection{Native Methods}
@@ -356,14 +359,11 @@ that may be called by a native method, and added \annotationnum annotations for 
 We found such an annotation was useful: one error
 is only reported when using the user-provided annotations.
 
-As demonstrated in our experiments, using our call
-graph construction algorithm helps in detecting errors
-in Android applications (Section~\ref{sec:reflectionaware}).
 
 \subsection{Filtering the Error Reports}
 \label{sec:heuristic}
 
-A static analysis can exhaustively check possible error paths; but may report
+A static analysis can check possible error paths without executing the code; but may report
 paths that do not actually exist (false positives) or multiple paths
  that have the same error cause (redundant warnings). We devise
 5 error filters below to remove likely false positives and redundant warnings.
