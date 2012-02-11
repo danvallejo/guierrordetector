@@ -23,14 +23,22 @@ Many popular GUI frameworks such as Swing~\cite{swing}, SWT~\cite{swt}, Eclipse 
 Android~\cite{android}, Qt~\cite{qt}, and MacOS Cocoa~\cite{macos}
 adopt the \textit{single-GUI-thread rule}:
 
-\vspace{-2mm}
+\makeatletter
+\newenvironment{myquotation}
+               {\list{}{\listparindent=0pt%whatever you need
+                        \itemindent    \listparindent
+                        \leftmargin=10pt%  whatever you need
+                        \rightmargin=0pt%whatever you need
+                        \topsep=0pt%%%%%  whatever you need
+                        \parsep        \z@ \@plus\p@}%
+                \item\relax}
+               {\endlist}
+\makeatother
 
-\begin{quote}
+\begin{myquotation}
 All GUI objects, including visual components and data models, must be
  accessed exclusively from the \textit{event dispatching thread}.
-\end{quote}
-
-\vspace{-2mm}
+\end{myquotation}
 
 The \textit{event dispatching thread}, also called the \textit{UI thread}, is a single
 special thread initialized by the GUI framework, where all event-handling code
@@ -327,6 +335,8 @@ and our proposed error filters significantly reduce the number of warnings.
 \subsection{Contributions}
 
 This paper makes the following contributions:
+
+\vspace{-5pt}
 
 \tinystep
 
