@@ -34,22 +34,22 @@ and \textbf{safe UI methods} for each framework.
 \begin{itemize}
 \smallstep
 
-\item \textbf{Call graph entry nodes: } the main method. Like a normal Java program,
+\item \textbf{Call graph entry nodes:}  the main method. Like a normal Java program,
 a SWT desktop application has a single main method as the entry point. By default,
 the main method is executed in the UI thread after the GUI
 is initialized.
 
 \smallstep
 
-\item \textbf{UI-accessing nodes: } the \CodeIn{Widget.checkWidget}
-and \CodeIn{Display.} \CodeIn{checkDevice} methods. SWT performs
+\item \textbf{UI-accessing nodes:}  the \CodeIn{Widget.checkWidget}
+and \CodeIn{Display.}\discretionary{}{}{}\CodeIn{checkDevice} methods. SWT performs
 runtime checking before accessing a GUI object via these methods.
 If the current thread is a non-UI thread, the \CodeIn{Widget.checkWidget}
 and \CodeIn{Display.checkDevice} methods throw a \CodeIn{RuntimeException}.
 
 \smallstep
 
-\item \textbf{Safe UI methods: } \CodeIn{Display.asyncExec}
+\item \textbf{Safe UI methods:}  \CodeIn{Display.asyncExec}
 and \CodeIn{Display.syncExec}. SWT provides these two methods
 to execute code (a)synchro- nizedly on the UI thread.
 
@@ -66,7 +66,7 @@ We instantiated our technique for the Eclipse plugin development framework as fo
 
 \begin{itemize}
 
-\item \textbf{Call graph entry nodes: } all user code methods that override
+\item \textbf{Call graph entry nodes:}  all user code methods that override
  SWT GUI event handling methods. Eclipse
 calls back the overridden methods to handle the
 events. All SWT GUI event handling methods (i.e., the overriden
@@ -110,7 +110,7 @@ methods: \CodeIn{repaint()}, \CodeIn{revali-\\date()}, and \CodeIn{invalidate()}
 
 \tinystep
 
-\item \textbf{Safe UI methods: } 
+\item \textbf{Safe UI methods:}  
 \CodeIn{SwingUtilities.}\CodeIn{invokeLater} and \CodeIn{SwingUti-\\lities.invokeAndWait}, which execute code on the UI thread.
 
 \end{itemize}
@@ -138,7 +138,7 @@ We instantiated our technique for Android programs as follows:
 \begin{itemize}
 \tinystep
 
-\item \textbf{Call graph entry nodes: }in an Android application,
+\item \textbf{Call graph entry nodes:} in an Android application,
 an \CodeIn{Activity} object is created and manipulated by the UI thread. Thus, we treat
 all public methods defined in the \CodeIn{Activity} class 
 and any overriding definitions in its subclasses as call graph entry nodes.
@@ -147,7 +147,7 @@ as entry nodes, since they are called back from the UI thread.
 
 \tinystep
 
-\item \textbf{UI-accessing nodes: }the \CodeIn{ViewRoot.checkThread} method.
+\item \textbf{UI-accessing nodes:} the \CodeIn{ViewRoot.checkThread} method.
 Like SWT, Android explicitly performs runtime checking before accessing
 a GUI object via the \CodeIn{ViewRoot.checkThread} method. If the current
 thread is a non-UI thread, the \CodeIn{ViewRoot.checkThread} method throws
@@ -155,7 +155,7 @@ a \CodeIn{RuntimeException}.
 
 \tinystep
 
-\item \textbf{Safe UI methods: } \CodeIn{View.post}
+\item \textbf{Safe UI methods:}  \CodeIn{View.post}
 and \CodeIn{View.postDelay}, which execute code on the UI thread. 
 
 \end{itemize}
