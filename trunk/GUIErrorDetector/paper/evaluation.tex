@@ -163,7 +163,7 @@ native methods or project-specific GUI interaction patterns were implemented.
 Only SGTPuzzler uses native methods to interact with
 the underlying operating system. For it, we manually checked the possible
 Java methods that a native method may call, and then added \annotationnum \CodeIn{@CalledByNativeMethods}
-annotations for it. Two subjects MyTracks and Fennec employ a customized pattern
+annotations for it. Two subjects, MyTracks and Fennec, employ a customized pattern
 to interact with the GUI framework. For example, in MyTracks, all non-UI
 threads are initialized via using the library method \CodeIn{android.os.} \CodeIn{handler.handleCallback}.
 % the \CodeIn{safeInvokeXX}
@@ -174,7 +174,7 @@ We added \filternum user-defined filters for these two subjects.
 %to indicate
 %that they are safe to be invoked from any thread. 
 In this experiment, none of the paper
-authors was familiar with the subjects; but we found it is quite easy
+authors was familiar with the subjects, but we found it was quite easy
 to add extra annotations and user-defined filters. All these
 manual parts took less than a total of 60 minutes.
 
@@ -267,7 +267,7 @@ are shown at the far right.} }
 \subsubsection{Errors in Multithreaded GUI Applications}
 \label{sec:errors}
 
-As shown Table~\ref{table:results},  our tool found
+As shown in Table~\ref{table:results},  our tool found
 real errors in each subject program. Using the 1-CFA
 call graph algorithm, our tool issued 22 warnings, among
 which \bugs warnings reveal \bugs distinct errors (\newbugs were previously unknown),
@@ -368,7 +368,7 @@ is invoked by non-UI threads when a \CodeIn{ResourceChangeEvent}
 happens. However, the \CodeIn{refresh} method directly accesses
 GUI objects (to refresh the view on line 415) without any
 protection and thus triggers the error.
-This error has been reported by other users 13 months after the
+This error was reported by other users 13 months after the
 buggy code was checked in, and fixed by developers.
 }} %\vspace{-5mm}
 \end{figure}
@@ -586,9 +586,11 @@ removed a further 65.52\% of the warnings. The most effective filter is
 
 \vspace{1mm}
 
-\noindent \textbf{\textit{Summary.}} Although a static analysis may
-issue false positives or redundant reports, a set of well-designed
-error filters can remove most of them.
+\noindent \textbf{\textit{Summary.}} Our proposed error filters are 
+effective in reducing the number of warnings.
+%Although a static analysis may
+%issue false positives or redundant reports, a set of well-designed
+%error filters can remove most of them.
 %Heuristic filter, effective.
 
 \begin{table}[t]
