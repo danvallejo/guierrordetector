@@ -25,9 +25,9 @@ in removing warnings (Section~\ref{sec:filters}).
 
 %library code: 1.4 million
 
-We used a set of open-source projects from Sourceforge, Google code,
+We used a set of open-source projects from SourceForge, Google Code,
 and the Eclipse plugin
-market as evaluation subjects. To choose subjects for each supported GUI framework,
+marketplace as evaluation subjects. To choose subjects for each supported GUI framework,
 we first searched for the framework keywords (e.g., ``Java Swing'' or ``Java SWT'')
 in the above three source repositories, and then selected subjects based on the following
 criteria. First, the subject must be a Java application, not
@@ -165,7 +165,7 @@ the underlying operating system. For it, we manually checked the possible
 Java methods that a native method may call, and then added \annotationnum \CodeIn{@CalledByNativeMethods}
 annotations for it. Two subjects, MyTracks and Fennec, employ a customized pattern
 to interact with the GUI framework. For example, in MyTracks, all non-UI
-threads are initialized via using the library method \CodeIn{android.os.} \CodeIn{handler.handleCallback}.
+threads are initialized via using the library method \CodeIn{android.os.}\discretionary{}{}{}\CodeIn{handler.handleCallback}.
 % the \CodeIn{safeInvokeXX}
 %method in the XXX subject first checks whether the current thread is the UI-thread, and
 %then determines whether to direct access a GUI object or wrap the code with
@@ -514,63 +514,65 @@ Android applications.
 \subsubsection{Comparing Graph Search Strategies}
 \label{sec:search}
 
-Our error detection algorithm in Figure~\ref{fig:detectalgorithm} uses a
-slightly modified BFS to search for
-potential single-GUI-thread violations. However, standard BFS
-and other graph search strategies such as
-DFS and exhaustive path search can also be employed. To
-understand trade-offs between using different search strategies, we 
-implemented three variants of the algorithm in Figure~\ref{fig:detectalgorithm}, and
-evaluated them on the same subjects with the identical environment settings.
+The error detection algorithm in Figure~\ref{fig:detectalgorithm} uses a
+separate BFS for each entry node.  This section evaluates three variants:
+a multiple-source BFS; a separate DFS for each entry node; and exhaustive
+search.
 
-The first variant uses standard BFS for graph traversal by deleting
-lines 6 and 24 in Figure~\ref{fig:detectalgorithm}, and changing
-7 in Figure~\ref{fig:detectalgorithm} to:
+The first variant uses a single BFS, but starting at multiple sources.  It deletes
+lines 6 and 24 in Figure~\ref{fig:detectalgorithm} and changes line
+7 to:
 
 \vspace{0.2mm}
-$\mathit{worklist}$ $\leftarrow$ $\bigcup_{entry \in entryNodes}$ getReachableStarts($\mathit{entry}$)
+$\mathit{worklist}$ $\leftarrow$ $\bigcup_{\mathit{entry} \in \mathit{entryNodes}}$ getReachableStarts($\mathit{entry}$)
 \vspace{0.2mm}
 
-\noindent This variant returns the shortest path from \textit{any} \CodeIn{Thread.start()} node
-to \textit{any} UI-accessing node, rather than the shortest path from \textit{a given}
-\CodeIn{Thread.start()} node to \textit{any} UI-accessing node as the algorithm in
+\noindent This variant returns the shortest path from any \CodeIn{Thread.start()} node
+to any UI-accessing node, rather than the shortest path from each
+\CodeIn{Thread.start()} node to any UI-accessing node as the algorithm in
 Figure~\ref{fig:detectalgorithm} does.
-This variant found 10 errors in total and missed 1 error in S3dropbox and 1 error in
-SudokuSolver. This is because in BFS (either the standard BFS or our algorithm), each
-node will \textit{only} be visited once; but in the standard BFS, if a node has been covered
-in an error path from a \CodeIn{Thread.start()} node, that node will not be visited again
-even when the standard BFS traverses from another \CodeIn{Thread.start()} node, thus
-missing potential errors.
+This variant reported 10 errors and 12 false positives.   It missed 1 error in S3dropbox and 1 error in
+SudokuSolver.
+It visits every node in the call graph only once, rather than potentially
+once per entry node, but in so doing prunes out real error paths.
 
-The second variant uses DFS for graph traversal by changing
-the data structure of $\mathit{worklist}$ on line 7 in Figure~\ref{fig:detectalgorithm} to
-a stack, and changing queue operations (\CodeIn{dequeue} and \CodeIn{enqueueAll}
-on lines 10 and 21 in Figure~\ref{fig:detectalgorithm}, respectively)
-to the corresponding stack operations (\CodeIn{pop} and \CodeIn{pushAll}).
-This variant found 11 errors in total and missed 1 error in the FileBunker subject.
-The reason is that DFS tends to search deeper into the graph, and the path it returns
-may not be the shortest one and is more likely to be an infeasible path in practice.
+The second variant one DFS per entry node, by changing
+the $\mathit{worklist}$ on line 7 of Figure~\ref{fig:detectalgorithm} to
+a stack, and changing queue operations dequeue and enqueueAll
+on lines 10 and 21
+to pop and pushAll.
+This variant reported 11 errors and 10 false positives.  It missed 1 error in FileBunker.
+DFS tends to search deeper into the graph and return longer paths that are
+more likely to be infeasible.
 %For the FileBunker subject, paths
 %returned by DFS are much longer than BFS, and do not actually exist.
-
 
 The third variant uses exhaustive search to find potential errors. This variant
 enumerates all non-cyclic paths from all reachable \CodeIn{Thread.start()} nodes
 to each UI-accessing node, and then checks whether each
 path spawns a new thread and accesses GUI objects without using safe UI methods.
-This variant ran out of memory on all subjects. We checked
-the explored paths before the algorithm terminated, and found none of them
-revealed a real error. This is because the number of
-non-cyclic paths in a graph is exponential in the graph size.
-For a realistic call graph which often contains thousands of nodes,
+This variant ran out of memory on all subjects, and did not output any real
+errors before it terminated.  The number of
+non-cyclic paths in a graph is exponential in the graph size, and it 
 it is infeasible to enumerate all paths.
+for a realistic call graph, which often contains thousands of nodes.
 %only a very few amount of paths can be enumerated within a practical amount of time.
 
+Given a sound call graph, exhaustive search is sound because it does not
+miss any possible errors.  However, it is impractical.  Compared to
+exhaustive search, using BFS or DFS can be viewed as a heuristic filtering
+step, akin to the filters of Section~\ref{sec:heuristic}.
+%   The algorithm of
+% Figure~\ref{fig:detectalgorithm}, which does multiple BFS traversals, does
+% less pruning, and runs more slowly, than the variant that does one
+% multi-source BFS, but
+ The heuristics of Section~\ref{sec:heuristic} are
+more effective at retaining real errors than the search variants.
 
 \vspace{1mm}
 
 \noindent \textbf{\textit{Summary.}} Our algorithm finds more errors than
-using standard BFS, DFS and exhaustive search in error detection.
+using multi-source BFS, DFS, or exhaustive search.
 
 
 \subsubsection{Evaluating Error Filters}
@@ -721,3 +723,15 @@ Our technique finds real-world errors and issues
 few false positive warnings. Our
 proposed filters are useful in reducing the number of warnings.
 
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "guierror"
+%%% TeX-command-default: "PDF"
+%%% End: 
+
+%  LocalWords:  multithreaded SWT multithreading 2mm VirgoFTP UI GMail S3
+%  LocalWords:  FileBunker ArecaBackup plugins HudsonEclipse EclipseRunner
+%  LocalWords:  S3dropbox SudokuSolver Sudoku mutlithreaded SGTPuzzler 9pt
+%  LocalWords:  Fennec MyTracks LOC v9306 plugin LOCC RTA CFA
+%  LocalWords:  CalledByNativeMethods
