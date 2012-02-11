@@ -15,11 +15,13 @@ This section formulates the problem. We first define
  \textit{safe UI methods}, and \textit{invalid thread access error}, and
 state two assumptions we make with regard to error detection.
 
+\vspace{1mm}
 \noindent {\textsc{\textbf{Definition 1 (UI Thread).}}} {The UI thread
 is a special thread created by the GUI framework during
 GUI initialization. After the GUI becomes visible, the UI thread
 takes charge of the application to handle events from the GUI.
-It spawns new threads to process lengthy operations in the background. }\vspace{1mm}
+It spawns new threads to process lengthy operations in the background. }
+\vspace{1mm}
 
 \noindent {\textsc{\textbf{Assumption 1.}}} {We assume that each multithreaded
 GUI application has a single global UI thread. This is true for applications
