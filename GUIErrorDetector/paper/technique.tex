@@ -82,7 +82,7 @@ dynamic call graphs over all possible executions of the program.
 A conservative, or sound, static call graph is a superset of
 the ideal call graph; it over-approximates the
 dynamic call graph of every possible execution. 
-Our algorithm's reports are in terms of methods, as shown in Figure~\ref{fig:report}.
+Based on call graph, our algorithm's reports are in terms of methods, as shown in Figure~\ref{fig:report}.
 
 %In an object-oriented programming language like
 %Java, a method is the basic logic unit in a program. Reporting
@@ -358,7 +358,7 @@ In our experiments, 1 out of \subnum programs (SGTPuzzler) uses native methods. 
 searched the Java source files to find all native methods,
 inspected the C code to determine possible target methods
 that may be called by a native method, and added \annotationnum annotations for this program.
-We found such an annotation was useful: one error
+We found such annotations were useful: one error
 is only reported when using the user-provided annotations.
 
 
