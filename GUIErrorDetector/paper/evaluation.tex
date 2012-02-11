@@ -40,32 +40,32 @@ The subjects used in our experiment (Table~\ref{table:subjects})
 include end-user applications, programming tools, and games. 
 
 
-\begin{myindentpar}{-2mm}
+% \begin{myindentpar}{-2mm}
 \begin{itemize}%\addtolength{\itemsep}{-0.5\baselineskip}
-\Item \textbf{SWT desktop applications.}
+\item \textbf{SWT desktop applications.}
 %VirgoFTP~\cite{virgo} and FileBunker~\cite{filebunker} are two useful SWT desktop applications.
 VirgoFTP~\cite{virgo} implements a simple FTP client based on Java and the SWT UI library.
 FileBunker~\cite{filebunker} is a file backup application that uses one or more GMail
 accounts as its backup repository. ArecaBackup~\cite{areca} offers a local
 file backup solution for Linux and Windows.
 
-\vspace{0.5mm}
-\vspace{0.5mm}
+% \vspace{0.5mm}
+% \vspace{0.5mm}
 
-\Item \textbf{Eclipse plugins.}
+\item \textbf{Eclipse plugins.}
 HudsonEclipse~\cite{hudson} monitors Hudson build status from Eclipse.
 EclipseRunner~\cite{eclipserunner} extends Eclipse's capability of running launch configurations.
 
-\vspace{0.5mm}
+% \vspace{0.5mm}
 
-\Item \textbf{Swing applications.} %S3dropbox~\cite{s3dropbox} and SudokuSolver~\cite{sudokusolver} are two Swing desktop applications.
+\item \textbf{Swing applications.} %S3dropbox~\cite{s3dropbox} and SudokuSolver~\cite{sudokusolver} are two Swing desktop applications.
 S3dropbox~\cite{s3dropbox}  allows users
 to drag and drop files to their Amazon S3 accounts. SudokuSolver~\cite{sudokusolver}
 computes Sudoku solutions using mutlithreaded execution. 
 
-\vspace{0.5mm}
+% \vspace{0.5mm}
 
-\Item  \textbf{Android applications.} %MyTracks~\cite{mytracks}, Fennec~\cite{fennec}, and SGTPuzzles~\cite{sgtpuzzles} are three Android applications.
+\item  \textbf{Android applications.} %MyTracks~\cite{mytracks}, Fennec~\cite{fennec}, and SGTPuzzles~\cite{sgtpuzzles} are three Android applications.
 SGTPuzzler~\cite{sgtpuzzles} is a single-player logic game.
 Fennec~\cite{fennec}, developed by Mozilla, is the Mozilla
 Firefox web browser for mobile devices. 
@@ -73,7 +73,7 @@ MyTracks~\cite{mytracks}, developed by Google, records users' GPS tracks, and pr
 interfaces to visualize them on Google Maps. 
 
 \end{itemize}
-\end{myindentpar}
+% \end{myindentpar}
 
 
 \begin{table}[t]
@@ -305,11 +305,10 @@ had not yet been verified by the developers.
 79.    display.showErrorMessage("Delete failed", 
         String.format(text, controller.getSelectedBucketName())); 
 80.\ttrcb
-\smallstep
 \end{alltt}
 \end{CodeOut}
-\smallstep
-\vspace*{-2.0ex} \Caption{{\label{fig:swingerror} An
+\vspace*{-15pt}
+\Caption{{\label{fig:swingerror} An
 invalid thread access error reported by our tool
 in the S3dropbox Swing application. The error occurs when
 the method \CodeIn{deleteCurrentBucket} invoked on line 63 throws
@@ -359,8 +358,8 @@ or memory-consistency errors.
 416.\ttrcb
 \end{alltt}
 \end{CodeOut}
-\smallstep
-\vspace*{-2.0ex} \Caption{{\label{fig:pluginerror} An
+\vspace*{-15pt}
+\Caption{{\label{fig:pluginerror} An
 invalid thread access error reported by our tool
 for the EclipseRunner plugin. In Eclipse, the
 callback method \CodeIn{resourceChanged} on line 181
@@ -688,7 +687,7 @@ open-source repositories. Another threat is that we only employed three
 widely-used call graph construction algorithms (i.e., RTA, 0-CFA, and 1-CFA) 
 in our evaluation. Using other 
 call graph construction algorithms such as XTA~\cite{xta}, VTA~\cite{Sundaresan:2000} or
-an incremental algorithm~\cite{inccg} might achieve divergent results.
+an incremental algorithm~\cite{inccg} might achieve different results.
 
 
 \vspace{1mm}

@@ -252,8 +252,8 @@ reports no warnings, the code is guaranteed to be bug-free.
 %$\rightarrow$\CodeIn{ \scriptsize{org.mozilla.gecko.gfx.LayerView.setViewportSize(IntSize;)}}\\
 %\hspace{5mm}\CodeIn{...}\\
 %$\rightarrow$\CodeIn{ \scriptsize{android.view.ViewRoot.checkThread()}}
-\tinystep
-\vspace*{-3.0ex} \Caption{{\label{fig:report} Our tool reports
+\vspace*{-15pt}
+\Caption{{\label{fig:report} Our tool reports
 a method call chain that reveals the potential error in
 Figure~\ref{fig:androiderror}. $\rightarrow$ represents
 the call relationship
@@ -348,7 +348,7 @@ call graph construction algorithm (Section~\ref{sec:technique}).
 instantiated it for four
 popular GUI platforms: SWT, Eclipse plugin, Swing, and Android (Section~\ref{sec:implementation}). Our
 tool implementation is publicly available at
-\url{http://guierrordetector.googlecode.com}.
+{\smaller\url{http://guierrordetector.googlecode.com}}.
 
 \tinystep
 
@@ -358,3 +358,8 @@ show the usefulness of the proposed technique (Section~\ref{sec:evaluation}).
 
 \end{itemize}
 
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "guierror"
+%%% TeX-command-default: "PDF"
+%%% End: 
