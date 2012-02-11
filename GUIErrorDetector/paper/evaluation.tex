@@ -534,9 +534,9 @@ Figure~\ref{fig:detectalgorithm} does.
 This variant reported 10 errors and 12 false positives.   It missed 1 error in S3dropbox and 1 error in
 SudokuSolver.
 It visits every node in the call graph only once, rather than potentially
-once per entry node, but in so doing prunes out real error paths.
+once per entry node, but doing so prunes out real error paths.
 
-The second variant one DFS per entry node, by changing
+The second variant uses one DFS per entry node, by changing
 the $\mathit{worklist}$ on line 7 of Figure~\ref{fig:detectalgorithm} to
 a stack, and changing queue operations dequeue and enqueueAll
 on lines 10 and 21
