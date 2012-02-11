@@ -71,7 +71,7 @@ If not, an \textit{invalid thread access error} will occur. This may
 terminate the application, but it is considered preferable
 to nondeterministic concurrency errors.
 
-The single-GUI-thread rule can be easily violated; since a spawned non-UI thread often needs to update
+The single-GUI-thread rule can be easily violated, since a spawned non-UI thread often needs to update
 the GUI  after its  task is finished.
 In practice, invalid thread access errors are \textit{frequent}, \textit{severe}, and \textit{hard to debug}.
 %and \textit{difficult to avoid}.
@@ -83,7 +83,7 @@ A Google search for ``SWTException:Invalid thread access''  returns over 11,800 
 consisting of numerous bug reports, forum posts, and mailing list threads on
 this problem. Eclipse, the IDE for Java development, is built on top of SWT\@.
 Searching for ``SWTException:Invalid thread access'' in Eclipse's bug repository
-and discussion forum returns over 2732 bug reports and 351 distinct threads, respectively. 
+and discussion forum returns over 2732 bug reports and 351 distinct discussion threads, respectively. 
 We manually studied all 156 distinct \textit{confirmed} bug reports, and 
 found this error has been confirmed in at least 20 distinct Eclipse projects
 and 40 distinct Eclipse components. Even after over 10 years of active development,
@@ -138,7 +138,7 @@ Bug 703256 reported on 11/17/2011 in Fennec (Mozilla Firefox for Android)
 release 10.0.a.rc3. On line 74, \CodeIn{LayerView}'s constructor
 calls method \CodeIn{setRenderer} which 
 spawns a new thread on line 283. This newly created, non-UI thread calls back method
-\CodeIn{onSurfaceChanged} that accesses GUI objects on line 222,
+\CodeIn{onSurfaceChanged} that accesses GUI objects on line 222 of \CodeIn{LayerRenderer},
 causing an invalid thread access error. Our tool
 finds this error and generates a report as shown in
 Figure~\ref{fig:report}.
@@ -176,7 +176,7 @@ Stylized coding patterns are also inadequate. One possible rule is to always
 access GUI objects via asynchronous message passing, to ensure a GUI object is accessed in
 the UI thread. For example, a developer could have prevented the bug in Figure~\ref{fig:androiderror}
 by wrapping line 222 inside a \CodeIn{post} message-passing method\footnote{The
-\CodeIn{post} method in class \CodeIn{android.widget.View} is a
+\CodeIn{post} method in class \CodeIn{android.widget.View} is
 a standard way to send asynchronized messages to the UI-thread.}, as follows:
 
 {\vspace{2mm}
@@ -196,7 +196,7 @@ a standard way to send asynchronized messages to the UI-thread.}, as follows:
 \end{CodeOut}}
 
 Such an approach is desirable for accesses from non-UI threads, but it is unnecessary.
-In our evaluation on real-world programs, we found a simple analysis that
+In our evaluation on real-world programs, we found that a simple analysis that
 requires GUI operations to be in a message issued
 an unacceptable number of warnings. %false positives and redundant warnings.
 Furthermore, this approach is dangerous for accesses from the UI thread. Asynchronized message passing offers
