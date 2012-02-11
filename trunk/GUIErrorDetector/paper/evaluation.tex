@@ -61,7 +61,7 @@ EclipseRunner~\cite{eclipserunner} extends Eclipse's capability of running launc
 \Item \textbf{Swing applications.} %S3dropbox~\cite{s3dropbox} and SudokuSolver~\cite{sudokusolver} are two Swing desktop applications.
 S3dropbox~\cite{s3dropbox}  allows users
 to drag and drop files to their Amazon S3 accounts. SudokuSolver~\cite{sudokusolver}
-computes Sudoku solutions efficiently using mutlithreaded execution. 
+computes Sudoku solutions using mutlithreaded execution. 
 
 \vspace{0.5mm}
 
@@ -546,7 +546,7 @@ The second variant uses DFS for graph traversal by changing
 the data structure of $\mathit{worklist}$ on line 7 in Figure~\ref{fig:detectalgorithm} to
 a stack, and changing queue operations (\CodeIn{dequeue} and \CodeIn{enqueueAll}
 on lines 10 and 21 in Figure~\ref{fig:detectalgorithm}, respectively)
-to the corresponding statck operations (\CodeIn{pop} and \CodeIn{pushAll}).
+to the corresponding stack operations (\CodeIn{pop} and \CodeIn{pushAll}).
 This variant found 11 errors in total and missed 1 error in the FileBunker subject.
 The reason is that DFS tends to search deeper into the graph, and the path it returns
 may not be the shortest one and is more likely to be an infeasible path in practice.
@@ -662,12 +662,14 @@ has been evaluated on \subnum subjects with over \totaloc LOC and frameworks
 with 1.4 MLOC, showing good scalability. Our evaluations
 were conducted on a 2.67GHz Intel Core PC with 4GB
 physical memory (1GB is allocated for JVM), running Fedora 16.
-For the most time-consuming subject, MyTracks, our tool finished the whole analysis
-within 209 seconds using the most expensive call graph construction
-algorithm: the reflection-aware 1-CFA algorithm. Analyzing
-other subjects using different algorithms took less time.
-The performance has not been tuned, and we believe
-that it could be improved further.
+For the most time-consuming subject, S3dropbox, our tool finished the whole analysis
+within 252 seconds using the most expensive 1-CFA call graph construction
+algorithm. Analyzing other subjects using different algorithms took less time.
+The percentage of call graph construction cost ranges
+from 33.4\% (Fennec) to 91.1\% (VirgoFTP) out of
+the total analysis time among all evaluated programs.
+%The performance has not been tuned, and we believe
+%that it could be improved further.
 
 
 

@@ -177,7 +177,7 @@ access GUI objects via asynchronous message passing, to ensure a GUI object is a
 the UI thread. For example, a developer could have prevented the bug in Figure~\ref{fig:androiderror}
 by wrapping line 222 inside a \CodeIn{post} message-passing method\footnote{The
 \CodeIn{post} method in class \CodeIn{android.widget.View} is
-a standard way to send asynchronized messages to the UI-thread.}, as follows:
+a standard way to send asynchronous messages to the UI-thread.}, as follows:
 
 {\vspace{2mm}
 \hspace{3mm}\small{In class: org.mozilla.gecko.gfx.LayerRenderer}
