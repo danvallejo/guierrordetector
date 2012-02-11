@@ -661,6 +661,8 @@ under column ``1-CFA'' in Table~\ref{table:results}.
 
 \subsection{Discussion}
 
+\label{sec:performance}
+
 \noindent \textbf{\textit{Performance and scalability.}} Our tool
 has been evaluated on \subnum subjects with over \totaloc LOC and frameworks
 with 1.4 MLOC, showing good scalability. Our evaluations
@@ -669,9 +671,8 @@ physical memory (1GB is allocated for JVM), running Fedora 16.
 For the most time-consuming subject, S3dropbox, our tool finished the whole analysis
 within 252 seconds using the most expensive 1-CFA call graph construction
 algorithm. Analyzing other subjects using different algorithms took less time.
-The percentage of call graph construction cost ranges
-from 33.4\% (Fennec) to 91.1\% (VirgoFTP) out of
-the total analysis time among all evaluated programs.
+Call graph construction took 33--91\% of
+the total analysis time.
 %The performance has not been tuned, and we believe
 %that it could be improved further.
 
