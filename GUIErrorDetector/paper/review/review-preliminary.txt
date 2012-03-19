@@ -1,0 +1,167 @@
+From: ISSTA 2012 <issta2012@easychair.org>
+Date: Mon, Mar 19, 2012 at 11:45 AM
+Subject: [ISSTA 2012] author response (paper 90)
+To: Sai Zhang <szhang@cs.washington.edu>
+
+Dear Sai,
+
+Thank you for your submission to ISSTA 2012. The ISSTA 2012 author
+response period has opened now, and will remain open through March 22
+(11:59pm, Pago Pago time).
+
+During this time, you will have access to the current state of your
+reviews and have the opportunity to submit a response of up to 500
+words. Please keep in mind the following during this process:
+
+* The response must focus on any factual errors in the reviews and any
+ questions posed by the reviewers. It must not provide new research
+ results. Try to be as concise and to the point as possible.
+
+* The author response period is an opportunity to react to the
+ reviews, but not a requirement to do so. Thus, if you feel the
+ reviews are accurate and the reviewers have not asked any questions,
+ then not responding is fine.
+
+* The reviews are as submitted by the PC members, without any
+ coordination between them. Thus, there may be
+ inconsistencies. Furthermore, these are not the final versions of
+ the reviews. The reviews may be updated to take into account the
+ discussions among the program committee.  We may find it necessary
+ to solicit additional reviews of your submission after the author
+ response period.
+
+* The program committee will read your responses carefully and take
+ this information into account during the discussions. On the other
+ hand, the program committee will not directly respond to your
+ responses, either before the program committee meeting or in the
+ final versions of the reviews.
+
+* Your response will be seen by all PC members who have access to the
+ discussion of your paper, so please try to be polite and
+ constructive.
+
+* You can submit a response to the reviews only once and will not be
+ able to update your response once it is sent.
+
+The reviews on your paper are attached to this letter. To submit your
+response you should log on the EasyChair Web site for ISSTA 2012 and
+select your submission on the menu.
+
+Best regards,
+
+Zhendong Su
+
+----------------------- REVIEW 1 ---------------------
+PAPER: 90
+TITLE: Finding Errors in Multithreaded GUI Applications
+AUTHORS: (anonymous)
+
+--- Please provide a short summary of the submission.
+SUMMARY:
+
+The authors consider the problem of the invalid thread access error,
+occurring when a non-UI thread invokes an unsafe UI thread method, giving
+raise to a runtime error. The authors propose a static analysis based on
+call graph reachability, to determine possible instances of the
+problem. They also propose some heuristic filters to reduce the number of
+false positives and redundant warnings.
+
+--- Your detailed evaluation.
+EVALUATION:
+
+The problem considered in this paper is quite narrow. However, the
+authors provide convincing evidence (in Sec. 1.2) that this very specific
+problem is of some relevance to developers.
+
+The proposed algorithm is a pretty straightforward reachability analysis
+algorithm based on graph visiting. However, the authors provide useful
+hints to make the technique applicable, e.g., on how reflection
+can be handled in practice. The proposed filtering techniques are also
+quite simple, but the experimental results show that they are very
+effective. Even though they make the analysis potentially unsound, these
+heuristics seem to eventually succeed in producing interesting and relevant
+warnings, without overwhelming the end user with an unmanageable amount of
+information.
+
+The empirical study was designed and conducted with care. Threats to
+validity have been analyzed properly and, when possible, addressed in a
+reasonable way.
+
+Overall, I have no major concern or issue about this work, its weaknesses
+being mostly the quite narrow scope and the relative simplicity of the
+proposed solution.
+
+One paragraph requires probably additional clarification. In Sec. 4.3.4,
+last paragraph, the authors claim that exhaustive search (which means
+enumeration of all non-cyclic paths, as explained in the previous
+paragraph) is sound while breadth/depth first searches are not so. I do not
+quite understand this claim. In fact, if the call graph is conservative and
+no filtering is applied, any graph visit algorithm can be used to solve the
+reachability problem associated with the invalid thread access
+error. Hence, I would say all three search strategies are sound, in this
+regard. If on the other hand by sound we mean that the search strategy is
+capable of reporting the exact error path, I think none of the three
+strategies is such. In fact, even the exhaustive  search might miss the
+error path, when this involves cycles. Please, clarify this issue.
+
+--- The most important aspects in your evaluation.
+POINTS IN FAVOR OR AGAINST:
+
++ well thought heuristics
++ good empirical study
+- narrow problem
+- simple solution
+
+--- Please list the most important questions for the authors to be addressed
+--- in their rebuttal.
+QUESTIONS FOR THE AUTHORS:
+
+----------------------- REVIEW 2 ---------------------
+PAPER: 90
+TITLE: Finding Errors in Multithreaded GUI Applications
+AUTHORS: (anonymous)
+
+--- Please provide a short summary of the submission.
+SUMMARY:
+This paper presents a strategy for detecting invalid thread access errors in
+multithreaded GUI applications, errors in which a GUI object is accessed from a
+non-UI thread, ie., a thread that is not the event dispatching thread.  The
+authors use static analysis, namely building a conservative static call graph
+and performing reachability analysis from the entry points, checking whether
+any path accesses a GUI object from a non-UI thread.  Evaluation consists of
+comparing the reported errors in 10 applications including apps developed with
+SWT, Eclipse (as a plugin), Swing, and Android.  Note the analysis is neither
+sound nor complete, however, the results were verified manually and with
+developers.  It had real errors in real programs.
+
+--- Your detailed evaluation.
+EVALUATION:
+This paper spends considerable time in the introduction building a case for the
+importance of this problem and the difficulty in detecting these errors as a
+human.  The technical approach is straightforward and simple, building a call
+graph and then performing graph reachability on the graph with checks along the
+paths.  The major contribution is the implementation which handles codes
+developed in 4 different frameworks and the empirical study of the use of the
+tool
+on applications in these 4 categories, also doing some in-depth comparison of
+using different
+call graph construction algorithms and filtering algorithms for the analysis.
+The evaluation is solid, with efforts to minimize threats to validity and
+in-depth analysis of the errors that were reported by the tool.
+
+This is a solid paper, more on the side of solving an important problem with a
+simple approach and performing an in-depth evaluation.
+
+--- The most important aspects in your evaluation.
+POINTS IN FAVOR OR AGAINST:
+Strengths:
+ - well written paper
+ - well-justified problem
+ - solid evaluation
+Weaknesses:
+ - narrow problem - one kind of error in GUI applications
+ - small technical contribution in terms of algorithm development
+
+--- Please list the most important questions for the authors to be addressed
+--- in their rebuttal.
+QUESTIONS FOR THE AUTHORS:
