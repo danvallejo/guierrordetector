@@ -4,7 +4,7 @@ We agree with reviewer #1 and #2 that this paper addresses one kind of
 error (i.e., the invalid thread access error) in GUI application.
 However, as shown in Sec 1.2, this error is important, pervasive, and
 severe in developing multithreaded GUI applications, and there are no
-effective solutions yet. As part of this paper’s contribution is
+effective solutions yet. As part of this paper's contribution is
 identifying the invalid thread access problem. We keep our solution
 simple to make it generally applicable and sufficient to detect many
 real errors [*is such argument useful?*], instead of focusing on finding
@@ -16,7 +16,7 @@ vulnerability (does a tainted input reach a security-critical operation?),
 or IO-related errors (e.g., does a closed file reach a read operation?).
 
 Reviewer #1 requests additional clarification for Sec. 4.3.4. Here,
-by “sound” graph visit algorithm, we mean one that will not miss any true
+by "sound" graph visit algorithm, we mean one that will not miss any true
 error path. Given a conservative call graph, BFS and DFS are not sound,
 because BFS returns the shortest path and DFS returns the first path it
 sees when searching in deep of the graph.  Both of them may return the
