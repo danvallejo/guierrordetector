@@ -113,16 +113,34 @@ AUTHORS: Sai Zhang, Hao Lu and Michael D. Ernst
 
 --- Please provide a short summary of the submission.
 SUMMARY:
-This paper presents a strategy for detecting invalid thread access errors in multithreaded GUI applications, errors in which a GUI object is accessed from a non-UI thread, ie., a thread that is not the event dispatching thread.  The authors use static analysis, namely building a conservative static call graph and performing reachability analysis from the entry points, checking whether any path accesses a GUI object from a non-UI thread.  Evaluation consists of comparing the reported errors in 10 applications including apps developed with SWT, Eclipse (as a plugin), Swing, and Android.  Note the analysis is neither sound nor complete, however, the results were verified manually and with developers.  It had real errors in real programs.
+This paper presents a strategy for detecting invalid thread access errors
+in multithreaded GUI applications, errors in which a GUI object is accessed
+from a non-UI thread, ie., a thread that is not the event dispatching
+thread.  The authors use static analysis, namely building a conservative
+static call graph and performing reachability analysis from the entry
+points, checking whether any path accesses a GUI object from a non-UI
+thread.  Evaluation consists of comparing the reported errors in 10
+applications including apps developed with SWT, Eclipse (as a plugin),
+Swing, and Android.  Note the analysis is neither sound nor complete,
+however, the results were verified manually and with developers.  It had
+real errors in real programs.
 
 --- Your detailed evaluation.
 EVALUATION:
-This paper spends considerable time in the introduction building a case for the importance of this problem and the difficulty in detecting these errors as a human.  The technical approach is straightforward and simple, building a call graph and then performing graph reachability on the graph with checks along the paths.  The major contribution is the implementation which handles codes developed in 4 different frameworks and the empirical study of the use of the tool
-on applications in these 4 categories, also doing some in-depth comparison of using different
-call graph construction algorithms and filtering algorithms for the analysis.  
-The evaluation is solid, with efforts to minimize threats to validity and in-depth analysis of the errors that were reported by the tool. 
+This paper spends considerable time in the introduction building a case for
+the importance of this problem and the difficulty in detecting these errors
+as a human.  The technical approach is straightforward and simple, building
+a call graph and then performing graph reachability on the graph with
+checks along the paths.  The major contribution is the implementation which
+handles codes developed in 4 different frameworks and the empirical study
+of the use of the tool on applications in these 4 categories, also doing
+some in-depth comparison of using different call graph construction
+algorithms and filtering algorithms for the analysis.  The evaluation is
+solid, with efforts to minimize threats to validity and in-depth analysis
+of the errors that were reported by the tool.
 
-This is a solid paper, more on the side of solving an important problem with a simple approach and performing an in-depth evaluation.
+This is a solid paper, more on the side of solving an important problem
+with a simple approach and performing an in-depth evaluation.
 
 --- The most important aspects in your evaluation.
 POINTS IN FAVOR OR AGAINST:
@@ -145,27 +163,81 @@ TITLE: Finding Errors in Multithreaded GUI Applications
 AUTHORS: Sai Zhang, Hao Lu and Michael D. Ernst
 
 SUMMARY:
-Many of the popular GUI frameworks use a single-threaded model when updating or accessing the GUI.  This means that concurrency bugs do not occur on the interface, and less overhead is required than in a multi-threaded approach– increasing user performance. However, the program itself can spawn threads that then interact with the GUI violating this model which can lead to invalid thread access errors.  This paper presents a static analysis technique to identify potential invalid thread access errors.  Optimisations of the analysis include a reflection-aware call graph algorithm for library functions, and filters to reduce false positives. An evaluation on a range of open source GUI applications shows that this technique can find previously unknown faults while producing only a small number of false positives. 
+Many of the popular GUI frameworks use a single-threaded model when
+updating or accessing the GUI.  This means that concurrency bugs do not
+occur on the interface, and less overhead is required than in a
+multi-threaded approach– increasing user performance. However, the program
+itself can spawn threads that then interact with the GUI violating this
+model which can lead to invalid thread access errors.  This paper presents
+a static analysis technique to identify potential invalid thread access
+errors.  Optimisations of the analysis include a reflection-aware call
+graph algorithm for library functions, and filters to reduce false
+positives. An evaluation on a range of open source GUI applications shows
+that this technique can find previously unknown faults while producing only
+a small number of false positives.
 
 EVALUATION:
-This paper is addressing an important problem that I have not seen addressed much in the testing literature on GUIs.   While the interface can assumed to be single-threaded the authors show that this can easily be violated and should be addressed during testing. Current testing techniques will only find these types of problems by chance.  The approach is well thought out and appears to be quite effective.  Not only does the tool provide the potential fault, but presents the call-graph to help the user identify the chain of actions leading tot the potential fault.  A tool to implement this technique has been created for four different GUI frameworks allowing for a broad evaluation. The case study isolates elements of the research (e.g. different call-graph algorithms/filters) and the results are promising.  Only a small number of faults were actually found in the real applications studied, but given their popularity this is not unexpected.  Overall – this is a nice contribut
-ion to the GUI testing literature.  I present some more detailed comments below.
+This paper is addressing an important problem that I have not seen
+addressed much in the testing literature on GUIs.   While the interface can
+assumed to be single-threaded the authors show that this can easily be
+violated and should be addressed during testing. Current testing techniques
+will only find these types of problems by chance.  The approach is well
+thought out and appears to be quite effective.  Not only does the tool
+provide the potential fault, but presents the call-graph to help the user
+identify the chain of actions leading tot the potential fault.  A tool to
+implement this technique has been created for four different GUI frameworks
+allowing for a broad evaluation. The case study isolates elements of the
+research (e.g. different call-graph algorithms/filters) and the results are
+promising.  Only a small number of faults were actually found in the real
+applications studied, but given their popularity this is not unexpected.
+Overall – this is a nice contribution to the GUI testing literature.  I
+present some more detailed comments below.
 
-Some of the figures (such as Figure 4 and 5 are not clearly delineated. Perhaps use a boxed mode to show them separately). 
+Some of the figures (such as Figure 4 and 5 are not clearly
+delineated. Perhaps use a boxed mode to show them separately).
 
-I am not convinced that your second filter is necessarily ‘sound’ since it relies on the human to remove possible methods from consideration. Perhaps an example will help here to provide more insight into why this holds.
+I am not convinced that your second filter is necessarily ‘sound’ since it
+relies on the human to remove possible methods from consideration. Perhaps
+an example will help here to provide more insight into why this holds.
 
-Section 3 describes the instantiation for the various frameworks.  There is a common set of variables that have to be instantiated. Why not show us a picture of this framework to provide a map for the reader of this section? Then it is clearer that you need to define the Call entry nodes, UI accessing nodes, etc.., but that these are common to your approach.. Also, can you say more about the implementation --- is this a single program that plugs in the correct implementation at runtime or do you have to recompile/run separate programs? 
+Section 3 describes the instantiation for the various frameworks.  There is
+a common set of variables that have to be instantiated. Why not show us a
+picture of this framework to provide a map for the reader of this section?
+Then it is clearer that you need to define the Call entry nodes, UI
+accessing nodes, etc.., but that these are common to your approach.. Also,
+can you say more about the implementation --- is this a single program that
+plugs in the correct implementation at runtime or do you have to
+recompile/run separate programs?
 
-In section 3.2 you discuss the use of the WALA framework and then talk about the reflection-aware call graph (which is only pertinent to the Android framework).  It seems like this gets lost though in the writing, since the discussion is the general implementation and then you mention other related work (36) which is only related to Android.  I might break out the Android specific code  -- in fact if you return to my last comment, you could show the framework and include the WALA implementation details that are common to all frameworks upfront. Then only discuss the Android specific implementation details in that section. 
+In section 3.2 you discuss the use of the WALA framework and then talk
+about the reflection-aware call graph (which is only pertinent to the
+Android framework).  It seems like this gets lost though in the writing,
+since the discussion is the general implementation and then you mention
+other related work (36) which is only related to Android.  I might break
+out the Android specific code  -- in fact if you return to my last comment,
+you could show the framework and include the WALA implementation details
+that are common to all frameworks upfront. Then only discuss the Android
+specific implementation details in that section.
 
-I am not familiar with the SudokuSolver program. Does it send email out to report results? You might clarify on page 7 why the JVM is launching the users mail client. 
+I am not familiar with the SudokuSolver program. Does it send email out to
+report results? You might clarify on page 7 why the JVM is launching the
+users mail client.
 
-Some of the figures contain all of the description code (e.g. Figure 8). I would describe the necessary information in the paper itself and not require the reader to move to the figure and read the caption to understand its importance.   In fact, I found that the paper probably would not miss the example from Figure 8 and would be just as strong so this is a candidate for removal if you need space for other changes. 
+Some of the figures contain all of the description code (e.g. Figure 8). I
+would describe the necessary information in the paper itself and not
+require the reader to move to the figure and read the caption to understand
+its importance.   In fact, I found that the paper probably would not miss
+the example from Figure 8 and would be just as strong so this is a
+candidate for removal if you need space for other changes.
 
-One study that would make this work stronger is to use the bug and revision history for a set of GUI applications with reported/fixed thread violation access errors and then evaluate your effectiveness on those. This would be a baseline to show that you find the already reported failures as well as the new ones you have discovered in this work. 
+One study that would make this work stronger is to use the bug and revision
+history for a set of GUI applications with reported/fixed thread violation
+access errors and then evaluate your effectiveness on those. This would be
+a baseline to show that you find the already reported failures as well as
+the new ones you have discovered in this work.
 
-I like the progression of data in Table 3 – incrementally showing the impact of filters. 
+I like the progression of data in Table 3 – incrementally showing the
+impact of filters.
 
 IN FAVOR: 
 - Interesting/important problem. 
