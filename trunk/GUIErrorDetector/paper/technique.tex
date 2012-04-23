@@ -95,7 +95,7 @@ Based on call graph, our algorithm's reports are in terms of methods, as shown i
 Our algorithm in Figure~\ref{fig:detectalgorithm} %works as follows. It
 first constructs a static call graph for the tested program (line 2),
 then specifies entry nodes, UI-accessing nodes, and safe UI nodes
-for it on lines 3, 4, and 5, respectively. Lines 3 -- 5 are GUI framework-specific.
+for it on lines 3, 4, and 5, respectively. Lines 3--5 are GUI framework-specific.
 As an example, for a SWT desktop application, the entry nodes include
 the single main method, UI-accessing nodes include methods
 \CodeIn{Widget.checkWidget} and \CodeIn{Display.}\CodeIn{checkDevice},
@@ -112,9 +112,9 @@ Each \CodeIn{Thread.start()} node in a call graph indicates that a new,
 non-UI thread is spawned.  The \CodeIn{Thread.start()}
 nodes act as the sources in the main graph traversal.
 The algorithm uses Breadth-First Search (BFS) to search for reachable UI-accessing
-methods (lines 9 -- 23).
+methods (lines 9--23).
 The algorithm stops the traversal if it reaches a UI-accessing
-method (lines 15 -- 17) or a safe UI method (lines 18, 19).
+method (lines 15--17) or a safe UI method (lines 18, 19).
 %Specifically, it uses a queue to keep track of the nodes to be visited (line 7),
 %and stores all visited nodes to avoid infinite loop (line 8).
 %The algorithm checks every successive node to be visited (line 16):
@@ -172,7 +172,7 @@ node \CodeIn{LayerView.<init>} to the UI-accessing node \CodeIn{ViewRoot}.\CodeI
 \end{algorithmic}
 \caption{Algorithm for detecting invalid thread access errors in multithreaded GUI programs. 
 Any call graph construction algorithm can be used (line 2). The algorithm
-is parameterized by the three methods in lines 3 -- 5 which are specific to each GUI framework
+is parameterized by the three methods in lines 3--5 which are specific to each GUI framework
  as described in Section~\ref{sec:platforms}.
 } \label{fig:detectalgorithm}
 \end{figure}
@@ -262,7 +262,7 @@ a Button object by its ID (line 6, the \CodeIn{findViewById} method).}
 \end{algorithmic}
 \vspace{-3mm}
 \caption{A reflection-aware call graph construction algorithm. Lines
-1 -- 7 are a simple program transformation to replace reflection calls
+1--7 are a simple program transformation to replace reflection calls
 with object creations, and line 8 builds the call graph using
 an existing call graph construction algorithm. This algorithm
 is parameterized by two methods on lines 2 and 3. 
@@ -280,7 +280,7 @@ The example code in Figure~\ref{fig:sampleandroid} from an Android application
  illustrates the limitations.
 In Figure~\ref{fig:sampleandroid}, line 6 uses reflection to create a \CodeIn{Button}
 object by looking up its id declared in the associated XML file. When this button
-is clicked, its event handling code (lines 9 -- 11) updates the text.
+is clicked, its event handling code (lines 9--11) updates the text.
 
 When analyzing the code in Figure~\ref{fig:sampleandroid}, existing call graph algorithms
 fail to conclude that the variable \CodeIn{button} declared on line 6
@@ -293,7 +293,7 @@ a reflection-aware call graph based on a simple program transformation.
 The basic idea is to replace reflection calls with explicit object
 creation expressions, pretending that the corresponding concrete object
 has been created.  The algorithm is shown in Figure~\ref{fig:cgalgorithm}.
-It consists of two steps. The first step (lines 1 -- 7) is a simple program
+It consists of two steps. The first step (lines 1--7) is a simple program
 transformation to replace reflection calls with object creation expressions, and
 the second step (line 8) uses an existing call graph construction algorithm
 to build the graph on the transformed program. In our context,
