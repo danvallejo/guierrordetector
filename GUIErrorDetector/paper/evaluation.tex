@@ -457,6 +457,7 @@ for outputting the shortest possible call chain. Figure~\ref{fig:ex} illustrates
 \CodeIn{safe()} is a Safe UI method, and \CodeIn{uiAcc()} is a UI-accessing method.
 (b) shows a less precise call graph built by RTA or 0-CFA, and (c) shows a more
 precise call graph built by 1-CFA. Nodes for constructors are omitted for brevity.
+\newline
 Using the less precise call graph, our error
 detection algorithm (Figure~\ref{fig:detectalgorithm}) reports an invalid method
 call chain: \CodeIn{entry()}
