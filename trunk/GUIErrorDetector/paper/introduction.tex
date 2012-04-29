@@ -17,11 +17,13 @@ of violating it, and a technique for statically detecting such violations.
 
 %\subsection{The Single-thread Rule for GUI Object Access}
 %ugly hack
-\subsection{\hspace{-1.1ex}\mbox{The}~\mbox{Single-thread}~\mbox{Rule}~\mbox{for}~\mbox{GUI}~\mbox{Object}~\mbox{Access}}
+%\subsection{\hspace{-1.1ex}\mbox{The}~\mbox{Single-thread}~\mbox{Rule}~\mbox{for}~\mbox{GUI}~\mbox{Object}~\mbox{Access}}
+
+\subsection{The Single-thread Rule}
 
 Many popular GUI frameworks such as Swing~\cite{swing}, SWT~\cite{swt}, Eclipse plugin~\cite{eclipse},
 Android~\cite{android}, Qt~\cite{qt}, and MacOS Cocoa~\cite{macos}
-adopt the \textit{single-GUI-thread rule}:
+adopt the \textit{single-GUI-thread rule} for GUI object access:
 
 \makeatletter
 \newenvironment{myquotation}
