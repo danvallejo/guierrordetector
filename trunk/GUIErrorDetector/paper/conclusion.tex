@@ -8,12 +8,6 @@ whether a non-UI thread can access a GUI object.
 It uses a reflection-aware call graph construction algorithm
 to build a good call graph, and employs a set of error
 filters to filter likely false positives and redundant warnings.
-%Since graphical user interfaces are often inadequately tested due
-%to the enormously large space of UI interactions and
-%extreme resource constraints during their development, we
-%believe that providing a static analysis can allow developers to find
-%more potential errors %before the application is released to customers (XXX),
-% to improve software reliability.
 We demonstrated the usefulness of our technique
 by an evaluation on \subnum programs built on 4 popular GUI
 frameworks. 
@@ -38,8 +32,8 @@ It suffers from false positives for many GUI applications,
 due to the conservative nature of static analysis.
 A possible way to reduce the number of false
 positives is to integrate with
-dynamic analyses~\cite{Jiang:2008:PPS:1453101.1453110}
-or symbolic analyses~\cite{xie05:symstra, Pasareanu:2011, halfond09issta, BMF97}
+dynamic analyses~\cite{ZhangSBE2011}
+or symbolic analyses~\cite{xie05:symstra, Pasareanu:2011}
 by using more accurate information to guide call graph exploration.
 
 %\item
@@ -49,7 +43,7 @@ way to improve software quality.  Although many
 testing techniques have been developed recently, few of them can be applied
 to unit test multithreaded GUI programs to find potential errors \textit{earlier}. We
 plan to investigate how to apply recent advance in automated
-testing~\cite{Staats:2011:PTO:1985793.1985847, Jagannath:2011:IMU:2025113.2025145, Muccini_Bertolino_Inverardi_2004, Ricca:2001:ATW:381473.381476, Harman:2007}
+testing~\cite{ZhangSBE2011, Jagannath:2011:IMU:2025113.2025145}
 to the context of multithreaded GUI applications.
 
 

@@ -11,14 +11,12 @@ call graph construction algorithms.
 \subsection{Analyzing and Testing GUI Applications}
 %\vspace{1mm}
 
-%\noindent \textit{\textbf{Analysis and Testing for GUI Applications}}
-Automated GUI testing is a challenging task~\cite{Bertolino:2007:STR:1253532.1254712,
-Harrold:2000:TR:336512.336532}.
+Automated GUI testing is a challenging task.
 Various techniques automate GUI testing including
 %model creation
 %(for model-based testing)~\cite{androidtesting}, %, Xie:2006:MTC:1172962.1172990},
 test generation~\cite{YuanMemonICSE2007},
-test oracle creation~\cite{MemonFSE2000}, test execution~\cite{YuanCohenMemonTSE2011},
+test execution~\cite{YuanCohenMemonTSE2011},
 and test script repairing~\cite{Huang:2010:RGT:1828417.1828465, Daniel:2011:AGR:2002931.2002937}.
 For example,
 Guitar~\cite{YuanCohenMemonTSE2011, YuanMemonICSE2007}
@@ -62,14 +60,14 @@ our core technique has been tailored for four GUI frameworks.
 %\vspace{1mm}
 
 %\noindent \textit{\textbf{Finding Bugs in Multithreaded Programs}}
-A rich body of techniques have been developed to detect bugs in multithreaded programs~\cite{Huang:2011:PPC:2001420.2001438, Weeratunge:2010, Huang:2011:EST}.
+A rich body of techniques have been developed to detect bugs in multithreaded programs~\cite{Huang:2011:PPC:2001420.2001438, Naik:2006, Savage:1997, smc}.
 Static analysis tools such as Chord~\cite{Naik:2006}
 explore multithreaded programs. Runtime
 analysis tools such as Eraser~\cite{Savage:1997}  dynamically detect concurrency bugs using lockset
 algorithms or some criteria-based automata. 
-More recently, Goldilocks~\cite{Elmas:2007} uses a
-hybrid model that combines the happens-before and lock-based
-approaches to identify data races based on an execution.
+%More recently, Goldilocks~\cite{Elmas:2007} uses a
+%hybrid model that combines the happens-before and lock-based
+%approaches to identify data races based on an execution.
 However, finding invalid-thread-access errors is quite different than detecting data races.
 A data race occurs when two concurrent threads access
 a shared variable and when at least one access is a write and the threads
@@ -82,7 +80,7 @@ and is much cheaper. Leveraging data race detection to
 improve our technique is future work.
 
 
-An alternative way to find bugs in multithreaded programs is using model checking~\cite{Nori:2010:ESO, Inverardi:2000, Siegel:2008}.
+An alternative way to find bugs in multithreaded programs is using model checking~\cite{smc}.
 By exhaustively exploring the thread scheduling space, a model checker can
 report counterexamples as bug reports.
 Unfortunately, due to the exponential size of the search space,
