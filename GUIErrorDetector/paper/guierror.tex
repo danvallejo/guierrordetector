@@ -1,7 +1,5 @@
 
-
-%\documentclass{acm_proc_article-sp}
-\documentclass{sig-alternate}
+\documentclass{sig-alternate-issta}
 \usepackage{multirow}
 \usepackage{fancyheadings}
 \usepackage{algorithmic}
@@ -15,14 +13,16 @@
 \usepackage{listings, algorithm, algorithmic, graphicx, listing}
 \usepackage{relsize}
 
+\usepackage{balance}
+
 %\usepackage{todonotes}
 \input{macros}
 
 % % Add line between figure and text
  \makeatletter
- \def\topfigrule{\kern3\p@ \hrule \kern -3.4\p@} % the \hrule is .4pt high
- \def\botfigrule{\kern-3\p@ \hrule \kern 2.6\p@} % the \hrule is .4pt high
- \def\dblfigrule{\kern3\p@ \hrule \kern -3.4\p@} % the \hrule is .4pt high
+ %\def\topfigrule{\kern3\p@ \hrule \kern -3.4\p@} % the \hrule is .4pt high
+ %\def\botfigrule{\kern-3\p@ \hrule \kern 2.6\p@} % the \hrule is .4pt high
+ %\def\dblfigrule{\kern3\p@ \hrule \kern -3.4\p@} % the \hrule is .4pt high
  \makeatother
  % If there is a line, you can get away with reducing the separation between
  % figures and text.  Don't do this without the line, though.
@@ -44,8 +44,6 @@
 \newcommand{\annotationnum}{7 }
 \newcommand{\filternum}{11 }
 
-% \newcommand{\smallstep}{\vspace{-2mm}}
-% \newcommand{\tinystep}{\vspace{-1mm}}
 \newcommand{\smallstep}{\relax}
 \newcommand{\tinystep}{\relax}
 
@@ -77,23 +75,28 @@
 
 \begin{document}
 
-\title{Finding Errors in Multithreaded GUI Applications}
-%\subtitle{[Extended Abstract]
-%\titlenote{This work is sponsored by}
+\clubpenalty = 10000
+\widowpenalty = 10000
+\displaywidowpenalty = 10000
 
+\conferenceinfo{ISSTA}{'12, July 15-20, 2012, Minneapolis, MN, USA}
+\CopyrightYear{12}
+\crdata{978-1-4503-1454-1/12/07}
+
+\title{Finding Errors in Multithreaded GUI Applications}
+\numberofauthors{1}
 
 \author{
 \alignauthor Sai Zhang \quad Hao L\"u \quad Michael D. Ernst\\
        \affaddr{Department of Computer Science \& Engineering}\\
-       %\affaddr{1932 Wallamaloo Lane}\\
        \affaddr{University of Washington}\\
        \email{\{szhang, hlv, mernst\}@cs.washington.edu}
 }
 
-%Generating fault-revealing tests for object-oriented programs
 
 \maketitle
-
+\thispagestyle{empty}
+\pagestyle{empty}
 
 \input{abstract}
 
@@ -120,8 +123,10 @@ answering our questions about WALA.
 %part by ABB Corporation and NSF under grant CCF-0963757.
 \vspace{-2mm}
 
+\balance
+
 \bibliographystyle{abbrv}
-\small{
+%\small{
 \bibliography{issta2012}
-}
+%}
 \end{document}
