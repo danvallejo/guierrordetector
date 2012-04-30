@@ -36,7 +36,7 @@ threads except for the UI thread in a multithreaded GUI application
  are called non-UI threads.}\vspace{1mm}
 
 \noindent {\textsc{\textbf{Assumption 2.}}} { We assume that each non-UI
-thread is spawned by the UI thread. Under this assumption,
+thread is (transitively) spawned by the UI thread. Under this assumption,
 we ignore all non-UI threads created by the GUI framework
 before the UI thread has been initialized. That is, all post-initialization
 GUI work occurs in the UI thread. Once the GUI is visible, the
@@ -404,7 +404,7 @@ for programmers to interpret.
 
 %\item
 \textbf{2. Filter Reports with User-Annotated Methods}. Users are
-permitted to explicitly annotate project-specific methods
+permitted to explicitly annotate specific methods
 that will never trigger an error.
 %For example, the Android GUI framework provides a utility method 
 %\CodeIn{runOnUIThread} to check whether the current thread is the UI thread
@@ -412,9 +412,25 @@ that will never trigger an error.
 %this method will be executed on the UI thread via message passing.
 %Thus,
 A reported method call chain containing an annotated  method
-can be safely removed. In our experiments, we produced a list of \filternum
-annotated methods for two subjects (Fennec and MyTracks) because they use a customized
-pattern to interact with the GUI framework.
+can be safely removed. 
+
+In our experiments, 
+we produced a list of \filternum annotated methods for two
+subjects (MyTracks and Fennec), since they employ a customized pattern
+to interact with the GUI framework. For example, in MyTracks, all non-UI
+threads are initialized via using the library method \CodeIn{android.os.}\discretionary{}{}{}\CodeIn{handler.handleCallback}.
+This method can be invoked from any thread and will never cause an
+invalid thread access error, because it checks whether the current
+thread is the UI thread or not before execution. If not,
+this method will be executed asynchronously via
+message passing. 
+
+
+
+
+% we produced a list of \filternum
+%annotated methods for two subjects (Fennec and MyTracks) because they use a customized
+%pattern to interact with the GUI framework.
 
 
 
