@@ -23,8 +23,6 @@ in removing warnings (Section~\ref{sec:filters}).
 \subsection{Subject Programs}
 \label{sec:subjects}
 
-%library code: 1.4 million
-
 We used a set of open-source projects from SourceForge, Google Code,
 and the Eclipse plugin
 marketplace as evaluation subjects. To choose subjects for each supported GUI framework,
@@ -163,16 +161,17 @@ native methods or project-specific GUI interaction patterns were implemented.
 Only SGTPuzzler uses native methods to interact with
 the underlying operating system. For it, we manually checked the possible
 Java methods that a native method may call, and then added \annotationnum \CodeIn{@CalledByNativeMethods}
-annotations for it. Two subjects, MyTracks and Fennec, employ a customized pattern
-to interact with the GUI framework. For example, in MyTracks, all non-UI
-threads are initialized via using the library method \CodeIn{android.os.}\discretionary{}{}{}\CodeIn{handler.handleCallback}.
+annotations for it. 
+%Two subjects, MyTracks and Fennec, employ a customized pattern
+%to interact with the GUI framework. For example, in MyTracks, all non-UI
+%threads are initialized via using the library method \CodeIn{android.os.}\discretionary{}{}{}\CodeIn{handler.handleCallback}.
 % the \CodeIn{safeInvokeXX}
 %method in the XXX subject first checks whether the current thread is the UI-thread, and
 %then determines whether to direct access a GUI object or wrap the code with
 %message passing. 
-We added \filternum user-defined filters for these two subjects.
-%to indicate
-%that they are safe to be invoked from any thread. 
+We also added \filternum user-defined filters for two subjects
+(MyTracks and Fennec), since they use a customized pattern
+to interact with the GUI framework.
 In this experiment, none of the paper
 authors was familiar with the subjects, but we found it was quite easy
 to add extra annotations and user-defined filters. All these
@@ -250,7 +249,8 @@ using standard call graph construction algorithm and our call
 graph construction algorithm in Section~\ref{sec:cgcon} (dealing
 with reflection calls and adding \annotationnum native method annotations
 for SGTPuzzler). The \newbugs errors found in VirgoFTP, FileBunker, ArecaBackup,
-S3dropbox, and SudokuSolver are previously  unknown. As a comparison, the
+S3dropbox, and SudokuSolver are previously  unknown. The rest \oldbugs errors
+in the other programs have been fixed in their succeeding releases. As a comparison, the
 results of the ``Requiring Wrappers'' approach (Section~\ref{sec:straightforward}),
 are shown at the far right.} }
 \end{table*}
@@ -385,8 +385,9 @@ Besides the above two examples, other errors our tool reported are also
 subtle to find. For example, our tool found two new errors in SudokuSolver.
 One error only happens when
 the given Sudoku is unsolvable; and the other one happens
-when  JVM fails to launch the %mail composing window of the
-user's default mail client.% (after a user clicks the "eMail Me" button).
+when the program fails to launch the mail composing window of the
+user's default mail client (i.e., the \CodeIn{java.awt.Desktop.mail()}
+method throws an exception).% (after a user clicks the "eMail Me" button).
 
 We found GUI developers have already
 used design patterns, runtime checks, and testing to avoid violating
@@ -558,16 +559,29 @@ it is infeasible to enumerate all paths
 for a realistic call graph, which often contains thousands of nodes.
 %only a very few amount of paths can be enumerated within a practical amount of time.
 
-Given a sound call graph, exhaustive search is sound because it does not
+Given a sound call graph, suppose that there exists some
+error-revealing path between an entry node E and a UI-accessing node U.  A sound
+search strategy is one that reports some error-revealing path between
+E and U, while  an unsound strategy might report an infeasible
+path between the nodes.  Exhaustive search is sound because it does not
 miss any possible errors.  However, it is impractical.  Compared to
-exhaustive search, using BFS or DFS can be viewed as a heuristic filtering
+exhaustive search, BFS or DFS is unsound because they visit
+every node, but do not traverse \textit{every} path to visit that node.
+Using BFS or DFS can be viewed as a heuristic filtering
 step, akin to the filters of Section~\ref{sec:heuristic}.
+% The heuristics of Section~\ref{sec:heuristic} are
+%more effective at retaining real errors than the search variants.
+%Given a sound call graph, exhaustive search is sound because it does not
+%miss any possible errors.  However, it is impractical.  Compared to
+%exhaustive search, using BFS or DFS can be viewed as a heuristic filtering
+%step, akin to the filters of Section~\ref{sec:heuristic}.
+%The heuristics of Section~\ref{sec:heuristic} are
+%more effective at retaining real errors than the search variants.
+
 %   The algorithm of
 % Figure~\ref{fig:detectalgorithm}, which does multiple BFS traversals, does
 % less pruning, and runs more slowly, than the variant that does one
 % multi-source BFS, but
- The heuristics of Section~\ref{sec:heuristic} are
-more effective at retaining real errors than the search variants.
 
 \vspace{1mm}
 
@@ -671,11 +685,7 @@ physical memory (1GB is allocated for JVM), running Fedora 16.
 For the most time-consuming subject, S3dropbox, our tool finished the whole analysis
 within 252 seconds using the most expensive 1-CFA call graph construction
 algorithm. Analyzing other subjects using different algorithms took less time.
-Call graph construction took 33--91\% of
-the total analysis time.
-%The performance has not been tuned, and we believe
-%that it could be improved further.
-
+Call graph construction took 33--91\% of the total time.
 
 
 \vspace{1mm}
@@ -684,7 +694,7 @@ the total analysis time.
 There are two major threats to validity in our evaluation. 
 One threat is the degree to which the subject programs
 used in our experiment are representative of true practice.
-In our evaluation, we only selected studied subjects from
+In our evaluation, we only selected subjects from
 open-source repositories. Another threat is that we only employed three
 widely-used call graph construction algorithms (i.e., RTA, 0-CFA, and 1-CFA) 
 in our evaluation. Using other 

@@ -8,11 +8,10 @@ We instantiated the proposed technique for four widely-used
 GUI frameworks, namely SWT, Eclipse plugin framework, Swing, and Android;
 and implemented an error detection tool.
 
-%We implemented the proposed technique using the WALA framework~\cite{walatutorial}.
-%Our prototype tool takes Java bytecode as input, 
-%automatically detects potential invalid thread access
-%errors, and scales to realistic programs.  
-
+Our tool is built on top of the WALA framework~\cite{walatutorial}.
+It takes Java bytecode as input, 
+automatically detects potential invalid thread access
+errors, and scales to realistic programs.  
 
 \tinystep
 
@@ -42,7 +41,7 @@ is initialized.
 \smallstep
 
 \item \textbf{UI-accessing nodes:}  the \CodeIn{Widget.checkWidget}
-and \CodeIn{Display.}\discretionary{}{}{}\CodeIn{checkDevice} methods. SWT performs
+and \CodeIn{Display.}\discretionary{}{}{}\CodeIn{check}\discretionary{}{}{}\CodeIn{Device} methods. SWT performs
 runtime checking before accessing a GUI object via these methods.
 If the current thread is a non-UI thread, the \CodeIn{Widget.checkWidget}
 and \CodeIn{Display.checkDevice} methods throw a \CodeIn{RuntimeException}.
@@ -167,13 +166,9 @@ Instantiating our general technique to  a specific framework
 requires moderate human effort. We wrote around 500 lines of Java code in total to achieve
 the above four instantiations.
 
-\subsection{Implementation Details}
+\subsection{Android-specific Implementation Details}
 
-We implemented our error detection tool using
-the WALA framework~\cite{walatutorial}.
-Our tool takes Java bytecode as input, 
-automatically detects potential invalid thread access
-errors, and scales to realistic programs.  
+
 We implemented the reflection-aware call graph construction
  algorithm (Section~\ref{sec:cg}) using WALA's \textit{bypass logic}.
 Unlike other tools~\cite{Payet:2011:SAA:2032266.2032299}, our tool
