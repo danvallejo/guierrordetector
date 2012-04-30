@@ -108,7 +108,7 @@ UI interactions that can trigger the bug;  it took developers 2 years
 to fix Eclipse bug 51757 and verify the patch.
 
 \begin{figure}[t]
-\hspace{6mm}\small{In class: org.mozilla.gecko.gfx.LayerView}
+\hspace{6mm}{In class: org.mozilla.gecko.gfx.LayerView}
 \vspace{-2mm}
 \begin{CodeOut}
 \begin{alltt}
@@ -121,7 +121,7 @@ to fix Eclipse bug 51757 and verify the patch.
      \ttrcb
 \end{alltt}
 \end{CodeOut}
-\hspace{6mm} \small{In Android library class: android.opengl.GLSurfaceView}
+\hspace{6mm} {In Android library class: android.opengl.GLSurfaceView}
 \vspace{-2mm}
 \begin{CodeOut}
 \begin{alltt}
@@ -132,7 +132,7 @@ to fix Eclipse bug 51757 and verify the patch.
      \ttrcb
 \end{alltt}
 \end{CodeOut}
- \hspace{6mm}\small{In class: org.mozilla.gecko.gfx.LayerRenderer}
+ \hspace{6mm}{In class: org.mozilla.gecko.gfx.LayerRenderer}
 \vspace{-2mm}
 \begin{CodeOut}
 \begin{alltt}
@@ -190,7 +190,7 @@ by wrapping line 222 inside a \CodeIn{post} message-passing method\footnote{The
 a standard way to send asynchronous messages to the UI-thread.}, as follows:
 
 {\vspace{2mm}
-\hspace{3mm}\small{In class: org.mozilla.gecko.gfx.LayerRenderer}
+\hspace{3mm}{In class: org.mozilla.gecko.gfx.LayerRenderer}
 \vspace{-2mm}
 \begin{CodeOut}
 \begin{alltt}
@@ -271,7 +271,7 @@ between methods, and \CodeIn{checkThread} is an Android library
 method  that checks whether the current thread is the
 event dispatching thread before accessing a GUI object.
 8 more methods in the call chain, shown as
-``\CodeIn{\small{...}}" above, are omitted for brevity.
+``\CodeIn{{...}}" above, are omitted for brevity.
 }} %\vspace{-5mm}
 \end{figure}
 
@@ -284,7 +284,7 @@ The warning is in the form of a method
 call chain from the starting point.
 As an example, Figure~\ref{fig:report} shows a report produced
 by our static analysis for the buggy code in Figure~\ref{fig:androiderror}.
-This report clearly indicates how a new, non-UI thread is spawned and
+This report indicates how a new, non-UI thread is spawned and
 accesses GUI objects. The generated report allows  developers to
 inspect the method call chain, understand how the error
 could be triggered, and fix it if it is a real bug.
@@ -359,8 +359,8 @@ call graph construction algorithm (Section~\ref{sec:technique}).
 \item \textbf{Implementation.} We implemented our technique and
 instantiated it for four
 popular GUI frameworks: SWT, Eclipse plugin, Swing, and Android (Section~\ref{sec:implementation}). Our
-tool implementation is publicly available at
-{\smaller\url{http://guierrordetector.googlecode.com}}.
+implementation is publicly available at
+{\url{http://guierrordetector.googlecode.com}}.
 
 \tinystep
 

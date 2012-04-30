@@ -32,9 +32,8 @@ we first searched for the framework keywords (e.g., ``Java Swing'' or ``Java SWT
 in the above three source repositories, and then selected subjects based on the following
 criteria. First, the subject must be a Java application, not
 an open library. Second, the subject must use multithreading in its implementation.
-Third, the subject must have undergone at least two years of active development,
-and it is listed in the first 3 result pages based on popularity. This permits us
-to exclude immature subjects that may contain obvious errors.
+Third, the subject is listed in the first 5 result pages.
+This permits us to exclude immature subjects that may contain obvious errors.
 
 The subjects used in our experiment (Table~\ref{table:subjects})
 include end-user applications, programming tools, and games. 
@@ -277,14 +276,14 @@ are redundant. Section~\ref{sec:reflectionaware} compares with other call graph
 construction algorithms.
 
 We submitted all \newbugs new errors
-to the subject developers. As of February 2012, 1 error in S3dropbox has been confirmed,
-we have reproduced 4 errors, and 2 errors in FileBunker and ArecaBackup
+to the subject developers. As of April 2012, 1 error in S3dropbox has been confirmed,
+we have reproduced 3 errors, and 3 errors in VirgoFTP, FileBunker and ArecaBackup
 had not yet been verified by the developers.
 
 
 
 \begin{figure}[t]
-\hspace{4mm}\small{In class: com.tomczarniecki.s3.gui.DeleteBucketAction}
+\hspace{4mm}{In class: com.tomczarniecki.s3.gui.DeleteBucketAction}
 \vspace{-2mm}
 \begin{CodeOut}
 \begin{alltt}
@@ -341,7 +340,7 @@ or memory-consistency errors.
 
 
 \begin{figure}[t]
-\hspace{4mm}\small{In class: com.eclipserunner.views.impl.RunnerView}
+\hspace{4mm}{In class: com.eclipserunner.views.impl.RunnerView}
 \vspace{-2mm}
 \begin{CodeOut}
 \begin{alltt} 
@@ -479,7 +478,7 @@ This is because the error-related GUI object (\CodeIn{msgTextView}) in MyTracks 
 reflectively as follows.
 
 {\vspace{2mm}
-\hspace{3mm}\small{In class: com.google.android.apps.mytracks.StatsUtilities}
+\hspace{3mm}{In class: com.google.android.apps.mytracks.StatsUtilities}
 \vspace{-2mm}
 \begin{CodeOut}
 \begin{alltt}
@@ -685,7 +684,7 @@ the total analysis time.
 There are two major threats to validity in our evaluation. 
 One threat is the degree to which the subject programs
 used in our experiment are representative of true practice.
-In our evaluation, the studied subjects were selected with a bias towards popularity from
+In our evaluation, we only selected studied subjects from
 open-source repositories. Another threat is that we only employed three
 widely-used call graph construction algorithms (i.e., RTA, 0-CFA, and 1-CFA) 
 in our evaluation. Using other 
