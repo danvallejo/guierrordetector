@@ -23,22 +23,25 @@ in removing warnings (Section~\ref{sec:filters}).
 \subsection{Subject Programs}
 \label{sec:subjects}
 
-We used a set of open-source projects from SourceForge, Google Code
+We used 10 open-source projects from SourceForge, Google Code
 and the Eclipse plugin marketplace as evaluation subjects. 
 
 Five subjects (EclipseRunner, HudsonEclipse, SGTPuzzler, Fennec, and MyTracks)
-have known invalid thread access errors, all of which have been fixed later.
-We ran our tool on the reported buggy versions to check whether it
-can correctly identify the existing errors. 
-We selected the other five subjects by first searching for the
+are selected because they have known invalid thread access errors (1 error per subject) and
+all errors have been fixed in later revisions.
+We used the buggy versions to check whether our tool
+can correctly identify those known errors. 
+For the other five subjects, we selected them
+by first searching for the
 framework keywords (e.g., ``Java Swing'' or ``Java SWT'')
 in the above source repositories, and then chosing subjects based on the following
 criteria. First, the subject must be a Java application, not
 an open library. Second, the subject must use multithreading in its implementation.
 Third, the subject is listed in the first 5 result pages.
 This permits us to exclude immature subjects that may contain obvious errors.
-We ran our tool on the latest stable release of each project to check whether
-it can find any new errors.
+For each selected subject, we ran our tool on the latest stable release to find new errors.
+%of each project to check whether
+%it can find any new errors.
 
 The subjects used in our experiment (Table~\ref{table:subjects})
 include end-user applications, programming tools, and games. 
@@ -163,29 +166,23 @@ used two configurations: with and without our enhancements
 (Section~\ref{sec:cgcon}).  We did not use more expensive algorithms like $k$-CFA ($k >$ 1),
 because they do not scale to our subject programs.
 
-We first inspected the source code of each subject to determine whether any
-native methods or project-specific GUI interaction patterns were implemented.
-Only SGTPuzzler uses native methods to interact with
+%We first inspected the source code of each subject to determine whether any
+%native methods or project-specific GUI interaction patterns were implemented.
+
+Subject SGTPuzzler uses native methods to interact with
 the underlying operating system. For it, we manually checked the possible
 Java methods that a native method may call, and then added \annotationnum \CodeIn{@CalledByNativeMethods}
 annotations for it. 
-%Two subjects, MyTracks and Fennec, employ a customized pattern
-%to interact with the GUI framework. For example, in MyTracks, all non-UI
-%threads are initialized via using the library method \CodeIn{android.os.}\discretionary{}{}{}\CodeIn{handler.handleCallback}.
-% the \CodeIn{safeInvokeXX}
-%method in the XXX subject first checks whether the current thread is the UI-thread, and
-%then determines whether to direct access a GUI object or wrap the code with
-%message passing. 
-We also added \filternum user-defined filters for two subjects
-(MyTracks and Fennec), since they use a customized pattern
-to interact with the GUI framework.
+During experiment, we found two subjects (MyTracks and Fennec)
+use a customized pattern to interact with the GUI framework.
+For them, we added \filternum user-defined filters.
 In this experiment, none of the paper
 authors was familiar with the subjects, but we found it was quite easy
 to add extra annotations and user-defined filters. All these
 manual parts took less than a total of 60 minutes.
 
 For all \subnum programs, we manually determined the validity of each output warning
-by either searching the bug repository to check it with the bug-fixing revision history,
+by either searching the bug repository to check bug-fixing revision histories,
 or submitting a new bug report, or writing a test driver to reproduce
 the error.
 
@@ -275,14 +272,15 @@ are shown at the far right.} }
 As shown in Table~\ref{table:results}, our tool found
 errors in each subject. Using the 1-CFA
 call graph algorithm, our tool issued 22 warnings, among
-which \bugs warnings reveal \bugs distinct errors (\newbugs were previously unknown),
+which \bugs warnings reveal \bugs distinct errors (\newbugs were previously unknown,
+and the \oldbugs known errors were correctly identified),
 2 warnings are false positives, and the remaining 8 warnings
 are redundant. Section~\ref{sec:reflectionaware} compares with other call graph
 construction algorithms.
 
 %After checking against existing patches, we found
-Our tool correctly identified the \oldbugs known errors, as compared to
-their patches.
+%Our tool correctly identified the \oldbugs known errors, as compared to
+%their patches.
 We submitted all \newbugs new errors
 to the subject developers. As of April 2012, 1 error in S3dropbox has been confirmed,
 we have reproduced 3 errors, and 3 errors in VirgoFTP, FileBunker and ArecaBackup
