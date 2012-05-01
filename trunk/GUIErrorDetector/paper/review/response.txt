@@ -22,6 +22,3 @@ rich history of testing and analysis problems being cast as reachability
 (the work of Tom Reps is one example).  We believe that other problems,
 such as detecting security vulnerabilities, can also be formulated as path
 reachability.  We have not done so in the current paper.
-
-
-
