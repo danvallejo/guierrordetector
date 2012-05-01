@@ -6,12 +6,7 @@
 
 We instantiated the proposed technique for four widely-used
 GUI frameworks, namely SWT, Eclipse plugin framework, Swing, and Android;
-and implemented an error detection tool.
-
-Our tool is built on top of the WALA framework~\cite{walatutorial}.
-It takes Java bytecode as input, 
-automatically detects potential invalid thread access
-errors, and scales to realistic programs.  
+and implemented an error detection tool on top of the WALA framework~\cite{walatutorial}.
 
 \tinystep
 
@@ -162,9 +157,11 @@ and \CodeIn{View.postDelay}, which execute code on the UI thread.
 
 \tinystep
 
-Instantiating our general technique to  a specific framework
-requires moderate human effort. We wrote around 500 lines of Java code in total to achieve
-the above four instantiations.
+Given a GUI application using a supported framework, our tool 
+takes its Java bytecode as input, 
+plugs in the corresponding instantiation parameters at runtime,
+and automatically detects potential invalid thread access
+errors.
 
 \subsection{Android-specific Implementation Details}
 
@@ -175,7 +172,7 @@ Unlike other tools~\cite{Payet:2011:SAA:2032266.2032299}, our tool
 does not require a separate pass for program instrumentation; instead, it
 parses the configuration file in an Android application,
 and then intercepts the call graph construction
-process on-the-fly to replace all reflection calls with object creation statements.
+process on-the-fly to replace all reflection calls with object creation expressions.
 Since Android applications are often fully encrypted and shipped in Dalvik
 bytecode as a single apk file, our tool first uses
 android-apktool~\cite{apktool} to

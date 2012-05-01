@@ -23,15 +23,22 @@ in removing warnings (Section~\ref{sec:filters}).
 \subsection{Subject Programs}
 \label{sec:subjects}
 
-We used a set of open-source projects from SourceForge, Google Code,
-and the Eclipse plugin
-marketplace as evaluation subjects. To choose subjects for each supported GUI framework,
-we first searched for the framework keywords (e.g., ``Java Swing'' or ``Java SWT'')
-in the above three source repositories, and then selected subjects based on the following
+We used a set of open-source projects from SourceForge, Google Code
+and the Eclipse plugin marketplace as evaluation subjects. 
+
+Five subjects (EclipseRunner, HudsonEclipse, SGTPuzzler, Fennec, and MyTracks)
+have known invalid thread access errors, all of which have been fixed later.
+We ran our tool on the reported buggy versions to check whether it
+can correctly identify the existing errors. 
+We selected the other five subjects by first searching for the
+framework keywords (e.g., ``Java Swing'' or ``Java SWT'')
+in the above source repositories, and then chosing subjects based on the following
 criteria. First, the subject must be a Java application, not
 an open library. Second, the subject must use multithreading in its implementation.
 Third, the subject is listed in the first 5 result pages.
 This permits us to exclude immature subjects that may contain obvious errors.
+We ran our tool on the latest stable release of each project to check whether
+it can find any new errors.
 
 The subjects used in our experiment (Table~\ref{table:subjects})
 include end-user applications, programming tools, and games. 
@@ -178,8 +185,7 @@ to add extra annotations and user-defined filters. All these
 manual parts took less than a total of 60 minutes.
 
 For all \subnum programs, we manually determined the validity of each output warning
-by either searching the
-bug repository to check whether the same error has been reported before,
+by either searching the bug repository to check it with the bug-fixing revision history,
 or submitting a new bug report, or writing a test driver to reproduce
 the error.
 
@@ -249,8 +255,7 @@ using standard call graph construction algorithm and our call
 graph construction algorithm in Section~\ref{sec:cgcon} (dealing
 with reflection calls and adding \annotationnum native method annotations
 for SGTPuzzler). The \newbugs errors found in VirgoFTP, FileBunker, ArecaBackup,
-S3dropbox, and SudokuSolver are previously  unknown. The rest \oldbugs errors
-in the other programs have been fixed in their succeeding releases. As a comparison, the
+S3dropbox, and SudokuSolver are previously  unknown. As a comparison, the
 results of the ``Requiring Wrappers'' approach (Section~\ref{sec:straightforward}),
 are shown at the far right.} }
 \end{table*}
@@ -267,14 +272,17 @@ are shown at the far right.} }
 \subsubsection{Errors in Multithreaded GUI Applications}
 \label{sec:errors}
 
-As shown in Table~\ref{table:results},  our tool found
-real errors in each subject program. Using the 1-CFA
+As shown in Table~\ref{table:results}, our tool found
+errors in each subject. Using the 1-CFA
 call graph algorithm, our tool issued 22 warnings, among
 which \bugs warnings reveal \bugs distinct errors (\newbugs were previously unknown),
 2 warnings are false positives, and the remaining 8 warnings
 are redundant. Section~\ref{sec:reflectionaware} compares with other call graph
 construction algorithms.
 
+%After checking against existing patches, we found
+Our tool correctly identified the \oldbugs known errors, as compared to
+their patches.
 We submitted all \newbugs new errors
 to the subject developers. As of April 2012, 1 error in S3dropbox has been confirmed,
 we have reproduced 3 errors, and 3 errors in VirgoFTP, FileBunker and ArecaBackup
@@ -387,7 +395,7 @@ One error only happens when
 the given Sudoku is unsolvable; and the other one happens
 when the program fails to launch the mail composing window of the
 user's default mail client (i.e., the \CodeIn{java.awt.Desktop.mail()}
-method throws an exception).% (after a user clicks the "eMail Me" button).
+method throws an exception after a user clicks the "eMail Me" button).
 
 We found GUI developers have already
 used design patterns, runtime checks, and testing to avoid violating
@@ -484,8 +492,8 @@ reflectively as follows.
 \begin{CodeOut}
 \begin{alltt}
 97.  public void setLatLong(int id, double d) \ttlcb
-98.     TextView msgTextView = (TextView) activity.\textbf{findViewById}(id);
-99.     msgTextView.setText(LAT\_LONG\_FORMAT.format(d));
+98.    TextView msgTextView = (TextView) activity.\textbf{findViewById}(id);
+99.    msgTextView.setText(LAT\_LONG\_FORMAT.format(d));
 100. \ttrcb
 \end{alltt}
 \end{CodeOut}}
@@ -507,8 +515,8 @@ annotations (Section~\ref{sec:annotation}).
 \vspace{1mm}
 
 \noindent \textbf{\textit{Summary.}} Using the 1-CFA 
-algorithm finds more errors than 0-CFA and RTA, and our call
-graph construction algorithm helps to find errors in some
+algorithm finds more errors than 0-CFA and RTA, and our reflection-aware
+call graph construction algorithm helps to find errors in some
 Android applications.
 
 
@@ -517,7 +525,7 @@ Android applications.
 
 The error detection algorithm in Figure~\ref{fig:detectalgorithm} uses a
 separate BFS for each entry node.  This section evaluates three variants:
-a multiple-source BFS; a separate DFS for each entry node; and exhaustive
+a multi-source BFS; a separate DFS for each entry node; and exhaustive
 search.
 
 The first variant uses a single BFS, but starting at multiple sources.  It deletes
@@ -564,7 +572,7 @@ error-revealing path between an entry node E and a UI-accessing node U.  A sound
 search strategy is one that reports some error-revealing path between
 E and U, while  an unsound strategy might report an infeasible
 path between the nodes.  Exhaustive search is sound because it does not
-miss any possible errors.  However, it is impractical.  Compared to
+miss any possible paths.  However, it is impractical.  Compared to
 exhaustive search, BFS or DFS is unsound because they visit
 every node, but do not traverse \textit{every} path to visit that node.
 Using BFS or DFS can be viewed as a heuristic filtering
@@ -589,25 +597,6 @@ step, akin to the filters of Section~\ref{sec:heuristic}.
 using multi-source BFS, DFS, or exhaustive search.
 
 
-\subsubsection{Evaluating Error Filters}
-\label{sec:filters}
-
-Table~\ref{table:filters} measures the effectiveness of the
-error filters of Section~\ref{sec:heuristic}.
-The five error filters removed 99.96\% of the reported warnings as likely false positives
-or redundant warnings. Specifically, two sound filters 1 and 2 
-removed 34.44\% of the warnings, and three heuristic filters 3, 4, and 5
-removed a further 65.52\% of the warnings. The most effective filter is
-\#4, for removing reports with the same head methods from the entry node to \CodeIn{Thread.start()}.
-
-\vspace{1mm}
-
-\noindent \textbf{\textit{Summary.}} Our proposed error filters are 
-effective in reducing the number of warnings.
-%Although a static analysis may
-%issue false positives or redundant reports, a set of well-designed
-%error filters can remove most of them.
-%Heuristic filter, effective.
 
 \begin{table}[t]
 \begin{center}
@@ -669,8 +658,29 @@ Column ``$F_{i,...,j}$'' represents the number of remaining warnings after apply
 the $i$th to $j$th filters as defined in Section~\ref{sec:heuristic}.
 The numbers in the last column are the same as the subcolumn ``\#Warning"
 under column ``1-CFA'' in Table~\ref{table:results}.
-} }
+} } \vspace{-2mm}
 \end{table}
+
+
+\subsubsection{Evaluating Error Filters}
+\label{sec:filters}
+
+Table~\ref{table:filters} measures the effectiveness of the
+error filters of Section~\ref{sec:heuristic}.
+The five error filters removed 99.96\% of the reported warnings as likely false positives
+or redundant warnings. Specifically, two sound filters 1 and 2 
+removed 34.44\% of the warnings, and three heuristic filters 3, 4, and 5
+removed a further 65.52\% of the warnings. The most effective filter is
+\#4, for removing reports with the same head methods from the entry node to \CodeIn{Thread.start()}.
+
+\vspace{1mm}
+
+\noindent \textbf{\textit{Summary.}} Our proposed error filters are 
+effective in reducing the number of warnings.
+%Although a static analysis may
+%issue false positives or redundant reports, a set of well-designed
+%error filters can remove most of them.
+%Heuristic filter, effective.
 
 
 \subsection{Discussion}
@@ -681,7 +691,7 @@ under column ``1-CFA'' in Table~\ref{table:results}.
 has been evaluated on \subnum subjects with over \totaloc LOC and frameworks
 with 1.4 MLOC, showing good scalability. Our evaluations
 were conducted on a 2.67GHz Intel Core PC with 4GB
-physical memory (1GB is allocated for JVM), running Fedora 16.
+physical memory (1GB is allocated for JVM), running Windows 7.
 For the most time-consuming subject, S3dropbox, our tool finished the whole analysis
 within 252 seconds using the most expensive 1-CFA call graph construction
 algorithm. Analyzing other subjects using different algorithms took less time.

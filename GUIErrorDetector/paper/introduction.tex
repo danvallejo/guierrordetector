@@ -152,7 +152,7 @@ spawns a new thread on line 283. This newly created, non-UI thread calls back me
 causing an invalid thread access error. Our tool
 finds this error and generates a report as shown in
 Figure~\ref{fig:report}.
-}} %\vspace{-5mm}
+}} \vspace{-1.8mm}
 \end{figure}
 
 The invalid thread access error is not unique to the SWT framework. Other recent GUI frameworks
@@ -309,7 +309,7 @@ they work well and make our technique more usable.
 \subsection{Technique Instantiation and Evaluation}
 
 
-We implemented an invalid-thread-error detection tool that supports
+We implemented an invalid-thread-access-error detection tool that supports
 four popular GUI frameworks: SWT, Eclipse plugin framework,
 Swing, and Android. Swing and SWT are the
 two dominant GUI frameworks for desktop Java applications.
@@ -359,7 +359,7 @@ call graph construction algorithm (Section~\ref{sec:technique}).
 \item \textbf{Implementation.} We implemented our technique and
 instantiated it for four
 popular GUI frameworks: SWT, Eclipse plugin, Swing, and Android (Section~\ref{sec:implementation}). Our
-implementation is publicly available at
+implementation is publicly available at:
 {\url{http://guierrordetector.googlecode.com}}.
 
 \tinystep

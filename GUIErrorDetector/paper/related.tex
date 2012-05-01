@@ -27,7 +27,7 @@ However, testing is often insufficient to detect many potential
 errors in a GUI application due to the huge space of possible UI interactions.
 %The large number of possible interactions
 %requires a large number of test inputs that require substantial human effort.
-In contrast, a static analysis can explore all paths to find potential errors missed by testing.
+In contrast, a sound static analysis can explore all paths to find potential errors missed by testing.
 Compared to software testing, a static analysis tool such as ours may
 report false positives and redundant warnings due to its conservative nature.
 In our experiments, simple error filters reduced the number of warnings to
@@ -47,7 +47,7 @@ analysis framework for Android programs based on  abstract
 interpretation. Their framework focuses on the Android platform, and
  consists of 7 existing static analyses such as
 nullness analysis, class analysis, and termination analysis.  However,
-their framework does not support detecting invalid-thread-access
+their framework does not support detecting invalid thread access
 errors, and uses a quite different abstraction than ours.
 To the best of our knowledge, we are the first to address the invalid
 thread access error detection problem for multithreaded GUI applications, and
@@ -64,16 +64,13 @@ A rich body of techniques have been developed to detect bugs in multithreaded pr
 Static analysis tools such as Chord~\cite{Naik:2006}
 explore multithreaded programs. Runtime
 analysis tools such as Eraser~\cite{Savage:1997}  dynamically detect concurrency bugs using lockset
-algorithms or some criteria-based automata. 
-%More recently, Goldilocks~\cite{Elmas:2007} uses a
-%hybrid model that combines the happens-before and lock-based
-%approaches to identify data races based on an execution.
-However, finding invalid-thread-access errors is quite different than detecting data races.
+algorithms.
+However, finding invalid thread access errors is quite different than detecting data races.
 A data race occurs when two concurrent threads access
 a shared variable and when at least one access is a write and the threads
 use no explicit mechanism to prevent the accesses from being simultaneous. In contrast,
 an invalid thread access error occurs when a non-UI thread accesses (reads or writes) a GUI object.
-Unlike detecting data races, finding an invalid-thread-access error does not require monitoring every shared-memory
+Unlike detecting data races, finding an invalid thread access error does not require monitoring every shared-memory
 reference to verify that consistent locking behavior is observed among different threads.
 A technique only needs to track whether a non-UI thread can accesses a GUI object or not,
 and is much cheaper. Leveraging data race detection to 
@@ -111,7 +108,7 @@ several low-cost call graph construction algorithms for Java.
 Sundaresan et al.~\cite{Sundaresan:2000} went beyond the
 RTA~\cite{rta} approach and used type propagation
 to build a more precise call graph.  However,
-those algorithms do not build a complete call graph in the presence of reflection.
+those algorithms do not build a sound call graph in the presence of reflection.
 As reflected in our experiments, using standard call graph algorithms
 misses errors in some Android applications.
 
@@ -122,11 +119,7 @@ attempts to infer additional information stored in string constants to resolve
 reflective calls statically. Their approach focuses on standard Java
 reflection calls (e.g., \CodeIn{Class.forName}) instead of
 framework-specific ones (e.g., \CodeIn{View.find-\\ViewById}).
-The standard call graph algorithms implemented in WALA, which we used
-in our experiments, actually handles standard Java
-reflection calls as~\cite{Livshits:2005} does, but still fails to build
-a sufficiently complete call graph for
-Android applications. TamiFlex~\cite{Bodden:2011}, a pure dynamic
+TamiFlex~\cite{Bodden:2011}, a pure dynamic
 approach, records all reflectively-created class instances
 by intercepting JVM system calls, and re-inserts those recorded 
 class into a program. However, TamiFlex requires a set of representative

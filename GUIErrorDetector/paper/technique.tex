@@ -422,8 +422,7 @@ threads are initialized via using the library method \CodeIn{android.os.}\discre
 This method can be invoked from any thread and will never cause an
 invalid thread access error, because it checks whether the current
 thread is the UI thread or not before execution. If not,
-this method will be executed asynchronously via
-message passing. 
+this method will use safe UI methods to run the code in the UI thread.
 
 
 
