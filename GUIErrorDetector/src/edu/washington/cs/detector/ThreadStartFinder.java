@@ -17,6 +17,7 @@ import com.ibm.wala.util.graph.Graph;
 import edu.washington.cs.detector.guider.CGTraverseDefaultGuider;
 import edu.washington.cs.detector.guider.CGTraverseGuider;
 import edu.washington.cs.detector.util.Log;
+import edu.washington.cs.detector.util.Utils;
 
 /**
  * Another way for comparison is to find all paths between 2 nodes
@@ -120,7 +121,7 @@ public class ThreadStartFinder {
 			}
 		}
 		
-		//just check whether the algorithm has found every reachable start node
+		//just check whether the algorithm has found every start node
 		//this is just for debugging purpose which let users know some starts are not reachable
 		if(check_find_all_starts) {
 			Collection<CGNode> allStarts = getAllThreadStartNodes(this.cg);
@@ -131,7 +132,21 @@ public class ThreadStartFinder {
 			Log.logln("All starts: " + allStarts);
 			Log.logln("All traversed: " + traversedStarts);
 			Log.logln("There are: " + allStarts.size()
-					+ ", but the algorithm only traverses: " + traversedStarts.size() + " of them.");
+					+ ", but  only : " + traversedStarts.size() + " of them are reachable.");
+			//processing other starts
+			Collection<CGNode> otherStarts = new LinkedHashSet<CGNode>();
+			for(CGNode start : allStarts) {
+				if(!traversedStarts.contains(start)) {
+					otherStarts.add(start);
+				}
+			}
+			for(CGNode otherStart : otherStarts) {
+				CallChainNode startCallChainNode = findPathByBFS(this.cg, this.startPoint, otherStart);
+				if(startCallChainNode != null) {
+					threadStarts.add(startCallChainNode);
+					Log.logln("Add new reachable start: " + otherStart);
+				}
+			}
 		}
 		
 		return threadStarts;
@@ -154,5 +169,56 @@ public class ThreadStartFinder {
 			return true;
 		}
 		return false;
+	}
+	
+	//FIXME redundant code below
+	public static CallChainNode findPathByBFS(Graph<CGNode> cg, CGNode start, CGNode dest) {
+        Map<CGNode, CallChainNode> cgNodeMap = new LinkedHashMap<CGNode, CallChainNode>();
+		
+		//keep track of all visited cg nodes
+		Set<CGNode> visited = new HashSet<CGNode>();
+		//do a BFS to find all reachable start
+		List<CGNode> queue = new LinkedList<CGNode>();
+		
+		queue.add(start);
+		cgNodeMap.put(start, new CallChainNode(start));
+		
+		while(!queue.isEmpty()) {
+			int removeIndex = 0;
+			CGNode node = queue.remove(removeIndex);
+			
+			Utils.checkTrue(cgNodeMap.containsKey(node));
+			CallChainNode chainNode = cgNodeMap.get(node);
+			
+			//if it is a starting node
+			if(node.equals(dest)) {
+				return chainNode;
+			}
+			
+			if(visited.contains(node)) {
+				continue;
+			} else {
+			    visited.add(node);
+			}
+
+			//do the next level
+			Iterator<CGNode> it = cg.getSuccNodes(node);
+			while(it.hasNext()) {
+				CGNode succNode = it.next();
+				//keep traversing
+				queue.add(succNode);
+				//check if it is already added
+				//It should be removed, other wise it will miss a few paths
+				// (1)  a() ->b() -> start()
+				// (2)  a() ->c() -> start()
+				//the start() method should correspond to two different callchainnode objects
+				//if(!cgNodeMap.containsKey(succNode)) {
+					cgNodeMap.put(succNode, new CallChainNode(succNode, chainNode));
+				//}
+			}
+		}
+		
+		//not reachable
+		return null;
 	}
 }
