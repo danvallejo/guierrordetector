@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import com.ibm.wala.core.tests.callGraph.CallGraphTestUtil;
 import com.ibm.wala.ipa.callgraph.propagation.SSAPropagationCallGraphBuilder;
+import com.ibm.wala.ipa.summaries.BypassMethodTargetSelector;
 import com.ibm.wala.util.io.FileProvider;
 
 import edu.washington.cs.detector.CGBuilder.CG;
@@ -34,6 +35,22 @@ public class TestTamingReflection extends TestCase {
 		builder.buildCG();
 		
 		PDFViewer.viewCG("reflection.pdf", builder.getAppCallGraph());
+	}
+	
+     public void testReflectionContext() throws IOException {
+		
+//		SSAPropagationCallGraphBuilder.turnOnDebug();
+//    	 BypassMethodTargetSelector.DEBUG = true;
+		
+		String appPath =  TestCommons.testfolder + "tamingreflectioncontext";
+		CGBuilder builder = new CGBuilder(appPath, FileProvider.getFile(CallGraphTestUtil.REGRESSION_EXCLUSIONS));
+		
+//		builder.setByPassFile("reflectioncontext.xml");
+		
+		builder.setCGType(CG.OneCFA);
+		builder.buildCG();
+		
+		PDFViewer.viewCG("reflectioncontext.pdf", builder.getAppCallGraph());
 	}
 
 }
