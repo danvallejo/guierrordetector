@@ -15,6 +15,7 @@ import edu.washington.cs.detector.AnomalyCallChain;
 import edu.washington.cs.detector.CGBuilder;
 import edu.washington.cs.detector.CGEntryManager;
 import edu.washington.cs.detector.CGBuilder.CG;
+import edu.washington.cs.detector.ThreadStartFinder;
 import edu.washington.cs.detector.UIAnomalyDetector;
 import edu.washington.cs.detector.guider.CGTraverseAndroidGuider;
 import edu.washington.cs.detector.guider.CGTraverseExploreClientRunnableStrategy;
@@ -140,6 +141,7 @@ public class TestMozillaFirefox extends AbstractAndroidTest {
 //			type = CG.RTA;
 	
 //			UIAnomalyDetector.setToUseDFS();
+//			ThreadStartFinder.check_find_all_starts = true;
 			
 			long startT = System.currentTimeMillis();
 		    List<AnomalyCallChain> chains = super.findErrorsInAndroidApp(type, ui2startGuider, start2checkGuider);

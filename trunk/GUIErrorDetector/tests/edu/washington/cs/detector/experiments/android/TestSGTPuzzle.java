@@ -18,6 +18,7 @@ import edu.washington.cs.detector.CGEntryManager;
 import edu.washington.cs.detector.CallChainFilter;
 import edu.washington.cs.detector.CGBuilder.CG;
 import edu.washington.cs.detector.NativeMethodConnector;
+import edu.washington.cs.detector.ThreadStartFinder;
 import edu.washington.cs.detector.UIAnomalyDetector;
 import edu.washington.cs.detector.experiments.filters.RemoveNoClientClassStrategy;
 import edu.washington.cs.detector.experiments.filters.RemoveNonClientHeadStrategy;
@@ -92,6 +93,8 @@ public class TestSGTPuzzle extends AbstractAndroidTest {
 //		start2checkGuider.addMethodGuidance("java.lang.Thread.start", "name.boyle.chris.sgtpuzzles.SGTPuzzles$9");
 		start2checkGuider.addExclusionGuidance("android.webkit");
 		start2checkGuider.addExclusionGuidance("android.os.HandlerThread");
+		
+		ThreadStartFinder.check_find_all_starts = true;
 		
 		//parse the native annotation
 		NativeMethodConnector connector = new NativeMethodConnector();

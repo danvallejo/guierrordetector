@@ -13,6 +13,7 @@ import edu.washington.cs.detector.AnomalyCallChain;
 import edu.washington.cs.detector.CGBuilder;
 import edu.washington.cs.detector.CGEntryManager;
 import edu.washington.cs.detector.CallChainFilter;
+import edu.washington.cs.detector.ThreadStartFinder;
 import edu.washington.cs.detector.UIAnomalyDetector;
 import edu.washington.cs.detector.UIAnomalyMethodFinder;
 import edu.washington.cs.detector.CGBuilder.CG;
@@ -99,10 +100,19 @@ public class TestMytracksAndroid extends AbstractAndroidTest {
 		CGTraverseExploreClientRunnableStrategy start2checkGuider = new CGTraverseExploreClientRunnableStrategy(guiderArray); 
 			//new CGTraverseOnlyClientRunnableStrategy();
 		//start2checkGuider.addMethodGuidance("java.lang.Thread.start", "android.os.HandlerThread.run");
+		
 		start2checkGuider.addMethodGuidance("android.os.Handler.dispatchMessage", "android.os.Handler.handleCallback");
 		start2checkGuider.addMethodGuidance("android.os.Handler.handleCallback", "com.google.android.apps.mytracks.content");
-//		start2checkGuider.addMethodGuidance("android.os.Handler.handleCallback", "com.google.android.apps.mytracks.content.TrackDataHub$6");
 //		UIAnomalyMethodFinder.DEBUG = true;
+		
+//		ThreadStartFinder.check_find_all_starts = true;
+		
+//		start2checkGuider.addExclusionGuidance("com.google.android.apps.mytracks.io");
+//		start2checkGuider.addExclusionGuidance("com.google.android.apps.mytracks.services");
+//		start2checkGuider.addExclusionGuidance("com.google.android.apps.mytracks.MyTracks$");
+//		start2checkGuider.addExclusionGuidance("com.google.android.apps.mytracks.StatsActivity$");
+//		start2checkGuider.addExclusionGuidance("android.webkit.");
+//		start2checkGuider.addExclusionGuidance("handleMessage");
 		
 		try {
 //			super.setRunnaiveApproach(true);
@@ -110,21 +120,26 @@ public class TestMytracksAndroid extends AbstractAndroidTest {
 			super.setByfileName("mytracks.xml");
 			
 			CG type = CG.RTA;
-			type = CG.TempZeroCFA;
+//			type = CG.TempZeroCFA;
 			type = CG.OneCFA;
 			
-			UIAnomalyDetector.setToUseDFS();
+//			UIAnomalyDetector.setToUseDFS();
 			
+			long startT = System.currentTimeMillis();
 		    List<AnomalyCallChain> chains = super.findErrorsInAndroidApp(type, ui2startGuider, start2checkGuider);
 //		    List<AnomalyCallChain> chains = super.findErrorsInAndroidApp(CG.OneCFA, ui2startGuider, start2checkGuider);
 //		    List<AnomalyCallChain> chains = super.findErrorsInAndroidApp(CG.FakeZeroCFA, ui2startGuider, start2checkGuider);
 		    
-//		    int i = 0;
-//		    for(AnomalyCallChain c : chains) {
-//		    	System.out.println("The " + i++ + "-th chain:");
-//			    System.out.println(c.getFullCallChainAsString());
-//		    }
-//		    Utils.dumpAnomalyCallChains(chains, "./output_chains.txt");
+		    long endT = System.currentTimeMillis();
+		    
+		    System.out.println("Used time: " + (endT - startT));
+		    
+		    int i = 0;
+		    for(AnomalyCallChain c : chains) {
+		    	System.out.println("The " + i++ + "-th chain:");
+			    System.out.println(c.getFullCallChainAsString());
+		    }
+		    Utils.dumpAnomalyCallChains(chains, "./output_chains.txt");
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
