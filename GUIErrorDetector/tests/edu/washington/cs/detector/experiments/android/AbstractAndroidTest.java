@@ -245,7 +245,11 @@ public abstract class AbstractAndroidTest extends TestCase {
 			Log.logln("    " + ep);
 		}
 		
+		long cgStart = System.currentTimeMillis();
 		builder.buildCG(entries);
+		long cgEnd = System.currentTimeMillis();
+		System.out.println("Measuring cg time: " + (cgEnd - cgStart));
+//		System.exit(1);
 		
 		if(this.runnaiveapproach) {
 			TestAndroids.seeNaiveResult(builder.getAppCallGraph(), builder.getClassHierarchy(), packageNames);
@@ -264,9 +268,9 @@ public abstract class AbstractAndroidTest extends TestCase {
 		
 		
 		//set up the anomaly detection
-//		UIAnomalyDetector detector = new UIAnomalyDetector(getAppPath());
+		UIAnomalyDetector detector = new UIAnomalyDetector(getAppPath());
 		
-		InvalidThreadAccessDetector detector = new InvalidThreadAccessDetector(getAppPath());
+//		InvalidThreadAccessDetector detector = new InvalidThreadAccessDetector(getAppPath());
 		
 		
 		String defaultcheckingfile = "./tests/edu/washington/cs/detector/checkingmethods_for_android.txt";
