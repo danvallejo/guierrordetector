@@ -118,14 +118,16 @@ public class TestMozillaFirefox extends AbstractAndroidTest {
 //		//
 //		return nonRedundant;
 //	}
-
 	public void testFindErrors() {
 		CGTraverseGuider ui2startGuider = new CGTraverseAndroidGuider();
 		String[] arrays 
 //		    = new String[]{"android.opengl."};
 		= new String[]{};
 		CGTraverseExploreClientRunnableStrategy start2checkGuider = new CGTraverseExploreClientRunnableStrategy(arrays);
-		start2checkGuider.addMethodGuidance("android.opengl.GLSurfaceView$GLThread.guardedRun", "org.mozilla.gecko.gfx.LayerRenderer");
+//		start2checkGuider.addMethodGuidance("android.opengl.GLSurfaceView$GLThread.guardedRun", "org.mozilla.gecko.gfx.LayerRenderer");
+		start2checkGuider.addExclusionGuidance("android.opengl.GLSurfaceView$GLThreadManager");
+		start2checkGuider.addExclusionGuidance("android.opengl.GLSurfaceView$GLThread.stop");
+		start2checkGuider.addExclusionGuidance("android.opengl.GLSurfaceView$EglHelper");
 		
 		try {
 //			super.setRunnaiveApproach(true);
@@ -136,21 +138,26 @@ public class TestMozillaFirefox extends AbstractAndroidTest {
 			CG type = CG.TempZeroCFA;
 			type = CG.OneCFA;
 //			type = CG.RTA;
-			
+	
 //			UIAnomalyDetector.setToUseDFS();
 			
+			long startT = System.currentTimeMillis();
 		    List<AnomalyCallChain> chains = super.findErrorsInAndroidApp(type, ui2startGuider, start2checkGuider);
+		    long endT = System.currentTimeMillis();
+		    
+		    System.out.println("Total time cost: " + (endT - startT));
+		    
 //		    List<AnomalyCallChain> chains = super.findErrorsInAndroidApp(CG.ZeroCFA, ui2startGuider, start2checkGuider);
 		    
 //		    List<AnomalyCallChain> chains = super.findErrorsInAndroidApp(CG.OneCFA, ui2startGuider, start2checkGuider);
 		    
-//		    int i = 0;
-//		    for(AnomalyCallChain c : chains) {
-//		    	System.out.println("The " + i++ + "-th chain:");
-//			    System.out.println(c.getFullCallChainAsString());
-//		    }
-//		    System.out.println("Number of chains: " + chains.size());
-//		    Utils.dumpAnomalyCallChains(chains, "./output_chains.txt");
+		    int i = 0;
+		    for(AnomalyCallChain c : chains) {
+		    	System.out.println("The " + i++ + "-th chain:");
+			    System.out.println(c.getFullCallChainAsString());
+		    }
+		    System.out.println("Number of chains: " + chains.size());
+		    Utils.dumpAnomalyCallChains(chains, "./output_chains.txt");
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
