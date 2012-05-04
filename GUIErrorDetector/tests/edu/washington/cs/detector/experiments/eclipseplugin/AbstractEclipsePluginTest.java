@@ -23,6 +23,7 @@ import edu.washington.cs.detector.UIAnomalyDetector;
 import edu.washington.cs.detector.UIAnomalyMethodFinder;
 import edu.washington.cs.detector.CGBuilder.CG;
 import edu.washington.cs.detector.experiments.filters.MergeSamePrefixToLibCallStrategy;
+import edu.washington.cs.detector.experiments.filters.MergeSameTailStrategy;
 import edu.washington.cs.detector.experiments.filters.RemoveNoClientClassStrategy;
 import edu.washington.cs.detector.experiments.filters.RemoveSameEntryStrategy;
 import edu.washington.cs.detector.experiments.filters.RemoveSubsumedChainStrategy;
@@ -47,7 +48,7 @@ import junit.framework.TestCase;
 public abstract class AbstractEclipsePluginTest extends TestCase {
 //	
 //	public static boolean DEBUG = false;
-//	
+//
 	private CGTraverseGuider threadStartGuider = null;
 	private CGTraverseGuider uiAnomalyGuider = null;
 	private CG type = null;
@@ -139,7 +140,11 @@ public abstract class AbstractEclipsePluginTest extends TestCase {
 		if(this.type != null) {
 			builder.setCGType(this.type);
 		}
+		long cgStart = System.currentTimeMillis();
 		builder.buildCG(entries);
+		long cgEnd = System.currentTimeMillis();
+		System.out.println("CG building time: " + (cgEnd - cgStart));
+//		System.exit(1);
 		
 		if(this.runnaiveapproach) {
 			TestEclipsePlugins.seeNaiveResult(builder.getAppCallGraph(), cha, this.getPackages());
@@ -302,18 +307,19 @@ public abstract class AbstractEclipsePluginTest extends TestCase {
 	}
 	
 	private List<AnomalyCallChain> filterCallChains(List<AnomalyCallChain> chains, Collection<CGNode> startNodes) {
+		chains = CallChainFilter.filter(chains, new RemoveSubsumedChainStrategy(startNodes));
+		
+		chains = Utils.removeRedundantAnomalyCallChains(chains);
+//		System.out.println("size of chains after removing redundancy: " + chains.size());
+		System.out.println("size of chains after removing subsumed calls: " + chains.size());
+		
 		chains = CallChainFilter.filter(chains, new RemoveSystemCallStrategy());
 		System.out.println("size of chains after removing system calls: " + chains.size());
 		
-		chains = Utils.removeRedundantAnomalyCallChains(chains);
-		System.out.println("size of chains after removing redundancy: " + chains.size());
-		
-		chains = CallChainFilter.filter(chains, new RemoveSubsumedChainStrategy(startNodes));
-		System.out.println("size of chains after removing subsumed calls: " + chains.size());
 		
 		if(packages != null) {
 		    chains = CallChainFilter.filter(chains, new RemoveNoClientClassStrategy(packages, true));
-		    System.out.println("size of chains after removing no client classes after start: " + chains.size());
+		    //System.out.println("size of chains after removing no client classes after start: " + chains.size());
 		}
 		
 		chains = CallChainFilter.filter(chains, new RemoveSameEntryStrategy());
@@ -323,6 +329,9 @@ public abstract class AbstractEclipsePluginTest extends TestCase {
 		  chains = CallChainFilter.filter(chains, new MergeSamePrefixToLibCallStrategy(packages));
 		  System.out.println("size of chains after removing same entry nodes to lib: " + chains.size());
 		}
+		
+		chains = CallChainFilter.filter(chains, new MergeSameTailStrategy());
+		System.out.println("size of chains after removing the same tail keeping the shortest chain: " + chains.size());
 		
 		return chains;
 	}
