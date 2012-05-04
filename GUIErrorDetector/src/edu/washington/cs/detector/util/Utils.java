@@ -252,6 +252,15 @@ public class Utils {
 		return false;
  	}
 	
+	public static boolean containIn(String dest, String[] strs) {
+		for(String str : strs) {
+			if(dest.indexOf(str) != -1) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public static <T> Collection<T> iterableToCollection(Iterable<T> ts) {
 		Collection<T> collection = new LinkedList<T>();
 		for(T t : ts) {
