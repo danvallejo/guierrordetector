@@ -1,12 +1,15 @@
 package edu.washington.cs.detector.guider;
 
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 import com.ibm.wala.classLoader.IClass;
 import com.ibm.wala.classLoader.IMethod;
 import com.ibm.wala.ipa.callgraph.CGNode;
 
+import edu.washington.cs.detector.util.Utils;
 import edu.washington.cs.detector.util.WALAUtils;
 
 public class CGTraverseExploreClientRunnableStrategy implements CGTraverseGuider {
@@ -14,6 +17,8 @@ public class CGTraverseExploreClientRunnableStrategy implements CGTraverseGuider
 	public final String[] clientRunnablePackage;
 	
 	public final Map<String, String> methodCallMapping = new LinkedHashMap<String, String>();
+	
+	public final Set<String> exclusionMethods = new LinkedHashSet<String>();
 	
 	CGTraverseGuider safeGuier = new CGTraverseAndroidSafeMethodGuider();
 	
@@ -24,6 +29,10 @@ public class CGTraverseExploreClientRunnableStrategy implements CGTraverseGuider
 	//the format:  a.b.c.Class.methodName
 	public void addMethodGuidance(String srcSig, String destSig) {
 		methodCallMapping.put(srcSig, destSig);
+	}
+	
+	public void addExclusionGuidance(String exclusionMethod) {
+		exclusionMethods.add(exclusionMethod);
 	}
 
 	@Override
@@ -41,6 +50,10 @@ public class CGTraverseExploreClientRunnableStrategy implements CGTraverseGuider
 //		}
 		
 		if(!safeGuier.traverse(src, dest)) {
+			return false;
+		}
+		
+		if(Utils.containIn(dest.getMethod().getSignature(), exclusionMethods.toArray(new String[0]))) {
 			return false;
 		}
 		
