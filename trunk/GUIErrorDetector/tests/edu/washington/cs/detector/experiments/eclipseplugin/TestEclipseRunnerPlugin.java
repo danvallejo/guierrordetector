@@ -123,18 +123,23 @@ public class TestEclipseRunnerPlugin extends AbstractEclipsePluginTest {
 		
 //		super.setCGType(CG.ZeroCFA);
 		super.setCGType(CG.OneCFA);
-//		super.setCGType(CG.RTA);
-//		super.setCGType(CG.ZeroCFA);
+		super.setCGType(CG.RTA);
+		super.setCGType(CG.ZeroCFA);
 //		super.setRunNaiveApproach(true);
 		
 //		super.setExhaustiveSearch(true);
-		UIAnomalyDetector.setToUseDFS();
+//		UIAnomalyDetector.setToUseDFS();
 		
 		super.setThreadStartGuider(new CGTraverseSWTGuider());
 		super.setUIAnomalyGuider(new CGTraverseSWTGuider());
 		super.setPackages(new String[]{"com.eclipserunner"});
 		
+		
+		long start = System.currentTimeMillis();
 		Collection<AnomalyCallChain> chains = super.reportUIErrors();
+		long end = System.currentTimeMillis();
+		
+		System.out.println("Total time: " + (end - start));
 		
 		int count = 0;
 		for(AnomalyCallChain chain : chains) {
