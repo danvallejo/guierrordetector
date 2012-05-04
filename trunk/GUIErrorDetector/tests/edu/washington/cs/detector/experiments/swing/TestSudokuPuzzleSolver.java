@@ -40,7 +40,7 @@ public class TestSudokuPuzzleSolver extends AbstractSwingTest {
 //		super.setCGType(CG.ZeroCFA);
 //		super.setCGType(CG.OneCFA);
 		super.setCGType(CG.TempZeroCFA);
-		super.setCGType(CG.OneCFA);
+//		super.setCGType(CG.OneCFA);
 		
 		UIAnomalyDetector.setToUseDFS(); //use DFS
 		

@@ -119,6 +119,9 @@ public abstract class AbstractSwingTest extends TestCase {
 	protected void checkCallChainNumber(int expectedNum, String appPath, String[] packages /*for filtering*/ ) throws IOException,
 	    ClassHierarchyException {
 		
+		//start to detect errors
+		long start = System.currentTimeMillis();
+		
 		UIAnomalyDetector detector = new UIAnomalyDetector(appPath);
 		
 //		InvalidThreadAccessDetector detector = new InvalidThreadAccessDetector(appPath);
@@ -169,7 +172,11 @@ public abstract class AbstractSwingTest extends TestCase {
 			}
 			
 			//start build call graph
+			long cgStart = System.currentTimeMillis();
 			builder.buildCG(eps);
+			long cgEnd = System.currentTimeMillis();
+			System.out.println("Measure cg time: " + (cgEnd - cgStart));
+//			System.exit(1);
 		}
 		
 		//System.exit(1);
@@ -203,19 +210,20 @@ public abstract class AbstractSwingTest extends TestCase {
 			nodes = this.tweakStartNode(nodes, builder.getClassHierarchy()); 
 		}
 
-		//start to detect errors
-		long start = System.currentTimeMillis();
+		
 		chains = detector.detectUIAnomaly(builder, nodes);
 		
 		
 		System.out.println("size of chains before removing redundancy: " + chains.size());
 		chains = Utils.removeRedundantAnomalyCallChains(chains);
 		System.out.println("size of chains after removing redundancy: " + chains.size());
-		chains = CallChainFilter.filter(chains, new RemoveSystemCallStrategy());
-		System.out.println("size of chains after removing system calls: " + chains.size());
+		
 		
 		chains = CallChainFilter.filter(chains, new RemoveSubsumedChainStrategy(nodes));
 		System.out.println("size of chains after removing subsumed calls: " + chains.size());
+		
+		chains = CallChainFilter.filter(chains, new RemoveSystemCallStrategy());
+		System.out.println("size of chains after removing system calls: " + chains.size());
 		
 		if(packages != null) {
 		    chains = CallChainFilter.filter(chains, new RemoveNoClientClassStrategy(packages, true));
