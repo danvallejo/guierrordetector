@@ -67,8 +67,8 @@ public class TestS3Dropbox extends AbstractSwingTest {
 		
 		UIAnomalyDetector.DEBUG = true;
 		super.setCGType(CG.OneCFA);
-//		super.setCGType(CG.RTA);
-//		super.setCGType(CG.ZeroCFA);
+		super.setCGType(CG.RTA);
+		super.setCGType(CG.ZeroCFA);
 		
 //		UIAnomalyDetector.setToUseDFS(); //use DFS
 		
