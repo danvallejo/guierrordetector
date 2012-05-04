@@ -27,6 +27,7 @@ import edu.washington.cs.detector.guider.CGTraverseExploreClientRunnableStrategy
 import edu.washington.cs.detector.guider.CGTraverseGuider;
 import edu.washington.cs.detector.util.Globals;
 import edu.washington.cs.detector.util.NativeAnnotationProcessor;
+import edu.washington.cs.detector.util.Utils;
 import edu.washington.cs.detector.util.WALAUtils;
 
 /**
@@ -85,8 +86,12 @@ public class TestSGTPuzzle extends AbstractAndroidTest {
 	
 	public void testFindErrors() throws ClassHierarchyException, IOException {
 		CGTraverseGuider ui2startGuider = new CGTraverseAndroidGuider();
-		CGTraverseExploreClientRunnableStrategy start2checkGuider = new  CGTraverseExploreClientRunnableStrategy(new String[]{"name.boyle.chris.sgtpuzzles"});
+		CGTraverseExploreClientRunnableStrategy start2checkGuider
+		= new  CGTraverseExploreClientRunnableStrategy(new String[]{});
+		//"name.boyle.chris.sgtpuzzles"
 //		start2checkGuider.addMethodGuidance("java.lang.Thread.start", "name.boyle.chris.sgtpuzzles.SGTPuzzles$9");
+		start2checkGuider.addExclusionGuidance("android.webkit");
+		start2checkGuider.addExclusionGuidance("android.os.HandlerThread");
 		
 		//parse the native annotation
 		NativeMethodConnector connector = new NativeMethodConnector();
@@ -94,6 +99,7 @@ public class TestSGTPuzzle extends AbstractAndroidTest {
 		for(String[] pair : pairs) {
 			connector.addNativeMethodMapping(pair[0], pair[1]);
 		}
+		
 		//only this rule is useful, the remaining is for completeness
 		//the following annotation information is actually read from the @CalledByNativeMethods
 		//for debugging purpose in this experiment, I hard code these parts, 7 annotations in total
@@ -125,16 +131,28 @@ public class TestSGTPuzzle extends AbstractAndroidTest {
 			//this finds bugs
 //		  List<AnomalyCallChain> chains = super.findErrorsInAndroidApp(CG.RTA, ui2startGuider, start2checkGuider, connector);
 		  CG type = CG.TempZeroCFA;
-		  type = CG.OneCFA;
+//		  type = CG.OneCFA;
 //		  type = CG.RTA;
 		  
 //		  super.setExhaustiveSearch(true);
-		  UIAnomalyDetector.setToUseDFS();
-		  
+//		  UIAnomalyDetector.setToUseDFS();
+		
 		  super.setAndroidCheckingFile("./tests/edu/washington/cs/detector/checkingmethods_for_android_extra.txt");
-//		  super.setByfileName("sgtpuzzle.xml");
-		  List<AnomalyCallChain> chains = super.findErrorsInAndroidApp(type, ui2startGuider, start2checkGuider, connector);
+		  super.setByfileName("sgtpuzzle.xml");
 		  
+		  long startT = System.currentTimeMillis();
+		  List<AnomalyCallChain> chains = super.findErrorsInAndroidApp(type, ui2startGuider, start2checkGuider, connector);
+		  long endT = System.currentTimeMillis();
+		  
+		  System.out.println("The total time cost: " + (endT - startT));
+		  
+		  int i = 0;
+		    for(AnomalyCallChain c : chains) {
+		    	System.out.println("The " + i++ + "-th chain:");
+			    System.out.println(c.getFullCallChainAsString());
+		    }
+		    System.out.println("Number of chains: " + chains.size());
+		    Utils.dumpAnomalyCallChains(chains, "./output_chains.txt");
 		  
 		} catch (Throwable e) {
 			e.printStackTrace();
