@@ -86,7 +86,7 @@ public class TestCommons extends TestCase {
 			}
 			sb.append(appJars.get(i));
 		}
-		if(additionalJars != null) {
+		if(additionalJars != null && !additionalJars.isEmpty()) {
 		    sb.append(Globals.pathSep);
 		    sb.append(additionalJars);
 		}
