@@ -4,9 +4,9 @@
 \section{Implementation}
 \label{sec:implementation}
 
+We implemented an error detection tool on top of the WALA framework~\cite{walatutorial}.
 We instantiated the proposed technique for four widely-used
-GUI frameworks, namely SWT, Eclipse plugin framework, Swing, and Android;
-and implemented an error detection tool on top of the WALA framework~\cite{walatutorial}.
+GUI frameworks, namely SWT, Eclipse plugin framework, Swing, and Android.
 
 \tinystep
 
@@ -25,27 +25,35 @@ and \textbf{safe UI methods} for each framework.
 
  We instantiated our technique for SWT applications as follows:
 
-\begin{itemize}
-\smallstep
+\preitemizespace
 
-\item \textbf{Call graph entry nodes:}  the main method. Like a normal Java program,
-a SWT desktop application has a single main method as the entry point. By default,
-the main method is executed in the UI thread after the GUI
+\begin{itemize}
+
+\item \textbf{Call graph entry nodes:}  the main method. 
+% Like a normal Java program,
+% a SWT desktop application has a single main method as the entry point. By default,
+% the main method
+It is executed in the UI thread after the GUI
 is initialized.
 
 \smallstep
 
 \item \textbf{UI-accessing nodes:}  the \CodeIn{Widget.checkWidget}
-and \CodeIn{Display.}\discretionary{}{}{}\CodeIn{check}\discretionary{}{}{}\CodeIn{Device} methods. SWT performs
-runtime checking before accessing a GUI object via these methods.
-If the current thread is a non-UI thread, the \CodeIn{Widget.checkWidget}
-and \CodeIn{Display.checkDevice} methods throw a \CodeIn{RuntimeException}.
+and \CodeIn{Display\-.check\-Device} methods.
+% SWT performs
+% runtime checking before accessing a GUI object via these methods.
+% If the current thread is a non-UI thread, the \CodeIn{Widget.checkWidget}
+% and \CodeIn{Display.checkDevice} methods throw a \CodeIn{RuntimeException}.
+If the current thread is a non-UI thread, these
+methods throw a \CodeIn{RuntimeException}.
+
 
 \smallstep
 
 \item \textbf{Safe UI methods:}  \CodeIn{Display.asyncExec}
-and \CodeIn{Display.syncExec}. SWT provides these two methods
-to execute code (a)synchro- nizedly on the UI thread.
+and \CodeIn{Display.syncExec}.
+These methods
+execute code (a)synchro\-nously on the UI thread.
 
 \end{itemize}
 
@@ -55,25 +63,23 @@ to execute code (a)synchro- nizedly on the UI thread.
 
 We instantiated our technique for the Eclipse plugin framework as follows:
 
-\smallstep
-\begin{myindentpar}{-2mm}
+\preitemizespace
 
 \begin{itemize}
 
 \item \textbf{Call graph entry nodes:}  all user code methods that override
  SWT GUI event handling methods. Eclipse
 calls back the overridden methods to handle the
-events. All SWT GUI event handling methods (i.e., the overriden
-methods in the class that implements \CodeIn{org.eclipse.swt.internal.SWTEventListener}) are
+events. All SWT GUI event handling methods (i.e., the overridden
+methods in a class that implements \CodeIn{org.eclipse.swt.internal.SWTEventListener}) are
 always called back from the UI thread.
 %, thus are used as call graph entry nodes.
 
 \tinystep
 
-\item \textbf{UI-accessing nodes} and \textbf{Safe UI methods} are the same as SWT.
+\item \textbf{UI-accessing nodes} and \textbf{Safe UI methods} are the same as SWT\@.
 
 \end{itemize}
-\end{myindentpar}
 
 \tinystep
 \tinystep
@@ -88,9 +94,9 @@ After a Swing program starts, its initial thread exits and the UI thread takes c
 of the application and starts to execute event-handling code or spawn new worker threads. 
 We instantiated our technique for Swing as follows:
 
-\begin{myindentpar}{-2mm}
+\preitemizespace
+
 \begin{itemize}
-\tinystep
 
 \item \textbf{Call graph entry nodes:} all user code methods that override
 Swing GUI event handling methods. Those event handling methods are always
@@ -100,15 +106,14 @@ called back from the UI thread.
 
 \item \textbf{UI-accessing nodes:} %as stated in Swing's documentation,
 all methods defined in each Swing GUI class except for three thread-safe
-methods: \CodeIn{repaint()}, \CodeIn{revali-\\date()}, and \CodeIn{invalidate()}.
+methods: \CodeIn{repaint()}, \CodeIn{reval\-i\-date()}, and \CodeIn{invalidate()}.
 
 \tinystep
 
 \item \textbf{Safe UI methods:}  
-\CodeIn{SwingUtilities.}\CodeIn{invokeLater} and \CodeIn{SwingUti-\\lities.invokeAndWait}, which execute code on the UI thread.
+\CodeIn{SwingUtilities.}\CodeIn{invokeLater} and \CodeIn{Swing\-Util\-ities.invokeAndWait}, which execute code on the UI thread.
 
 \end{itemize}
-\end{myindentpar}
 
 \smallstep
 
@@ -128,9 +133,9 @@ to interact with users through a visual interface and handle GUI events.
 We instantiated our technique for Android programs as follows:
 
 
-\begin{myindentpar}{-2mm}
+\preitemizespace
+
 \begin{itemize}
-\tinystep
 
 \item \textbf{Call graph entry nodes:} in an Android application,
 an \CodeIn{Activity} object is created and manipulated by the UI thread. Thus, we treat
@@ -142,8 +147,9 @@ as entry nodes, since they are called back from the UI thread.
 \tinystep
 
 \item \textbf{UI-accessing nodes:} the \CodeIn{ViewRoot.checkThread} method.
-Like SWT, Android explicitly performs runtime checking before accessing
-a GUI object via the \CodeIn{ViewRoot.checkThread} method. If the current
+% Like SWT, Android explicitly performs runtime checking before accessing
+% a GUI object via the \CodeIn{ViewRoot.checkThread} method.
+If the current
 thread is a non-UI thread, the \CodeIn{ViewRoot.checkThread} method throws
 a \CodeIn{RuntimeException}.
 
@@ -153,7 +159,6 @@ a \CodeIn{RuntimeException}.
 and \CodeIn{View.postDelay}, which execute code on the UI thread. 
 
 \end{itemize}
-\end{myindentpar}
 
 \tinystep
 
@@ -178,8 +183,20 @@ bytecode as a single apk file, our tool first uses
 android-apktool~\cite{apktool} to
 decrypt the apk file, and then uses the 
 ded translator~\cite{ded} to convert
-Dalvik bytecode to Java bytecode before feeding to WALA.  The Android system
+Dalvik bytecode to Java bytecode before feeding to WALA\@.  The Android system
 library (i.e., \CodeIn{android.jar}) uses many ``stub'' classes as
 placeholders for the sake of efficiency. We manually re-compiled 
 \CodeIn{android.jar} from its source code, so it contains real
 class files rather than stubs.
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "guierror"
+%%% TeX-command-default: "PDF"
+%%% End: 
+
+%  LocalWords:  WALA SWT plugin checkWidget RuntimeException asyncExec apk
+%  LocalWords:  syncExec synchro nously reval SwingUtilities invokeLater
+%  LocalWords:  Util ities invokeAndWait ViewRoot checkThread postDelay
+%  LocalWords:  WALA's Dalvik apktool ded

@@ -118,7 +118,7 @@ to reason about reflective calls. The analysis
 attempts to infer additional information stored in string constants to resolve
 reflective calls statically. Their approach focuses on standard Java
 reflection calls (e.g., \CodeIn{Class.forName}) instead of
-framework-specific ones (e.g., \CodeIn{View.find-\\ViewById}).
+framework-specific ones (e.g., \CodeIn{View.find\-ViewById}).
 TamiFlex~\cite{Bodden:2011}, a pure dynamic
 approach, records all reflectively-created class instances
 by intercepting JVM system calls, and re-inserts those recorded 
@@ -152,4 +152,12 @@ online by intercepting the standard call graph construction process.
 %approach to call graph construction.
 
 
- 
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "guierror"
+%%% TeX-command-default: "PDF"
+%%% End: 
+
+%  LocalWords:  multithreaded Memon Xie Payet Spoto lockset Palsberg RTA
+%  LocalWords:  Sundaresan Livshits forName ViewById TamiFlex Spoto's
+%  LocalWords:  findViewById

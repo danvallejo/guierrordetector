@@ -2,7 +2,7 @@
 \label{sec:introduction}
 
 End-user satisfaction depends in part on the responsiveness and
-robustness of a software application's GUI.
+robustness of a software application's GUI\@.
 
 To make the GUI more responsive, 
 GUI applications often spawn separate threads to handle time-consuming
@@ -15,11 +15,11 @@ of violating it, and a technique for statically detecting such violations.
 
 
 
-%\subsection{The Single-thread Rule for GUI Object Access}
+%\subsection{The Single-GUI-Thread Rule for GUI Object Access}
 %ugly hack
 %\subsection{\hspace{-1.1ex}\mbox{The}~\mbox{Single-thread}~\mbox{Rule}~\mbox{for}~\mbox{GUI}~\mbox{Object}~\mbox{Access}}
 
-\subsection{The Single-thread Rule}
+\subsection{The Single-GUI-Thread Rule}
 
 Many popular GUI frameworks such as Swing~\cite{swing}, SWT~\cite{swt}, Eclipse plugin~\cite{eclipse},
 Android~\cite{android}, Qt~\cite{qt}, and MacOS Cocoa~\cite{macos}
@@ -78,7 +78,7 @@ program comprehension, and testing would be more difficult.
 The single-GUI-thread rule requires GUI application developers to
  ensure that all GUI objects are accessed only by the UI thread.
 If not, an \textit{invalid thread access error} will occur. This may
-terminate the application, but it is considered preferable
+terminate the application --- doing so is considered preferable
 to nondeterministic concurrency errors.
 
 The single-GUI-thread rule can be easily violated, since a spawned non-UI thread often needs to update
@@ -89,7 +89,7 @@ In practice, invalid thread access errors are \textit{frequent}, \textit{severe}
 Take the popular Standard Widget Toolkit (SWT) GUI framework as an example. 
 Invalid thread access is one of the top 3 bugs in developing a SWT application, and is
 the source of many concurrency bugs~\cite{top3bugs}.
-A Google search for ``SWTException:Invalid thread access''  returns over 11,800 entries,
+A Google search for ``SWTException:Invalid thread access''  returns over 11,800 hits,
 consisting of numerous bug reports, forum posts, and mailing list threads on
 this problem. Eclipse, the IDE for Java development, is built on top of SWT\@.
 Searching for ``SWTException:Invalid thread access'' in Eclipse's bug repository
@@ -164,7 +164,7 @@ in an Android library.
 
 %It may work during development, but like most concurrent bugs, you'll start to see weird exceptions come up that seem completely unrelated, and occur non-- usually spotted AFTER you've shipped by real users. Not good.
 
-%Also, you've got no confidence that your app will continue to work on future CPUs with more and more cores - which are more prone to encountering weird threading issues due to them being truely concurrent rather than just simulated by the OS.
+%Also, you've got no confidence that your app will continue to work on future CPUs with more and more cores - which are more prone to encountering weird threading issues due to them being truely concurrent rather than just simulated by the OS\@.
 
 
 \subsection{Finding Invalid Thread Access Errors}
@@ -176,7 +176,7 @@ access errors. Current techniques are not effective. %must be developed.% to all
 %Software testing, the most widely used method to ensure program correctness,
 %is insufficient to detect such errors. 
 It is infeasible for testing to cover the enormous space of possible interactions
-with a GUI. Each sequence of GUI events can result in
+with a GUI\@. Each sequence of GUI events can result in
 a different state, and each GUI event may need to be evaluated in all of
 these states. A  software system like Eclipse
 often has a test suite that achieves fairly high statement coverage,
@@ -187,7 +187,7 @@ access GUI objects via asynchronous message passing, to ensure a GUI object is a
 the UI thread. For example, a developer could have prevented the bug in Figure~\ref{fig:androiderror}
 by wrapping line 222 inside a \CodeIn{post} message-passing method\footnote{The
 \CodeIn{post} method in class \CodeIn{android.widget.View} is
-a standard way to send asynchronous messages to the UI-thread.}, as follows:
+a standard way to send asynchronous messages to the UI thread.}, as follows:
 
 {\vspace{2mm}
 \hspace{3mm}{In class: org.mozilla.gecko.gfx.LayerRenderer}
@@ -205,11 +205,12 @@ a standard way to send asynchronous messages to the UI-thread.}, as follows:
 \end{alltt}
 \end{CodeOut}}
 
-Such an approach is desirable for accesses from non-UI threads, but it is unnecessary.
+Such an approach is desirable for accesses from non-UI threads, but it is
+not necessary for all accesses.
 In our evaluation on real-world programs, we found that a simple analysis that
 requires GUI operations to be in a message issued
 an unacceptable number of warnings. %false positives and redundant warnings.
-Furthermore, this approach is dangerous for accesses from the UI thread. Asynchronized message passing offers
+Furthermore, this approach is dangerous for accesses from the UI thread. Asynchronous message passing offers
 no timing guarantee, so a GUI object may have already been
 disposed before the message sent to it arrives, causing other bugs. 
 
@@ -300,8 +301,8 @@ also compare its usefulness with existing call graph construction algorithms in
 our experiments.
 
 Static analysis may report false positives due to its
-conservative nature, or multiple warnings that actually correspond
-to the same error. To address such limitations, we devise a set
+conservative nature, or may report multiple warnings that actually correspond
+to the same error. To address such limitations, we devised a set
  of error filters to remove likely false positives and redundant warnings.
 The filters introduce potential unsoundness to our algorithm, but in practice
 they work well and make our technique more usable.
@@ -313,7 +314,7 @@ We implemented an invalid-thread-access-error detection tool that supports
 four popular GUI frameworks: SWT, Eclipse plugin framework,
 Swing, and Android. Swing and SWT are the
 two dominant GUI frameworks for desktop Java applications.
-Eclipse is a widely-used IDE for Java. Android is the \#1 platform for
+Eclipse is the most widely-used IDE for Java. Android is the \#1 platform for
 mobile applications with market share 56\% as of September 2011.
 Although our technique is applicable to any GUI
 framework with the single-GUI-thread rule, each framework
@@ -322,15 +323,16 @@ entry points}. Thus, our implementation is parameterized with respect to
 those framework-specific parts (see Section~\ref{sec:platforms}).
 
 
-Our tool works in an automatic manner,
+Our tool works in an automatic manner
 and scales to realistic programs.
-We evaluated our implementation on \subnum programs comprising \totaloc LOC.
+We evaluated our implementation on \subnum programs comprising \totaloc LOC\@.
 The experimental results demonstrate
 that: our technique is effective (it found \bugs real-world errors
  and produced only \falses false positive warnings);
 our reflection-aware call graph construction algorithm helps in
 finding errors in Android applications;
-and our proposed error filters significantly reduce the number of warnings.
+and our proposed error filters significantly reduce the number of warnings
+and thus the programmer effort.
 %false positives and redundant warnings.
 
 
@@ -349,7 +351,7 @@ the invalid thread access error detection problem for multithreaded GUI applicat
 \tinystep
 
 \item \textbf{Technique.} We formulate finding
-the invalid thread access error as a call graph reachability problem,
+invalid thread access errors as an elegant call graph reachability problem,
 and present a general error detection technique.
 In addition, we use a reflection-aware
 call graph construction algorithm (Section~\ref{sec:technique}).
@@ -365,7 +367,7 @@ implementation is publicly available at:
 \tinystep
 
 \item \textbf{Evaluation.} We applied our tool to \subnum programs 
-from 4 different frameworks, comprising \totaloc LOC. The results
+from 4 different frameworks, comprising \totaloc LOC\@. The results
 show the usefulness of the proposed technique (Section~\ref{sec:evaluation}).
 
 \end{itemize}
@@ -375,3 +377,9 @@ show the usefulness of the proposed technique (Section~\ref{sec:evaluation}).
 %%% TeX-master: "guierror"
 %%% TeX-command-default: "PDF"
 %%% End: 
+
+%  LocalWords:  multithreaded SWT plugin MacOS myquotation 0pt 10pt GL10
+%  LocalWords:  SWTException LayerView LayerController mRenderer mGLThread
+%  LocalWords:  LayerRenderer setRenderer GLThread onSurfaceChanged gl RTA
+%  LocalWords:  glViewport mView setViewportSize IntSize Fennec GUIs init
+%  LocalWords:  GLSurfaceView guardedRun checkThread CFA
