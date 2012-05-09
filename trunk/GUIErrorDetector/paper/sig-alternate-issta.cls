@@ -550,11 +550,12 @@
 
 %
 
+\newcommand{\captionfont}{\bf}
 \long\def\@makecaption#1#2{
    \vskip 10pt
-   \setbox\@tempboxa\hbox{\textbf{#1: #2}}
+   \setbox\@tempboxa\hbox{\captionfont{#1: #2\strut}}
    \ifdim \wd\@tempboxa >\hsize % IF longer than one line:
-       \textbf{#1: #2}\par                %   THEN set as ordinary paragraph.
+       {\captionfont\noindent\parbox{\hsize}{#1: #2\strut}}\par     %   THEN set as ordinary paragraph.
      \else                      %   ELSE  center.
        \hbox to\hsize{\hfil\box\@tempboxa\hfil}
    \fi}

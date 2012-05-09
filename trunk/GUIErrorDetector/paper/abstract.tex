@@ -4,7 +4,7 @@ application often has a main \textit{UI thread} (or \textit{event dispatching th
 and spawns separate threads to handle lengthy operations in the background,
 such as expensive computation, I/O tasks, and network requests.
 Many GUI frameworks require all GUI objects to be accessed exclusively by the
-UI thread. If a GUI object is accessed through a non-UI thread,
+UI thread. If a GUI object is accessed from a non-UI thread,
 an \textit{invalid thread access} error occurs and the whole
 application may abort. 
 
@@ -35,3 +35,14 @@ Reliability, Experimentation.
 \\
 \textbf{Keywords: }
 Static analysis, invalid thread access error.
+
+\label{this-label-makes-etags-order-this-file-properly}
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "guierror"
+%%% TeX-command-default: "PDF"
+%%% End: 
+
+%  LocalWords:  multithreaded SWT plugin LOC
