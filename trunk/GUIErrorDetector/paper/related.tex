@@ -61,10 +61,11 @@ our core technique has been tailored for four GUI frameworks.
 
 %\noindent \textit{\textbf{Finding Bugs in Multithreaded Programs}}
 A rich body of techniques have been developed to detect bugs in multithreaded programs~\cite{Huang:2011:PPC:2001420.2001438, Naik:2006, Savage:1997, smc}.
+Runtime analysis tools such as Eraser~\cite{Savage:1997} 
+dynamically detect concurrency bugs using lockset algorithms.
 Static analysis tools such as Chord~\cite{Naik:2006}
-explore multithreaded programs. Runtime
-analysis tools such as Eraser~\cite{Savage:1997}  dynamically detect concurrency bugs using lockset
-algorithms.
+exploit a key property of Java - namely the scoped use
+of locks, to further improve the precision of lockset computations.
 However, finding invalid thread access errors is quite different than detecting data races.
 A data race occurs when two concurrent threads access
 a shared variable and when at least one access is a write and the threads
