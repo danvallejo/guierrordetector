@@ -1,7 +1,7 @@
 \smallstep
 \section{Conclusion and Future Work}
 
-This paper presented a general technique to find invalid
+This paper presented a simple, general, effective technique to find invalid
 thread access errors in multithreaded GUI applications. 
 Our technique statically explores paths in a call graph to check
 whether a non-UI thread can access a GUI object.
@@ -9,13 +9,12 @@ It uses a reflection-aware call graph construction algorithm
 to build a good call graph, and employs a set of error
 filters to filter likely false positives and redundant warnings.
 We demonstrated the usefulness of our technique
-by an evaluation on \subnum programs built on 4 popular GUI
+by evaluating it on \subnum programs built on 4 popular GUI
 frameworks. 
 
-The source code of our tool implementation is available at:
+The source code of our tool implementation is available at: \\
+\url{http://guierrordetector.googlecode.com}
 
-
-\noindent \url{http://guierrordetector.googlecode.com}
 
 
 \vspace{1mm}
@@ -27,7 +26,7 @@ work will concentrate on the following topics:
 %\begin{itemize}
 %\item
 \textbf{Integration with dynamic and symbolic analyses.} The technique 
-presented in this paper is a call graph-based, pure static analysis. 
+presented in this paper is a call-graph-based, pure static analysis. 
 It suffers from false positives for many GUI applications,
 due to the conservative nature of static analysis.
 A possible way to reduce the number of false
