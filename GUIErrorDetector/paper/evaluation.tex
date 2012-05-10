@@ -723,10 +723,15 @@ that are created during the pre-initialization GUI work. One way
 to remedy this limitation is to design an analysis to identify
 those non-UI threads created before a GUI is launched.
 Second, like many bug-finding techniques, our technique
-is neither sound nor complete. It may miss true positives due
-to the graph search strategy, and it never reports cyclic paths.  It may
-issue false positives due to the conservative nature of
-a static analysis. Designing better call graph construction algorithms,
+is neither sound nor complete. It may issue false positives
+due to the conservative nature of a static analysis.
+It may miss true positives due to the graph search strategy,
+and it never reports cyclic paths. Furthermore, for the
+sake of scalability, our tool implementation uses the default
+configuration of WALA and ignores part of the AWT library. Thus,
+it missed one error in S3dropbox which can be found by using a different
+technique~\cite{JSR308-webpage-201110}.
+Designing better call graph construction algorithms,
 graph search strategies, and filtering heuristics may alleviate this limitation.
 Third, our tool cannot compute call relationships
 for inter-process communication between components. It also
