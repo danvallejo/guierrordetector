@@ -446,14 +446,7 @@ like \CodeIn{Runtime.}\CodeIn{shutDown} are unlikely to
 be buggy. For example, the \CodeIn{Runtime.}\CodeIn{shutDown}
 method is called when the JVM terminates, and uses multithreading
 to dispose all GUI objects when the program exits.
-% We encoded a list of 25 common library calls by proposing
-% a basic set of library calls that seemed %natural and
-% generally applicable, based on our programming experience.
-% We later added other calls we found helpful in analyzing
-% programs on different GUI frameworks and that we believed would be generally useful.
-Our experiments use a list of 25 such library calls.
-%We did this only between experiments rather than biasing experiments by tuning
-%our tool to specific programs.
+Our experiments use a list of \libnum such library calls.
 
 \textbf{4. Filter Reports with the Same Head Methods from the Entry Node to \CodeIn{Thread.start()}}. A method can call
 multiple methods that access GUI objects, such as:
