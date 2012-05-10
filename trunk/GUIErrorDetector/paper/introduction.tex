@@ -93,7 +93,7 @@ A Google search for ``SWTException:Invalid thread access''  returns over 11,800 
 consisting of numerous bug reports, forum posts, and mailing list threads on
 this problem. Eclipse, the IDE for Java development, is built on top of SWT\@.
 Searching for ``SWTException:Invalid thread access'' in Eclipse's bug repository
-and discussion forum returns 2732 bug reports and 351 distinct discussion threads, respectively. 
+and discussion forum returns over 2700 bug reports and 350 distinct discussion threads, respectively. 
 We manually studied all 156 distinct \textit{confirmed} bug reports, and 
 found this error has been confirmed in at least 20 distinct Eclipse projects
 and 40 distinct Eclipse components. Even after over 10 years of active development,
@@ -145,7 +145,7 @@ to fix Eclipse bug 51757 and verify the patch.
 \tinystep
 \vspace*{-3.0ex} \Caption{{\label{fig:androiderror} 
 Bug 703256 reported on 11/17/2011 in Fennec (Mozilla Firefox for Android)
-release 10.0.a.rc3. On line 74, \CodeIn{LayerView}'s constructor
+revision d7fa4814218d. On line 74, \CodeIn{LayerView}'s constructor
 calls method \CodeIn{setRenderer} which 
 spawns a new thread on line 283. This newly created, non-UI thread calls back method
 \CodeIn{onSurfaceChanged} that accesses GUI objects on line 222 of \CodeIn{LayerRenderer},
