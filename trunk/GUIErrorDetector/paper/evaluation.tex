@@ -104,7 +104,7 @@ interfaces to visualize them on Google Maps.
  \hline
 \multicolumn{4}{|l|}{Eclipse plugins}   \\
  \hline
- EclipseRunner (1.1.0) &  3101 &  48 &  354\\
+ EclipseRunner (1.0.0) &  3101 &  48 &  354\\
  \hline
  HudsonEclipse(1.0.9)&  11077 &  74 &  649 \\
  \hline
@@ -122,7 +122,7 @@ interfaces to visualize them on Google Maps.
  \hline
  Fennec (d7fa4814218d)&  8577 &  51 &  620 \\
  \hline
- MyTracks (1.1.13.rc4)&  20297 &  143 &  1374 \\
+ MyTracks (01d5c1e1cd47)&  20297 &  143 &  1374 \\
 \hline
 \hline
  Total &  99458 &  1094 &  11221 \\
@@ -166,9 +166,6 @@ used two configurations: with and without our enhancements
 (Section~\ref{sec:cgcon}).  We did not use more expensive algorithms like $k$-CFA ($k >$ 1),
 because they do not scale to our subject programs.
 
-%We first inspected the source code of each subject to determine whether any
-%native methods or project-specific GUI interaction patterns were implemented.
-
 Subject SGTPuzzler uses native methods to interact with
 the underlying operating system. For it, we manually checked the possible
 Java methods that a native method may call, and then added \annotationnum \CodeIn{@CalledByNativeMethods}
@@ -181,12 +178,12 @@ authors was familiar with the subjects, but we found it was quite easy
 to add extra annotations and user-defined filters. All these
 manual parts took less than a total of 60 minutes.
 
-We manually determined the validity of each warning
-by either searching the bug repository to check bug-fixing revision histories,
-writing a test driver to reproduce
-the error,
-or submitting a new bug report.
-
+We manually determined the validity of each warning.
+For a known error, we compared the generated report (i.e., the
+error-revealing method call chain as Figure~\ref{fig:report} shows) against the
+actual error-fixing patch to check whether our tool correctly identified the
+erroneous method. For a previously-unknown error, we submitted a new bug
+report to its developers, and wrote a test driver to reproduce it.
 
 
 \begin{table*}[ht]
