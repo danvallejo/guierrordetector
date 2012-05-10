@@ -65,9 +65,25 @@ without going through any safe UI method. }\vspace{1mm}
 \noindent  {\textsc{\textbf{Problem.}}}
 At a high level, to detect an invalid thread access error, an analysis needs to track all
 non-UI threads spawned by the UI thread, and check whether those non-UI threads
-may invoke a UI-accessing method.
+may invoke a UI-accessing method.\vspace{1mm}
 
-\tinystep
+
+\noindent  {\textsc{\textbf{Example.}}} Figure~\ref{fig:simplecg} shows an example call graph
+to illustrate the invalid thread access problem.
+
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[scale=0.44]{simplecg}
+  \vspace*{-1.0ex}\caption {{\label{fig:simplecg} A simple call graph to illustrate the
+invalid thread access problem. The \CodeIn{entry()} node is executing
+in a UI thread. Nodes \CodeIn{uiAcc1()}, \CodeIn{uiAcc2}, and \CodeIn{uiAcc3} are
+three UI-Accessing methods. Node \CodeIn{safe()} is a Safe UI Method.
+Node \CodeIn{start()} is a non-UI thread spawning method. Method call chain:
+\CodeIn{entry()} $\rightarrow$ \CodeIn{start()} $\rightarrow$ \CodeIn{uiAcc3()}
+indicates an invalid thread access error.}}
+\end{figure}
+
 
 \subsection{Error Detection Algorithm}
 \label{sec:algorithm}
