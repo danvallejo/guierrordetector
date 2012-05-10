@@ -74,7 +74,7 @@ to illustrate the invalid thread access problem.
 
 \begin{figure}[t]
   \centering
-  \includegraphics[scale=0.44]{simplecg}
+  \includegraphics[scale=0.40]{simplecg}
   \vspace*{-1.0ex}\caption {{\label{fig:simplecg} A simple call graph to illustrate the
 invalid thread access problem. The \CodeIn{entry()} node is executing
 in a UI thread. Nodes \CodeIn{uiAcc1()}, \CodeIn{uiAcc2}, and \CodeIn{uiAcc3} are
@@ -82,6 +82,7 @@ three UI-Accessing methods. Node \CodeIn{safe()} is a Safe UI Method.
 Node \CodeIn{start()} is a non-UI thread spawning method. Method call chain:
 \CodeIn{entry()} $\rightarrow$ \CodeIn{start()} $\rightarrow$ \CodeIn{uiAcc3()}
 indicates an invalid thread access error.}}
+\vspace{-2mm}
 \end{figure}
 
 
