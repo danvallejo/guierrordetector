@@ -1,4 +1,4 @@
-PDF_FIGURES = cgexample.pdf
+PDF_FIGURES = cgexample.pdf simplecg.pdf
 
 # Ensure that fonts are embedded in the resulting PDF file
 EPSTOPDF = GS_OPTIONS="-dEmbedAllFonts=true -dPDFSETTINGS=/printer" epstopdf
@@ -39,3 +39,5 @@ clean:
 cgexample.pdf: cgexample.eps
 	${EPSTOPDF} $<
 
+simplecg.pdf: simplecg.eps
+	${EPSTOPDF} $<
