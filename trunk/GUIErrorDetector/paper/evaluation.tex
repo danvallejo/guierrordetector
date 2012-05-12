@@ -179,10 +179,10 @@ to add extra annotations and user-defined filters. All these
 manual parts took less than a total of 60 minutes.
 
 We manually determined the validity of each warning.
-For a known error, we compared the generated report (i.e., the
-error-revealing method call chain as Figure~\ref{fig:report} shows) against the
-actual error-fixing patch to check whether our tool correctly identified the
-erroneous method. For a previously-unknown error, we submitted a new bug
+For a known error, we compared the generated report (i.e., an
+error-revealing method call chain as shown in Figure~\ref{fig:report}) against the
+actual bug-fixing patch to check whether the tool identified the
+buggy method. For a previously-unknown error, we submitted a new bug
 report to its developers, and wrote a test driver to reproduce it.
 %wrote a test driver to 
 
@@ -278,8 +278,8 @@ are redundant. Section~\ref{sec:reflectionaware} compares with other call graph
 construction algorithms.
 
 We submitted all \newbugs new errors to the respective developers. As of May 2012, 
-1 error S3dropbox has been confirmed, we have reproduced 2 errors,
-and 4 errors in VirgoFTP, FileBunker, and ArecaBackup
+1 error S3dropbox has been confirmed, and we have reproduced other errors,
+in which 4 errors in VirgoFTP, FileBunker, and ArecaBackup
 have not yet been verified by the developers. 
 %2 errors in SudokuSolver can be reproduced by simply
 %clicking its UIs, and the rest 4 errors can be reproduced
