@@ -123,8 +123,8 @@ public class TestEclipseRunnerPlugin extends AbstractEclipsePluginTest {
 		
 //		super.setCGType(CG.ZeroCFA);
 		super.setCGType(CG.OneCFA);
-		super.setCGType(CG.RTA);
-		super.setCGType(CG.ZeroCFA);
+//		super.setCGType(CG.RTA);
+//		super.setCGType(CG.ZeroCFA);
 //		super.setRunNaiveApproach(true);
 		
 //		super.setExhaustiveSearch(true);
