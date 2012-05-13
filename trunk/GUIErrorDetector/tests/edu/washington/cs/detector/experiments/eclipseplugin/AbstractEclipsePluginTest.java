@@ -272,6 +272,7 @@ public abstract class AbstractEclipsePluginTest extends TestCase {
 		
 		if(this.useexhaustivesearch) {
 			System.out.println("starting exhaustive search....");
+			WALAUtils.showGraphStats(builder.getAppCallGraph());
 			
 			AnomalyCallChainSearcher searcher = new AnomalyCallChainSearcher(builder.getAppCallGraph(), eventNodes);
 			searcher.setUiGuider(this.uiAnomalyGuider);
@@ -280,7 +281,7 @@ public abstract class AbstractEclipsePluginTest extends TestCase {
 			
 			ExhaustiveSearcher.USE_CLOCK = true;
 			SimpleClock.start();
-			SimpleClock.setBudget(1200000); //20 mins
+			SimpleClock.setBudget(1200000*3); //20 mins
 			
 			Collection<List<CGNode>> result = searcher.findUIAnomalyCallChains();
 			

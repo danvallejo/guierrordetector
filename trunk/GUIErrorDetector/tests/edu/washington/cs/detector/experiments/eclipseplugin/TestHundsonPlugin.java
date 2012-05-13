@@ -116,7 +116,7 @@ public class TestHundsonPlugin extends AbstractEclipsePluginTest {
 //		super.setCGType(CG.ZeroCFA);
 		super.setCGType(CG.OneCFA);
 //		super.setCGType(CG.RTA);
-		super.setCGType(CG.TempZeroCFA);
+//		super.setCGType(CG.TempZeroCFA);
 		
 //		super.setRunNaiveApproach(true);
 		
