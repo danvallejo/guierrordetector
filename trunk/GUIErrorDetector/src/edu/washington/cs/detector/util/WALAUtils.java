@@ -89,6 +89,21 @@ public class WALAUtils {
 		    Log.log(sb.toString());
 	}
 	
+	public static void showGraphStats(Graph<CGNode> g) {
+		System.out.println("Node num: " + g.getNumberOfNodes());
+		int maxOutD = -1;
+		int totalOutD = 0;
+		for(CGNode node : g) {
+			int outD = g.getSuccNodeCount(node);
+			totalOutD += outD;
+			if(outD > maxOutD) {
+				maxOutD = outD;
+			}
+		}
+		System.out.println("Max out-edge number per node: " + maxOutD);
+		System.out.println("Average out-edge number: " + (float)totalOutD/g.getNumberOfNodes());
+	}
+	
 	  //FIXME buyer aware
 	  public static Graph<CGNode> copy(Graph<CGNode> g) throws WalaException {
 		  return pruneGraph(g, new AcceptAllFilter());
