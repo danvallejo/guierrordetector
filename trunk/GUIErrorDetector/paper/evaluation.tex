@@ -31,7 +31,7 @@ are selected because they have known invalid thread access errors (1 error per s
 all errors have been fixed in later revisions.
 We used the buggy versions to check whether our tool
 can correctly identify those known errors. 
-For the other five subjects, we selected them
+For the other four subjects, we selected them
 by first searching for the
 framework keywords (e.g., ``Java Swing'' or ``Java SWT'')
 in the above source repositories, and then choosing subjects based on the following
@@ -181,7 +181,7 @@ manual parts took less than a total of 60 minutes.
 We manually determined the validity of each warning.
 For a known error, we compared the generated report (i.e., an
 error-revealing method call chain as shown in Figure~\ref{fig:report}) against the
-actual bug-fixing patch to check whether the tool identified the
+actual bug fix to check whether the tool identified the
 buggy method. For a previously-unknown error, we submitted a new bug
 report to its developers, and wrote a test driver to reproduce it.
 %wrote a test driver to 
@@ -270,7 +270,7 @@ are shown at the far right.} }
 
 As shown in Table~\ref{table:results}, our tool found
 errors in each subject. Using the 1-CFA
-call graph algorithm, our tool issued 22 warnings, among
+call graph algorithm, our tool issued \warnings warnings, among
 which \bugs warnings reveal \bugs distinct errors (\newbugs were previously unknown,
 and the \oldbugs known errors were correctly identified),
 2 warnings are false positives, and the remaining 8 warnings
@@ -543,7 +543,7 @@ $\mathit{worklist}$ $\leftarrow$ $\bigcup_{\mathit{entry} \in \mathit{entryNodes
 to any UI-accessing node, rather than the shortest path from each
 \CodeIn{Thread.start()} node to any UI-accessing node as the algorithm in
 Figure~\ref{fig:detectalgorithm} does.
-This variant reported 10 errors and 12 false positives.   It missed 1 error in S3dropbox and 1 error in
+This variant reported 8 errors and 12 false positives.   It missed 1 error in S3dropbox and 1 error in
 SudokuSolver.
 It visits every node in the call graph only once, rather than potentially
 once per entry node, but doing so prunes out real error paths.
@@ -553,7 +553,7 @@ the $\mathit{worklist}$ on line 7 of Figure~\ref{fig:detectalgorithm} to
 a stack, and changing queue operations dequeue and enqueueAll
 on lines 10 and 21
 to pop and pushAll.
-This variant reported 11 errors and 10 false positives.  It missed 1 error in FileBunker.
+This variant reported 9 errors and 10 false positives.  It missed 1 error in FileBunker.
 DFS tends to search deeper into the graph and return longer paths that are
 more likely to be infeasible or to be removed by the filters.
 %For the FileBunker subject, paths
