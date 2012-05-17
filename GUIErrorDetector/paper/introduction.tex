@@ -37,10 +37,16 @@ adopt the \textit{single-GUI-thread rule} for GUI object access:
                {\endlist}
 \makeatother
 
-\begin{myquotation}
+%\begin{myquotation}
+%this is on purpose. if not, the code in the next page will be
+%scattered into 2 pages
+\vspace{-2mm}
+\begin{quotation}
 All GUI objects, including visual components and data models, must be
  accessed exclusively from the \textit{event dispatching thread}.
-\end{myquotation}
+\end{quotation}
+\vspace{-2mm}
+%\end{myquotation}
 
 The \textit{event dispatching thread}, also called the \textit{UI thread}, is a single
 special thread initialized by the GUI framework, where all event-handling code
