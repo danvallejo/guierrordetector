@@ -102,6 +102,7 @@ set of error filters, to achieve good scalability with reasonable accuracy.
 \subsection{Call Graph Construction Algorithms}
 %\vspace{1mm}
 
+\begin{comment}
 %\noindent \textit{\textbf{Call Graph Construction Algorithms}}
 We briefly mention some call graph construction
 algorithms for Java. Grove et al.~\cite{kcfa} described a unified
@@ -116,7 +117,13 @@ those algorithms do not build a sound call graph in the presence of reflection.
 As reflected in our experiments, using standard call graph algorithms
 misses errors in some Android applications.
 
+\end{comment}
 
+Call graph construction algorithms have been well studied in the literature. However,
+standard algorithms such as RTA~\cite{rta} and k-CFA~\cite{kcfa} do not build
+a sound call graph in the presence of reflection.
+As reflected in our experiments, using standard call graph algorithms
+misses errors in some Android applications.
 Livshits et al.~\cite{Livshits:2005} presented a static analysis
 to reason about reflective calls. The analysis
 attempts to infer additional information stored in string constants to resolve
