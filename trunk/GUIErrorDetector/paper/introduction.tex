@@ -29,8 +29,8 @@ adopt the \textit{single-GUI-thread rule} for GUI object access:
 \newenvironment{myquotation}
                {\list{}{\listparindent=0pt%whatever you need
                         \itemindent    \listparindent
-                        \leftmargin=10pt%  whatever you need
-                        \rightmargin=0pt%whatever you need
+                        \leftmargin=14pt%  whatever you need
+                        \rightmargin=14pt%whatever you need
                         \topsep=0pt%%%%%  whatever you need
                         \parsep        \z@ \@plus\p@}%
                 \item\relax}
@@ -152,7 +152,7 @@ spawns a new thread on line 283. This newly created, non-UI thread calls back me
 causing an invalid thread access error. Our tool
 finds this error and generates a report as shown in
 Figure~\ref{fig:report}.
-}} \vspace{-1.8mm}
+}} %\vspace{-1.8mm}
 \end{figure}
 
 The invalid thread access error is not unique to the SWT framework. Other recent GUI frameworks
