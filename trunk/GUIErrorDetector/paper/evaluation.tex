@@ -23,7 +23,7 @@ in removing warnings (Section~\ref{sec:filters}).
 \subsection{Subject Programs}
 \label{sec:subjects}
 
-We used 10 open-source projects from SourceForge, Google Code,
+We used \subnum open-source projects from SourceForge, Google Code,
 and the Eclipse plugin marketplace as evaluation subjects. 
 
 Five subjects (EclipseRunner, HudsonEclipse, SGTPuzzler, Fennec, and MyTracks)
@@ -52,7 +52,7 @@ include end-user applications, programming tools, and games.
 \begin{itemize}%\addtolength{\itemsep}{-0.5\baselineskip}
 \item \textbf{SWT desktop applications.}
 %VirgoFTP~\cite{virgo} and FileBunker~\cite{filebunker} are two useful SWT desktop applications.
-VirgoFTP~\cite{virgo} implements a simple FTP client based on Java and the SWT UI library.
+%VirgoFTP~\cite{virgo} implements a simple FTP client based on Java and the SWT UI library.
 FileBunker~\cite{filebunker} is a file backup application that uses one or more GMail
 accounts as its backup repository. ArecaBackup~\cite{areca} offers a local
 file backup solution for Linux and Windows.
@@ -94,8 +94,8 @@ interfaces to visualize them on Google Maps.
  Program (version) & LOC & Classes & Methods \\
 \hline \hline
 \multicolumn{4}{|l|}{SWT desktop applications}   \\
- \hline
- VirgoFTP (1.3.5) &  10815 &  116 &  1955\\
+ %\hline
+ %VirgoFTP (1.3.5) &  10815 &  116 &  1955\\
  \hline
  FileBunker (1.1.2)&  14237 &  150 &  1106  \\
  \hline
@@ -125,7 +125,7 @@ interfaces to visualize them on Google Maps.
  MyTracks (01d5c1e1cd47)&  20297 &  143 &  1374 \\
 \hline
 \hline
- Total &  99458 &  1094 &  11221 \\
+ Total &  \totaloc &  978 &  9266 \\
 \hline
 \multicolumn{4}{l}{}   \\
 \hline
@@ -201,8 +201,8 @@ report to its developers, and wrote a test driver to reproduce it.
  & CG Size & \#Warning & \#Bug & CG Size & \#Warning & \#Bug & CG Size & \#Warning & \#Bug & \#Warning \\
 \hline \hline
 \multicolumn{11}{|l|}{SWT desktop applications}   \\
- \hline
- VirgoFTP&  12401 &  1 &  1 & 10858 & 1 & 1 & 43598 & 2 & 2& 149  \\
+ %\hline
+ %VirgoFTP&  12401 &  1 &  1 & 10858 & 1 & 1 & 43598 & 2 & 2& 149  \\
  \hline
  FileBunker &  18951 &  1 &  0 & 15743 & 0 & 0 & 76088 & 2 & 1& 693  \\
  \hline
@@ -234,7 +234,7 @@ report to its developers, and wrote a test driver to reproduce it.
  MyTracks & 24036 / 24036 &  161 / 220 & 0 / 0 & 10803 / 13645 & 119 / 119 & 0 / 0 & 39235 / 110977 & 1 / 1 & 0 / 1 & 1192 \\
 \hline
 \hline
- Total & 199161 / 199724 &  177 / 251 & 5 / 5 & 149441 / 153054& 133 / 137& 6 / 7 & 577821 / 652756& 21 / 22 & 10 / 12 & 6542\\
+ Total & 186760 / 187323&  176 / 250 & 4 / 4 & 138583 / 142196& 132 / 136& 5 / 6 & 534223 / 609158& 19 / 20 & 8 / 10 & 6393\\
 \hline
 \end{tabular}
 \end{center}
@@ -250,7 +250,7 @@ For the Android applications, a slash ``/'' separates the result of
 using standard call graph construction algorithm and our call
 graph construction algorithm in Section~\ref{sec:cgcon} (dealing
 with reflection calls and adding \annotationnum native method annotations
-for SGTPuzzler). The \newbugs errors found in VirgoFTP, FileBunker, ArecaBackup,
+for SGTPuzzler). The \newbugs errors found in FileBunker, ArecaBackup,
 S3dropbox, and SudokuSolver are previously  unknown. As a comparison, the
 results of the ``Requiring Wrappers'' approach (Section~\ref{sec:straightforward}),
 are shown at the far right.} }
@@ -279,7 +279,7 @@ construction algorithms.
 
 We submitted all \newbugs new errors to the respective developers. As of May 2012, 
 1 error S3dropbox has been confirmed, and we have reproduced other errors,
-in which 4 errors in VirgoFTP, FileBunker, and ArecaBackup
+in which 2 errors in FileBunker and ArecaBackup
 have not yet been verified by the developers. 
 %2 errors in SudokuSolver can be reproduced by simply
 %clicking its UIs, and the rest 4 errors can be reproduced
@@ -563,12 +563,14 @@ The third variant uses exhaustive search to find potential errors. This variant
 enumerates all non-cyclic paths from all reachable \CodeIn{Thread.start()} nodes
 to each UI-accessing node, and then checks whether each
 path spawns a new thread and accesses GUI objects without using safe UI methods.
-However, the number of non-cyclic paths in a graph is exponential in the graph size,
-and it is infeasible for this variant to enumerate all paths for a realistic
-call graph, which often contains thousands of
-nodes (e.g., $2^{1000}$ $\approx$ 1.07$\times$$10^{301}$). In our experiment,
-we ran this variant on each subject for 1 hour, it explored 5.1$\times$$10^9$ paths on average, but did not
-output any real errors before it terminated.
+We ran this variant on each subject for 1 hour, it explored 5.1$\times$$10^9$ paths
+on average, but did not output any real errors before it terminated.
+The number of non-cyclic paths in a graph is exponential in the graph size,
+and it is infeasible to enumerate all paths for a realistic call graph.
+In our experiments, the smallest call graph contains 7201 nodes and the average out-degree
+of each node is 2.15. Thus, a rough estimation for the number of distinct
+non-cyclic paths leads to an astronomically large number: 
+$2.15^{7201}$ $\approx$ 1.07$\times$$10^{2107}$.
 
 %for a realistic call graph consisting of thousands
 %of nodes, 
@@ -621,8 +623,8 @@ using multi-source BFS, DFS, or exhaustive search.
  Program &Filtering  & $F_1$ & $F_{1,2}$ & $F_{1,2,3}$&$F_{1,2,3,4}$ & $F_{1,2,3,4,5}$\\
 \hline \hline
 \multicolumn{7}{|l|}{SWT desktop applications}   \\
- \hline
- VirgoFTP &  21 &  21 &  21 & 7 &  2 & 2\\
+ %\hline
+ %VirgoFTP &  21 &  21 &  21 & 7 &  2 & 2\\
  \hline
  FileBunker &  4494 &  4494 &  4494 &  3210 &  10  & 2\\
  \hline
@@ -654,7 +656,7 @@ using multi-source BFS, DFS, or exhaustive search.
  MyTracks &  1176 &  1176 &  483 & 441 &  69 & 1 \\
 \hline
  \hline
- Total &  60631 &  40461 &  39764 &  37421 &  112 & 22 \\
+ Total &  60610 &  40440 &  39753 &  37414 &  110 & \warnings \\
  \hline
 \end{tabular}
 \end{center}
