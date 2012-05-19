@@ -159,7 +159,7 @@ the bottom table.} }
 \subsection{Experimental Procedure}
 \label{sec:procedural}
 
-We ran our tool on each subject with three call graph construction
+We ran our tool on each subject program with three call graph construction
 algorithms: RTA~\cite{rta}, 0-CFA, and 1-CFA~\cite{kcfa}.  When running
 each call graph construction algorithm on three Android applications, we
 used two configurations: with and without our enhancements
@@ -174,7 +174,7 @@ Two subjects (MyTracks and Fennec)
 use a customized pattern to interact with the GUI framework.
 For them, we added \filternum user-defined filters, described in Section~\ref{sec:heuristic}.
 In this experiment, none of the paper
-authors was familiar with the subjects, but we found it was quite easy
+authors was familiar with the subject programs, but we found it was quite easy
 to add extra annotations and user-defined filters. All these
 manual parts took less than a total of 60 minutes.
 
@@ -269,7 +269,7 @@ are shown at the far right.} }
 \label{sec:errors}
 
 As shown in Table~\ref{table:results}, our tool found
-errors in each subject. Using the 1-CFA
+errors in each subject program. Using the 1-CFA
 call graph algorithm, our tool issued \warnings warnings, among
 which \bugs warnings reveal \bugs distinct errors (\newbugs were previously unknown,
 and the \oldbugs known errors were correctly identified),
@@ -278,9 +278,9 @@ are redundant. Section~\ref{sec:reflectionaware} compares with other call graph
 construction algorithms.
 
 We submitted all \newbugs new errors to the respective developers. As of May 2012, 
-1 error S3dropbox has been confirmed, and we have reproduced other errors.
+1 error in S3dropbox has been confirmed, and we have reproduced all the other errors.
 All found bugs and our experimental results are
-publicly available at: \url{http://www.cs.washington.edu/homes/szhang/guierror/}.
+publicly available at \url{http://www.cs.washington.edu/homes/szhang/guierror/}.
 %in which 2 errors in FileBunker and ArecaBackup
 %have not yet been verified by the developers. 
 %2 errors in SudokuSolver can be reproduced by simply
@@ -398,14 +398,15 @@ when the program fails to launch the mail-composing window of the
 user's default mail client (i.e., the \CodeIn{java.awt.Desktop.mail()}
 method throws an exception after a user clicks the ``eMail Me'' button).
 
-We found GUI developers have already
+\enlargethispage{5pt}
+
+We found that GUI developers have already
 used design patterns, runtime checks, and testing to avoid violating
 the single-GUI-thread rule. However, due to the huge space of
 possible UI interactions, hard-to-find
 invalid thread access errors still exist.
 %Thus, a static analysis as presented in this paper
 %would be useful.
-
 
 \vspace{1mm}
 
@@ -563,13 +564,13 @@ The third variant uses exhaustive search to find potential errors. This variant
 enumerates all non-cyclic paths from all reachable \CodeIn{Thread.start()} nodes
 to each UI-accessing node, and then checks whether each
 path spawns a new thread and accesses GUI objects without using safe UI methods.
-We ran this variant on each subject for 1 hour, it explored 5.1$\times$$10^9$ paths
-on average, but did not output any real errors before it terminated.
+We ran this variant on each subject program for 1 hour.  It explored 5.1$\times$$10^9$ paths
+on average, but did not output any of the 10 errors before it terminated.
 The number of non-cyclic paths in a graph is exponential in the graph size,
 and it is infeasible to enumerate all paths for a realistic call graph.
 In our experiments, the smallest call graph contains 7201 nodes and the average out-degree
-of each node is 2.15. Thus, a rough estimation for the number of distinct
-non-cyclic paths gives an astronomically large number: 
+of each node is 2.15.  The number of distinct
+non-cyclic paths is astronomically large; a rough estimate is
 $2.15^{7201}$ $\approx$ 1.07$\times$$10^{2107}$.
 
 %for a realistic call graph consisting of thousands
@@ -699,7 +700,7 @@ effective in reducing the number of warnings.
 \label{sec:performance}
 
 \noindent \textbf{\textit{Performance and scalability.}} Our tool
-has been evaluated on \subnum subjects with \totaloc LOC and frameworks
+has been evaluated on \subnum subject programs with \totaloc LOC and frameworks
 with 1.4 MLOC, showing good scalability. Our evaluations
 were conducted on a 2.67GHz Intel Core PC with 4GB
 physical memory (1GB is allocated for the JVM), running Windows 7.
@@ -739,8 +740,7 @@ It may miss true positives due to the graph search strategy,
 and it never reports cyclic paths. Furthermore, for the
 sake of scalability, our tool implementation uses the default
 configuration of WALA and ignores part of the AWT library. Thus,
-it missed one error in S3dropbox which can be found by using a different
-technique~\cite{JSR308-webpage-201110}.
+it missed one error in S3dropbox which we later found by using pluggable type-checking~\cite{DietlDEMS2011}.
 Designing better call graph construction algorithms,
 graph search strategies, and filtering heuristics may alleviate this limitation.
 Third, our tool cannot compute call relationships

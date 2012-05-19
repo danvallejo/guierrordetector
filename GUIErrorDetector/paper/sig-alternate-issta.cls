@@ -708,12 +708,14 @@
  \null
  \setbox\@acmtitlebox\vbox{%
 \baselineskip 20pt
-\vskip 2em                   % Vertical space above title.
+%\vskip 2em                   % Vertical space above title.
+%\vskip 1em                   % Vertical space above title.
    \begin{center}
     {\ttlfnt \@title\par}       % Title set in 18pt Helvetica (Arial) bold size.
     \vskip 1.5em                % Vertical space after title.
 %This should be the subtitle.
-{\subttlfnt \the\subtitletext\par}\vskip 1.25em%\fi
+%{\subttlfnt \the\subtitletext\par}\vskip 1.25em%\fi
+{\subttlfnt \the\subtitletext\par}\vskip .75em%\fi
     {\baselineskip 16pt\aufnt   % each author set in \12 pt Arial, in a
      \lineskip .5em             % tabular environment
      \begin{tabular}[t]{c}\@author
@@ -721,7 +723,8 @@
     \vskip 1.5em               % Vertical space after author.
    \end{center}}
  \dimen0=\ht\@acmtitlebox
- \advance\dimen0 by -12.75pc\relax % Increased space for title box -- KBT
+% \advance\dimen0 by -12.75pc\relax % Increased space for title box -- KBT
+ \advance\dimen0 by -10.75pc\relax % Increased space for title box -- KBT
  \unvbox\@acmtitlebox
  \ifdim\dimen0<0.0pt\relax\vskip-\dimen0\fi}
 
@@ -843,8 +846,8 @@
 \@float{copyrightbox}[b]
 \begin{center}
 \setlength{\unitlength}{1pc}
-\begin{picture}(20,6) %Space for copyright notice
-\put(0,-0.95){\crnotice{\@toappear}}
+\begin{picture}(20,5) %Space for copyright notice
+\put(0,-0.75){\crnotice{\@toappear}}
 \end{picture}
 \end{center}
 \end@float}
