@@ -150,12 +150,14 @@ Swing (1.6)&  167961 &  878 &  13159 \\
 used in our evaluation. Column ``LOC'' is the number of lines
 of code, as counted by LOCC~\cite{locc}.  Each program is analyzed
 together with its GUI framework, as listed in
-the bottom table.} }
+the bottom table.}} 
 \end{table}
 
 \smallstep
 \tinystep
 
+%\vspace{2mm}
+\vspace{-3mm}
 \subsection{Experimental Procedure}
 \label{sec:procedural}
 
@@ -257,6 +259,7 @@ are shown at the far right.} }
 \end{table*}
 
 \tinystep
+%\vspace{1mm}
 \subsection{Results}
 \label{sec:results}
 
@@ -265,6 +268,7 @@ are shown at the far right.} }
 %the effect of applying each heuristic filter.
 \smallstep
 
+\vspace{-1mm}
 \subsubsection{Errors in Multithreaded GUI Applications}
 \label{sec:errors}
 
@@ -324,7 +328,7 @@ the method \CodeIn{deleteCurrentBucket} invoked on line 63 throws
 an exception, which causes method \CodeIn{deleteError} to
 access a Swing GUI object \CodeIn{display} on line 79 from
 a non-UI thread. This error was previously unknown, and has been confirmed by the S3dropbox developers.
-}} %\vspace{-5mm}
+}} %\vspace{-1mm}
 \end{figure}
 
 %Figures~\ref{fig:swingerror} amd~\ref{fig:pluginerror} show
@@ -414,6 +418,8 @@ invalid thread access errors still exist.
 in multithreaded GUI applications with
 acceptable accuracy.
 
+
+%\vspace{-4mm}
 \subsubsection{Comparison to Requiring Wrappers}
 \label{sec:straightforward}
 
