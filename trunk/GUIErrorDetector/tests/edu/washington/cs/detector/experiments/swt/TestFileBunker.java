@@ -13,6 +13,7 @@ import edu.washington.cs.detector.experimental.InvalidThreadAccessDetector;
 import edu.washington.cs.detector.experiments.filters.MergeSameEntryToStartPathStrategy;
 import edu.washington.cs.detector.experiments.filters.MergeSameTailStrategy;
 import edu.washington.cs.detector.experiments.filters.RemoveContainingNodeStrategy;
+import edu.washington.cs.detector.experiments.filters.RemoveSubsumedChainStrategy;
 import edu.washington.cs.detector.experiments.filters.RemoveSystemCallStrategy;
 import edu.washington.cs.detector.guider.CGTraverseSWTGuider;
 import edu.washington.cs.detector.util.Globals;
@@ -40,12 +41,14 @@ public class TestFileBunker extends TestCase {
 		
 		Log.logConfig("./log.txt");
 		
+		long start = System.currentTimeMillis();
+		
 		UIAnomalyDetector.DEBUG = true;
 		
 		//initialize a UI anomaly detector
-//        UIAnomalyDetector detector = new UIAnomalyDetector(path);
+        UIAnomalyDetector detector = new UIAnomalyDetector(path);
 		
-		InvalidThreadAccessDetector detector = new InvalidThreadAccessDetector(path);
+//		InvalidThreadAccessDetector detector = new InvalidThreadAccessDetector(path);
         
         detector.setThreadStartGuider(new CGTraverseSWTGuider());
         detector.setUIAnomalyGuider(new CGTraverseSWTGuider());
@@ -53,13 +56,18 @@ public class TestFileBunker extends TestCase {
 		//configure the call graph builder, use 1-CFA as default
 		CGBuilder builder = new CGBuilder(path);
 		builder.setCGType(CG.OneCFA);
-//		builder.setCGType(CG.RTA);
+		builder.setCGType(CG.RTA);
 //		builder.setCGType(CG.ZeroCFA);
-//		builder.setCGType(CG.FakeZeroCFA);
+		builder.setCGType(CG.TempZeroCFA);
 		
-//		UIAnomalyDetector.setToUseDFS();
+		UIAnomalyDetector.setToUseDFS();
 		
+		long cgstart = System.currentTimeMillis();
 		builder.buildCG();
+		long cgend = System.currentTimeMillis();
+		System.out.println("CG building time: " + (cgend - cgstart));
+//		System.exit(1);
+		
 		//dump debugging information
 		WALAUtils.dumpClasses(builder.getClassHierarchy(), "./logs/loaded_classes.txt");
 	    Utils.dumpCollection(WALAUtils.getUnloadedClasses(builder.getClassHierarchy(),
@@ -69,24 +77,33 @@ public class TestFileBunker extends TestCase {
 		System.out.println("Number of anomaly call chains: " + chains.size());
 		
 		CallChainFilter filter = new CallChainFilter(chains);
+		chains = filter.apply(new RemoveSubsumedChainStrategy());
+		System.out.println("No of chains after removing subsumption: " + chains.size());
+		
+		 filter = new CallChainFilter(chains);
 		chains = filter.apply(new RemoveContainingNodeStrategy("Lorg/eclipse/swt/graphics/Device, dispose()V"));
 		System.out.println("No of chains after filtering dispose(): " + chains.size());
 		
 		 filter = new CallChainFilter(chains);
 		chains = filter.apply(new RemoveSystemCallStrategy());
 		System.out.println("No of chains after filtering system classes: " + chains.size());
+
+		filter = new CallChainFilter(chains);
+		chains = filter.apply(new MergeSameEntryToStartPathStrategy());
+		System.out.println("No of chains after removing same entry to start path: " + chains.size());
 		
 		filter = new CallChainFilter(chains);
 		chains = filter.apply(new MergeSameTailStrategy());
 		System.out.println("No of chains after removing common tails: " + chains.size());
+		
+		long end = System.currentTimeMillis();
+		
+		System.out.println("Total time: " + (end - start));
 //		
 //		filter = new CallChainFilter(chains);
 //		chains = filter.apply(new RemoveContainingNodeStrategy("Lorg/eclipse/swt/graphics/Device, dispose()V"));
 //		System.out.println("No of chains after filtering dispose(): " + chains.size());
 		
-		filter = new CallChainFilter(chains);
-		chains = filter.apply(new MergeSameEntryToStartPathStrategy());
-		System.out.println("No of chains after removing same entry to start path: " + chains.size());
 		
 		Utils.dumpAnomalyCallChains(chains, "./logs/file-bunker-anomalies.txt");
 	}

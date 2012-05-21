@@ -10,8 +10,10 @@ import edu.washington.cs.detector.TestCommons;
 import edu.washington.cs.detector.UIAnomalyDetector;
 import edu.washington.cs.detector.CGBuilder.CG;
 import edu.washington.cs.detector.experimental.InvalidThreadAccessDetector;
+import edu.washington.cs.detector.experiments.filters.MergeSameEntryToStartPathStrategy;
 import edu.washington.cs.detector.experiments.filters.MergeSamePrefixToLibCallStrategy;
 import edu.washington.cs.detector.experiments.filters.MergeSameTailStrategy;
+import edu.washington.cs.detector.experiments.filters.RemoveSubsumedChainStrategy;
 import edu.washington.cs.detector.experiments.filters.RemoveSystemCallStrategy;
 import edu.washington.cs.detector.guider.CGTraverseSWTGuider;
 import edu.washington.cs.detector.util.Globals;
@@ -40,6 +42,7 @@ public class TestArecaBackup extends TestCase {
 	    
 	
 	public void testArecaBackup() throws IOException {
+		long start = System.currentTimeMillis();
 		String path = appPath + Globals.pathSep + libJar;
 		
 //        UIAnomalyDetector detector = new UIAnomalyDetector(path);
@@ -51,23 +54,35 @@ public class TestArecaBackup extends TestCase {
 		
 		CGBuilder builder = new CGBuilder(path);
 		builder.setCGType(CG.OneCFA);
-//		builder.setCGType(CG.RTA);
-//		builder.setCGType(CG.FakeZeroCFA);
+		builder.setCGType(CG.RTA);
+		builder.setCGType(CG.TempZeroCFA);
 		
 		//UIAnomalyDetector.setToUseDFS();
 		
+		long cgStart = System.currentTimeMillis();
 		builder.buildCG();
+		long cgEnd = System.currentTimeMillis();
+		System.out.println("cg building time: " + (cgEnd - cgStart));
+//		System.exit(1);
 		
 		WALAUtils.dumpClasses(builder.getClassHierarchy(), "./logs/loaded_classes.txt");
 	    Utils.dumpCollection(WALAUtils.getUnloadedClasses(builder.getClassHierarchy(),
 	    		TestCommons.getJarsFromPath(path)),  "./logs/unloaded_classes.txt");
-		
+	    
 		List<AnomalyCallChain> chains = detector.detectUIAnomaly(builder);
 		System.out.println("Number of anomaly call chains: " + chains.size());
 		
 		CallChainFilter filter = new CallChainFilter(chains);
+		chains = filter.apply(new RemoveSubsumedChainStrategy());
+		System.out.println("No of chains after filtering subsumed chains: " + chains.size());
+		
+		filter = new CallChainFilter(chains);
 		chains = filter.apply(new RemoveSystemCallStrategy());
 		System.out.println("No of chains after filtering system classes: " + chains.size());
+		
+		filter = new CallChainFilter(chains);
+		chains = filter.apply(new MergeSameEntryToStartPathStrategy());
+		System.out.println("No of chains after removing common heads: " + chains.size());
 		
 		filter = new CallChainFilter(chains);
 		chains = filter.apply(new MergeSameTailStrategy());
@@ -76,6 +91,10 @@ public class TestArecaBackup extends TestCase {
 		filter = new CallChainFilter(chains);
 		chains = filter.apply(new MergeSamePrefixToLibCallStrategy(new String[]{"com.application.areca", "com.jcraft.jsch", "com.myJava"}));
 		System.out.println("No of chains after removing common tails of lib calls: " + chains.size());
+		
+		long end = System.currentTimeMillis();
+		
+		System.out.println("The total time: " + (start - end));
 		
 		Utils.dumpAnomalyCallChains(chains, "./logs/areca-anomalies.txt");
 		
