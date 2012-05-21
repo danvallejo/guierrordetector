@@ -122,7 +122,7 @@ public abstract class AbstractAndroidTest extends TestCase {
 	    builder.makeScopeAndClassHierarchy();
 	    ClassHierarchy cha = builder.getClassHierarchy();
 
-		Log.logConfig("./log.txt");
+		Log.logConfig("./android-log.txt");
 	    
 	    Collection<IClass> runnableInApp = WALAUtils.getRunnablesInApp(cha);
 	    Collection<IClass> runnableInClient = new LinkedHashSet<IClass>();
@@ -303,9 +303,10 @@ public abstract class AbstractAndroidTest extends TestCase {
 			
 			ExhaustiveSearcher.USE_CLOCK = true;
 			SimpleClock.start();
-			SimpleClock.setBudget(1200000); //20 mins
+			SimpleClock.setBudget(1200000*3); //20 mins set the exploration time limit
 			
 			Collection<List<CGNode>> result = searcher.findFullAnomalyCallChains();
+			System.out.println("Number of searched method call chains: " + result.size());
 			
 			SimpleClock.reset();
 			ExhaustiveSearcher.USE_CLOCK = false;

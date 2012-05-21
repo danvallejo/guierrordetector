@@ -119,6 +119,7 @@ public class TestMozillaFirefox extends AbstractAndroidTest {
 //		//
 //		return nonRedundant;
 //	}
+	//560000000
 	public void testFindErrors() {
 		CGTraverseGuider ui2startGuider = new CGTraverseAndroidGuider();
 		String[] arrays 
@@ -140,6 +141,7 @@ public class TestMozillaFirefox extends AbstractAndroidTest {
 			type = CG.OneCFA;
 //			type = CG.RTA;
 	
+//			super.setExhaustiveSearch(true);
 //			UIAnomalyDetector.setToUseDFS();
 //			ThreadStartFinder.check_find_all_starts = true;
 			
