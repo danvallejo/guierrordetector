@@ -12,6 +12,7 @@ import com.ibm.wala.util.graph.Graph;
 import edu.washington.cs.detector.NativeMethodConnector;
 import edu.washington.cs.detector.guider.CGTraverseDefaultGuider;
 import edu.washington.cs.detector.guider.CGTraverseGuider;
+import edu.washington.cs.detector.util.Log;
 
 /**
  * The basic algorithm to perform exhaustive search of all
@@ -83,6 +84,7 @@ abstract public class ExhaustiveSearcher {
 	 *   breadFirst(graph, new LinkedList<CGNode>());  //empty visited nodes at the beginning
 	 *   
 	 * */
+	private static long pathNum = 0;
 	public Collection<List<CGNode>> breadFirst(Graph<CGNode> graph, LinkedList<CGNode> visited) {
 		Collection<List<CGNode>> returnChains = new LinkedHashSet<List<CGNode>>();
 		//return the current visited chains if time is up
@@ -93,6 +95,10 @@ abstract public class ExhaustiveSearcher {
         }
 		//fetch one from the visited list, and get all adjacent nodes.
 		CGNode lastNode = visited.getLast();
+		pathNum++;
+		if(pathNum % 10000000 == 0) {
+			Log.logln("The current number of explored paths: " + pathNum);
+		}
 		LinkedList<CGNode> ajacentNodes = this.getAdjacentNodes(graph, lastNode);
 		//check whether that it is a native method or not
 		//if it is native method, check whether this native method is annotated to be called
@@ -125,6 +131,9 @@ abstract public class ExhaustiveSearcher {
                 //create the path
                 List<CGNode> chain = this.generatePath(visited);
                 returnChains.add(chain);
+//                if(returnChains.size() % 100 == 0) {
+//                	System.out.println("chain num: " + returnChains.size());
+//                }
                 //return if time up
                 if(USE_CLOCK) {
                 	if(SimpleClock.finish()) {
