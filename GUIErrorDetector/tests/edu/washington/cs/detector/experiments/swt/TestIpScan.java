@@ -14,6 +14,7 @@ import edu.washington.cs.detector.experiments.filters.MergeSameTailStrategy;
 import edu.washington.cs.detector.experiments.filters.RemoveSystemCallStrategy;
 import edu.washington.cs.detector.guider.CGTraverseSWTGuider;
 import edu.washington.cs.detector.util.Globals;
+import edu.washington.cs.detector.util.Log;
 import edu.washington.cs.detector.util.Utils;
 import edu.washington.cs.detector.util.WALAUtils;
 import junit.framework.TestCase;
@@ -26,11 +27,12 @@ public class TestIpScan extends TestCase {
 	public String libJar =  dir + "swt-win64.jar"
 	     + Globals.pathSep + dir + "picocontainer-1.0.jar";
 
-	String[] packages = new String[]{"net.azib.ipscan"};
+	String[] packages = new String[]{"net.azib.ipscan", "org.savarese"};
 	
 	String logFile = "./logs/ipscan-anomalies.txt";
 	
 	public void testIpscan() throws IOException {
+		Log.logConfig("./log.txt");
 		String path = appPath + Globals.pathSep + libJar;
         UIAnomalyDetector detector = new UIAnomalyDetector(path);
         
@@ -43,6 +45,7 @@ public class TestIpScan extends TestCase {
 //		builder.setCGType(CG.FakeZeroCFA);
 		
 		//UIAnomalyDetector.setToUseDFS();
+		UIAnomalyDetector.DEBUG = true;
 		
 		builder.buildCG();
 		
