@@ -16,7 +16,7 @@ public class SmallSmokeTest extends TestCase {
 		PDFViewer.DISABLE_VIEW_CG = true;
 		
 		TestSuite suite = new TestSuite();
-		
+	 
 		//remove this, since it need environment-specific settings
 		//suite.addTest(TestUtils.suite());
 		suite.addTest(TestFileExistence.suite());
