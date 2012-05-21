@@ -85,6 +85,7 @@ public class TestSGTPuzzle extends AbstractAndroidTest {
 	    return extraEntrypoints;
 	}
 	
+	//for exhaustive search it outputs 5.0 * 10^8 paths in a hour
 	public void testFindErrors() throws ClassHierarchyException, IOException {
 		CGTraverseGuider ui2startGuider = new CGTraverseAndroidGuider();
 		CGTraverseExploreClientRunnableStrategy start2checkGuider
@@ -134,7 +135,7 @@ public class TestSGTPuzzle extends AbstractAndroidTest {
 			//this finds bugs
 //		  List<AnomalyCallChain> chains = super.findErrorsInAndroidApp(CG.RTA, ui2startGuider, start2checkGuider, connector);
 		  CG type = CG.TempZeroCFA;
-//		  type = CG.OneCFA;
+		  type = CG.OneCFA;
 //		  type = CG.RTA;
 		  
 //		  super.setExhaustiveSearch(true);

@@ -89,6 +89,7 @@ public class TestMytracksAndroid extends AbstractAndroidTest {
 //		
 //		return result;
 //	}
+	//explored 390000000 paths
 	public void testFindErrors() {
 		CGTraverseGuider ui2startGuider = new CGTraverseAndroidGuider();
 		String[] guiderArray = 
@@ -123,6 +124,7 @@ public class TestMytracksAndroid extends AbstractAndroidTest {
 //			type = CG.TempZeroCFA;
 			type = CG.OneCFA;
 			
+//			super.setExhaustiveSearch(true);
 //			UIAnomalyDetector.setToUseDFS();
 			
 			long startT = System.currentTimeMillis();
