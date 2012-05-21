@@ -11,8 +11,10 @@ import edu.washington.cs.detector.ThreadStartFinder;
 import edu.washington.cs.detector.UIAnomalyDetector;
 import edu.washington.cs.detector.CGBuilder.CG;
 import edu.washington.cs.detector.experimental.InvalidThreadAccessDetector;
+import edu.washington.cs.detector.experiments.filters.MergeSameEntryToStartPathStrategy;
 import edu.washington.cs.detector.experiments.filters.MergeSamePrefixToLibCallStrategy;
 import edu.washington.cs.detector.experiments.filters.MergeSameTailStrategy;
+import edu.washington.cs.detector.experiments.filters.RemoveSubsumedChainStrategy;
 import edu.washington.cs.detector.experiments.filters.RemoveSystemCallStrategy;
 import edu.washington.cs.detector.guider.CGTraverseSWTGuider;
 import edu.washington.cs.detector.util.Globals;
@@ -33,28 +35,33 @@ public class TestVirgoFtp extends TestCase {
 	    Globals.pathSep + "D:\\research\\guierror\\eclipsews\\virgoftp-1.3.5\\xerces.jar";
 	
 	public void testRunVirgoFtp() throws IOException {
+		long start = System.currentTimeMillis();
 		String path = appPath + Globals.pathSep + libJar;
 		
 		Log.logConfig("./log.txt");
 		
-//        UIAnomalyDetector detector = new UIAnomalyDetector(path);
+        UIAnomalyDetector detector = new UIAnomalyDetector(path);
 		
 		//the worklist based
-        InvalidThreadAccessDetector detector = new InvalidThreadAccessDetector(path);
+//        InvalidThreadAccessDetector detector = new InvalidThreadAccessDetector(path);
         
         detector.setThreadStartGuider(new CGTraverseSWTGuider());
         detector.setUIAnomalyGuider(new CGTraverseSWTGuider());
 		
 		CGBuilder builder = new CGBuilder(path);
 		builder.setCGType(CG.OneCFA);
-//		builder.setCGType(CG.RTA);
-//		builder.setCGType(CG.FakeZeroCFA);
+		builder.setCGType(CG.RTA);
+		builder.setCGType(CG.TempZeroCFA);
 		
-		ThreadStartFinder.check_find_all_starts = true;
+//		ThreadStartFinder.check_find_all_starts = true;
 		
 		//UIAnomalyDetector.setToUseDFS();
 		
+		long cgStart = System.currentTimeMillis();
 		builder.buildCG();
+		long cgEnd = System.currentTimeMillis();
+		System.out.println("Building cg for virgo: " + (cgEnd - cgStart));
+//		System.exit(1);
 		
 		WALAUtils.dumpClasses(builder.getClassHierarchy(), "./logs/loaded_classes.txt");
 	    Utils.dumpCollection(WALAUtils.getUnloadedClasses(builder.getClassHierarchy(),
@@ -64,6 +71,10 @@ public class TestVirgoFtp extends TestCase {
 		System.out.println("Number of anomaly call chains: " + chains.size());
 		
 		CallChainFilter filter = new CallChainFilter(chains);
+		chains = filter.apply(new RemoveSubsumedChainStrategy());
+		System.out.println("No of chains after remvoing subsumption: " + chains.size());
+		
+		filter = new CallChainFilter(chains);
 		chains = filter.apply(new RemoveSystemCallStrategy());
 		System.out.println("No of chains after filtering system classes: " + chains.size());
 		
@@ -74,6 +85,10 @@ public class TestVirgoFtp extends TestCase {
 		filter = new CallChainFilter(chains);
 		chains = filter.apply(new MergeSamePrefixToLibCallStrategy(new String[]{"edu.sysu.virgoftp"}));
 		System.out.println("No of chains after removing common tails of lib calls: " + chains.size());
+		
+		long end = System.currentTimeMillis();
+		
+		System.out.println("The total time: " + (end - start));
 		
 		Utils.dumpAnomalyCallChains(chains, "./logs/virgo-ftp-anomalies.txt");
 		
