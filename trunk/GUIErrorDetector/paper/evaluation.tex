@@ -43,7 +43,7 @@ For each selected subject, we ran our tool on the latest stable release to find 
 %of each project to check whether
 %it can find any new errors.
 
-The subjects used in our experiment (Table~\ref{table:subjects})
+The subjects used in our experiment (Figure~\ref{table:subjects})
 include end-user applications, programming tools, and games. 
 
 \vspace{-5pt}
@@ -84,7 +84,7 @@ interfaces to visualize them on Google Maps.
 % \end{myindentpar}
 
 
-\begin{table}[t]
+\begin{figure}[t]
 \begin{center}
  \fontsize{9pt}{\baselineskip}\selectfont
 \hspace*{-0.2cm}
@@ -151,7 +151,7 @@ used in our evaluation. Column ``LOC'' is the number of lines
 of code, as counted by LOCC~\cite{locc}.  Each program is analyzed
 together with its GUI framework, as listed in
 the bottom table.}} 
-\end{table}
+\end{figure}
 
 \smallstep
 \tinystep
@@ -189,7 +189,7 @@ report to its developers, and wrote a test driver to reproduce it.
 %wrote a test driver to 
 
 
-\begin{table*}[ht]
+\begin{figure*}[ht]
 \begin{center}
  \fontsize{9pt}{\baselineskip}\selectfont
 \hspace*{-0.2cm}
@@ -256,23 +256,20 @@ for SGTPuzzler). The \newbugs errors found in FileBunker, ArecaBackup,
 S3dropbox, and SudokuSolver are previously  unknown. As a comparison, the
 results of the ``Requiring Wrappers'' approach (Section~\ref{sec:straightforward}),
 are shown at the far right.} }
-\end{table*}
+\end{figure*}
 
 \tinystep
 %\vspace{1mm}
 \subsection{Results}
 \label{sec:results}
 
-%Table~\ref{table:results} show the errors in
-%our subject programs, and Table~\ref{table:filters} show
-%the effect of applying each heuristic filter.
 \smallstep
 
 \vspace{-1mm}
 \subsubsection{Errors in Multithreaded GUI Applications}
 \label{sec:errors}
 
-As shown in Table~\ref{table:results}, our tool found
+As shown in Figure~\ref{table:results}, our tool found
 errors in each subject program. Using the 1-CFA
 call graph algorithm, our tool issued \warnings warnings, among
 which \bugs warnings reveal \bugs distinct errors (\newbugs were previously unknown,
@@ -435,7 +432,7 @@ error that our technique found.
 However, requiring wrappers 
 issues a huge number of warnings,
 most of which are probably false positives (see the far right column of
-Table~\ref{table:results}).
+Figure~\ref{table:results}).
 The primary reason is that this simple approach
 does not globally reason about the calling relationship between
 threads, UI-accessing methods, and safe UI methods, and thus it often incorrectly
@@ -457,7 +454,7 @@ access to be wrapped.
 \label{sec:reflectionaware}
 
 We next compare the 3 call graph construction algorithms (RTA, 0-CFA, and 1-CFA)
-used in our experiments. As shown in Table~\ref{table:results},  1-CFA found
+used in our experiments. As shown in Figure~\ref{table:results},  1-CFA found
 more errors than the other two algorithms. This
 is because RTA and 0-CFA do not consider the calling context when
 constructing a call graph:  they
@@ -487,7 +484,7 @@ The algorithm outputs the actual error path when using the more precise call gra
 
 
 
-The results in Table~\ref{table:results} also show that using the
+The results in Figure~\ref{table:results} also show that using the
 call graph construction algorithm in Section~\ref{sec:cgcon}
 helps in finding errors in Android applications. One error from the MyTracks Android application
 can only be found by using the reflection-aware call graph construction algorithm (Section~\ref{sec:cg}).
@@ -614,7 +611,7 @@ using multi-source BFS, DFS, or exhaustive search.
 
 
 
-\begin{table}[t]
+\begin{figure}[t]
 \begin{center}
  \fontsize{9pt}{\baselineskip}\selectfont
 \setlength{\tabcolsep}{.34\tabcolsep}
@@ -673,15 +670,15 @@ Other algorithms show similar patterns, which are omitted for brevity.
 Column ``$F_{i,...,j}$'' represents the number of remaining warnings after applying
 the $i$th to $j$th filters as defined in Section~\ref{sec:heuristic}.
 The numbers in the last column are the same as the subcolumn ``\#Warning"
-under column ``1-CFA'' in Table~\ref{table:results}.
+under column ``1-CFA'' in Figure~\ref{table:results}.
 } } \vspace{-2mm}
-\end{table}
+\end{figure}
 
 
 \subsubsection{Evaluating Error Filters}
 \label{sec:filters}
 
-Table~\ref{table:filters} measures the effectiveness of the
+Figure~\ref{table:filters} measures the effectiveness of the
 error filters of Section~\ref{sec:heuristic}.
 The five error filters removed 99.96\% of the reported warnings as likely false positives
 or redundant warnings. Specifically, the two sound filters 1 and 2 
