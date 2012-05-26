@@ -29,8 +29,8 @@ adopt the \textit{single-GUI-thread rule} for GUI object access:
 \newenvironment{myquotation}
                {\list{}{\listparindent=0pt%whatever you need
                         \itemindent    \listparindent
-                        \leftmargin=14pt%  whatever you need
-                        \rightmargin=14pt%whatever you need
+                        \leftmargin=10pt%  whatever you need
+                        \rightmargin=0pt%whatever you need
                         \topsep=0pt%%%%%  whatever you need
                         \parsep        \z@ \@plus\p@}%
                 \item\relax}
@@ -40,12 +40,12 @@ adopt the \textit{single-GUI-thread rule} for GUI object access:
 %\begin{myquotation}
 %this is on purpose. if not, the code in the next page will be
 %scattered into 2 pages
-\vspace{-2mm}
-\begin{quotation}
+%\vspace{-2mm}
+\begin{myquotation}
 All GUI objects, including visual components and data models, must be
  accessed exclusively from the \textit{event dispatching thread}.
-\end{quotation}
-\vspace{-2mm}
+\end{myquotation}
+%\vspace{-2mm}
 %\end{myquotation}
 
 The \textit{event dispatching thread}, also called the \textit{UI thread}, is a single
