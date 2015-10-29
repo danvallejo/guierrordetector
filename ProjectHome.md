@@ -1,0 +1,1 @@
+GUIErrorDetector is a tool to help developers to find invalid thread access errors in a GUI application.
